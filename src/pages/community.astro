@@ -1,9 +1,10 @@
 ---
-import { getEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHeader from '@/components/PageHeader.astro';
 import Section from '@/components/Section.astro';
 import SocialEmbed from '@/components/SocialEmbed.astro';
+import GallerySlideshow from '@/components/GallerySlideshow.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
 import Button from '@/components/Button.astro';
 import Icon, { type IconName } from '@/components/brand/Icon.astro';
@@ -11,6 +12,8 @@ import { site } from '@/lib/settings';
 
 const page = await getEntry('pages', 'community');
 if (!page) throw new Error('Missing content file: src/content/pages/community.md');
+
+const galleries = await getCollection('galleries');
 
 type Channel = { icon: IconName; name: string; href: string; what: string; cta: string };
 
@@ -93,7 +96,11 @@ const channels: Channel[] = ([
     </div>
   </Section>
 
-  <Section tone="base" title="Instagram" kicker="Photos">
+  <Section tone="base" title="From the Field" kicker="Photos">
+    <GallerySlideshow galleries={galleries} class="mx-auto max-w-4xl" />
+  </Section>
+
+  <Section tone="topo" title="Instagram" kicker="Latest posts">
     <SocialEmbed network="instagram" />
   </Section>
 

@@ -1,0 +1,76 @@
+---
+/**
+ * GallerySlideshow — server half of the Slideshow island.
+ *
+ * Resolves every photo through Astro's image service at build time and hands
+ * the React island finished `src`/`srcSet` strings. The island therefore
+ * ships behaviour only; no image optimization, no asset imports and no
+ * `ImageMetadata` cross the bundle boundary.
+ *
+ * Renders the shared mascot empty state when there are no photos yet, so the
+ * section is safe to place on a page before the photography exists.
+ */
+import { getImage } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import Slideshow, { type Slide } from './Slideshow.tsx';
+import MascotCallout from './MascotCallout.astro';
+import { resolveImage } from '@/lib/images';
+
+interface Props {
+  galleries: CollectionEntry<'galleries'>[];
+  /** Advance automatically. Off by default; ignored under reduced-motion. */
+  autoplayMs?: number;
+  emptyTitle?: string;
+  emptyBody?: string;
+  class?: string;
+}
+
+const {
+  galleries,
+  autoplayMs,
+  emptyTitle = 'No photos up yet',
+  emptyBody = "Somebody always forgets to bring a camera. When shots from the last event land, they show up here.",
+  class: className = '',
+} = Astro.props;
+
+const photos = galleries
+  .sort((a, b) => a.data.order - b.data.order)
+  .flatMap((gallery) =>
+    gallery.data.photos.map((photo) => ({ ...photo, galleryTitle: gallery.data.title }))
+  );
+
+const resolved = await Promise.all(
+    photos.map(async (photo) => {
+      const asset = await resolveImage(photo.image);
+      if (!asset) return null;
+
+      const optimized = await getImage({
+        src: asset,
+        widths: [480, 768, 1200],
+        format: 'webp',
+      });
+
+      const slide: Slide = {
+        src: optimized.src,
+        srcSet: optimized.srcSet.attribute || undefined,
+        width: Number(optimized.attributes.width ?? asset.width),
+        height: Number(optimized.attributes.height ?? asset.height),
+        alt: photo.alt,
+        caption: photo.caption ?? photo.galleryTitle,
+      };
+      return slide;
+    })
+);
+
+// flatMap narrows without a type predicate, which TS won't accept against an
+// already-annotated element type.
+const slides: Slide[] = resolved.flatMap((slide) => (slide ? [slide] : []));
+---
+
+{
+  slides.length > 0 ? (
+    <Slideshow client:visible slides={slides} autoplayMs={autoplayMs} className={className} />
+  ) : (
+    <MascotCallout as="h3" title={emptyTitle} body={emptyBody} class={className} />
+  )
+}

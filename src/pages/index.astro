@@ -11,7 +11,7 @@ import NewsletterBlock from '@/components/NewsletterBlock.astro';
 import SponsorMarquee from '@/components/SponsorMarquee.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
 import Button from '@/components/Button.astro';
-import Countdown from '@/components/Countdown.svelte';
+import Countdown from '@/components/Countdown.astro';
 import Icon from '@/components/brand/Icon.astro';
 import { site } from '@/lib/settings';
 import { getEvents } from '@/lib/events';
@@ -107,7 +107,7 @@ const eventSchema = next
                 </time>
               </p>
               {/* The only always-ticking island on the page (§4). */}
-              <Countdown client:load target={next.data.startDate.toISOString()} />
+              <Countdown target={next.data.startDate} />
             </div>
 
             <div class="mt-7 flex flex-wrap gap-3">

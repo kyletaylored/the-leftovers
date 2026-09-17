@@ -319,6 +319,42 @@ content:
           - { name: noindex, label: Hide from search engines, type: boolean, default: false }
       - { name: body, label: Body, type: rich-text }
 
+  # -- Galleries ------------------------------------------------------------
+  - name: galleries
+    label: Photo galleries
+    description: >-
+      Feeds the slideshow on the Community page. One entry per set — an event,
+      a season, a jersey drop. Every photo needs alt text.
+    type: collection
+    path: src/content/galleries
+    filename: '{fields.title}.yml'
+    format: yaml
+    view:
+      fields: [title, order]
+      primary: title
+      sort: [order, title]
+    fields:
+      - { name: title, label: Gallery title, type: string, required: true }
+      - name: event
+        label: Event (optional)
+        type: reference
+        options: { collection: events, value: '{filename}', label: '{fields.title}' }
+      - { name: order, label: Sort order, type: number, default: 1 }
+      - name: photos
+        label: Photos
+        type: object
+        list: true
+        fields:
+          - { name: image, label: Photo, type: image, options: { media: images }, required: true }
+          - name: alt
+            label: Alt text
+            type: string
+            required: true
+            description: >-
+              Describe what's happening in the shot. Read aloud to blind
+              visitors and indexed by image search.
+          - { name: caption, label: Caption (optional), type: string }
+
   # -- FAQs -----------------------------------------------------------------
   - name: faqs
     label: FAQs

@@ -151,6 +151,32 @@ const pagesCollection = defineCollection({
   }),
 });
 
+/**
+ * Photo galleries — one file per set (an event, a season, a jersey drop).
+ * Feeds the Slideshow component. Not in PRD §6: added because a free-agent
+ * team's best recruiting asset is photos of people playing, and §7's gallery
+ * component needed somewhere to get them from.
+ */
+const galleries = defineCollection({
+  loader: glob({ base: './src/content/galleries', pattern: '**/*.{yml,yaml}' }),
+  schema: z.object({
+    title: z.string(),
+    /** Optional link back to the event these were shot at. */
+    event: reference('events').optional(),
+    order: z.number().default(100),
+    photos: z
+      .array(
+        z.object({
+          image: imagePath,
+          /** Required, as everywhere else an image appears (§6). */
+          alt: z.string(),
+          caption: z.string().optional(),
+        })
+      )
+      .default([]),
+  }),
+});
+
 const faqs = defineCollection({
   loader: file('./src/content/faqs.yml'),
   schema: z.object({
@@ -168,5 +194,6 @@ export const collections = {
   sponsors,
   products,
   pages: pagesCollection,
+  galleries,
   faqs,
 };

@@ -25,7 +25,7 @@ const imageAsset = await resolveImage(image);
 const badge = {
   'pre-order': { label: 'Pre-Order', classes: 'bg-gold text-ink' },
   available: { label: 'Available', classes: 'bg-forest-600 text-bone' },
-  'sold-out': { label: 'Sold Out', classes: 'bg-ink-700 text-bone-muted' },
+  'sold-out': { label: 'Sold Out', classes: 'bg-crimson text-bone' },
 }[status];
 
 const soldOut = status === 'sold-out';

@@ -1,0 +1,31 @@
+---
+/**
+ * Countdown — server half of the countdown island.
+ *
+ * Its whole job is to compute `initialRemaining` at build time and hand it to
+ * the React island, so the island's first client render matches the server
+ * HTML byte for byte. Without this, React throws a hydration mismatch
+ * (#418) on every page with a countdown, because SSR happens at build time
+ * and hydration happens whenever someone loads the page.
+ *
+ * `client:visible` rather than `client:load`: a countdown nobody has scrolled
+ * to yet doesn't need React on the critical path.
+ */
+import CountdownIsland from './CountdownIsland.tsx';
+
+interface Props {
+  /** The target instant. */
+  target: Date;
+  passedLabel?: string;
+}
+
+const { target, passedLabel } = Astro.props;
+const initialRemaining = Math.max(0, target.getTime() - Date.now());
+---
+
+<CountdownIsland
+  client:visible
+  target={target.toISOString()}
+  initialRemaining={initialRemaining}
+  passedLabel={passedLabel}
+/>

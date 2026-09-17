@@ -1,7 +1,7 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
-import svelte from '@astrojs/svelte';
+import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 
 /**
@@ -23,7 +23,7 @@ export default defineConfig({
   // trailingSlash: 'never' exactly — canonical URLs and the served paths are
   // then the same string, with no redirect hop for a crawler to follow.
   build: { format: 'file' },
-  integrations: [sitemap(), svelte()],
+  integrations: [sitemap(), react()],
   vite: { plugins: [tailwindcss()] },
   image: {
     // Brand motifs are SVG; only photography goes through the image service.

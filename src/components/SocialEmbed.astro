@@ -3,8 +3,13 @@
  * SocialEmbed — wraps whichever third-party widget script §8.3 settles on.
  *
  * Three realities this component encodes, so no page has to re-learn them:
- *  - Facebook GROUPS cannot be embedded at all. The only honest treatment is
- *    a link-out button, so `facebook` renders exactly that (§8.3, §13).
+ *  - Facebook: §8.3 ruled out an embedded feed because the team was assumed
+ *    to run a GROUP, and Groups cannot be embedded by anyone. The team's
+ *    presence is actually a PAGE (facebook.com/leftoverspb), and Meta's Page
+ *    Plugin does embed Pages — so this renders the real feed when
+ *    `facebookPagePlugin.enabled` is set, and the link-out card otherwise.
+ *    It defaults to OFF because the plugin loads Meta's SDK and sets
+ *    cookies, which would contradict the footer's "no trackers" claim.
  *  - Instagram has no casual live-feed API, so a grid needs a third-party
  *    aggregator's script. Until one is configured in site settings, this
  *    renders the link-out fallback instead of an empty hole.
@@ -28,6 +33,7 @@ const { network, title, class: className = '' } = Astro.props;
 const widget = site.instagramWidget;
 const instagramReady = Boolean(widget.scriptSrc && widget.elementClass);
 const discordReady = Boolean(site.discordServerId);
+const facebookReady = Boolean(site.facebookPagePlugin.enabled && site.facebookPagePlugin.pageUrl);
 ---
 
 <div class:list={[className]}>
@@ -77,18 +83,42 @@ const discordReady = Boolean(site.discordServerId);
   }
 
   {
-    network === 'facebook' && (
-      /* Meta's Page Plugin only supports public Pages, never Groups — there
-         is no embeddable group feed to build against (§8.3). */
-      <MascotCallout
-        as="h3"
-        title="The Facebook group"
-        body="Facebook doesn't let anyone embed group posts, so this one is a door rather than a window. The group is where photos and post-tournament arguing live."
-      >
-        <Button href={site.social.facebookGroup} external size="sm" variant="outline">
-          Join the Facebook group
-        </Button>
-      </MascotCallout>
-    )
+    network === 'facebook' &&
+      (facebookReady ? (
+        <>
+          <div
+            class="fb-page w-full"
+            data-href={site.facebookPagePlugin.pageUrl}
+            data-tabs="timeline"
+            data-width="500"
+            data-height="640"
+            data-small-header="false"
+            data-adapt-container-width="true"
+            data-hide-cover="false"
+            data-show-facepile="true"
+          >
+            <blockquote cite={site.facebookPagePlugin.pageUrl} class="fb-xfbml-parse-ignore">
+              <a href={site.facebookPagePlugin.pageUrl} rel="noopener">The Leftovers on Facebook</a>
+            </blockquote>
+          </div>
+          <script
+            is:inline
+            async
+            defer
+            crossorigin="anonymous"
+            src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v21.0"
+          />
+        </>
+      ) : (
+        <MascotCallout
+          as="h3"
+          title="The Facebook page"
+          body="Photo dumps, post-tournament arguing and local field chatter. The embedded feed is switched off so the site stays cookie-free — this is the door to it."
+        >
+          <Button href={site.social.facebookGroup} external size="sm" variant="outline">
+            Follow The Leftovers on Facebook
+          </Button>
+        </MascotCallout>
+      ))
   }
 </div>

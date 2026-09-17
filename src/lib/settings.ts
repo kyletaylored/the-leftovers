@@ -31,6 +31,12 @@ const settingsSchema = z.object({
     email: z.string(),
   }),
   discordServerId: z.string().default(''),
+  facebookPagePlugin: z
+    .object({
+      enabled: z.boolean().default(false),
+      pageUrl: z.string().default(''),
+    })
+    .prefault({}),
   instagramWidget: z
     .object({
       provider: z.string().default(''),

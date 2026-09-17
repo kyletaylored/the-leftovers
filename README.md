@@ -71,27 +71,59 @@ than code:
 |---|---|
 | Framework | [Astro](https://astro.build) 7 — static output, zero JS by default |
 | Styling | Tailwind CSS 4 (`@theme` tokens in `src/styles/global.css`) |
-| Islands | Svelte 5, used for exactly two components (see below) |
+| Islands | **React 19 + shadcn/ui**, used for three components (see below) |
 | Content | Astro content collections — Markdown/YAML in `src/content` |
 | CMS | [Pages CMS](https://pagescms.org) — config in `.pages.yml` |
 | Fonts | Astro's font API, self-hosted and subset (Anton, Inter, Permanent Marker) |
 | Hosting | **GitHub Pages** today (`.github/workflows/deploy.yml`); Cloudflare Pages config is committed and ready |
 
-### Why only two islands
+### Islands, and what they cost
 
 Astro ships no JavaScript unless a component asks for it, so the framework
-choice only matters for the handful of things that genuinely need state:
+choice only matters for the few things that genuinely need state:
 
-- **`Countdown.svelte`** — ticks down to the next event. Server-rendered with
-  correct values first, so it is never blank and never shifts layout.
-- **`StatLeaderboardTable.svelte`** — sortable/filterable career stats. Also
-  server-rendered as a complete `<table>`: with JS blocked it is still a
-  perfectly usable stats table, and sorting is the enhancement.
+- **`CountdownIsland.tsx`** — ticks down to the next event. Wrapped by
+  `Countdown.astro`, which computes the first value at build time so
+  hydration matches the server HTML exactly (see the comment in the island;
+  getting this wrong throws React hydration error #418 on every page).
+- **`StatLeaderboardTable.tsx`** — sortable/filterable career stats,
+  server-rendered as a complete `<table>`. With JS blocked it is still a
+  perfectly usable stats table; sorting is the enhancement.
+- **`Slideshow.tsx`** — photo carousel on shadcn/ui's Carousel (Embla).
+  `GallerySlideshow.astro` optimizes every image at build time and passes
+  finished `src`/`srcSet` strings, so no image pipeline reaches the client.
 
-Everything else is plain Astro or CSS. The mobile nav is ~30 lines of vanilla
-JS, the FAQ accordion is native `<details>`, and the sponsor marquee is a CSS
-animation. Total JS shipped: **~47 KB uncompressed / ~17 KB gzipped**, almost
-all of it the Svelte runtime.
+Everything else is plain Astro or CSS: the mobile nav is ~30 lines of vanilla
+JS, the FAQ accordion is native `<details>`, the sponsor marquee is a CSS
+animation, and the Hero video variant is declarative.
+
+**Every island is `client:visible`.** That's what keeps React off the
+critical path — nothing downloads until you scroll to it, which is why the
+scores below held at 100 after the migration (LCP actually improved, because
+the homepage countdown stopped loading eagerly).
+
+React is a deliberate departure from PRD §4, which specified Svelte and said
+to avoid a full framework "unless a specific feature later demands it". The
+team chose React + shadcn for tooling and maintainability reasons. The
+measured cost, honestly:
+
+| | Svelte 5 | React 19 |
+|---|---|---|
+| Client runtime | 40 KB raw / **15 KB gz** | 213 KB raw / **66 KB gz** |
+| Total JS in `dist` | 47 KB raw / 17 KB gz | 280 KB raw / 90 KB gz |
+| Transferred on a page you scroll through | ~17 KB gz | ~70 KB gz |
+| Lighthouse mobile | 100 | 100 |
+
+So ~4x the JavaScript for anyone who reaches an island, absorbed by
+`client:visible` plus a text LCP element. It doesn't show up in the scores;
+it would start to matter if islands ever move above the fold or multiply.
+
+shadcn components are wired to the brand rather than shipping their own
+palette: every shadcn token (`--background`, `--primary`, `--ring`, …) is
+defined in terms of a brand token in `global.css`, so anything added from the
+registry lands on-brand. Note `--primary` is the *fill* crimson and no
+crimson resolves to a foreground token — the locked crimson fails AA as text
+(2.18:1), per the contrast table below.
 
 ---
 

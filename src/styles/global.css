@@ -39,6 +39,76 @@
   --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ------------------------------------------------------------------ *
+ * shadcn/ui token bridge.
+ *
+ * shadcn components are written against semantic tokens (`bg-background`,
+ * `text-muted-foreground`, `border-border`, `ring-ring`, …). Rather than
+ * ship shadcn's default neutral palette alongside ours — two competing
+ * colour systems in one stylesheet — every one of its tokens is defined in
+ * terms of a brand token above. Anything pulled in from shadcn therefore
+ * lands on-brand with no per-component overriding.
+ *
+ * Note which crimson is used where: `--primary` is the FILL crimson and
+ * `--destructive` reuses it, while text-weight roles resolve to bone/gold.
+ * The locked crimson fails AA as text (2.18:1 on ink), so it must never end
+ * up as a foreground token. See §10.4 and the contrast table in the README.
+ * ------------------------------------------------------------------ */
+:root {
+  --radius: 0.125rem; /* the brand is square-ish; shadcn defaults to 0.5rem */
+
+  --background: var(--color-ink);
+  --foreground: var(--color-bone);
+
+  --card: var(--color-ink-800);
+  --card-foreground: var(--color-bone);
+  --popover: var(--color-ink-800);
+  --popover-foreground: var(--color-bone);
+
+  --primary: var(--color-crimson);
+  --primary-foreground: var(--color-bone);
+  --secondary: var(--color-ink-700);
+  --secondary-foreground: var(--color-bone);
+
+  --muted: var(--color-ink-700);
+  --muted-foreground: var(--color-bone-muted);
+  --accent: var(--color-gold);
+  --accent-foreground: var(--color-ink);
+
+  --destructive: var(--color-crimson);
+  --destructive-foreground: var(--color-bone);
+
+  --border: var(--color-ink-600);
+  --input: var(--color-ink-600);
+  --ring: var(--color-gold);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 6px);
+}
+
 @layer base {
   :root {
     color-scheme: dark;

@@ -37,6 +37,18 @@ and unused. The real cost is that **the strict CSP and security headers in
 `public/_headers` are not active**, since that's a Cloudflare feature. Switch
 path in [DEPLOY.md](DEPLOY.md).
 
+**Deviation — UI framework.** §4 specifies Svelte for islands and says to
+avoid React "unless a specific feature later demands it". The team chose
+**React 19 + shadcn/ui** for tooling and maintainability (shadcn registry
+access). Measured cost: the client runtime goes from 15 KB gzipped to 66 KB,
+and total JS from 17 KB to 90 KB. Every island is `client:visible`, so
+nothing loads until scrolled to and the mobile scores held at 100 — LCP
+improved to 1.5s because the homepage countdown stopped loading eagerly. The
+tradeoff would start to bite if an island ever moves above the fold.
+
+shadcn ships no second palette: its tokens are redefined in terms of brand
+tokens in `global.css`, so registry components land on-brand.
+
 **Deviation — analytics.** Cloudflare Web Analytics is a Cloudflare-only
 feature, so nothing is wired up. No tracking script is committed, which keeps
 the footer's "no trackers, no cookies" claim true.
@@ -47,14 +59,16 @@ Svelte is in the stack for exactly two components, which is what §4 asks for:
 
 | Interactive thing | How it's built | JS cost |
 |---|---|---|
-| Sortable/filterable stat table | Svelte island, SSR'd as a full `<table>` first | ~4.8 KB + runtime |
-| Event countdown | Svelte island, SSR'd with correct values | ~1.4 KB + runtime |
+| Sortable/filterable stat table | React island, SSR'd as a full `<table>` first | ~5 KB + runtime |
+| Event countdown | React island, SSR'd via an Astro wrapper that pins the first value | ~1.3 KB + runtime |
+| Photo slideshow | React island on shadcn/ui Carousel (Embla) | ~24 KB + runtime |
 | Mobile nav toggle | ~30 lines of vanilla JS | negligible |
 | FAQ accordion | Native `<details>` | **0** |
 | Sponsor marquee | CSS animation | **0** |
 | Hero video variant | Declarative `<video autoplay muted>` | **0** |
 
-Total: ~47 KB raw / ~17 KB gzipped, nearly all the Svelte runtime.
+Total: ~280 KB raw / ~90 KB gzipped, nearly all the React runtime. All three
+are `client:visible`.
 
 ## §5 Site map
 
@@ -243,8 +257,8 @@ broken; all of it is a fidelity choice someone should make on purpose.
 
 | # | Sheet | Built | Notes |
 |---|---|---|---|
-| 1 | **Sold-out badge is crimson filled** | Grey (`ink-700` + muted text) | One-line fix. Grey reads as "inactive", crimson as "gone" — the sheet's call is probably better |
-| 2 | **Leading stat row is SOLID gold with dark text** | 12% gold tint + inset gold bar | §7 only says "gold highlight on top row", so mine satisfies the PRD but undersells the sheet. Solid gold needs the row's text switched to `ink` to hold contrast |
+| 1 | **Sold-out badge is crimson filled** | **Now matches** — crimson fill, bone text | Grey read as "inactive"; crimson reads as "gone" |
+| 2 | **Leading stat row is SOLID gold with dark text** | **Now matches** — solid gold, ink text | Done while porting the table to React. The ribbed gold numeral would vanish on a gold row, so the leader's jersey number renders as flat ink digits |
 | 3 | **Tertiary / text-link button** (gold, underlined) | Not built | No consumer yet |
 | 4 | **Disabled button state** (grey) | Not built | No consumer yet — nothing on the site disables a button |
 | 5 | **Event date badge includes day-of-week** ("SAT" above "SEP 20") | Month + day only | `dayOfWeek()` already exists in `lib/format.ts`, unused |
@@ -277,3 +291,16 @@ The brand guide and `homepage-1` drove the build. I did not review
 added to the README — which is why these deltas surfaced late rather than
 being decided up front. Nothing here contradicts the PRD; it's fidelity
 against a sheet that is more specific than the spec it accompanies.
+
+---
+
+## Additions beyond the PRD
+
+Things now in the repo that §6/§7 don't mention, and why.
+
+| Addition | Why |
+|---|---|
+| `galleries` collection + `Slideshow` | A free-agent team's best recruiting asset is photos of people playing. §7 has a masonry gallery but no carousel, and the team asked for one. `GallerySlideshow.astro` renders the shared mascot empty state until photos exist, so it's safe to ship before the photography |
+| `faqs` collection | Feeds the About accordion and the `FAQPage` structured data in §10.3 |
+| Facebook **Page** embed | §8.3 ruled out an embedded feed on the assumption the team ran a *Group*, which genuinely cannot be embedded. The team's presence is a **Page** (`facebook.com/leftoverspb`), and Meta's Page Plugin does embed Pages. Wired behind `facebookPagePlugin.enabled`, **off by default**: the plugin loads Meta's SDK and sets cookies, which would make the footer's "no trackers, no cookies" line untrue. Turning it on means changing that copy and allowlisting `facebook.net`/`facebook.com` in `_headers` |
+| shadcn token bridge | Keeps one colour system instead of two (see the §4 deviation) |

@@ -33,13 +33,28 @@ primaryCta:
   label: Join the Team
   href: /roster#open-slots
 
+# The handle is `leftoverspb` nearly everywhere.
+#
+# Note `facebook` is a PAGE (facebook.com/leftoverspb), not a Group
+# (facebook.com/groups/...). That matters: PRD §8.3 ruled out embedding a
+# feed because Groups can't be embedded by anyone — but Meta's Page Plugin
+# CAN embed a Page. See `facebookPagePlugin` below.
 social:
-  instagram: https://www.instagram.com/
-  facebookGroup: https://www.facebook.com/groups/
+  instagram: https://www.instagram.com/leftoverspb/
+  facebookGroup: https://www.facebook.com/leftoverspb
   discord: https://discord.gg/
-  youtube: https://www.youtube.com/
-  tiktok: https://www.tiktok.com/
-  email: team@theleftovers.gg
+  youtube: https://www.youtube.com/@leftoverspb
+  tiktok: https://www.tiktok.com/@leftoverspb
+  email: team@theleftoverspb.com
+
+# Meta's Page Plugin can embed a public Page's feed, unlike a Group. It is
+# OFF by default on purpose: the plugin loads Meta's SDK, which sets cookies
+# and would make the footer's "no trackers, no cookies" line untrue. Turn it
+# on only alongside changing that copy — and allowlist facebook.net /
+# facebook.com in public/_headers.
+facebookPagePlugin:
+  enabled: false
+  pageUrl: https://www.facebook.com/leftoverspb
 
 # Discord's official, free server widget (§8.3). Put the numeric server ID
 # here to render the live member count block on /community.

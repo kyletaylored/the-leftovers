@@ -7,7 +7,7 @@ import ProductCard from '@/components/ProductCard.astro';
 import ThreeColumn from '@/components/ThreeColumn.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
 import Button from '@/components/Button.astro';
-import Countdown from '@/components/Countdown.svelte';
+import Countdown from '@/components/Countdown.astro';
 import Prose from '@/components/Prose.astro';
 import { site } from '@/lib/settings';
 
@@ -81,8 +81,7 @@ const howPreordersWork = [
               </p>
             </div>
             <Countdown
-              client:visible
-              target={closingSoon.data.preorderCloses.toISOString()}
+              target={closingSoon.data.preorderCloses}
               passedLabel="This batch has closed"
             />
           </div>
