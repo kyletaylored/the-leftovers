@@ -1,5 +1,5 @@
 import { load as parseYaml } from 'js-yaml';
-import { z } from 'astro:content';
+import * as z from 'astro/zod';
 // `?raw` inlines the file at build time. Reading it with fs at runtime would
 // work in dev and then fail in the prerender step, where the YAML isn't
 // copied next to the bundled module.
@@ -40,7 +40,7 @@ const settingsSchema = z.object({
     .prefault({}),
   mailingList: z.object({
     provider: z.string(),
-    formAction: z.string().url(),
+    formAction: z.url(),
     emailFieldName: z.string().default('email'),
     hiddenFields: z.record(z.string(), z.string()).default({}),
   }),

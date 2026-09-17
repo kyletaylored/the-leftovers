@@ -4,8 +4,17 @@ import sitemap from '@astrojs/sitemap';
 import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
 
-// Update this once the domain decision in the PRD (§13) is made.
-export const SITE = 'https://theleftovers.pages.dev';
+/**
+ * The single source of truth for the site's public origin. Canonical URLs,
+ * sitemap.xml, robots.txt and the Open Graph tags all derive from it, so
+ * moving hosts is this one line.
+ *
+ * The custom domain (PRD §13's open question, now settled) serves from the
+ * root, which is what keeps GitHub Pages viable without a `base` path — a
+ * project page at /the-leftovers/ would require prefixing every internal
+ * link and asset URL.
+ */
+export const SITE = 'https://theleftoverspb.com';
 
 export default defineConfig({
   site: SITE,

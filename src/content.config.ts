@@ -1,4 +1,5 @@
-import { defineCollection, reference, z } from 'astro:content';
+import { defineCollection, reference } from 'astro:content';
+import * as z from 'astro/zod';
 import { glob, file } from 'astro/loaders';
 
 /* -------------------------------------------------------------------------
@@ -17,9 +18,9 @@ const imagePath = z.string().describe('Repo path, e.g. /src/assets/img/players/2
 
 const socials = z
   .object({
-    instagram: z.string().url().optional(),
-    tiktok: z.string().url().optional(),
-    youtube: z.string().url().optional(),
+    instagram: z.url().optional(),
+    tiktok: z.url().optional(),
+    youtube: z.url().optional(),
     discord: z.string().optional(),
   })
   .prefault({});
@@ -64,9 +65,9 @@ const events = defineCollection({
     location: z.object({
       venue: z.string(),
       city: z.string(),
-      mapUrl: z.string().url().optional(),
+      mapUrl: z.url().optional(),
     }),
-    registrationUrl: z.string().url().optional(),
+    registrationUrl: z.url().optional(),
     /**
      * Optional manual override. Left empty, upcoming/past is DERIVED from the
      * date so the site can never show a stale "upcoming" event just because
@@ -116,7 +117,7 @@ const sponsors = defineCollection({
     name: z.string(),
     logo: imagePath.optional(),
     logoAlt: z.string(),
-    url: z.string().url().optional(),
+    url: z.url().optional(),
     tier: z.enum(['title', 'gold', 'supporting']).default('supporting'),
   }),
 });
@@ -131,7 +132,7 @@ const products = defineCollection({
     price: z.number().nonnegative(),
     currency: z.string().default('USD'),
     /** Bonfire / Fourthwall campaign URL. The site never takes payment (§8.2). */
-    buyUrl: z.string().url(),
+    buyUrl: z.url(),
     status: z.enum(['available', 'pre-order', 'sold-out']).default('available'),
     /** Pre-order batch close date, shown as a countdown on the shop page. */
     preorderCloses: z.coerce.date().optional(),

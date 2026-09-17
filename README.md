@@ -3,6 +3,8 @@
 Static site for **The Leftovers**, a semi-professional, community-run paintball
 team with a rotating free-agent roster.
 
+Live at **[theleftoverspb.com](https://theleftoverspb.com)**.
+
 Built against `_reference/the-leftovers-website-PRD.md` and the brand style
 guide alongside it. Note that `_reference/` is gitignored, so those files are
 local-only — section references below (§4, §8.1, §10.2 and so on) point into
@@ -28,7 +30,7 @@ monthly bill or a database to keep alive.
 | Content | Astro content collections — Markdown/YAML in `src/content` |
 | CMS | [Pages CMS](https://pagescms.org) — config in `.pages.yml` |
 | Fonts | Astro's font API, self-hosted and subset (Anton, Inter, Permanent Marker) |
-| Hosting | Cloudflare Pages (`wrangler.toml`, `public/_headers`, `public/_redirects`) |
+| Hosting | **GitHub Pages** today (`.github/workflows/deploy.yml`); Cloudflare Pages config is committed and ready |
 
 ### Why only two islands
 
@@ -118,8 +120,14 @@ scripts/make-og-default.mjs  Generates the social card
 - Editing content (for the team, no code required): **[docs/EDITING.md](docs/EDITING.md)**
 - First-time CMS + hosting setup: **[docs/DEPLOY.md](docs/DEPLOY.md)**
 
-Day to day: a save in Pages CMS is a commit to `main`, which is an automatic
-Cloudflare Pages build and deploy. There is no manual deploy step.
+Day to day: a save in Pages CMS is a commit to `main`, which triggers
+`.github/workflows/deploy.yml` and is live in a couple of minutes. There is no
+manual deploy step.
+
+The workflow runs `npm run build`, which is `astro check && astro build` — a
+type error or a content file that doesn't match its schema fails the build
+rather than deploying a broken page, and a failed build leaves the live site
+serving the last good version.
 
 ---
 
@@ -172,15 +180,17 @@ label does.
 
 These are decisions for the team, not code gaps:
 
-1. **Domain & DNS.** `site` in `astro.config.mjs` is currently the
-   `*.pages.dev` placeholder. Canonical URLs, the sitemap, `robots.txt` and the
-   OG tags all read from it, so changing that one line moves everything.
+1. **Security headers are not active yet.** `public/_headers` carries the
+   strict CSP and the security headers, but those are a *Cloudflare Pages*
+   feature — GitHub Pages ignores the file entirely. They start working the
+   day the site moves to Cloudflare Pages (see
+   [docs/DEPLOY.md](docs/DEPLOY.md)); there's nothing to change in the repo.
 2. **Discord server ID** — set `discordServerId` in `src/data/site.yml` to swap
    the Community page's link-out card for Discord's live widget.
 3. **Instagram widget** — pick a provider free tier and fill in
    `instagramWidget`. Until then the page shows a link-out card rather than a
-   hole. Remember to allowlist the script's origin in `public/_headers`, which
-   has a strict CSP.
+   hole. Allowlist the script's origin in `public/_headers` at the same time,
+   so it doesn't break the moment the site moves to Cloudflare Pages.
 4. **Mailing list** — `mailingList.formAction` points at a placeholder
    Buttondown endpoint. Swap in the real one.
 5. **Who owns content edits** day to day. The tooling is done; the owner isn't

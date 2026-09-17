@@ -1,0 +1,96 @@
+# Build and deploy to GitHub Pages.
+#
+# GitHub Pages is the PRD's documented fallback host (§4.1). It's free and it
+# serves this site fine, with two caveats worth knowing:
+#
+#   1. `public/_headers` and `public/_redirects` are Cloudflare Pages features
+#      and do NOTHING here. That means the strict Content Security Policy and
+#      the security headers are not active on GitHub Pages. They ship in the
+#      repo ready for the move to Cloudflare Pages, which is the reason §4.1
+#      recommends it.
+#   2. There are no per-PR preview deployments. This workflow builds on PRs to
+#      catch breakage, but only `main` deploys.
+#
+# Every push to main — including a content save from Pages CMS, which commits
+# straight to main — rebuilds and deploys. That's the §11 editorial workflow:
+# a save is a commit is a deploy, with no manual step.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Lets you re-deploy the current main without pushing an empty commit.
+  workflow_dispatch:
+
+# Read the repo; mint an id-token for the Pages deployment.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race. `cancel-in-progress: false` matters here: a
+# content editor can easily save twice in a minute, and cancelling the
+# in-flight deploy would leave the site mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `npm ci` respects the lockfile exactly, so a deploy can't pick up a
+      # different dependency version than the one that was tested.
+      - name: Install dependencies
+        run: npm ci
+
+      # `npm run build` is `astro check && astro build`: a type error or a
+      # content file that doesn't match its schema fails here rather than
+      # deploying a broken page. A failed build leaves the live site alone.
+      - name: Build
+        run: npm run build
+
+      # Jekyll is applied to GitHub Pages output by default and skips paths
+      # beginning with an underscore — which would silently drop Astro's
+      # entire `_astro/` directory (all CSS, JS and fonts). `public/.nojekyll`
+      # is committed; this is belt-and-braces in case it's ever removed.
+      - name: Disable Jekyll processing
+        run: touch dist/.nojekyll
+
+      # The custom domain must be present in the published output or GitHub
+      # unsets it on each deploy. `public/CNAME` is committed, so this only
+      # verifies it survived the build rather than writing it.
+      - name: Verify CNAME
+        run: |
+          test -f dist/CNAME || { echo "::error::dist/CNAME missing — public/CNAME should be copied by the build"; exit 1; }
+          echo "CNAME: $(cat dist/CNAME)"
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy
+    # Pull requests build but don't publish.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

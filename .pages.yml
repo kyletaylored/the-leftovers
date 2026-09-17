@@ -407,7 +407,3 @@ content:
           - { name: bonfireUrl, label: Bonfire store URL, type: string }
           - { name: alwaysOpenUrl, label: 'Always-open store URL', type: string }
       - { name: footerNote, label: Footer note, type: text, required: true }
-
-settings:
-  content:
-    merge: true
