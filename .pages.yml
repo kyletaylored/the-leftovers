@@ -355,7 +355,6 @@ content:
         description: >-
           The deadline. Drives the countdown and closes the form automatically
           — you don't need to come back and switch it off.
-      - { name: opensAt, label: Orders open, type: date }
       - { name: price, label: Price per jersey, type: number, required: true }
       - { name: currency, label: Currency, type: string, default: USD }
       - { name: priceNote, label: Price note, type: string, description: 'e.g. "shipped anywhere in the US"' }
@@ -374,6 +373,17 @@ content:
         type: string
         list: true
         required: true
+        description: >-
+          ⚠️ These must match the linked Google Form's size options EXACTLY
+          ("Large", not "L"). Google discards a multiple-choice answer it
+          doesn't recognise, and it does so silently.
+      - name: deliveryOptions
+        label: Delivery options
+        type: string
+        list: true
+        description: >-
+          ⚠️ Must match the Google Form's delivery options exactly, for the
+          same reason as Sizes above. Leave empty to hide the question.
       - name: customisation
         label: Per-jersey customisation
         type: object

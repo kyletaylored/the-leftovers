@@ -12,7 +12,12 @@ variants:
   - name: V2
     description: Full ruyi-cloud print with lantern detailing.
     imageAlt: The Leftovers V2 jersey in pink with full cloud print
-sizes: [YS, YM, YL, S, M, L, XL, 2XL, 3XL]
+# These strings must match the Google Form's options exactly.
+# Note the form offers no youth sizes.
+sizes: [Small, Medium, Large, X-Large, 2XL, 3XL]
+deliveryOptions:
+  - Ship to my address
+  - Pick up at the team field
 customisation:
   nameOnBack: true
   numberOnBack: true

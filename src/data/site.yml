@@ -97,14 +97,27 @@ shop:
 # To post automatically, set `endpoint` and (for a Google Form)
 # provider: google-form plus the googleFormFields map below.
 preorderForm:
-  provider: ''
-  endpoint: ''
-  # Cloudflare Turnstile. Only real protection once the endpoint verifies the
-  # token server-side — a site key alone is decoration.
+  provider: google-form
+  endpoint: https://docs.google.com/forms/d/e/1FAIpQLSfLHwT4Z3KBbdlC9PiD1aLS3VmOV6artoKhnygFCFRjWOxFLw/formResponse
+  # Cloudflare Turnstile can't be verified by a Google Form (nothing runs
+  # server-side), so leave this empty until the endpoint is a real function.
   turnstileSiteKey: ''
-  # Google Forms only: our field name -> Google's entry.NNN id.
-  # docs/PREORDERS.md explains how to read these off a prefill link.
-  googleFormFields: {}
+  # Our field name -> the form's entry id. Read off the live form's own
+  # definition rather than guessed. Every one is OPTIONAL on the form, so a
+  # blank value can't cause a silent rejection.
+  #
+  # The form is shaped one-jersey-per-response, so a multi-jersey order sends
+  # one response PER JERSEY — which is what you want for a print list anyway.
+  googleFormFields:
+    fullName: entry.1131801463
+    email: entry.290171208
+    phone: entry.594193250
+    size: entry.464995239
+    wantsCustomName: entry.1643166177
+    nameOnBack: entry.1188798159
+    numberOnBack: entry.2064202525
+    delivery: entry.941658169
+    address: entry.1692716281
 
 footerNote: >-
   Free agents welcome. Show up, pay your entry, play the tournament —

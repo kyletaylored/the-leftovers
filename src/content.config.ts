@@ -163,7 +163,6 @@ const preorders = defineCollection({
     /** Short line under the title, e.g. "Breast Cancer Awareness drop". */
     eyebrow: z.string().optional(),
     status: z.enum(['draft', 'open', 'closed', 'fulfilled']).default('draft'),
-    opensAt: z.coerce.date().optional(),
     /** The order deadline. Drives the countdown and auto-closes the form. */
     closesAt: z.coerce.date(),
 
@@ -184,7 +183,15 @@ const preorders = defineCollection({
       )
       .min(1),
 
+    /**
+     * Size labels must match the backing Google Form's option strings
+     * EXACTLY — a multiple-choice answer Google doesn't recognise is
+     * discarded. See docs/PREORDERS.md.
+     */
     sizes: z.array(z.string()).min(1),
+
+    /** Ship vs collect. Labels must likewise match the form's options. */
+    deliveryOptions: z.array(z.string()).default([]),
 
     /** Which per-jersey fields the order form should collect. */
     customisation: z

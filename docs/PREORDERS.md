@@ -75,6 +75,58 @@ numbers and a total, in the same format every time.
 will drop off between the review screen and their mail client. If that starts
 costing real orders, that's the signal to move to a tier below — not before.
 
+### Connected now — the Breast Cancer Awareness Google Form
+
+`preorderForm` in site settings is wired to the live form
+(`1FAIpQLSf…FRjWOxFLw`). The nine `entry.NNN` ids were read off the form's own
+published definition, not guessed, and **every question on it is optional**, so
+a blank value can't cause a silent rejection.
+
+#### One response per jersey
+
+The form asks for one size, one name and one number, so it is shaped
+**one jersey per response**. A two-jersey order therefore submits **two
+responses**, with the contact details and address repeated.
+
+That's the right shape rather than a workaround: the Sheet ends up as one row
+per garment, which is the list you hand a printer.
+
+#### ⚠️ Two questions the form is missing
+
+| Missing | Impact |
+|---|---|
+| **Jersey version (V1 / V2)** | **This one matters.** The drop sells both, and the form has no question for it — so responses can't tell you which cut to print. The site collects it and currently has nowhere to send it |
+| Payment method | Minor, since payment is arranged personally anyway. Collected on-site and shown on the receipt |
+
+To capture version, add a **multiple choice** question to the form titled
+e.g. "Jersey Version" with options exactly `V1` and `V2`, then take a fresh
+pre-filled link, find its new `entry.NNN`, and add to site settings:
+
+```yaml
+    variant: entry.NNNNNNNNN
+```
+
+The code already sends `variant` per jersey — it's only unmapped, so adding
+the id is the entire change. Same pattern for `paymentMethod` and `notes`.
+
+#### ⚠️ Multiple-choice values must match EXACTLY
+
+Google silently discards a multiple-choice answer it doesn't recognise. The
+form offers `Small / Medium / Large / X-Large / 2XL / 3XL`, so the drop's
+`sizes` list uses those exact strings — **not** `S / M / L`. Same for
+`deliveryOptions` against `Ship to my address / Pick up at the team field`.
+
+Note the form has **no youth sizes**; add the questions first if the team
+wants to offer them.
+
+#### Testing it
+
+Nothing was submitted while wiring this up — the outgoing requests were
+intercepted and inspected rather than sent, so there are no test rows in your
+responses. To verify for real: place one order on the site, check the Sheet,
+delete the row. Do that again after **any** edit to the form, because
+recreating a question changes its `entry.NNN`.
+
 ### Recommended next step — a Google Form as the backend (free, unlimited)
 
 Worth being precise, because there are two very different ways to "use a

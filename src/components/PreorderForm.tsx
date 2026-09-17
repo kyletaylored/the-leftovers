@@ -53,6 +53,8 @@ interface PreorderFormProps {
   nameOnBack: boolean;
   numberOnBack: boolean;
   paymentMethods: PaymentMethod[];
+  /** Ship vs collect, matching the backing form's option strings. */
+  deliveryOptions?: string[];
   /** Optional submit endpoint. Empty = `handoff` mode (the default). */
   endpoint?: string;
   /** `google-form` switches to Google's entry.NNN encoding. */
@@ -99,6 +101,7 @@ export default function PreorderForm({
   nameOnBack,
   numberOnBack,
   paymentMethods,
+  deliveryOptions = [],
   endpoint,
   provider,
   fieldMap = {},
@@ -167,6 +170,7 @@ export default function PreorderForm({
         .split('\n')
         .map((line) => `  ${line}`),
       '',
+      ...(get('delivery') ? [`Delivery: ${get('delivery')}`] : []),
       ...(get('paymentMethod') ? [`Paying by: ${get('paymentMethod')}`] : []),
       ...(get('notes') ? [`Notes: ${get('notes')}`] : []),
     ].join('\n');
@@ -214,16 +218,47 @@ export default function PreorderForm({
      * the buyer hasn't lost anything and can send it across themselves.
      */
     if (provider === 'google-form') {
-      const params = new URLSearchParams();
-      for (const [name, entryId] of Object.entries(fieldMap)) {
-        const value = String(data.get(name) ?? '').trim();
-        if (value) params.set(entryId, value);
+      /**
+       * The form is shaped ONE JERSEY PER RESPONSE — it has a single size,
+       * name and number question. So an order for three jerseys sends three
+       * responses with the contact and address repeated.
+       *
+       * That isn't a workaround, it's the better shape: the spreadsheet ends
+       * up as one row per garment, which is exactly the list you need to hand
+       * a printer. Sequential rather than parallel, to stay polite.
+       */
+      const entry = (name: string) => fieldMap[name];
+
+      for (const row of rows) {
+        const params = new URLSearchParams();
+        const put = (name: string, value: string) => {
+          const id = entry(name);
+          if (id && value) params.set(id, value);
+        };
+
+        put('fullName', String(data.get('fullName') ?? '').trim());
+        put('email', String(data.get('email') ?? '').trim());
+        put('phone', String(data.get('phone') ?? '').trim());
+        put('address', String(data.get('address') ?? '').trim());
+        put('delivery', String(data.get('delivery') ?? '').trim());
+        put('paymentMethod', String(data.get('paymentMethod') ?? '').trim());
+        put('notes', String(data.get('notes') ?? '').trim());
+
+        put('size', row.size);
+        put('variant', row.variant);
+        put('nameOnBack', row.nameOnBack);
+        put('numberOnBack', row.numberOnBack);
+        // The form asks this as an explicit Yes/No, so derive it rather than
+        // leaving a question blank that a human will wonder about.
+        put('wantsCustomName', row.nameOnBack ? 'Yes' : 'No');
+
+        try {
+          await fetch(endpoint, { method: 'POST', mode: 'no-cors', body: params });
+        } catch {
+          // Opaque either way; the receipt below is the safety net.
+        }
       }
-      try {
-        await fetch(endpoint, { method: 'POST', mode: 'no-cors', body: params });
-      } catch {
-        // Opaque either way; fall through to the receipt.
-      }
+
       setState('done');
       return;
     }
@@ -562,6 +597,20 @@ export default function PreorderForm({
           Payment is arranged directly with the captain — nothing is charged here.
         </p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {deliveryOptions.length > 0 && (
+            <div>
+              <label className={label} htmlFor="delivery">
+                Getting it to you
+              </label>
+              <select id="delivery" name="delivery" className={field} required>
+                {deliveryOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           {paymentMethods.length > 0 && (
             <div>
               <label className={label} htmlFor="paymentMethod">
