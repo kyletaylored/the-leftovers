@@ -47,7 +47,10 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: lts
+          # Must be the nvm alias form. setup-node accepts `lts/*`, `lts/jod`
+          # and `lts/-n`; a bare `lts` is not a documented alias and fails to
+          # resolve, which takes the whole deploy with it.
+          node-version: lts/*
           cache: npm
 
       # `npm ci` respects the lockfile exactly, so a deploy can't pick up a
