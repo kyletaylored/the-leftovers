@@ -1,0 +1,36 @@
+---
+/**
+ * MascotMark — the official takeout-box icon.
+ *
+ * Replaces the hand-drawn `Mascot.astro` everywhere the mascot appears. That
+ * component was an approximation built before the real art existed; keeping
+ * both in use meant two different mascots on one page.
+ *
+ * Raster art, so it always renders through <Image> at the size actually
+ * needed. `dim` is for the decorative placements (empty states, watermarks)
+ * where the mascot should recede rather than compete.
+ */
+import { Image } from 'astro:assets';
+import icon from '@/assets/img/brand/icon.png';
+
+interface Props {
+  class?: string;
+  /** Rendered CSS width in px at the largest breakpoint; drives the srcset. */
+  width?: number;
+  /** Fade it back for watermark/empty-state use. */
+  dim?: boolean;
+}
+
+const { class: className = '', width = 96, dim = false } = Astro.props;
+---
+
+<Image
+  src={icon}
+  alt=""
+  aria-hidden="true"
+  widths={[width, width * 2]}
+  sizes={`${width}px`}
+  loading="lazy"
+  decoding="async"
+  class:list={['h-auto', dim && 'opacity-45', className]}
+/>

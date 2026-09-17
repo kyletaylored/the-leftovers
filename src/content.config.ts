@@ -62,11 +62,14 @@ const events = defineCollection({
     league: z.string().optional(),
     startDate: z.coerce.date(),
     endDate: z.coerce.date().optional(),
-    location: z.object({
-      venue: z.string(),
-      city: z.string(),
-      mapUrl: z.url().optional(),
-    }),
+    /** Optional: events are often announced before the venue is confirmed. */
+    location: z
+      .object({
+        venue: z.string(),
+        city: z.string(),
+        mapUrl: z.url().optional(),
+      })
+      .optional(),
     registrationUrl: z.url().optional(),
     /**
      * Optional manual override. Left empty, upcoming/past is DERIVED from the

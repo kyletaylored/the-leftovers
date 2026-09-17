@@ -51,17 +51,24 @@ export default defineConfig({
       fallbacks: ['system-ui', 'sans-serif'],
     },
     {
-      // Brush display. Used ONLY for the few places the wordmark is live text
-      // (e.g. jersey-name flourishes); the logo itself is a static SVG.
-      // Subset to just the glyphs in "THE LEFTOVERS" per PRD §10.2.
-      provider: fontProviders.google(),
-      name: 'Permanent Marker',
+      // The display face used in the official logo lockup. Self-hosted from
+      // src/assets/fonts (NOT public/, which would duplicate the file into the
+      // build output), and pre-converted to woff2 by `npm run font` — Astro's
+      // local provider serves the file as given, and the supplied .ttf was
+      // 31KB against 19KB for the same glyphs in woff2.
+      provider: fontProviders.local(),
+      name: 'Monster Mash',
       cssVariable: '--font-brush',
-      weights: [400],
-      styles: ['normal'],
-      subsets: ['latin'],
-      fallbacks: ['cursive'],
-      options: { experimental: { glyphs: ['T', 'H', 'E', 'L', 'F', 'O', 'V', 'R', 'S', ' '] } },
+      fallbacks: ['Impact', 'fantasy'],
+      options: {
+        variants: [
+          {
+            src: ['./src/assets/fonts/MonsterMashMedium.woff2'],
+            weight: 500,
+            style: 'normal',
+          },
+        ],
+      },
     },
   ],
 });

@@ -1,51 +1,72 @@
 ---
+/**
+ * Home.
+ *
+ * Deliberately a COMMUNITY page, not a team dashboard. Earlier versions led
+ * with a stat strip, a countdown panel, a roster row, a merch banner and a
+ * sponsor marquee — six competing blocks before a first-time visitor learned
+ * what the team even is.
+ *
+ * The order now answers a newcomer's questions in the order they'd ask them:
+ * what is this → how do I get in → when's the next one → where does everyone
+ * hang out. Stats live on /stats; merch lives on /shop.
+ */
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/Hero.astro';
-import StatStrip from '@/components/StatStrip.astro';
 import Section from '@/components/Section.astro';
-import PlayerCard from '@/components/PlayerCard.astro';
-import ProductCard from '@/components/ProductCard.astro';
-import CtaStrip from '@/components/CtaStrip.astro';
+import ThreeColumn from '@/components/ThreeColumn.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
-import SponsorMarquee from '@/components/SponsorMarquee.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
 import Button from '@/components/Button.astro';
-import Countdown from '@/components/Countdown.astro';
-import Icon from '@/components/brand/Icon.astro';
+import Icon, { type IconName } from '@/components/brand/Icon.astro';
 import { site } from '@/lib/settings';
 import { getEvents } from '@/lib/events';
-import { getTeamStats } from '@/lib/stats';
-import TerracedDivider from '@/components/brand/TerracedDivider.astro';
-import { dateRange, dayNum, fullDate, isoDate, monthShort } from '@/lib/format';
+import { dateRange, isoDate } from '@/lib/format';
 
-const [{ next, upcoming }, stats, players, products, sponsors] = await Promise.all([
-  getEvents(),
-  getTeamStats(),
-  getCollection('players'),
-  getCollection('products'),
-  getCollection('sponsors'),
-]);
+const [{ next }, players] = await Promise.all([getEvents(), getCollection('players')]);
 
-// Three featured players plus the first open slot — exactly the mockup's row.
-const featured = players
-  .filter((p) => p.data.status === 'active' && p.data.featured)
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 3);
-const openSlot = players.find((p) => p.data.status === 'open-slot');
-const rosterRow = [...featured, ...(openSlot ? [openSlot] : [])];
+const openSlots = players.filter((player) => player.data.status === 'open-slot').length;
 
-/** Everything after the featured "next up" event. */
-const later = upcoming.slice(1, 4);
+const premise = [
+  {
+    icon: 'chat' as const,
+    title: 'No tryout',
+    body: 'There is no selection process and no waiting for a season to start. Say you’re coming and you’re on the sheet.',
+  },
+  {
+    icon: 'jersey' as const,
+    title: 'Bring your own gear',
+    body: 'Your marker, mask and pods. Cover your entry and paint on the day. We don’t take a cut and there are no dues.',
+  },
+  {
+    icon: 'trophy' as const,
+    title: 'You actually play',
+    body: 'No bench and no practice squad. If you confirmed, you’re playing points in a registered tournament.',
+  },
+];
 
-const preorder =
-  products.find((p) => p.data.status === 'pre-order') ??
-  products.filter((p) => p.data.status === 'available').sort((a, b) => a.data.order - b.data.order)[0];
+const channels: Array<{ icon: IconName; name: string; href?: string; blurb: string }> = [
+  {
+    icon: 'discord',
+    name: 'Discord',
+    href: site.social.discord,
+    blurb: 'Where the next squad gets sorted. Start here.',
+  },
+  {
+    icon: 'facebook',
+    name: 'Facebook',
+    href: site.social.facebookGroup,
+    blurb: 'Photos and post-event arguing.',
+  },
+  {
+    icon: 'instagram',
+    name: 'Instagram',
+    href: site.social.instagram,
+    blurb: 'Game day, in pictures.',
+  },
+];
 
-/**
- * Event rich results (§10.3): the next tournament is the single most valuable
- * thing on this page to make eligible for Google's event treatment.
- */
 const eventSchema = next
   ? [
       {
@@ -55,158 +76,147 @@ const eventSchema = next
         endDate: isoDate(next.data.endDate ?? next.data.startDate),
         eventStatus: 'https://schema.org/EventScheduled',
         eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-        location: {
-          '@type': 'Place',
-          name: next.data.location.venue,
-          address: { '@type': 'PostalAddress', addressLocality: next.data.location.city },
-        },
         competitor: { '@id': new URL('/#team', Astro.site).href },
+        ...(next.data.location
+          ? {
+              location: {
+                '@type': 'Place',
+                name: next.data.location.venue,
+                address: { '@type': 'PostalAddress', addressLocality: next.data.location.city },
+              },
+            }
+          : {}),
         ...(next.data.registrationUrl ? { url: next.data.registrationUrl } : {}),
       },
     ]
   : [];
 ---
 
-<BaseLayout
-  title={site.title}
-  description={site.description}
-  schema={eventSchema}
->
-  <Hero variant="brand" tagline={`Paintball Team / ${site.tagline}`}>
+<BaseLayout title={site.title} description={site.description} schema={eventSchema}>
+  <Hero variant="brand" tagline={site.tagline}>
     <Button slot="actions" href="/roster#open-slots" size="lg">Join the crew</Button>
-    <Button slot="actions" href="/events" variant="outline" size="lg">See the schedule</Button>
+    {
+      site.social.discord && (
+        <Button slot="actions" href={site.social.discord} external variant="outline" size="lg">
+          Open the Discord
+        </Button>
+      )
+    }
   </Hero>
 
-  <StatStrip stats={stats} />
+  <!-- WHAT THIS IS ---------------------------------------------------------->
+  <Section tone="base" eyebrow="Free agents welcome" title="Anyone Can Play">
+    <p class="max-w-2xl text-base leading-relaxed text-bone-muted sm:text-lg">
+      {site.description}
+    </p>
+    <ThreeColumn items={premise} class="mt-10" />
+  </Section>
 
-  <!-- NEXT UP -------------------------------------------------------------->
-  <Section tone="base">
+  <!-- NEXT UP --------------------------------------------------------------->
+  <Section tone="alt" eyebrow="Next up" title="On the Calendar">
     {
       next ? (
-        <div class="grid gap-6 lg:grid-cols-[1.15fr_1fr] lg:gap-10">
-          <div class="rounded-sm border border-ink-600 bg-ink-800 p-6 sm:p-8">
-            <p class="eyebrow mb-2">Next up</p>
-            <h2 class="text-4xl text-bone sm:text-5xl">{next.data.title}</h2>
-            <p class="mt-2 flex flex-wrap items-center gap-2 text-sm text-bone-muted sm:text-base">
-              <Icon name="pin" class="size-4 text-gold" />
-              {next.data.location.venue} · {next.data.location.city}
-            </p>
-
-            <hr class="my-6 border-gold/40" />
-
-            <div class="flex flex-wrap items-center gap-6">
-              <p class="flex items-center gap-3">
-                <Icon name="calendar" class="size-9 shrink-0 text-gold" />
-                <time datetime={isoDate(next.data.startDate)} class="block">
-                  <span class="block text-[0.65rem] font-bold uppercase tracking-[0.2em] text-bone-muted">
-                    Gates open
-                  </span>
-                  <span class="block font-[var(--font-display)] text-2xl uppercase text-bone sm:text-3xl">
-                    {fullDate(next.data.startDate)}
-                  </span>
-                </time>
-              </p>
-              {/* The only always-ticking island on the page (§4). */}
-              <Countdown target={next.data.startDate} />
-            </div>
-
-            <div class="mt-7 flex flex-wrap gap-3">
-              {next.data.registrationUrl && (
-                <Button href={next.data.registrationUrl} external>
-                  Register for {next.data.title}
-                </Button>
-              )}
-              <Button href="/events" variant="outline">All {upcoming.length} upcoming events</Button>
-            </div>
-          </div>
-
-          {/* The rest of the calendar rather than a second copy of the same
-              event — the feature panel already covers `next` in full. */}
-          <div class="rounded-sm border border-ink-600 bg-ink-800 p-6 sm:p-8">
-            <p class="eyebrow mb-4">Also on the calendar</p>
-            {later.length > 0 ? (
-              <ul class="divide-y divide-ink-600/70">
-                {later.map((event) => (
-                  <li class="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
-                    <div class="flex shrink-0 flex-col items-center rounded-sm border border-gold/40 bg-ink-900 px-2.5 py-1.5">
-                      <span class="text-[0.55rem] font-bold uppercase tracking-[0.14em] text-gold-300">
-                        {monthShort(event.data.startDate)}
-                      </span>
-                      <span class="numeral text-2xl leading-none">{dayNum(event.data.startDate)}</span>
-                    </div>
-                    <div class="min-w-0">
-                      <h3 class="text-xl text-bone">{event.data.title}</h3>
-                      <p class="mt-1 text-sm text-bone-muted">
-                        {event.data.location.venue} · {event.data.location.city}
-                      </p>
-                      <p class="mt-0.5 text-sm text-bone-muted">
-                        <time datetime={isoDate(event.data.startDate)}>
-                          {dateRange(event.data.startDate, event.data.endDate)}
-                        </time>
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p class="text-sm leading-relaxed text-bone-muted">
-                Nothing else on the board yet. Next season's dates land in the Discord first.
-              </p>
+        <div class="flex flex-col gap-6 rounded-sm border border-ink-600 bg-ink-800 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div class="min-w-0">
+            {next.data.league && (
+              <span class="mb-3 inline-block rounded-full bg-crimson px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-bone">
+                {next.data.league}
+              </span>
             )}
-
-            <div class="mt-6">
-              <Button href="/events" variant="ghost" size="sm">Full schedule &amp; past results</Button>
-            </div>
-
-            <TerracedDivider variant="line" seed={9} class="mt-7 h-6 opacity-70" />
+            <h3 class="text-2xl text-bone sm:text-3xl">{next.data.title}</h3>
+            <p class="mt-2 text-sm text-bone-muted">
+              <time datetime={isoDate(next.data.startDate)}>
+                {dateRange(next.data.startDate, next.data.endDate)}
+              </time>
+              {next.data.location && (
+                <>
+                  <span aria-hidden="true"> · </span>
+                  {next.data.location.venue}
+                </>
+              )}
+            </p>
+          </div>
+          <div class="flex shrink-0 flex-wrap gap-3">
+            {next.data.registrationUrl && (
+              <Button href={next.data.registrationUrl} external size="sm">
+                Register
+              </Button>
+            )}
+            <Button href="/events" variant="outline" size="sm">
+              Full schedule
+            </Button>
           </div>
         </div>
       ) : (
         <MascotCallout
-          title="No events on the board"
-          body="The next tournament hasn't been posted yet. The Discord always knows first."
+          title="Nothing on the board yet"
+          body="The next tournament hasn't been posted. The Discord always knows first."
         >
-          <Button href={site.social.discord} external size="sm">Join the Discord</Button>
+          {site.social.discord && (
+            <Button href={site.social.discord} external size="sm">
+              Join the Discord
+            </Button>
+          )}
         </MascotCallout>
       )
     }
   </Section>
 
-  <!-- THE ROSTER ----------------------------------------------------------->
-  <Section tone="alt" title="The Roster" kicker="Meet the crew" divider dividerSeed={11}>
-    <div class="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
-      {rosterRow.map((player) => <PlayerCard player={player} href="/roster" />)}
-    </div>
-    <div class="mt-8 flex flex-wrap gap-3">
-      <Button href="/roster" variant="outline">See the full roster</Button>
-      <Button href="/stats" variant="ghost">Player stats</Button>
+  <!-- COMMUNITY ------------------------------------------------------------->
+  <Section tone="base" eyebrow="Find the crew" title="Where Everyone Is">
+    <ul class="grid gap-4 sm:grid-cols-3">
+      {
+        channels
+          .filter((channel) => channel.href)
+          .map((channel) => (
+            <li>
+              <a
+                href={channel.href}
+                rel="noopener"
+                class="group flex h-full flex-col rounded-sm border border-ink-600 bg-ink-800 p-6 transition-colors hover:border-gold/60 hover:bg-ink-700"
+              >
+                <span class="mb-4 inline-flex size-11 items-center justify-center rounded-sm bg-ink-900 text-gold">
+                  <Icon name={channel.icon} class="size-5" />
+                </span>
+                <span class="font-display text-xl uppercase text-bone group-hover:text-gold-300">
+                  {channel.name}
+                </span>
+                <span class="mt-1.5 text-sm leading-relaxed text-bone-muted">{channel.blurb}</span>
+              </a>
+            </li>
+          ))
+      }
+    </ul>
+
+    <div class="mt-8">
+      <Button href="/community" variant="ghost">Everything in one place</Button>
     </div>
   </Section>
 
-  <!-- PRE-ORDER ------------------------------------------------------------>
-  <Section tone="base">
-    <CtaStrip
-      eyebrow="Official gear"
-      title="Pre-Order Now"
-      body="Jerseys / Hats / Apparel. Batched pre-orders run on Bonfire — the window opens, orders are collected, and everything prints once it closes."
-    >
-      <Button slot="actions" href="/shop" variant="gold" size="lg">Shop the drop</Button>
-      {site.shop.bonfireUrl && (
-        <Button slot="actions" href={site.shop.bonfireUrl} external variant="ghost" size="lg" class="!border-bone/40 !text-bone hover:!border-bone">
-          Open the Bonfire store
-        </Button>
-      )}
-      {preorder && <ProductCard product={preorder} as="h3" class="max-w-xs bg-ink" />}
-    </CtaStrip>
-  </Section>
+  <!-- OPEN SLOTS ------------------------------------------------------------>
+  {
+    openSlots > 0 && (
+      <Section tone="alt">
+        <div class="flex flex-col items-start gap-6 rounded-sm border-2 border-dashed border-gold/50 bg-ink-800/50 p-7 sm:flex-row sm:items-center sm:justify-between sm:p-9">
+          <div>
+            <p class="eyebrow mb-2">
+              {openSlots} open {openSlots === 1 ? 'slot' : 'slots'}
+            </p>
+            <h2 class="text-2xl text-bone sm:text-3xl">There's room on the roster</h2>
+            <p class="mt-2 max-w-xl text-sm leading-relaxed text-bone-muted">
+              Every name on the roster started as one of these.
+            </p>
+          </div>
+          <Button href="/roster#open-slots" variant="gold" class="shrink-0">
+            See open slots
+          </Button>
+        </div>
+      </Section>
+    )
+  }
 
-  <!-- COMMUNITY ------------------------------------------------------------>
-  <Section tone="alt">
+  <!-- NEWSLETTER ------------------------------------------------------------>
+  <Section tone="base" divider dividerSeed={11}>
     <NewsletterBlock />
-  </Section>
-
-  <!-- SPONSORS ------------------------------------------------------------->
-  <Section tone="base">
-    <SponsorMarquee sponsors={sponsors} />
   </Section>
 </BaseLayout>

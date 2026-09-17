@@ -1,42 +1,23 @@
 ---
 /**
- * Hero — the homepage brand lockup (§7 traditional components).
+ * Hero — the page-opening block (§7).
  *
- * Four variants per §7: `brand` (mascot + wordmark, the mockup's hero),
- * `image` (photography with an overlay), `video` (looping background) and
- * `text` (copy only).
+ * `brand` renders the official logo lockup. The logo art already contains the
+ * wordmark, so nothing else competes with it here: one image, a tagline, two
+ * actions, and room to breathe. Earlier versions stacked a separate mascot and
+ * wordmark side by side at 64/52 units tall, which is what made the homepage
+ * feel magnified.
  *
- * The `video` variant is the one that can wreck a mobile visit, so it is
- * deliberately conservative and ships ZERO JavaScript:
+ * `image` and `video` put photography behind the copy; `text` is copy only.
  *
- *  - A `poster` image is REQUIRED and is rendered through <Image> as the
- *    eager, high-priority backdrop. That image — not the video — is the LCP
- *    element, so the hero paints at the same speed as every other variant
- *    and can't shift when the clip arrives.
- *  - `muted` + `playsinline` + `preload="metadata"`: autoplay works without
- *    a script, and only metadata is fetched up front.
- *  - Under prefers-reduced-motion the <video> is hidden and paused in CSS and
- *    the poster stands in permanently.
- *
- * No loader script, deliberately: an inline one would be blocked by the
- * site's own CSP (`script-src 'self'`, see public/_headers), and a hoisted
- * one would ship a JS request to every page using ANY Hero variant, video or
- * not. The honest limitation of doing it declaratively is that a
- * reduced-motion visitor may still fetch the video's metadata before CSS
- * hides it — bounded by `preload="metadata"`, but not zero.
- *
- * Everything decorative here is SVG — clouds, lanterns, terraced ridge, the
- * topo texture — so the largest hero element by bytes is the wordmark, not a
- * 1.5MB background plate. That is the §10.1 media-weight rule applied at the
- * one place on the site most likely to break it, and it keeps the LCP
- * element text rather than an image.
+ * The logo is the LCP element on the homepage, so it is eager, high-priority,
+ * and width/height-locked. Everything decorative around it is SVG.
  */
 import { Image } from 'astro:assets';
-import Mascot from './brand/Mascot.astro';
-import Wordmark from './brand/Wordmark.astro';
+import logo from '@/assets/img/brand/logo.png';
 import RuyiCloud from './brand/RuyiCloud.astro';
-import Lantern from './brand/Lantern.astro';
 import TerracedDivider from './brand/TerracedDivider.astro';
+import { site } from '@/lib/settings';
 
 interface Props {
   variant?: 'brand' | 'image' | 'video' | 'text';
@@ -62,7 +43,6 @@ const {
   class: className = '',
 } = Astro.props;
 
-// A video hero with no poster would flash empty and take the LCP hit with it.
 if (variant === 'video' && (!video || !poster)) {
   throw new Error('Hero variant="video" requires both `video` and `poster`.');
 }
@@ -81,11 +61,11 @@ const backdrop = variant === 'video' ? poster : image;
           sizes="100vw"
           loading="eager"
           fetchpriority="high"
-          class="absolute inset-0 size-full object-cover opacity-45"
+          class="absolute inset-0 size-full object-cover opacity-40"
         />
         {variant === 'video' && (
           <video
-            class="hero-video absolute inset-0 size-full object-cover opacity-45"
+            class="hero-video absolute inset-0 size-full object-cover opacity-40"
             src={video}
             autoplay
             muted
@@ -102,30 +82,43 @@ const backdrop = variant === 'video' ? poster : image;
     )
   }
 
-  <!-- Ruyi-cloud corners + hanging lanterns (brand motifs, §9) -->
-  <RuyiCloud side="left" class="pointer-events-none absolute -left-8 -top-6 h-32 w-auto sm:h-44 lg:h-56" />
-  <RuyiCloud side="right" class="pointer-events-none absolute -right-8 -top-6 h-32 w-auto sm:h-44 lg:h-56" />
-  <Lantern class="pointer-events-none absolute left-[12%] -top-2 hidden h-32 w-auto opacity-80 sm:block lg:h-44" cord={70} />
-  <Lantern class="pointer-events-none absolute right-[12%] -top-4 hidden h-28 w-auto opacity-80 sm:block lg:h-40" cord={50} />
+  <!-- Ruyi-cloud banks rolling in from the top corners (§9 motif). -->
+  <RuyiCloud
+    variant={1}
+    class="pointer-events-none absolute -left-10 -top-5 h-14 w-auto text-crimson sm:h-24 lg:h-36"
+  />
+  <RuyiCloud
+    variant={2}
+    flip
+    class="pointer-events-none absolute -right-10 -top-5 h-14 w-auto text-crimson sm:h-24 lg:h-36"
+  />
 
-  <div class="relative mx-auto max-w-7xl px-4 pb-24 pt-14 sm:px-6 sm:pb-28 lg:pb-32 lg:pt-20">
+  <div class="relative mx-auto max-w-5xl px-4 pb-24 pt-12 text-center sm:px-6 sm:pb-28 lg:pb-32 lg:pt-16">
     {
       variant === 'brand' ? (
-        <div class="flex flex-col items-center gap-4 text-center lg:flex-row lg:justify-center lg:gap-10 lg:text-left">
-          <Mascot class="h-36 w-auto shrink-0 sm:h-48 lg:h-64" />
-          <div class="min-w-0">
-            <h1 class="sr-only">{title ?? 'The Leftovers — semi-pro community paintball team'}</h1>
-            <Wordmark class="mx-auto h-28 w-auto sm:h-40 lg:mx-0 lg:h-52" size="hero" label={false} />
-            {tagline && (
-              <p class="mt-3 text-[0.62rem] font-bold uppercase tracking-[0.3em] text-bone sm:text-sm sm:tracking-[0.34em]">
-                {tagline}
-              </p>
-            )}
-          </div>
-        </div>
+        <>
+          {/* The logo carries the accessible name, so the h1 is visually
+              hidden rather than duplicated on screen. */}
+          <h1 class="sr-only">{title ?? `${site.title} — ${site.tagline}`}</h1>
+          <Image
+            src={logo}
+            alt={`${site.title} logo`}
+            widths={[224, 288, 320, 448, 640]}
+            sizes="(min-width: 1024px) 320px, (min-width: 640px) 288px, 224px"
+            quality={68}
+            loading="eager"
+            fetchpriority="high"
+            class="mx-auto h-auto w-56 sm:w-72 lg:w-80"
+          />
+          {tagline && (
+            <p class="mx-auto mt-6 max-w-xl text-[0.62rem] font-bold uppercase tracking-[0.28em] text-bone-muted sm:text-xs sm:tracking-[0.32em]">
+              {tagline}
+            </p>
+          )}
+        </>
       ) : (
-        <div class="max-w-3xl">
-          <h1 class="text-5xl text-bone sm:text-6xl lg:text-7xl">{title}</h1>
+        <div class="mx-auto max-w-3xl">
+          <h1 class="text-4xl text-bone sm:text-5xl lg:text-6xl">{title}</h1>
           {tagline && (
             <p class="mt-4 text-base leading-relaxed text-bone-muted sm:text-lg">{tagline}</p>
           )}
@@ -133,17 +126,17 @@ const backdrop = variant === 'video' ? poster : image;
       )
     }
 
-    <div class="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-4">
+    <div class="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-4">
       <slot name="actions" />
     </div>
   </div>
 
-  <TerracedDivider seed={3} class="absolute bottom-0 left-0 h-16 sm:h-24 lg:h-28" />
+  <TerracedDivider seed={3} class="absolute bottom-0 left-0 h-14 sm:h-20 lg:h-24" />
 </section>
 
 <style>
-  /* A background clip is decoration. Under reduced-motion the poster image
-     underneath it is the whole hero. */
+  /* A background clip is decoration; under reduced-motion the poster is the
+     whole hero. */
   @media (prefers-reduced-motion: reduce) {
     .hero-video {
       display: none;

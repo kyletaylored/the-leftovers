@@ -19,7 +19,7 @@ const settingsSchema = z.object({
   tagline: z.string(),
   description: z.string(),
   established: z.number(),
-  homeBase: z.string(),
+  homeBase: z.string().default(''),
   nav: z.array(linkSchema).min(1),
   primaryCta: linkSchema,
   social: z.object({

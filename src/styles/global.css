@@ -16,6 +16,10 @@
   --color-ink-600: #322c24; /* hairline borders */
 
   --color-crimson: #8b1e2b; /* locked crimson — fills, banners */
+  /* The red in the official logo art. Used only where live text sits next to
+     the logo (the nav wordmark) so the two don't read as different reds.
+     Like the locked crimson, it is NOT an AA-passing text colour on ink. */
+  --color-brand-red: #d12026;
   --color-crimson-600: #a32534; /* hover fill */
   --color-crimson-400: #e06070; /* crimson as TEXT on dark (AA) */
 

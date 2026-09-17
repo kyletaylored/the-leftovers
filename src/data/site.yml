@@ -5,11 +5,13 @@
 title: The Leftovers
 tagline: Play / Compete / Leftovers
 description: >-
-  The Leftovers are a semi-professional, community-run paintball team built
-  from rotating free agents. Anyone willing to show up and play a tournament
-  can earn a spot on the roster.
+  The Leftovers are a community-run paintball team built from rotating free
+  agents. There's no tryout and no bench — if you can make the date and cover
+  your own entry, you can play a tournament with us.
 established: 2022
-homeBase: Denton, TX
+# Optional. Leave blank until the team decides how it wants to describe its
+# region; it feeds the footer and the SportsTeam structured data.
+homeBase: ''
 
 nav:
   - label: Home

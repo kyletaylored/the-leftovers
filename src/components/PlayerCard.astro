@@ -15,7 +15,7 @@
  */
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import Mascot from './brand/Mascot.astro';
+import MascotMark from './brand/MascotMark.astro';
 import Icon from './brand/Icon.astro';
 import { resolveImage } from '@/lib/images';
 
@@ -42,7 +42,7 @@ const isOpenSlot = status === 'open-slot';
         className,
       ]}
     >
-      <Mascot class="h-24 w-auto transition-transform duration-300 group-hover:-translate-y-1 sm:h-28" />
+      <MascotMark class="w-20 transition-transform duration-300 group-hover:-translate-y-1 sm:w-24" width={96} />
       <Heading class="text-xl text-bone sm:text-2xl">Open Slot</Heading>
       <p class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
         Join the roster
@@ -89,7 +89,7 @@ const isOpenSlot = status === 'open-slot';
           </div>
         ) : (
           <div class="relative flex size-full items-end justify-center pb-2">
-            <Mascot variant="line" class="h-3/5 w-auto opacity-60" steam={false} />
+            <MascotMark class="w-2/5" width={128} dim />
           </div>
         )}
 

@@ -9,7 +9,7 @@
  */
 import { site } from '@/lib/settings';
 import Wordmark from './brand/Wordmark.astro';
-import Mascot from './brand/Mascot.astro';
+import MascotMark from './brand/MascotMark.astro';
 import Icon from './brand/Icon.astro';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -29,7 +29,7 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
       class="tap flex shrink-0 items-center gap-2"
       aria-current={path === '/' ? 'page' : undefined}
     >
-      <Mascot class="h-10 w-auto" steam={false} />
+      <MascotMark class="w-9 shrink-0" width={36} />
       <Wordmark class="h-9 w-auto" size="nav" label={site.title} />
     </a>
 

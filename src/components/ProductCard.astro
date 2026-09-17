@@ -9,7 +9,7 @@
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import Button from './Button.astro';
-import Mascot from './brand/Mascot.astro';
+import MascotMark from './brand/MascotMark.astro';
 import { resolveImage } from '@/lib/images';
 import { money, fullDate } from '@/lib/format';
 
@@ -51,7 +51,7 @@ const soldOut = status === 'sold-out';
         />
       ) : (
         <div class="flex size-full items-center justify-center">
-          <Mascot variant="line" class="h-1/2 w-auto opacity-50" steam={false} />
+          <MascotMark class="w-1/3" width={128} dim />
         </div>
       )
     }

@@ -7,7 +7,7 @@
  * empty states feeling like the same team instead of five different
  * apologies.
  */
-import Mascot from './brand/Mascot.astro';
+import MascotMark from './brand/MascotMark.astro';
 
 interface Props {
   title: string;
@@ -24,7 +24,7 @@ const { title, body, as: Heading = 'h2', class: className = '' } = Astro.props;
     className,
   ]}
 >
-  <Mascot variant="line" class="h-24 w-auto sm:h-28" />
+  <MascotMark class="w-20 sm:w-24" width={96} dim />
   <Heading class="text-2xl text-bone sm:text-3xl">{title}</Heading>
   {body && <p class="max-w-md text-sm leading-relaxed text-bone-muted">{body}</p>}
   <div class="mt-1 flex flex-wrap justify-center gap-3">

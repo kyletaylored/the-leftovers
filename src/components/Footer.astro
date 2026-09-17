@@ -1,9 +1,10 @@
 ---
 import { site } from '@/lib/settings';
 import Wordmark from './brand/Wordmark.astro';
-import Mascot from './brand/Mascot.astro';
+import MascotMark from './brand/MascotMark.astro';
 import Icon, { type IconName } from './brand/Icon.astro';
 import TerracedDivider from './brand/TerracedDivider.astro';
+import { CLOUD_ATTRIBUTION } from '@/lib/clouds';
 
 const socials: Array<{ name: IconName; href?: string; label: string }> = [
   { name: 'instagram', href: site.social.instagram, label: 'Instagram' },
@@ -21,11 +22,13 @@ const year = new Date().getFullYear();
     <div class="grid gap-10 lg:grid-cols-[1.2fr_1fr_1fr]">
       <div>
         <div class="flex items-center gap-3">
-          <Mascot variant="line" class="h-12 w-auto" steam={false} />
+          <MascotMark class="w-11" width={44} />
           <Wordmark class="h-10 w-auto" size="footer" label={false} />
         </div>
         <p class="mt-4 max-w-sm text-sm leading-relaxed text-bone-muted">{site.footerNote}</p>
-        <p class="eyebrow mt-4">Est. {site.established} · {site.homeBase}</p>
+        <p class="eyebrow mt-4">
+          Est. {site.established}{site.homeBase && ` · ${site.homeBase}`}
+        </p>
       </div>
 
       <nav aria-label="Footer">
@@ -73,9 +76,24 @@ const year = new Date().getFullYear();
       </div>
     </div>
 
-    <p class="mt-10 border-t border-ink-600/60 pt-6 text-xs tracking-wide text-bone-muted">
-      © {year} {site.title}. All rights reserved. Built as a static site — no trackers, no cookies.
-    </p>
+    <div class="mt-10 space-y-2 border-t border-ink-600/60 pt-6 text-xs tracking-wide text-bone-muted">
+      <p>
+        © {year} {site.title}. All rights reserved. Built as a static site — no trackers, no
+        cookies.
+      </p>
+      {/* Attribution is a condition of the Vecteezy licence, not a courtesy.
+          See ATTRIBUTIONS.md before removing it. */}
+      <p>
+        Cloud motifs:{' '}
+        <a
+          href={CLOUD_ATTRIBUTION.href}
+          rel="noopener nofollow"
+          class="underline decoration-ink-600 underline-offset-2 hover:text-gold-300"
+        >
+          {CLOUD_ATTRIBUTION.label}
+        </a>
+      </p>
+    </div>
   </div>
 
   <TerracedDivider seed={7} class="h-14 sm:h-20" />

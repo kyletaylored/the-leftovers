@@ -30,10 +30,10 @@ That's it. There's no application and nothing to fill in.
 
 ## Sponsorship and field partnerships
 
-We run four to six PBLeague events a season with jerseys, a Discord community
-and a local following in north Texas. If you're a field, a paint distributor or
-a gear shop and that's interesting to you, email the captain directly and we'll
-send through what we can offer.
+We run tournament events with jerseys, a Discord community and a growing local
+following. If you're a field, a paint distributor or a gear shop and that's
+interesting to you, email the captain directly and we'll send through what we
+can offer.
 
 ## Press and photos
 

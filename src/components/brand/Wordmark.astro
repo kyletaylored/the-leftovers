@@ -6,8 +6,11 @@
  * text, so it can't reflow or resize as the display face loads. That is what
  * `textLength` + `lengthAdjust` buy here: the two words are pinned to fixed
  * widths inside a fixed viewBox, so the mark occupies exactly the same box
- * whether Permanent Marker has loaded, is still loading, or failed outright
- * and fell back to a system cursive. No overflow, no layout shift, no
+ * whether Monster Mash — the face used in the official logo art — has loaded,
+ * is still loading, or failed outright and fell back to Impact.
+ *
+ * The hero uses the official logo IMAGE instead; this is the small-scale
+ * wordmark for the nav and footer, where the full lockup would be unreadable. No overflow, no layout shift, no
  * per-browser drift — and the glyph set is subsetted to just these letters in
  * astro.config.mjs.
  *
@@ -25,7 +28,7 @@ interface Props {
 const {
   class: className = '',
   size = 'nav',
-  color = 'var(--color-crimson-600)',
+  color = 'var(--color-brand-red)',
   label = 'The Leftovers',
 } = Astro.props;
 

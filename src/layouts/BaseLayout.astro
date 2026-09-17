@@ -38,7 +38,7 @@ const organizationSchema = {
   url: new URL('/', Astro.site).href,
   logo: new URL('/og-default.png', Astro.site).href,
   foundingDate: String(site.established),
-  areaServed: site.homeBase,
+  ...(site.homeBase ? { areaServed: site.homeBase } : {}),
   email: site.social.email,
   sameAs: [
     site.social.instagram,
@@ -63,7 +63,10 @@ const organizationSchema = {
 
     <Font cssVariable="--font-headline" preload />
     <Font cssVariable="--font-body" preload />
-    <Font cssVariable="--font-brush" preload />
+    {/* Deliberately NOT preloaded: the display face is 31KB and its only
+        above-the-fold use is the small nav wordmark, so preloading it would
+        compete with the hero logo for bandwidth on the critical path. */}
+    <Font cssVariable="--font-brush" />
 
     <Seo {...seo} schema={[organizationSchema, ...(seo.schema ?? [])]} />
   </head>

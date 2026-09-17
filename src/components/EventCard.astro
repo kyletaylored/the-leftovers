@@ -85,12 +85,18 @@ const upcoming = isUpcoming(event);
         >
           {title}
         </Heading>
-        <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-bone-muted">
-          <Icon name="pin" class="size-4 shrink-0 text-gold" />
-          <span>{location.venue}</span>
-          <span aria-hidden="true">·</span>
-          <span>{location.city}</span>
-        </p>
+        {
+          location ? (
+            <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-bone-muted">
+              <Icon name="pin" class="size-4 shrink-0 text-gold" />
+              <span>{location.venue}</span>
+              <span aria-hidden="true">·</span>
+              <span>{location.city}</span>
+            </p>
+          ) : (
+            <p class="mt-2 text-sm italic text-bone-muted">Venue to be confirmed</p>
+          )
+        }
         <p class="mt-1 text-sm text-bone-muted">
           <time datetime={isoDate(startDate)}>{dateRange(startDate, endDate)}</time>
         </p>
@@ -121,7 +127,7 @@ const upcoming = isUpcoming(event);
             Event details
           </Button>
         ) : (
-          location.mapUrl && (
+          location?.mapUrl && (
             <Button href={location.mapUrl} external variant="ghost" size="sm">
               {location.venue} on the map
             </Button>

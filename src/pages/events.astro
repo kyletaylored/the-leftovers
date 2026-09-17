@@ -20,11 +20,15 @@ const schema = upcoming.map((event) => ({
   endDate: isoDate(event.data.endDate ?? event.data.startDate),
   eventStatus: 'https://schema.org/EventScheduled',
   eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-  location: {
-    '@type': 'Place',
-    name: event.data.location.venue,
-    address: { '@type': 'PostalAddress', addressLocality: event.data.location.city },
-  },
+  ...(event.data.location
+    ? {
+        location: {
+          '@type': 'Place',
+          name: event.data.location.venue,
+          address: { '@type': 'PostalAddress', addressLocality: event.data.location.city },
+        },
+      }
+    : {}),
   competitor: { '@id': new URL('/#team', Astro.site).href },
   ...(event.data.registrationUrl ? { url: event.data.registrationUrl } : {}),
 }));

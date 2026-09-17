@@ -15,12 +15,13 @@ const { title, eyebrow, intro } = Astro.props;
 
 <header class="bg-topo relative overflow-hidden border-b border-ink-600/60">
   <RuyiCloud
-    side="right"
-    class="pointer-events-none absolute -right-10 -top-16 h-40 w-auto opacity-25 sm:h-52"
+    variant={3}
+    flip
+    class="pointer-events-none absolute -right-16 -top-10 h-28 w-auto text-crimson opacity-25 sm:h-40"
   />
-  <div class="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:py-20">
+  <div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
     {eyebrow && <p class="eyebrow mb-3">{eyebrow}</p>}
-    <h1 class="max-w-4xl text-5xl text-bone sm:text-6xl lg:text-7xl">{title}</h1>
+    <h1 class="max-w-4xl text-4xl text-bone sm:text-5xl lg:text-6xl">{title}</h1>
     {intro && <p class="mt-5 max-w-2xl text-base leading-relaxed text-bone-muted sm:text-lg">{intro}</p>}
   </div>
 </header>
