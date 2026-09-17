@@ -114,19 +114,22 @@ footer copy a lie**, so change it in `src/data/site.yml` if that day comes.
 
 ## 6. Third-party accounts
 
-None are required to launch, and the site degrades honestly without each:
+**None are required.** The site is fully functional with zero third-party
+accounts, and every integration degrades to something honest rather than
+breaking. That's deliberate: the organisation is informal and hasn't picked
+long-term tools, so nothing here assumes a commitment.
 
-| Service | What it's for | Without it |
+| Service | What it would add | Without it (current state) |
 |---|---|---|
-| **Bonfire** | Jersey pre-order batches and merch (PRD §8.2) | Shop cards link to a placeholder store URL |
-| **Buttondown** (or Mailchimp) | Mailing list | The signup form posts nowhere useful |
-| **Discord** | Community hub + free official widget | Community page shows a link-out card |
-| **Elfsight / Juicer / SnapWidget** | Instagram feed grid | Community page shows a link-out card |
+| **Google Forms** | Pre-orders land in a Sheet automatically | The order form still works — it prices and formats the order and the buyer emails or pastes it. See [PREORDERS.md](PREORDERS.md) |
+| **Discord** | The free official server widget | Community page shows a link-out card |
+| **A mailing-list provider** | An actual list to join | The newsletter block points at the community channels instead of showing a form that posts nowhere |
+| **An Instagram widget** | A live photo grid | Community page shows a link-out card; the on-site slideshow covers photos |
+| **A print store** (Bonfire etc.) | Evergreen merch | `products` is empty and the shop shows drops only. Batch jersey drops don't need it |
 
-Fill each one in via **Site settings** in the CMS as the accounts come online.
-No code change needed for any of them.
-
----
+Fill any of them in via **Site settings** in the CMS as and when the team
+decides. No code changes needed for any except the Instagram widget, which
+needs its script origin allowlisted in `public/_headers`.
 
 ## Moving to Cloudflare Pages
 

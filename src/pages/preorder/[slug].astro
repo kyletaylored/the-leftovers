@@ -187,7 +187,10 @@ const schema = [
             nameOnBack={d.customisation.nameOnBack}
             numberOnBack={d.customisation.numberOnBack}
             paymentMethods={d.paymentMethods}
-            endpoint={site.preorderForm.endpoint}
+            endpoint={site.preorderForm.endpoint || undefined}
+            provider={site.preorderForm.provider || undefined}
+            fieldMap={site.preorderForm.googleFormFields}
+            teamEmail={site.social.email}
             turnstileSiteKey={site.preorderForm.turnstileSiteKey || undefined}
           />
         </div>

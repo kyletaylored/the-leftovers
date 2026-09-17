@@ -11,9 +11,21 @@ import { cn } from '@/lib/utils';
  * confirmation screen that states the amount, the payment handles, and in
  * plain words that a spot is not held until payment arrives.
  *
- * Posts as a normal form submission to whatever endpoint site settings give
- * it (§4's pattern: no backend of our own, no PII through our infrastructure).
- * See docs/PREORDERS.md for the two supported backends.
+ * Two modes, and the DEFAULT one commits the team to nothing:
+ *
+ *  - `handoff` (no endpoint configured) — the form validates, prices and
+ *    formats the order, then hands the finished text back to the buyer to
+ *    send themselves by email or paste wherever the team already talks. No
+ *    account, no signup, no monthly cap, no vendor. The form still does the
+ *    valuable part: turning a comment thread into a complete, unambiguous
+ *    order with a total on it.
+ *  - `post` (endpoint configured) — submits directly. Works with a form
+ *    relay, a Cloudflare Function, or a **Google Form's `formResponse`
+ *    endpoint** via `provider: 'google-form'`, which maps our field names
+ *    onto Google's `entry.NNN` ids so responses land in a Google Sheet while
+ *    the visible form stays entirely ours.
+ *
+ * See docs/PREORDERS.md.
  *
  * Bot protection without a server: a honeypot field real users never see, and
  * a minimum fill time — a bot that posts in under three seconds is rejected
@@ -41,8 +53,17 @@ interface PreorderFormProps {
   nameOnBack: boolean;
   numberOnBack: boolean;
   paymentMethods: PaymentMethod[];
-  /** Form relay endpoint. Empty renders the fallback notice instead. */
-  endpoint: string;
+  /** Optional submit endpoint. Empty = `handoff` mode (the default). */
+  endpoint?: string;
+  /** `google-form` switches to Google's entry.NNN encoding. */
+  provider?: string;
+  /**
+   * Google Forms only: our field name -> `entry.NNN` id. See
+   * docs/PREORDERS.md for how to read the ids off a prefill link.
+   */
+  fieldMap?: Record<string, string>;
+  /** Where a handoff-mode order is emailed. */
+  teamEmail: string;
   /** Optional Turnstile site key. */
   turnstileSiteKey?: string;
   maxJerseys?: number;
@@ -79,6 +100,9 @@ export default function PreorderForm({
   numberOnBack,
   paymentMethods,
   endpoint,
+  provider,
+  fieldMap = {},
+  teamEmail,
   turnstileSiteKey,
   maxJerseys = 6,
 }: PreorderFormProps) {
@@ -86,8 +110,10 @@ export default function PreorderForm({
   const [rows, setRows] = useState<JerseyRow[]>([
     { id: 1, variant: variants[0]?.name ?? '', size: '', nameOnBack: '', numberOnBack: '' },
   ]);
-  const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+  const [state, setState] = useState<'idle' | 'sending' | 'review' | 'done' | 'error'>('idle');
   const [error, setError] = useState<string>();
+  const [summary, setSummary] = useState('');
+  const [copied, setCopied] = useState(false);
 
   const total = useMemo(() => rows.length * price, [rows.length, price]);
 
@@ -113,6 +139,39 @@ export default function PreorderForm({
   const removeRow = (id: number) =>
     setRows((prev) => (prev.length === 1 ? prev : prev.filter((row) => row.id !== id)));
 
+  /** One readable order, for a human reading an email — not a database row. */
+  function buildSummary(data: FormData) {
+    const lines = rows.map((row, index) => {
+      const parts = [`  ${index + 1}. ${row.variant}`, `size ${row.size}`];
+      if (nameOnBack && row.nameOnBack) parts.push(`name "${row.nameOnBack}"`);
+      if (numberOnBack && row.numberOnBack) parts.push(`number ${row.numberOnBack}`);
+      return parts.join(' · ');
+    });
+
+    const get = (key: string) => String(data.get(key) ?? '').trim();
+
+    return [
+      `${campaign} — pre-order`,
+      '',
+      `Jerseys (${rows.length}):`,
+      ...lines,
+      '',
+      `Total: ${money(total, currency)}`,
+      '',
+      `Name:  ${get('fullName')}`,
+      `Email: ${get('email')}`,
+      ...(get('phone') ? [`Phone: ${get('phone')}`] : []),
+      '',
+      'Ship to:',
+      ...get('address')
+        .split('\n')
+        .map((line) => `  ${line}`),
+      '',
+      ...(get('paymentMethod') ? [`Paying by: ${get('paymentMethod')}`] : []),
+      ...(get('notes') ? [`Notes: ${get('notes')}`] : []),
+    ].join('\n');
+  }
+
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
@@ -126,26 +185,49 @@ export default function PreorderForm({
       return;
     }
 
-    // Flatten the jersey rows into readable lines, because the person reading
-    // this is the captain in an email, not a database.
+    const text = buildSummary(data);
+    setSummary(text);
+    setError(undefined);
+
+    // Default path: hand the finished order back to the buyer. Nothing leaves
+    // the browser, so there is no service to sign up for and no cap to hit.
+    if (!endpoint) {
+      setState('review');
+      return;
+    }
+
     data.delete('company');
     data.set('campaign', campaign);
     data.set('jerseyCount', String(rows.length));
     data.set('orderTotal', money(total, currency));
-    data.set(
-      'jerseys',
-      rows
-        .map((row, index) => {
-          const parts = [`#${index + 1}`, row.variant, `size ${row.size}`];
-          if (nameOnBack && row.nameOnBack) parts.push(`name "${row.nameOnBack}"`);
-          if (numberOnBack && row.numberOnBack) parts.push(`number ${row.numberOnBack}`);
-          return parts.join(' · ');
-        })
-        .join('\n')
-    );
+    data.set('summary', text);
 
     setState('sending');
-    setError(undefined);
+
+    /**
+     * Google Forms path.
+     *
+     * Google serves no CORS headers on `formResponse`, so this is necessarily
+     * `mode: 'no-cors'` — the request goes out, the response is opaque, and we
+     * CANNOT tell whether it succeeded. That's why the confirmation screen
+     * still shows the order text and a copy button: if this silently failed,
+     * the buyer hasn't lost anything and can send it across themselves.
+     */
+    if (provider === 'google-form') {
+      const params = new URLSearchParams();
+      for (const [name, entryId] of Object.entries(fieldMap)) {
+        const value = String(data.get(name) ?? '').trim();
+        if (value) params.set(entryId, value);
+      }
+      try {
+        await fetch(endpoint, { method: 'POST', mode: 'no-cors', body: params });
+      } catch {
+        // Opaque either way; fall through to the receipt.
+      }
+      setState('done');
+      return;
+    }
+
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -155,22 +237,109 @@ export default function PreorderForm({
       if (!response.ok) throw new Error(`Submission failed (${response.status})`);
       setState('done');
     } catch {
-      setState('error');
+      // Falling back to the handoff view beats a dead end: the order is
+      // already formatted, so the buyer can still send it themselves.
+      setState('review');
       setError(
-        'That didn’t go through. Try again, or message the captain directly and we’ll take it down manually.'
+        'Couldn\u2019t send that automatically — here\u2019s your order to send across instead.'
       );
     }
   }
 
-  if (!endpoint) {
+  async function copySummary() {
+    try {
+      await navigator.clipboard.writeText(summary);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2500);
+    } catch {
+      // Clipboard can be blocked; the textarea is selectable as a fallback.
+      setCopied(false);
+    }
+  }
+
+  const mailtoHref = `mailto:${teamEmail}?subject=${encodeURIComponent(
+    `Pre-order: ${campaign}`
+  )}&body=${encodeURIComponent(summary)}`;
+
+  /** Shared: what to pay, how, and the sentence that matters most. */
+  const nextSteps = (
+    <>
+      {paymentMethods.length > 0 && (
+        <div className="mt-5 border-l-2 border-gold pl-4">
+          <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-gold-300">
+            Send payment via
+          </p>
+          <ul className="mt-2 space-y-1 text-sm text-bone">
+            {paymentMethods.map((method) => (
+              <li key={method.label}>
+                {method.label}
+                {method.handle && <span className="text-bone-muted"> — {method.handle}</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <p className="mt-5 text-sm leading-relaxed text-bone-muted">
+        <strong className="text-bone">Your spot isn&rsquo;t held until payment arrives.</strong>{' '}
+        We&rsquo;ll confirm once it does. If you don&rsquo;t hear back within a day or two, chase
+        us — it means something went wrong, not that you&rsquo;re in.
+      </p>
+    </>
+  );
+
+  // Handoff mode: the order is priced and formatted; the buyer sends it.
+  if (state === 'review') {
     return (
-      <div className="rounded-sm border border-dashed border-gold/50 bg-ink-800/60 p-6">
-        <h3 className="font-display text-xl uppercase text-bone">Order form not connected</h3>
-        <p className="mt-2 text-sm leading-relaxed text-bone-muted">
-          Set <code className="text-gold-300">preorderForm.endpoint</code> in site settings to start
-          taking orders. Until then, orders still go through the Facebook post — see
-          docs/PREORDERS.md for the two ways to wire this up.
+      <div className="rounded-sm border border-gold/60 bg-ink-800 p-6 sm:p-8" role="status" aria-live="polite">
+        <h3 className="font-display text-2xl uppercase text-bone">Your order is ready to send</h3>
+        <p className="mt-3 text-sm leading-relaxed text-bone-muted">
+          {rows.length} {rows.length === 1 ? 'jersey' : 'jerseys'} — total{' '}
+          <strong className="text-bone">{money(total, currency)}</strong>. Email it across or paste
+          it wherever you normally reach us. Nothing has been sent automatically.
         </p>
+
+        {error && (
+          <p className="mt-3 text-sm text-crimson-400" role="alert">
+            {error}
+          </p>
+        )}
+
+        <label htmlFor="order-summary" className={cn(label, 'mt-6')}>
+          Your order
+        </label>
+        <textarea
+          id="order-summary"
+          readOnly
+          rows={Math.min(20, summary.split('\n').length + 1)}
+          value={summary}
+          onFocus={(e) => e.currentTarget.select()}
+          className="w-full rounded-sm border border-input bg-ink-900 p-3 font-mono text-xs leading-relaxed text-bone"
+        />
+
+        <div className="mt-4 flex flex-wrap gap-3">
+          <a
+            href={mailtoHref}
+            className="inline-flex min-h-11 items-center rounded-sm bg-crimson px-6 text-xs font-bold uppercase tracking-[0.14em] text-bone transition-colors hover:bg-crimson-600"
+          >
+            Email this order
+          </a>
+          <button
+            type="button"
+            onClick={copySummary}
+            className="inline-flex min-h-11 items-center rounded-sm border border-gold px-6 text-xs font-bold uppercase tracking-[0.14em] text-gold-300 transition-colors hover:bg-gold hover:text-ink"
+          >
+            {copied ? 'Copied' : 'Copy to clipboard'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setState('idle')}
+            className="inline-flex min-h-11 items-center px-2 text-xs font-bold uppercase tracking-[0.14em] text-bone-muted hover:text-bone"
+          >
+            Edit order
+          </button>
+        </div>
+
+        {nextSteps}
       </div>
     );
   }
@@ -188,28 +357,38 @@ export default function PreorderForm({
           <strong className="text-bone">{money(total, currency)}</strong>.
         </p>
 
-        {paymentMethods.length > 0 && (
-          <div className="mt-5 border-l-2 border-gold pl-4">
-            <p className="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-gold-300">
-              Send payment via
-            </p>
-            <ul className="mt-2 space-y-1 text-sm text-bone">
-              {paymentMethods.map((method) => (
-                <li key={method.label}>
-                  {method.label}
-                  {method.handle && <span className="text-bone-muted"> — {method.handle}</span>}
-                </li>
-              ))}
-            </ul>
+        {/* Kept as a receipt on purpose. A Google Forms submission is opaque
+            (no CORS), so we can't prove it landed — this way a silent failure
+            costs the buyer nothing. */}
+        <details className="mt-5">
+          <summary className="cursor-pointer text-xs font-bold uppercase tracking-[0.14em] text-gold-300">
+            Your order, for your records
+          </summary>
+          <textarea
+            readOnly
+            rows={Math.min(20, summary.split('\n').length + 1)}
+            value={summary}
+            onFocus={(e) => e.currentTarget.select()}
+            className="mt-3 w-full rounded-sm border border-input bg-ink-900 p-3 font-mono text-xs leading-relaxed text-bone"
+          />
+          <div className="mt-3 flex flex-wrap gap-3">
+            <a
+              href={mailtoHref}
+              className="inline-flex min-h-11 items-center rounded-sm border border-gold px-5 text-xs font-bold uppercase tracking-[0.14em] text-gold-300 transition-colors hover:bg-gold hover:text-ink"
+            >
+              Email a copy
+            </a>
+            <button
+              type="button"
+              onClick={copySummary}
+              className="inline-flex min-h-11 items-center px-2 text-xs font-bold uppercase tracking-[0.14em] text-bone-muted hover:text-bone"
+            >
+              {copied ? 'Copied' : 'Copy'}
+            </button>
           </div>
-        )}
+        </details>
 
-        {/* The single most important sentence on the page. */}
-        <p className="mt-5 text-sm leading-relaxed text-bone-muted">
-          <strong className="text-bone">Your spot isn&rsquo;t held until payment arrives.</strong>{' '}
-          We&rsquo;ll confirm by email once it does. If you don&rsquo;t hear back within a day or
-          two, chase us — it means something went wrong, not that you&rsquo;re in.
-        </p>
+        {nextSteps}
       </div>
     );
   }

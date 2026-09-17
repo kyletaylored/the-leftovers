@@ -45,8 +45,9 @@ const settingsSchema = z.object({
     })
     .prefault({}),
   mailingList: z.object({
-    provider: z.string(),
-    formAction: z.url(),
+    provider: z.string().default(''),
+    /** Empty until a provider is chosen; the UI degrades rather than break. */
+    formAction: z.union([z.url(), z.literal('')]).default(''),
     emailFieldName: z.string().default('email'),
     hiddenFields: z.record(z.string(), z.string()).default({}),
   }),
@@ -55,6 +56,7 @@ const settingsSchema = z.object({
       provider: z.string().default(''),
       endpoint: z.string().default(''),
       turnstileSiteKey: z.string().default(''),
+      googleFormFields: z.record(z.string(), z.string()).default({}),
     })
     .prefault({}),
   shop: z

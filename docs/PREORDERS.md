@@ -11,9 +11,11 @@ that, not around looking like a checkout:
 - a confirmation screen stating the amount and the payment handles,
 - and one blunt sentence: **your spot isn't held until payment arrives.**
 
-**No payment is taken on the site.** Payment stays a person-to-person Venmo /
-Zelle / cash arrangement, exactly as it works today. The form's job is to
-produce one unambiguous order request per buyer.
+**No payment is taken on the site**, and **no third-party tool is required.**
+Payment stays a person-to-person Venmo / Zelle / cash arrangement, exactly as
+it works today. The form's job is to produce one unambiguous, priced order
+request per buyer — everything after that is still as informal as the team
+wants it to be.
 
 ---
 
@@ -44,32 +46,113 @@ rather than show a stale bar.
 
 ---
 
-## Wiring up the form (one-time, needs a developer)
+## How submission works
 
-The form posts to whatever endpoint `preorderForm.endpoint` in site settings
-gives it. **With no endpoint set it renders a "not connected" notice** rather
-than silently swallowing orders.
+The form does the valuable part regardless of tooling: it validates the order,
+prices it, and formats it. What happens next has three tiers, and **the
+default requires no accounts, no signups and no commitment to any tool.**
 
-Two supported options.
+### Default — hand the order back to the buyer (nothing to set up)
 
-### Option A — a free form relay (works today, on GitHub Pages)
+With `preorderForm.endpoint` empty, which is how it ships:
 
-Sign up for a relay that accepts a plain `POST` and emails you the submission
-(Web3Forms, Formspree, Basin and similar all do). Put its endpoint in site
-settings and you're done.
+1. The buyer fills in the form and hits **Place pre-order**.
+2. They get a **review screen** with the finished order as selectable text,
+   the total, and the payment handles.
+3. They send it themselves — **Email this order** (a prefilled `mailto:` to the
+   team address) or **Copy to clipboard** to paste into Discord, Messenger, or
+   wherever the team already talks.
 
-- **Works right now**, no hosting change.
-- **100% our design** — this is a real form on our page, not an iframe, so it
-  matches the site exactly.
-- Data arrives by email, and most relays can also push to a Google Sheet.
+Nothing leaves the browser. No third-party service, no monthly cap, no vendor
+to migrate off later, and no data sitting in someone's SaaS account.
 
-**The catch:** free tiers cap submissions per month, and a 40-jersey drop plus
-mistakes and duplicates can get close. Check the cap before a big drop.
-Bot protection is the honeypot and timing check below plus whatever the relay
-does server-side — a Turnstile key alone won't help here, because nothing
-verifies the token.
+It is still a large improvement on a comment thread, because the thing the
+comment thread got wrong was never the sending — it was that orders arrived
+incomplete, unpriced and ambiguous. Here every order arrives with sizes, names,
+numbers and a total, in the same format every time.
 
-### Option B — Cloudflare Pages Function (better, needs the Cloudflare move)
+**The tradeoff, stated plainly:** the buyer has to complete the send, so some
+will drop off between the review screen and their mail client. If that starts
+costing real orders, that's the signal to move to a tier below — not before.
+
+### Recommended next step — a Google Form as the backend (free, unlimited)
+
+Worth being precise, because there are two very different ways to "use a
+Google Form" and only one of them looks good.
+
+**Embedding the form in an iframe cannot be made to match this site.** A
+cross-origin iframe can't be restyled — no CSS reaches inside it. Google's own
+theming is a header colour, a font choice and a background, so an embedded
+form will always look like a Google Form sitting in a hole in the page. If the
+goal is "make it look nice", this isn't the route.
+
+**Posting our own form to a Google Form's endpoint is a different story**, and
+it's a good fit here:
+
+- **Free and effectively unlimited** — no submission cap to watch.
+- **Responses land in a Google Sheet** automatically, which is a genuinely good
+  place to run a 40-jersey drop from: sort, filter, tick people off as payment
+  arrives, export.
+- **You already have a Google account**, so there's no new tool to commit to.
+- **The visible form stays 100% ours** — the on-brand form you already have.
+
+Set it up:
+
+1. Build a Google Form with one question per field you want as a **column**.
+   Short answer for `fullName`, `email`, `phone`, `paymentMethod`,
+   `orderTotal`, `jerseyCount`; **paragraph** for `address` and `summary`.
+2. Click **⋮ → Get pre-filled link**, put junk in every field, and copy the
+   generated URL. It contains `entry.123456789=junk` pairs — those numbers are
+   the field ids.
+3. In site settings set `provider: google-form`, set `endpoint` to the form's
+   `.../formResponse` URL (take the `/viewform` URL and swap the last
+   segment), and fill in `googleFormFields`:
+
+   ```yaml
+   preorderForm:
+     provider: google-form
+     endpoint: https://docs.google.com/forms/d/e/FORM_ID/formResponse
+     googleFormFields:
+       fullName: entry.111111111
+       email: entry.222222222
+       phone: entry.333333333
+       address: entry.444444444
+       paymentMethod: entry.555555555
+       orderTotal: entry.666666666
+       jerseyCount: entry.777777777
+       summary: entry.888888888
+   ```
+
+Only map what you want columns for. `summary` is the important one — it holds
+the full per-jersey breakdown (version, size, name, number) as formatted text,
+so you don't need a column per jersey.
+
+**Three honest caveats:**
+
+1. **We can't confirm it worked.** Google serves no CORS headers on
+   `formResponse`, so the request is necessarily fire-and-forget and the
+   response is opaque to us. That's why the confirmation screen still shows the
+   order text with a copy button — if a submission silently fails, the buyer
+   hasn't lost anything. **Send a test order and check the Sheet after any
+   change to the form.**
+2. **Field ids break if you recreate a question.** Renaming a question is safe;
+   deleting and re-adding it changes the `entry.NNN`. If orders stop appearing,
+   re-read the prefill link first.
+3. **Google's own spam protection doesn't apply**, because we're bypassing
+   their UI. Bot protection is our honeypot and timing check below.
+
+### Later — a form relay (one signup, ~5 minutes)
+
+When the team wants orders to arrive automatically, sign up for any service
+that accepts a plain `POST` and emails you the result (Web3Forms, Formspree,
+Basin and similar). Put its URL in `preorderForm.endpoint` and the form starts
+submitting directly. **The review screen stays as the fallback** if the request
+fails, so a relay outage can't lose an order.
+
+Still fully on-brand — a real form on our page, not an embedded iframe.
+Watch the free-tier monthly submission cap before a big drop.
+
+### Eventually — a Cloudflare Pages Function (the proper version)
 
 Once the site is on Cloudflare Pages (see [DEPLOY.md](DEPLOY.md) — it's also
 what activates the security headers), add a function at
@@ -78,21 +161,13 @@ what activates the security headers), add a function at
 1. reads the submitted `FormData`,
 2. **verifies the Turnstile token server-side** against
    `https://challenges.cloudflare.com/turnstile/v0/siteverify`,
-3. writes the order somewhere durable — D1, or an append to a Google Sheet,
+3. writes the order somewhere durable (D1, or an append to a spreadsheet),
 4. emails the captain a formatted copy.
 
-Then set `preorderForm.endpoint` to `/api/preorder` and
-`preorderForm.turnstileSiteKey` to your Turnstile site key.
+Then set `endpoint` to `/api/preorder` and `turnstileSiteKey` to your site key.
+Real bot protection, no submission cap worth worrying about, no third party.
 
-- **Real bot protection**, because the token is actually checked.
-- **No submission cap** worth worrying about (100k requests/day free).
-- No third-party form service in the loop.
-
-**This is the recommended end state.** Option A exists so orders can stop
-going through Facebook comments this week rather than after a hosting
-migration.
-
----
+**None of this is required to start taking orders.** Tier 1 works today.
 
 ## Bot protection as shipped
 

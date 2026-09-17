@@ -51,20 +51,28 @@ export default defineConfig({
       fallbacks: ['system-ui', 'sans-serif'],
     },
     {
-      // The display face used in the official logo lockup. Self-hosted from
-      // src/assets/fonts (NOT public/, which would duplicate the file into the
-      // build output), and pre-converted to woff2 by `npm run font` — Astro's
-      // local provider serves the file as given, and the supplied .ttf was
-      // 31KB against 19KB for the same glyphs in woff2.
+      /**
+       * The display face from the official logo lockup. Licensed for web use
+       * (Comic Book Fonts LLC), so the WOFF2 from the vendor's `Web/` folder
+       * is what ships — the OTF/TTF in that download are desktop-only.
+       *
+       * NOT subsetted, and deliberately so: the licence forbids derivative
+       * works and reverse-engineering, which is exactly what subsetting or
+       * re-encoding the file would be. 47KB is the price of using it legally,
+       * which is also why it is not preloaded (see BaseLayout).
+       *
+       * Licence is per-domain with a monthly pageview allowance — see
+       * ATTRIBUTIONS.md before adding a second domain or celebrating traffic.
+       */
       provider: fontProviders.local(),
-      name: 'Monster Mash',
+      name: 'CC Monster Mash',
       cssVariable: '--font-brush',
       fallbacks: ['Impact', 'fantasy'],
       options: {
         variants: [
           {
-            src: ['./src/assets/fonts/MonsterMashMedium.woff2'],
-            weight: 500,
+            src: ['./src/assets/fonts/CCMonsterMash-Regular.woff2'],
+            weight: 400,
             style: 'normal',
           },
         ],

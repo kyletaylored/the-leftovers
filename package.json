@@ -10,8 +10,7 @@
     "check": "astro check",
     "astro": "astro",
     "og": "node scripts/make-og-default.mjs",
-    "brand": "node scripts/prep-brand-assets.mjs",
-    "font": "node scripts/prep-font.mjs"
+    "brand": "node scripts/prep-brand-assets.mjs"
   },
   "type": "module",
   "dependencies": {
@@ -36,7 +35,6 @@
     "@types/js-yaml": "^4.0.9",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "typescript": "^6.0.3",
-    "wawoff2": "^2.0.1"
+    "typescript": "^6.0.3"
   }
 }

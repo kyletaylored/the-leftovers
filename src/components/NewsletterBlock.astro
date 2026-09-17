@@ -3,10 +3,15 @@
  * NewsletterBlock — a native <form> posting DIRECTLY to the email provider
  * (§4, §8.3).
  *
- * The action URL comes from site settings, so switching Buttondown →
- * Mailchimp is a CMS edit, not a code change. No PII ever touches our
- * infrastructure and there is no backend to run: the provider owns the
- * double-opt-in, the list and the unsubscribe link.
+ * The action URL comes from site settings, so switching providers is a CMS
+ * edit, not a code change. No PII ever touches our infrastructure and there
+ * is no backend to run: the provider owns the double-opt-in, the list and the
+ * unsubscribe link.
+ *
+ * With NO provider configured — the current state, since the team hasn't
+ * committed to one — this renders the community channels instead. A signup
+ * box that posts nowhere is worse than no signup box: people type an address,
+ * believe they're subscribed, and hear nothing.
  */
 import { site } from '@/lib/settings';
 import Lantern from './brand/Lantern.astro';
@@ -20,15 +25,30 @@ interface Props {
   as?: 'h2' | 'h3';
   class?: string;
 }
+const { formAction, emailFieldName, hiddenFields } = site.mailingList;
+const configured = Boolean(formAction);
+
+/** Where to send people while there's no list to join. */
+type Fallback = { icon: 'discord' | 'facebook' | 'instagram'; label: string; href: string };
+const fallbacks: Fallback[] = (
+  [
+    { icon: 'discord', label: 'Discord', href: site.social.discord },
+    { icon: 'facebook', label: 'Facebook', href: site.social.facebookGroup },
+    { icon: 'instagram', label: 'Instagram', href: site.social.instagram },
+  ] satisfies Array<Omit<Fallback, 'href'> & { href?: string }>
+).flatMap((channel) => (channel.href ? [{ ...channel, href: channel.href }] : []));
+
+// Copy shifts with the state: promising "a few emails a season" when there is
+// no list to join would be a straightforward lie.
 const {
-  title = 'Community & Newsletter',
+  title = configured ? 'Community & Newsletter' : 'Follow Along',
   eyebrow = 'Stay in the loop',
-  body = 'Event dates, roster openings, and jersey drops — a few emails a season, never more.',
+  body = configured
+    ? 'Event dates, roster openings, and jersey drops — a few emails a season, never more.'
+    : 'Event dates, roster openings and jersey drops all get posted in the community channels.',
   as: Heading = 'h2',
   class: className = '',
 } = Astro.props;
-
-const { formAction, emailFieldName, hiddenFields } = site.mailingList;
 ---
 
 <div
@@ -49,39 +69,69 @@ const { formAction, emailFieldName, hiddenFields } = site.mailingList;
     <Heading class="text-3xl text-bone sm:text-4xl">{title}</Heading>
     <p class="mt-2 max-w-md text-sm leading-relaxed text-bone-muted">{body}</p>
 
-    <form
-      action={formAction}
-      method="post"
-      target="_blank"
-      class="mt-5 flex flex-col gap-3 sm:max-w-lg sm:flex-row"
-    >
-      {Object.entries(hiddenFields).map(([name, value]) => <input type="hidden" name={name} value={value} />)}
+    {
+      configured ? (
+        <>
+          <form
+            action={formAction}
+            method="post"
+            target="_blank"
+            class="mt-5 flex flex-col gap-3 sm:max-w-lg sm:flex-row"
+          >
+            {Object.entries(hiddenFields).map(([name, value]) => (
+              <input type="hidden" name={name} value={value} />
+            ))}
 
-      <div class="flex-1">
-        <label for="newsletter-email" class="sr-only">Email address</label>
-        <input
-          id="newsletter-email"
-          type="email"
-          name={emailFieldName}
-          required
-          autocomplete="email"
-          placeholder="Enter your email address…"
-          class="tap w-full rounded-sm border border-ink-600 bg-ink-900 px-4 py-3 text-sm text-bone placeholder:text-bone-muted/70 focus:border-gold focus:outline-none"
-        />
-      </div>
+            <div class="flex-1">
+              <label for="newsletter-email" class="sr-only">Email address</label>
+              <input
+                id="newsletter-email"
+                type="email"
+                name={emailFieldName}
+                required
+                autocomplete="email"
+                placeholder="Enter your email address…"
+                class="tap w-full rounded-sm border border-ink-600 bg-ink-900 px-4 py-3 text-sm text-bone placeholder:text-bone-muted/70 focus:border-gold focus:outline-none"
+              />
+            </div>
 
-      <button
-        type="submit"
-        class="tap inline-flex shrink-0 items-center justify-center gap-2 rounded-sm bg-crimson px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-bone transition-colors hover:bg-crimson-600"
-      >
-        Subscribe
-        <Icon name="arrow-right" class="size-4" />
-      </button>
-    </form>
+            <button
+              type="submit"
+              class="tap inline-flex shrink-0 items-center justify-center gap-2 rounded-sm bg-crimson px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-bone transition-colors hover:bg-crimson-600"
+            >
+              Subscribe
+              <Icon name="arrow-right" class="size-4" />
+            </button>
+          </form>
 
-    <p class="mt-3 text-xs text-bone-muted">
-      Handled by {site.mailingList.provider}. Unsubscribe any time — we never sell or share your
-      address.
-    </p>
+          <p class="mt-3 text-xs text-bone-muted">
+            Handled by {site.mailingList.provider}. Unsubscribe any time — we never sell or share
+            your address.
+          </p>
+        </>
+      ) : (
+        <div class="mt-5">
+          <ul class="flex flex-wrap gap-3">
+            {
+              fallbacks.map((channel) => (
+                <li>
+                  <a
+                    href={channel.href}
+                    rel="noopener"
+                    class="tap inline-flex items-center gap-2 rounded-sm border border-gold px-5 py-3 text-xs font-bold uppercase tracking-[0.14em] text-gold-300 transition-colors hover:bg-gold hover:text-ink"
+                  >
+                    <Icon name={channel.icon} class="size-4" />
+                    {channel.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-3 max-w-md text-xs leading-relaxed text-bone-muted">
+            There's no mailing list yet — everything gets posted in the channels above first.
+          </p>
+        </div>
+      )
+    }
   </div>
 </div>

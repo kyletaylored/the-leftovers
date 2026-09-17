@@ -69,15 +69,17 @@ instagramWidget:
   scriptSrc: ''
   elementClass: ''
 
-# Mailing list: a native <form> posting straight to the provider, so no PII
-# ever touches our infrastructure (§4, §8.3).
+# Mailing list. A native <form> posting straight to a provider, so no PII ever
+# touches our infrastructure (§4, §8.3).
+#
+# No provider is chosen yet and the team doesn't want to commit to one. With
+# `formAction` empty the newsletter block points people at the community
+# channels instead of rendering a form that posts nowhere.
 mailingList:
-  provider: buttondown
-  formAction: https://buttondown.com/api/emails/embed-subscribe/theleftovers
+  provider: ''
+  formAction: ''
   emailFieldName: email
-  # Buttondown wants this hidden field; Mailchimp uses a different scheme.
-  hiddenFields:
-    embed: '1'
+  hiddenFields: {}
 
 shop:
   # Bonfire campaign for evergreen items (§8.2). Batch jersey drops are taken
@@ -86,15 +88,23 @@ shop:
   bonfireUrl: ''
   alwaysOpenUrl: ''
 
-# On-site pre-order form. See docs/PREORDERS.md for the two backends.
-# Empty endpoint = the form renders a "not connected" notice instead of
-# silently swallowing orders.
+# On-site pre-order form. See docs/PREORDERS.md.
+#
+# Leave `endpoint` EMPTY and the form still works: it prices and formats the
+# order, then hands it to the buyer to email or paste. No account, no cap, no
+# tool to commit to.
+#
+# To post automatically, set `endpoint` and (for a Google Form)
+# provider: google-form plus the googleFormFields map below.
 preorderForm:
   provider: ''
   endpoint: ''
   # Cloudflare Turnstile. Only real protection once the endpoint verifies the
   # token server-side — a site key alone is decoration.
   turnstileSiteKey: ''
+  # Google Forms only: our field name -> Google's entry.NNN id.
+  # docs/PREORDERS.md explains how to read these off a prefill link.
+  googleFormFields: {}
 
 footerNote: >-
   Free agents welcome. Show up, pay your entry, play the tournament —
