@@ -119,6 +119,8 @@ scripts/make-og-default.mjs  Generates the social card
 
 - Editing content (for the team, no code required): **[docs/EDITING.md](docs/EDITING.md)**
 - First-time CMS + hosting setup: **[docs/DEPLOY.md](docs/DEPLOY.md)**
+- Section-by-section PRD audit — what shipped, what deviates and why:
+  **[docs/PRD-CONFORMANCE.md](docs/PRD-CONFORMANCE.md)**
 
 Day to day: a save in Pages CMS is a commit to `main`, which triggers
 `.github/workflows/deploy.yml` and is live in a couple of minutes. There is no

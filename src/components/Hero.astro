@@ -2,8 +2,28 @@
 /**
  * Hero — the homepage brand lockup (§7 traditional components).
  *
- * Three variants: `brand` (mascot + wordmark, the mockup's hero), `image`
- * (photography with an overlay) and `text` (copy only).
+ * Four variants per §7: `brand` (mascot + wordmark, the mockup's hero),
+ * `image` (photography with an overlay), `video` (looping background) and
+ * `text` (copy only).
+ *
+ * The `video` variant is the one that can wreck a mobile visit, so it is
+ * deliberately conservative and ships ZERO JavaScript:
+ *
+ *  - A `poster` image is REQUIRED and is rendered through <Image> as the
+ *    eager, high-priority backdrop. That image — not the video — is the LCP
+ *    element, so the hero paints at the same speed as every other variant
+ *    and can't shift when the clip arrives.
+ *  - `muted` + `playsinline` + `preload="metadata"`: autoplay works without
+ *    a script, and only metadata is fetched up front.
+ *  - Under prefers-reduced-motion the <video> is hidden and paused in CSS and
+ *    the poster stands in permanently.
+ *
+ * No loader script, deliberately: an inline one would be blocked by the
+ * site's own CSP (`script-src 'self'`, see public/_headers), and a hoisted
+ * one would ship a JS request to every page using ANY Hero variant, video or
+ * not. The honest limitation of doing it declaratively is that a
+ * reduced-motion visitor may still fetch the video's metadata before CSS
+ * hides it — bounded by `preload="metadata"`, but not zero.
  *
  * Everything decorative here is SVG — clouds, lanterns, terraced ridge, the
  * topo texture — so the largest hero element by bytes is the wordmark, not a
@@ -19,23 +39,43 @@ import Lantern from './brand/Lantern.astro';
 import TerracedDivider from './brand/TerracedDivider.astro';
 
 interface Props {
-  variant?: 'brand' | 'image' | 'text';
+  variant?: 'brand' | 'image' | 'video' | 'text';
   title?: string;
   tagline?: string;
   image?: ImageMetadata;
   imageAlt?: string;
+  /** `video` variant: path to the looping clip, e.g. "/video/break.mp4". */
+  video?: string;
+  /** Required for `video` — it's the poster AND the reduced-motion fallback. */
+  poster?: ImageMetadata;
   class?: string;
 }
 
-const { variant = 'brand', title, tagline, image, imageAlt = '', class: className = '' } = Astro.props;
+const {
+  variant = 'brand',
+  title,
+  tagline,
+  image,
+  imageAlt = '',
+  video,
+  poster,
+  class: className = '',
+} = Astro.props;
+
+// A video hero with no poster would flash empty and take the LCP hit with it.
+if (variant === 'video' && (!video || !poster)) {
+  throw new Error('Hero variant="video" requires both `video` and `poster`.');
+}
+
+const backdrop = variant === 'video' ? poster : image;
 ---
 
 <section class:list={['bg-topo relative overflow-hidden', className]}>
   {
-    variant === 'image' && image && (
+    (variant === 'image' || variant === 'video') && backdrop && (
       <>
         <Image
-          src={image}
+          src={backdrop}
           alt={imageAlt}
           widths={[640, 960, 1440, 1920]}
           sizes="100vw"
@@ -43,7 +83,21 @@ const { variant = 'brand', title, tagline, image, imageAlt = '', class: classNam
           fetchpriority="high"
           class="absolute inset-0 size-full object-cover opacity-45"
         />
-        <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/30"></div>
+        {variant === 'video' && (
+          <video
+            class="hero-video absolute inset-0 size-full object-cover opacity-45"
+            src={video}
+            autoplay
+            muted
+            loop
+            playsinline
+            disablepictureinpicture
+            preload="metadata"
+            aria-hidden="true"
+            tabindex="-1"
+          />
+        )}
+        <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/30" />
       </>
     )
   }
@@ -86,3 +140,13 @@ const { variant = 'brand', title, tagline, image, imageAlt = '', class: classNam
 
   <TerracedDivider seed={3} class="absolute bottom-0 left-0 h-16 sm:h-24 lg:h-28" />
 </section>
+
+<style>
+  /* A background clip is decoration. Under reduced-motion the poster image
+     underneath it is the whole hero. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-video {
+      display: none;
+    }
+  }
+</style>
