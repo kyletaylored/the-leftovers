@@ -11,7 +11,7 @@ description: >-
 established: 2022
 # Optional. Leave blank until the team decides how it wants to describe its
 # region; it feeds the footer and the SportsTeam structured data.
-homeBase: ''
+homeBase: ""
 
 nav:
   - label: Home
@@ -45,7 +45,6 @@ social:
   instagram: https://www.instagram.com/leftoverspb/
   facebookGroup: https://www.facebook.com/leftoverspb
   discord: https://discord.gg/
-  youtube: https://www.youtube.com/@leftoverspb
   tiktok: https://www.tiktok.com/@leftoverspb
   email: team@theleftoverspb.com
 
@@ -60,14 +59,14 @@ facebookPagePlugin:
 
 # Discord's official, free server widget (§8.3). Put the numeric server ID
 # here to render the live member count block on /community.
-discordServerId: ''
+discordServerId: ""
 
 # Instagram feed widget (§8.3). Paste the <script> src from the chosen
 # provider's free tier (Elfsight / Juicer / SnapWidget) and its element class.
 instagramWidget:
-  provider: ''
-  scriptSrc: ''
-  elementClass: ''
+  provider: ""
+  scriptSrc: ""
+  elementClass: ""
 
 # Mailing list. A native <form> posting straight to a provider, so no PII ever
 # touches our infrastructure (§4, §8.3).
@@ -76,8 +75,8 @@ instagramWidget:
 # `formAction` empty the newsletter block points people at the community
 # channels instead of rendering a form that posts nowhere.
 mailingList:
-  provider: ''
-  formAction: ''
+  provider: ""
+  formAction: ""
   emailFieldName: email
   hiddenFields: {}
 
@@ -85,8 +84,8 @@ shop:
   # Bonfire campaign for evergreen items (§8.2). Batch jersey drops are taken
   # through the on-site pre-order form below instead, because they need
   # per-jersey customisation Bonfire can't collect.
-  bonfireUrl: ''
-  alwaysOpenUrl: ''
+  bonfireUrl: ""
+  alwaysOpenUrl: ""
 
 # On-site pre-order form. See docs/PREORDERS.md.
 #
@@ -101,7 +100,7 @@ preorderForm:
   endpoint: https://docs.google.com/forms/d/e/1FAIpQLSfLHwT4Z3KBbdlC9PiD1aLS3VmOV6artoKhnygFCFRjWOxFLw/formResponse
   # Cloudflare Turnstile can't be verified by a Google Form (nothing runs
   # server-side), so leave this empty until the endpoint is a real function.
-  turnstileSiteKey: ''
+  turnstileSiteKey: ""
   # Our field name -> the form's entry id. Read off the live form's own
   # definition rather than guessed. Every one is OPTIONAL on the form, so a
   # blank value can't cause a silent rejection.
