@@ -63,9 +63,12 @@ const organizationSchema = {
 
     <Font cssVariable="--font-headline" preload />
     <Font cssVariable="--font-body" preload />
-    {/* Deliberately NOT preloaded: the display face is 31KB and its only
-        above-the-fold use is the small nav wordmark, so preloading it would
-        compete with the hero logo for bandwidth on the critical path. */}
+    {/* Deliberately NOT preloaded. Be aware this helps less than it seems:
+        the nav wordmark is above the fold, so the browser still fetches this
+        face at VeryHigh priority while building first paint (measured in
+        Lighthouse's network log). Not preloading avoids adding a second
+        competing high-priority hint alongside the hero logo, but it does not
+        move the font off the critical path. See ATTRIBUTIONS.md. */}
     <Font cssVariable="--font-brush" />
 
     <Seo {...seo} schema={[organizationSchema, ...(seo.schema ?? [])]} />

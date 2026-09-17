@@ -34,9 +34,11 @@ Read these before "optimising" the font. The licence is specific.
 - **Only the one cut we use.** `Worn` is the one that ships, chosen to match
   the roughed-up edges of the logo lettering. The download also includes
   Regular, Outline, Color and Legacy files; none are used, so none are
-  committed. `Worn` costs ~89KB against ~48KB for `Regular` — a knowing
-  trade for brand fidelity, and affordable only because the face is not
-  preloaded, so it never blocks first paint.
+  committed. `Worn` costs ~89KB against ~48KB for `Regular` — a knowing trade
+  for brand fidelity, worth ~0.3s of homepage LCP (2.1s against a 2.5s
+  budget). It is not preloaded, but measurement shows that doesn't make it
+  free: the nav wordmark is above the fold, so the browser fetches the face at
+  VeryHigh priority anyway.
 - **Do NOT subset, re-encode or convert it.** The licence forbids derivative
   works and reverse-engineering, and subsetting or transcoding the file is
   arguably both. This is why the font ships at its full ~48KB rather than

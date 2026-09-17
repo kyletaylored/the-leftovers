@@ -58,8 +58,14 @@ export default defineConfig({
        *
        * The `Worn` cut, which matches the distressed edges of the logo
        * lettering. It costs ~89KB against ~48KB for `Regular` — accepted
-       * knowingly for brand fidelity, and affordable because the face is not
-       * preloaded (see BaseLayout) so it never blocks first paint.
+       * knowingly for brand fidelity.
+       *
+       * Note it is NOT preloaded, but do not read that as "cheap": the nav
+       * wordmark is above the fold, so the browser discovers this face while
+       * building first paint and fetches it at VeryHigh priority regardless.
+       * Measured: skipping the preload does not deprioritise it. The ~0.3s of
+       * homepage LCP it costs is the honest price, and the only real lever
+       * would be to stop rendering the wordmark as live text at all.
        *
        * NOT subsetted, and deliberately so: the licence forbids derivative
        * works and reverse-engineering, which is exactly what subsetting or
