@@ -56,22 +56,27 @@ export default defineConfig({
        * (Comic Book Fonts LLC), so the WOFF2 from the vendor's `Web/` folder
        * is what ships — the OTF/TTF in that download are desktop-only.
        *
+       * The `Worn` cut, which matches the distressed edges of the logo
+       * lettering. It costs ~89KB against ~48KB for `Regular` — accepted
+       * knowingly for brand fidelity, and affordable because the face is not
+       * preloaded (see BaseLayout) so it never blocks first paint.
+       *
        * NOT subsetted, and deliberately so: the licence forbids derivative
        * works and reverse-engineering, which is exactly what subsetting or
-       * re-encoding the file would be. 47KB is the price of using it legally,
-       * which is also why it is not preloaded (see BaseLayout).
+       * re-encoding the file would be. The full weight is the price of using
+       * it legally.
        *
        * Licence is per-domain with a monthly pageview allowance — see
        * ATTRIBUTIONS.md before adding a second domain or celebrating traffic.
        */
       provider: fontProviders.local(),
-      name: 'CC Monster Mash',
+      name: 'CC Monster Mash Worn',
       cssVariable: '--font-brush',
       fallbacks: ['Impact', 'fantasy'],
       options: {
         variants: [
           {
-            src: ['./src/assets/fonts/CCMonsterMash-Regular.woff2'],
+            src: ['./src/assets/fonts/CCMonsterMash-Worn.woff2'],
             weight: 400,
             style: 'normal',
           },

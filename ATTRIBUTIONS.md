@@ -20,7 +20,7 @@ Vecteezy art, attribution is a licence condition, not a courtesy.
 
 | Font | Use | Source / licence |
 |---|---|---|
-| **CC Monster Mash** (Regular) | The "THE LEFTOVERS" wordmark, matching the official logo art | Comic Book Fonts LLC — **commercial web licence purchased.** Source download kept in the (gitignored) `_reference/` folder |
+| **CC Monster Mash** (**Worn**) | The "THE LEFTOVERS" wordmark, matching the distressed lettering in the official logo art | Comic Book Fonts LLC — **commercial web licence purchased.** Source download kept in the (gitignored) `_reference/` folder |
 | **Anton** | Headlines | Google Fonts, SIL Open Font License 1.1 |
 | **Inter** | Body and UI text | Google Fonts, SIL Open Font License 1.1 |
 
@@ -31,8 +31,12 @@ Read these before "optimising" the font. The licence is specific.
 - **WOFF2 only for web.** Only `Web/CCMonsterMash-Regular.woff2` is shipped
   (`src/assets/fonts/`). The OTF/TTF files in the vendor download are licensed
   for **desktop use**, not embedding, so they are deliberately not in the repo.
-- **Only the one weight we use.** The download also includes Outline, Worn,
-  Color and Legacy files. None are used, so none are committed.
+- **Only the one cut we use.** `Worn` is the one that ships, chosen to match
+  the roughed-up edges of the logo lettering. The download also includes
+  Regular, Outline, Color and Legacy files; none are used, so none are
+  committed. `Worn` costs ~89KB against ~48KB for `Regular` — a knowing
+  trade for brand fidelity, and affordable only because the face is not
+  preloaded, so it never blocks first paint.
 - **Do NOT subset, re-encode or convert it.** The licence forbids derivative
   works and reverse-engineering, and subsetting or transcoding the file is
   arguably both. This is why the font ships at its full ~48KB rather than
@@ -43,10 +47,10 @@ Read these before "optimising" the font. The licence is specific.
 - **Single domain.** Licensed for `theleftoverspb.com`. A second domain —
   including a staging domain that serves it publicly — needs additional
   licensing.
-- ⚠️ **Monthly pageview allowance.** The standard web licence covers **10,000
-  pageviews per month**. That is a real operational limit, not boilerplate: if
-  the site's traffic grows past it, buy the extra tier. Worth checking against
-  analytics once there are any.
+- **Monthly pageview allowance.** The standard web licence covers **10,000
+  pageviews per month**. Not a concern at current traffic, and noted here only
+  so it isn't a surprise later — if the site ever takes off, buy the extra
+  tier rather than discovering this in a licence audit.
 - **No AI/ML training** on the font files.
 
 ## Brand art
