@@ -1,0 +1,64 @@
+---
+/**
+ * Section — the standard page section: heading block plus content, with the
+ * brand's eyebrow/rule treatment from the mockup.
+ *
+ * Headings render at the level the CALLER passes, defaulting to h2, so no
+ * component ever introduces a competing <h1> (§10.3).
+ */
+import TerracedDivider from './brand/TerracedDivider.astro';
+
+interface Props {
+  title?: string;
+  /** Small text to the right of the title, as in "THE ROSTER — MEET THE CREW". */
+  kicker?: string;
+  eyebrow?: string;
+  as?: 'h2' | 'h3';
+  id?: string;
+  /** Alternate background for visual rhythm between sections. */
+  tone?: 'base' | 'alt' | 'topo';
+  /** Close the section with the terraced-mountain divider. */
+  divider?: boolean;
+  dividerSeed?: number;
+  class?: string;
+}
+
+const {
+  title,
+  kicker,
+  eyebrow,
+  as: Heading = 'h2',
+  id,
+  tone = 'base',
+  divider = false,
+  dividerSeed = 1,
+  class: className = '',
+} = Astro.props;
+
+const tones = { base: 'bg-ink', alt: 'bg-ink-900', topo: 'bg-topo' } as const;
+---
+
+<section id={id} class:list={[tones[tone], 'relative', divider && 'pb-0', className]}>
+  <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:py-20">
+    {
+      (title || eyebrow) && (
+        <div class="mb-8 lg:mb-10">
+          {eyebrow && <p class="eyebrow mb-3">{eyebrow}</p>}
+          {title && (
+            <div class="flex flex-wrap items-baseline gap-x-5 gap-y-2">
+              <Heading class="text-4xl text-bone sm:text-5xl lg:text-6xl">{title}</Heading>
+              {kicker && (
+                <span class="flex items-center gap-3 text-[0.7rem] font-bold uppercase tracking-[0.22em] text-bone-muted">
+                  <span class="h-px w-8 bg-gold/70" aria-hidden="true" />
+                  {kicker}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      )
+    }
+    <slot />
+  </div>
+  {divider && <TerracedDivider seed={dividerSeed} class="h-12 sm:h-16 lg:h-20" />}
+</section>

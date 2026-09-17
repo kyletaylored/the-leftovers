@@ -1,0 +1,72 @@
+# ---------------------------------------------------------------------------
+# site-settings (PRD §6) — the one file a non-developer edits to change nav
+# labels, social links, and the mailing-list endpoint. Edited in Pages CMS.
+# ---------------------------------------------------------------------------
+title: The Leftovers
+tagline: Play / Compete / Leftovers
+description: >-
+  The Leftovers are a semi-professional, community-run paintball team built
+  from rotating free agents. Anyone willing to show up and play a tournament
+  can earn a spot on the roster.
+established: 2022
+homeBase: Denton, TX
+
+nav:
+  - label: Home
+    href: /
+  - label: About
+    href: /about
+  - label: Roster
+    href: /roster
+  - label: Events
+    href: /events
+  - label: Stats
+    href: /stats
+  - label: Shop
+    href: /shop
+  - label: Community
+    href: /community
+  - label: Contact
+    href: /contact
+
+primaryCta:
+  label: Join the Team
+  href: /roster#open-slots
+
+social:
+  instagram: https://www.instagram.com/
+  facebookGroup: https://www.facebook.com/groups/
+  discord: https://discord.gg/
+  youtube: https://www.youtube.com/
+  tiktok: https://www.tiktok.com/
+  email: team@theleftovers.gg
+
+# Discord's official, free server widget (§8.3). Put the numeric server ID
+# here to render the live member count block on /community.
+discordServerId: ''
+
+# Instagram feed widget (§8.3). Paste the <script> src from the chosen
+# provider's free tier (Elfsight / Juicer / SnapWidget) and its element class.
+instagramWidget:
+  provider: ''
+  scriptSrc: ''
+  elementClass: ''
+
+# Mailing list: a native <form> posting straight to the provider, so no PII
+# ever touches our infrastructure (§4, §8.3).
+mailingList:
+  provider: buttondown
+  formAction: https://buttondown.com/api/emails/embed-subscribe/theleftovers
+  emailFieldName: email
+  # Buttondown wants this hidden field; Mailchimp uses a different scheme.
+  hiddenFields:
+    embed: '1'
+
+shop:
+  # Bonfire campaign for the batched jersey pre-order drop (§8.2).
+  bonfireUrl: https://www.bonfire.com/store/the-leftovers/
+  alwaysOpenUrl: ''
+
+footerNote: >-
+  Free agents welcome. Show up, pay your entry, play the tournament —
+  that's the whole tryout.

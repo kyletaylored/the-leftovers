@@ -1,0 +1,127 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import StatNumber from '@/components/StatNumber.astro';
+import StatLeaderboardTable from '@/components/StatLeaderboardTable.svelte';
+import MascotCallout from '@/components/MascotCallout.astro';
+import Button from '@/components/Button.astro';
+import Icon from '@/components/brand/Icon.astro';
+import { getPlayerStats, getTeamStats, getResultsWithEvents } from '@/lib/stats';
+import { rate, ordinal, dateRange } from '@/lib/format';
+
+const [rows, team, results] = await Promise.all([
+  getPlayerStats(),
+  getTeamStats(),
+  getResultsWithEvents(),
+]);
+
+const roles = [...new Set(rows.map((row) => row.role))].sort();
+
+const headline = [
+  { value: team.eventCount, label: 'Events played' },
+  { value: `${team.wins}-${team.losses}`, label: 'Record' },
+  { value: rate(team.winRate), label: 'Win rate' },
+  { value: team.podiums, label: 'Podiums' },
+  { value: team.bestPlacement ? ordinal(team.bestPlacement) : '—', label: 'Best finish' },
+];
+---
+
+<BaseLayout
+  title="Tournament Stats & Standings"
+  description={`Career tournament stats for The Leftovers: ${team.wins}-${team.losses} across ${team.eventCount} PBLeague events, with per-player eliminations, flag pulls and penalties.`}
+>
+  <PageHeader
+    eyebrow="By the numbers"
+    title="Stats & Standings"
+    intro="Every figure here is derived from stat lines typed in by hand after each tournament. Nothing is estimated, and nothing is rounded up in our favour."
+  />
+
+  <Section tone="base">
+    <div class="grid grid-cols-2 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+      {headline.map((item) => <StatNumber value={item.value} label={item.label} size="sm" />)}
+    </div>
+  </Section>
+
+  <!-- LEADERBOARD ---------------------------------------------------------->
+  <Section tone="alt" title="Player Leaderboard" kicker="Career totals">
+    {
+      rows.length > 0 ? (
+        /* Server-rendered as a complete table; the island only adds sorting
+           and filtering on top (§4). */
+        <StatLeaderboardTable client:visible rows={rows} roles={roles} />
+      ) : (
+        <MascotCallout
+          title="No stat lines yet"
+          body="Stats go up after each tournament. Once the first event's sheet is entered, this fills in."
+        >
+          <Button href="/events" size="sm" variant="outline">See the schedule</Button>
+        </MascotCallout>
+      )
+    }
+  </Section>
+
+  <!-- EVENT BY EVENT ------------------------------------------------------->
+  <Section tone="base" title="Event by Event" kicker="Team results" divider dividerSeed={17}>
+    {
+      results.length > 0 ? (
+        <div class="overflow-x-auto rounded-sm border border-ink-600">
+          <table class="w-full border-collapse text-sm">
+            <caption class="sr-only">Team placement and record at every event played.</caption>
+            <thead>
+              <tr class="bg-ink-900 text-left">
+                <th scope="col" class="px-4 py-3 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone">Event</th>
+                <th scope="col" class="px-4 py-3 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone">Dates</th>
+                <th scope="col" class="px-4 py-3 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone">League</th>
+                <th scope="col" class="px-4 py-3 text-right text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone">Record</th>
+                <th scope="col" class="px-4 py-3 text-right text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone">Finish</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.map(({ result, event }, index) => (
+                <tr
+                  class:list={[
+                    'border-t border-ink-600/60',
+                    index === 0 && 'bg-gold/10 shadow-[inset_3px_0_0_var(--color-gold)]',
+                  ]}
+                >
+                  <th scope="row" class="px-4 py-3 text-left font-semibold text-bone">
+                    <a href="/events" class="hover:text-gold-300">{event.data.title}</a>
+                  </th>
+                  <td class="whitespace-nowrap px-4 py-3 text-bone-muted">
+                    {dateRange(event.data.startDate, event.data.endDate)}
+                  </td>
+                  <td class="px-4 py-3 text-bone-muted">{event.data.league ?? '—'}</td>
+                  <td class="px-4 py-3 text-right tabular-nums text-bone-muted">
+                    {result.data.record ?? '—'}
+                  </td>
+                  <td class="px-4 py-3 text-right text-bone">
+                    {result.data.placement
+                      ? `${ordinal(result.data.placement)}${result.data.fieldSize ? ` of ${result.data.fieldSize}` : ''}`
+                      : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <MascotCallout title="No events scored yet" />
+      )
+    }
+
+    <!-- The honest version of the data story, per §8.1 and §13. -->
+    <aside class="mt-8 flex gap-4 rounded-sm border border-ink-600 bg-ink-800 p-5">
+      <Icon name="chat" class="size-6 shrink-0 text-gold" />
+      <div class="text-sm leading-relaxed text-bone-muted">
+        <p class="mb-1 font-semibold text-bone">Where these numbers come from</p>
+        <p>
+          PBLeague's tournament system exports results to the event organiser, not as a public
+          feed, so there's nothing to sync against. After each event the captain enters the sheet
+          by hand and the totals, rates and standings on this page are calculated from it. If a
+          line looks wrong, it probably is — tell us and it gets corrected.
+        </p>
+      </div>
+    </aside>
+  </Section>
+</BaseLayout>

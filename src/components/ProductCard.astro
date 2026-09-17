@@ -1,0 +1,90 @@
+---
+/**
+ * ProductCard — a teaser card that links OUT to Bonfire/Fourthwall (§8.2).
+ *
+ * The site takes no payment and holds no cart: zero PCI surface, zero
+ * recurring cost. The card's job is to make the drop look official and hand
+ * the visitor off.
+ */
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import Button from './Button.astro';
+import Mascot from './brand/Mascot.astro';
+import { resolveImage } from '@/lib/images';
+import { money, fullDate } from '@/lib/format';
+
+interface Props {
+  product: CollectionEntry<'products'>;
+  as?: 'h2' | 'h3';
+  class?: string;
+}
+const { product, as: Heading = 'h3', class: className = '' } = Astro.props;
+const { name, blurb, image, imageAlt, price, currency, buyUrl, status, preorderCloses } = product.data;
+const imageAsset = await resolveImage(image);
+
+const badge = {
+  'pre-order': { label: 'Pre-Order', classes: 'bg-gold text-ink' },
+  available: { label: 'Available', classes: 'bg-forest-600 text-bone' },
+  'sold-out': { label: 'Sold Out', classes: 'bg-ink-700 text-bone-muted' },
+}[status];
+
+const soldOut = status === 'sold-out';
+---
+
+<article
+  class:list={[
+    'group flex flex-col overflow-hidden rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/50',
+    className,
+  ]}
+>
+  <div class="relative aspect-square overflow-hidden bg-ink-900">
+    {
+      imageAsset ? (
+        <Image
+          src={imageAsset}
+          alt={imageAlt}
+          widths={[300, 480, 720]}
+          sizes="(min-width: 1024px) 320px, 45vw"
+          loading="lazy"
+          decoding="async"
+          class:list={['size-full object-cover', soldOut && 'opacity-40 grayscale']}
+        />
+      ) : (
+        <div class="flex size-full items-center justify-center">
+          <Mascot variant="line" class="h-1/2 w-auto opacity-50" steam={false} />
+        </div>
+      )
+    }
+    <span
+      class={`absolute left-3 top-3 rounded-full px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] ${badge.classes}`}
+      >{badge.label}</span
+    >
+  </div>
+
+  <div class="flex flex-1 flex-col p-5">
+    <Heading class="text-xl text-bone">{name}</Heading>
+    <p class="numeral mt-1.5 text-2xl leading-none">{money(price, currency)}</p>
+    {blurb && <p class="mt-3 text-sm leading-relaxed text-bone-muted">{blurb}</p>}
+    {
+      preorderCloses && !soldOut && (
+        <p class="mt-3 text-xs text-gold-300">
+          Batch closes <time datetime={preorderCloses.toISOString()}>{fullDate(preorderCloses)}</time>
+        </p>
+      )
+    }
+
+    <div class="mt-5 pt-1">
+      {
+        soldOut ? (
+          <p class="text-xs font-bold uppercase tracking-[0.16em] text-bone-muted">
+            This drop has closed
+          </p>
+        ) : (
+          <Button href={buyUrl} external size="sm" variant={status === 'pre-order' ? 'primary' : 'outline'}>
+            {status === 'pre-order' ? `Pre-order the ${name}` : `Buy the ${name}`}
+          </Button>
+        )
+      }
+    </div>
+  </div>
+</article>

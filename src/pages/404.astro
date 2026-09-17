@@ -1,0 +1,27 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/Section.astro';
+import MascotCallout from '@/components/MascotCallout.astro';
+import Button from '@/components/Button.astro';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="That page doesn't exist on The Leftovers site."
+  noindex
+>
+  <Section tone="topo" class="flex min-h-[60vh] items-center">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="numeral text-7xl leading-none sm:text-9xl">404</p>
+      <MascotCallout
+        as="h2"
+        class="mt-8 border-0 bg-transparent"
+        title="Nothing left over here"
+        body="This page either moved, never existed, or got eaten. Try the roster, the schedule, or the shop."
+      >
+        <Button href="/" variant="outline" size="sm">Back to the homepage</Button>
+        <Button href="/events" variant="ghost" size="sm">See the schedule</Button>
+      </MascotCallout>
+    </div>
+  </Section>
+</BaseLayout>

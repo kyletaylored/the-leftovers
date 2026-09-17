@@ -1,0 +1,26 @@
+---
+/**
+ * StatNumber — a single gold ribbed numeral with its label, as in the
+ * homepage stat strip. The ribbed look is the `.numeral` treatment from
+ * global.css (a gradient clipped to text), not a separate typeface (§9).
+ */
+interface Props {
+  value: string | number;
+  label: string;
+  size?: 'sm' | 'md' | 'lg';
+  class?: string;
+}
+const { value, label, size = 'md', class: className = '' } = Astro.props;
+const sizes = {
+  sm: 'text-4xl sm:text-5xl',
+  md: 'text-5xl sm:text-6xl',
+  lg: 'text-6xl sm:text-7xl lg:text-8xl',
+} as const;
+---
+
+<div class={`text-center ${className}`}>
+  <p class={`numeral leading-[0.85] ${sizes[size]}`}>{value}</p>
+  <p class="mt-2 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-bone-muted sm:text-xs">
+    {label}
+  </p>
+</div>

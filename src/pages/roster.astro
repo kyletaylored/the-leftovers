@@ -1,0 +1,147 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import PlayerCard from '@/components/PlayerCard.astro';
+import Button from '@/components/Button.astro';
+import Callout from '@/components/Callout.astro';
+import Prose from '@/components/Prose.astro';
+import ThreeColumn from '@/components/ThreeColumn.astro';
+import Icon from '@/components/brand/Icon.astro';
+import { site } from '@/lib/settings';
+import { fullDate } from '@/lib/format';
+
+const players = await getCollection('players');
+const active = players
+  .filter((p) => p.data.status === 'active')
+  .sort((a, b) => a.data.order - b.data.order || (a.data.number ?? 99) - (b.data.number ?? 99));
+const openSlots = players.filter((p) => p.data.status === 'open-slot');
+
+const bios = await Promise.all(
+  active.map(async (player) => ({ player, ...(await render(player)) }))
+);
+
+/**
+ * Person entries nested under the team (§10.3). Only rostered players are
+ * emitted — an "open slot" is a CTA, not a person.
+ */
+const schema = [
+  {
+    '@type': 'SportsTeam',
+    '@id': new URL('/#team', Astro.site).href,
+    athlete: active.map((player) => ({
+      '@type': 'Person',
+      name: player.data.name,
+      jobTitle: player.data.role,
+      ...(player.data.socials.instagram ? { sameAs: [player.data.socials.instagram] } : {}),
+    })),
+  },
+];
+
+const howItWorks = [
+  {
+    icon: 'chat' as const,
+    title: 'Say you’re in',
+    body: 'Post in the Discord event channel or email the captain. No application, no tryout date to wait for.',
+  },
+  {
+    icon: 'calendar' as const,
+    title: 'Confirm the date',
+    body: 'Slots go in the order people confirm. Confirming means you’re actually showing up — we plan the squad around it.',
+  },
+  {
+    icon: 'jersey' as const,
+    title: 'Show up and play',
+    body: 'Cover your entry and paint, bring your own marker and mask, and you’re playing points. Nobody sits.',
+  },
+];
+---
+
+<BaseLayout
+  title="Roster"
+  description={`The ${active.length}-player Leftovers roster, plus ${openSlots.length} open slot${openSlots.length === 1 ? '' : 's'} for the next PBLeague event. Rotating free-agent team out of ${site.homeBase}.`}
+  schema={schema}
+>
+  <PageHeader
+    eyebrow="Meet the crew"
+    title="The Roster"
+    intro={`${active.length} rostered players and ${openSlots.length} open slot${openSlots.length === 1 ? '' : 's'}. The slots are real — every name below started as one.`}
+  />
+
+  {/* This section needs its own h2: the player cards render h3, and without a
+      heading here the page would jump h1 -> h3 (§10.3 heading hierarchy). */}
+  <Section tone="base" title="The Crew" kicker={`${active.length} rostered`}>
+    <div class="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+      {active.map((player) => <PlayerCard player={player} />)}
+    </div>
+  </Section>
+
+  <!-- OPEN SLOTS ----------------------------------------------------------->
+  <Section
+    id="open-slots"
+    tone="alt"
+    eyebrow="Free agents welcome"
+    title="Open Slots"
+    kicker={`${openSlots.length} available`}
+  >
+    {
+      openSlots.length > 0 ? (
+        <>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {openSlots.map((slot) => (
+              <PlayerCard player={slot} href={`mailto:${site.social.email}?subject=Open%20slot%20for%20the%20next%20event`} />
+            ))}
+            <Callout class="self-start sm:col-span-2" cite="— The whole tryout process">
+              If you can make the date and cover your own entry and paint, you can play.
+            </Callout>
+          </div>
+
+          <h3 class="mt-14 mb-6 text-2xl text-bone sm:text-3xl">How it works</h3>
+          <ThreeColumn items={howItWorks} as="h4" />
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <Button href={site.social.discord} external>Ask in the Discord</Button>
+            <Button href="/contact" variant="outline">Email the captain</Button>
+          </div>
+        </>
+      ) : (
+        <p class="text-base text-bone-muted">
+          Every slot for the next event is filled. Jump in the
+          <a href={site.social.discord} rel="noopener" class="text-gold-300 underline underline-offset-4">Discord</a>
+          and you'll hear about the next one first.
+        </p>
+      )
+    }
+  </Section>
+
+  <!-- BIOS ----------------------------------------------------------------->
+  <Section tone="base" title="Player Notes" kicker="Who plays what" divider dividerSeed={5}>
+    <ul class="grid gap-8 lg:grid-cols-2 lg:gap-x-12">
+      {
+        bios.map(({ player, Content }) => (
+          <li id={player.id} class="border-l-2 border-ink-600 pl-5">
+            <h3 class="flex items-baseline gap-3 text-2xl text-bone">
+              {player.data.number !== undefined && (
+                <span class="numeral text-3xl leading-none">{player.data.number}</span>
+              )}
+              {player.data.name}
+            </h3>
+            <p class="mt-1 flex flex-wrap items-center gap-x-3 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
+              <span>{player.data.role}</span>
+              {player.data.joined && (
+                <span class="text-bone-muted">
+                  <Icon name="calendar" class="mr-1 inline size-3.5 align-[-2px]" />
+                  Since {fullDate(player.data.joined)}
+                </span>
+              )}
+            </p>
+            <Prose class="mt-3">
+              <Content />
+            </Prose>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+</BaseLayout>

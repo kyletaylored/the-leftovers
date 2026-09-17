@@ -1,0 +1,30 @@
+---
+/**
+ * ThreeColumn — the icon/feature grid (§7). Mobile stacks; columns are added
+ * going up, never removed going down.
+ */
+import Icon, { type IconName } from './brand/Icon.astro';
+
+interface Props {
+  items: Array<{ icon?: IconName; title: string; body: string }>;
+  as?: 'h2' | 'h3' | 'h4';
+  class?: string;
+}
+const { items, as: Heading = 'h3', class: className = '' } = Astro.props;
+---
+
+<ul class:list={['grid gap-5 sm:grid-cols-2 lg:grid-cols-3', className]}>
+  {
+    items.map((item) => (
+      <li class="rounded-sm border border-ink-600 bg-ink-800 p-6 transition-colors hover:border-gold/50">
+        {item.icon && (
+          <span class="mb-4 inline-flex size-12 items-center justify-center rounded-sm bg-ink-900 text-gold">
+            <Icon name={item.icon} class="size-6" />
+          </span>
+        )}
+        <Heading class="text-xl text-bone">{item.title}</Heading>
+        <p class="mt-2 text-sm leading-relaxed text-bone-muted">{item.body}</p>
+      </li>
+    ))
+  }
+</ul>

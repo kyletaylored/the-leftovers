@@ -1,0 +1,88 @@
+---
+/**
+ * Hero — the homepage brand lockup (§7 traditional components).
+ *
+ * Three variants: `brand` (mascot + wordmark, the mockup's hero), `image`
+ * (photography with an overlay) and `text` (copy only).
+ *
+ * Everything decorative here is SVG — clouds, lanterns, terraced ridge, the
+ * topo texture — so the largest hero element by bytes is the wordmark, not a
+ * 1.5MB background plate. That is the §10.1 media-weight rule applied at the
+ * one place on the site most likely to break it, and it keeps the LCP
+ * element text rather than an image.
+ */
+import { Image } from 'astro:assets';
+import Mascot from './brand/Mascot.astro';
+import Wordmark from './brand/Wordmark.astro';
+import RuyiCloud from './brand/RuyiCloud.astro';
+import Lantern from './brand/Lantern.astro';
+import TerracedDivider from './brand/TerracedDivider.astro';
+
+interface Props {
+  variant?: 'brand' | 'image' | 'text';
+  title?: string;
+  tagline?: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+  class?: string;
+}
+
+const { variant = 'brand', title, tagline, image, imageAlt = '', class: className = '' } = Astro.props;
+---
+
+<section class:list={['bg-topo relative overflow-hidden', className]}>
+  {
+    variant === 'image' && image && (
+      <>
+        <Image
+          src={image}
+          alt={imageAlt}
+          widths={[640, 960, 1440, 1920]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="high"
+          class="absolute inset-0 size-full object-cover opacity-45"
+        />
+        <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/30"></div>
+      </>
+    )
+  }
+
+  <!-- Ruyi-cloud corners + hanging lanterns (brand motifs, §9) -->
+  <RuyiCloud side="left" class="pointer-events-none absolute -left-8 -top-6 h-32 w-auto sm:h-44 lg:h-56" />
+  <RuyiCloud side="right" class="pointer-events-none absolute -right-8 -top-6 h-32 w-auto sm:h-44 lg:h-56" />
+  <Lantern class="pointer-events-none absolute left-[12%] -top-2 hidden h-32 w-auto opacity-80 sm:block lg:h-44" cord={70} />
+  <Lantern class="pointer-events-none absolute right-[12%] -top-4 hidden h-28 w-auto opacity-80 sm:block lg:h-40" cord={50} />
+
+  <div class="relative mx-auto max-w-7xl px-4 pb-24 pt-14 sm:px-6 sm:pb-28 lg:pb-32 lg:pt-20">
+    {
+      variant === 'brand' ? (
+        <div class="flex flex-col items-center gap-4 text-center lg:flex-row lg:justify-center lg:gap-10 lg:text-left">
+          <Mascot class="h-36 w-auto shrink-0 sm:h-48 lg:h-64" />
+          <div class="min-w-0">
+            <h1 class="sr-only">{title ?? 'The Leftovers — semi-pro community paintball team'}</h1>
+            <Wordmark class="mx-auto h-28 w-auto sm:h-40 lg:mx-0 lg:h-52" size="hero" label={false} />
+            {tagline && (
+              <p class="mt-3 text-[0.62rem] font-bold uppercase tracking-[0.3em] text-bone sm:text-sm sm:tracking-[0.34em]">
+                {tagline}
+              </p>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div class="max-w-3xl">
+          <h1 class="text-5xl text-bone sm:text-6xl lg:text-7xl">{title}</h1>
+          {tagline && (
+            <p class="mt-4 text-base leading-relaxed text-bone-muted sm:text-lg">{tagline}</p>
+          )}
+        </div>
+      )
+    }
+
+    <div class="mt-8 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-4">
+      <slot name="actions" />
+    </div>
+  </div>
+
+  <TerracedDivider seed={3} class="absolute bottom-0 left-0 h-16 sm:h-24 lg:h-28" />
+</section>

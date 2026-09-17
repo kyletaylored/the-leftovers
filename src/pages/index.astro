@@ -1,0 +1,212 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import StatStrip from '@/components/StatStrip.astro';
+import Section from '@/components/Section.astro';
+import PlayerCard from '@/components/PlayerCard.astro';
+import ProductCard from '@/components/ProductCard.astro';
+import CtaStrip from '@/components/CtaStrip.astro';
+import NewsletterBlock from '@/components/NewsletterBlock.astro';
+import SponsorMarquee from '@/components/SponsorMarquee.astro';
+import MascotCallout from '@/components/MascotCallout.astro';
+import Button from '@/components/Button.astro';
+import Countdown from '@/components/Countdown.svelte';
+import Icon from '@/components/brand/Icon.astro';
+import { site } from '@/lib/settings';
+import { getEvents } from '@/lib/events';
+import { getTeamStats } from '@/lib/stats';
+import TerracedDivider from '@/components/brand/TerracedDivider.astro';
+import { dateRange, dayNum, fullDate, isoDate, monthShort } from '@/lib/format';
+
+const [{ next, upcoming }, stats, players, products, sponsors] = await Promise.all([
+  getEvents(),
+  getTeamStats(),
+  getCollection('players'),
+  getCollection('products'),
+  getCollection('sponsors'),
+]);
+
+// Three featured players plus the first open slot — exactly the mockup's row.
+const featured = players
+  .filter((p) => p.data.status === 'active' && p.data.featured)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 3);
+const openSlot = players.find((p) => p.data.status === 'open-slot');
+const rosterRow = [...featured, ...(openSlot ? [openSlot] : [])];
+
+/** Everything after the featured "next up" event. */
+const later = upcoming.slice(1, 4);
+
+const preorder =
+  products.find((p) => p.data.status === 'pre-order') ??
+  products.filter((p) => p.data.status === 'available').sort((a, b) => a.data.order - b.data.order)[0];
+
+/**
+ * Event rich results (§10.3): the next tournament is the single most valuable
+ * thing on this page to make eligible for Google's event treatment.
+ */
+const eventSchema = next
+  ? [
+      {
+        '@type': 'SportsEvent',
+        name: `${next.data.title}${next.data.league ? ` — ${next.data.league}` : ''}`,
+        startDate: isoDate(next.data.startDate),
+        endDate: isoDate(next.data.endDate ?? next.data.startDate),
+        eventStatus: 'https://schema.org/EventScheduled',
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        location: {
+          '@type': 'Place',
+          name: next.data.location.venue,
+          address: { '@type': 'PostalAddress', addressLocality: next.data.location.city },
+        },
+        competitor: { '@id': new URL('/#team', Astro.site).href },
+        ...(next.data.registrationUrl ? { url: next.data.registrationUrl } : {}),
+      },
+    ]
+  : [];
+---
+
+<BaseLayout
+  title={site.title}
+  description={site.description}
+  schema={eventSchema}
+>
+  <Hero variant="brand" tagline={`Paintball Team / ${site.tagline}`}>
+    <Button slot="actions" href="/roster#open-slots" size="lg">Join the crew</Button>
+    <Button slot="actions" href="/events" variant="outline" size="lg">See the schedule</Button>
+  </Hero>
+
+  <StatStrip stats={stats} />
+
+  <!-- NEXT UP -------------------------------------------------------------->
+  <Section tone="base">
+    {
+      next ? (
+        <div class="grid gap-6 lg:grid-cols-[1.15fr_1fr] lg:gap-10">
+          <div class="rounded-sm border border-ink-600 bg-ink-800 p-6 sm:p-8">
+            <p class="eyebrow mb-2">Next up</p>
+            <h2 class="text-4xl text-bone sm:text-5xl">{next.data.title}</h2>
+            <p class="mt-2 flex flex-wrap items-center gap-2 text-sm text-bone-muted sm:text-base">
+              <Icon name="pin" class="size-4 text-gold" />
+              {next.data.location.venue} · {next.data.location.city}
+            </p>
+
+            <hr class="my-6 border-gold/40" />
+
+            <div class="flex flex-wrap items-center gap-6">
+              <p class="flex items-center gap-3">
+                <Icon name="calendar" class="size-9 shrink-0 text-gold" />
+                <time datetime={isoDate(next.data.startDate)} class="block">
+                  <span class="block text-[0.65rem] font-bold uppercase tracking-[0.2em] text-bone-muted">
+                    Gates open
+                  </span>
+                  <span class="block font-[var(--font-display)] text-2xl uppercase text-bone sm:text-3xl">
+                    {fullDate(next.data.startDate)}
+                  </span>
+                </time>
+              </p>
+              {/* The only always-ticking island on the page (§4). */}
+              <Countdown client:load target={next.data.startDate.toISOString()} />
+            </div>
+
+            <div class="mt-7 flex flex-wrap gap-3">
+              {next.data.registrationUrl && (
+                <Button href={next.data.registrationUrl} external>
+                  Register for {next.data.title}
+                </Button>
+              )}
+              <Button href="/events" variant="outline">All {upcoming.length} upcoming events</Button>
+            </div>
+          </div>
+
+          {/* The rest of the calendar rather than a second copy of the same
+              event — the feature panel already covers `next` in full. */}
+          <div class="rounded-sm border border-ink-600 bg-ink-800 p-6 sm:p-8">
+            <p class="eyebrow mb-4">Also on the calendar</p>
+            {later.length > 0 ? (
+              <ul class="divide-y divide-ink-600/70">
+                {later.map((event) => (
+                  <li class="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
+                    <div class="flex shrink-0 flex-col items-center rounded-sm border border-gold/40 bg-ink-900 px-2.5 py-1.5">
+                      <span class="text-[0.55rem] font-bold uppercase tracking-[0.14em] text-gold-300">
+                        {monthShort(event.data.startDate)}
+                      </span>
+                      <span class="numeral text-2xl leading-none">{dayNum(event.data.startDate)}</span>
+                    </div>
+                    <div class="min-w-0">
+                      <h3 class="text-xl text-bone">{event.data.title}</h3>
+                      <p class="mt-1 text-sm text-bone-muted">
+                        {event.data.location.venue} · {event.data.location.city}
+                      </p>
+                      <p class="mt-0.5 text-sm text-bone-muted">
+                        <time datetime={isoDate(event.data.startDate)}>
+                          {dateRange(event.data.startDate, event.data.endDate)}
+                        </time>
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="text-sm leading-relaxed text-bone-muted">
+                Nothing else on the board yet. Next season's dates land in the Discord first.
+              </p>
+            )}
+
+            <div class="mt-6">
+              <Button href="/events" variant="ghost" size="sm">Full schedule &amp; past results</Button>
+            </div>
+
+            <TerracedDivider variant="line" seed={9} class="mt-7 h-6 opacity-70" />
+          </div>
+        </div>
+      ) : (
+        <MascotCallout
+          title="No events on the board"
+          body="The next tournament hasn't been posted yet. The Discord always knows first."
+        >
+          <Button href={site.social.discord} external size="sm">Join the Discord</Button>
+        </MascotCallout>
+      )
+    }
+  </Section>
+
+  <!-- THE ROSTER ----------------------------------------------------------->
+  <Section tone="alt" title="The Roster" kicker="Meet the crew" divider dividerSeed={11}>
+    <div class="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+      {rosterRow.map((player) => <PlayerCard player={player} href="/roster" />)}
+    </div>
+    <div class="mt-8 flex flex-wrap gap-3">
+      <Button href="/roster" variant="outline">See the full roster</Button>
+      <Button href="/stats" variant="ghost">Player stats</Button>
+    </div>
+  </Section>
+
+  <!-- PRE-ORDER ------------------------------------------------------------>
+  <Section tone="base">
+    <CtaStrip
+      eyebrow="Official gear"
+      title="Pre-Order Now"
+      body="Jerseys / Hats / Apparel. Batched pre-orders run on Bonfire — the window opens, orders are collected, and everything prints once it closes."
+    >
+      <Button slot="actions" href="/shop" variant="gold" size="lg">Shop the drop</Button>
+      {site.shop.bonfireUrl && (
+        <Button slot="actions" href={site.shop.bonfireUrl} external variant="ghost" size="lg" class="!border-bone/40 !text-bone hover:!border-bone">
+          Open the Bonfire store
+        </Button>
+      )}
+      {preorder && <ProductCard product={preorder} as="h3" class="max-w-xs bg-ink" />}
+    </CtaStrip>
+  </Section>
+
+  <!-- COMMUNITY ------------------------------------------------------------>
+  <Section tone="alt">
+    <NewsletterBlock />
+  </Section>
+
+  <!-- SPONSORS ------------------------------------------------------------->
+  <Section tone="base">
+    <SponsorMarquee sponsors={sponsors} />
+  </Section>
+</BaseLayout>

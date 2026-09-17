@@ -1,0 +1,139 @@
+---
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import ProductCard from '@/components/ProductCard.astro';
+import ThreeColumn from '@/components/ThreeColumn.astro';
+import MascotCallout from '@/components/MascotCallout.astro';
+import Button from '@/components/Button.astro';
+import Countdown from '@/components/Countdown.svelte';
+import Prose from '@/components/Prose.astro';
+import { site } from '@/lib/settings';
+
+const page = await getEntry('pages', 'shop');
+if (!page) throw new Error('Missing content file: src/content/pages/shop.md');
+const { Content } = await render(page);
+
+const products = (await getCollection('products')).sort((a, b) => a.data.order - b.data.order);
+const preorders = products.filter((p) => p.data.status === 'pre-order');
+const evergreen = products.filter((p) => p.data.status !== 'pre-order');
+const closingSoon = preorders.find((p) => p.data.preorderCloses);
+
+/**
+ * Product rich results (§10.3). Emitted even though checkout happens off-site
+ * on Bonfire — the offer is real, the URL just points somewhere else.
+ */
+const schema = products.map((product) => ({
+  '@type': 'Product',
+  name: product.data.name,
+  ...(product.data.blurb ? { description: product.data.blurb } : {}),
+  brand: { '@id': new URL('/#team', Astro.site).href },
+  offers: {
+    '@type': 'Offer',
+    price: product.data.price,
+    priceCurrency: product.data.currency,
+    url: product.data.buyUrl,
+    availability:
+      product.data.status === 'sold-out'
+        ? 'https://schema.org/SoldOut'
+        : product.data.status === 'pre-order'
+          ? 'https://schema.org/PreOrder'
+          : 'https://schema.org/InStock',
+  },
+}));
+
+const howPreordersWork = [
+  {
+    icon: 'calendar' as const,
+    title: 'The window opens',
+    body: 'A campaign runs for a couple of weeks. You order and pay during the window — that’s the whole commitment.',
+  },
+  {
+    icon: 'jersey' as const,
+    title: 'The batch prints',
+    body: 'Once the window closes, everything gets printed in one run. No minimum to hit, no risk of the run being cancelled.',
+  },
+  {
+    icon: 'chopsticks' as const,
+    title: 'It ships to you',
+    body: 'Bonfire ships direct and handles support. We never see your card details and we hold no stock.',
+  },
+];
+---
+
+<BaseLayout
+  title={page.data.seo.title ?? page.data.title}
+  description={page.data.seo.description}
+  schema={schema}
+>
+  <PageHeader eyebrow={page.data.eyebrow} title={page.data.title} intro={page.data.intro} />
+
+  {
+    preorders.length > 0 && (
+      <Section tone="base" title="Open Pre-Orders" kicker="Batch drop">
+        {closingSoon?.data.preorderCloses && (
+          <div class="mb-8 flex flex-wrap items-center gap-6 rounded-sm border border-gold/40 bg-ink-800 p-5 sm:p-6">
+            <div>
+              <p class="eyebrow mb-1">Window closes</p>
+              <p class="text-2xl text-bone sm:text-3xl" style="font-family: var(--font-display)">
+                {closingSoon.data.name}
+              </p>
+            </div>
+            <Countdown
+              client:visible
+              target={closingSoon.data.preorderCloses.toISOString()}
+              passedLabel="This batch has closed"
+            />
+          </div>
+        )}
+
+        <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {preorders.map((product) => (
+            <li class="flex">
+              <ProductCard product={product} class="w-full" />
+            </li>
+          ))}
+        </ul>
+      </Section>
+    )
+  }
+
+  <Section tone="alt" title="Always Available" kicker="Small stuff">
+    {
+      evergreen.length > 0 ? (
+        <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {evergreen.map((product) => (
+            <li class="flex">
+              <ProductCard product={product} class="w-full" />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <MascotCallout
+          title="Nothing in the store right now"
+          body="Between drops there's usually nothing here. The mailing list is the easiest way to catch the next one."
+        >
+          <Button href="/community" size="sm" variant="outline">Join the mailing list</Button>
+        </MascotCallout>
+      )
+    }
+  </Section>
+
+  <Section tone="base" title="How Pre-Orders Work" kicker="No surprises" divider dividerSeed={29}>
+    <ThreeColumn items={howPreordersWork} />
+
+    <Prose class="mt-10">
+      <Content />
+    </Prose>
+
+    {
+      site.shop.bonfireUrl && (
+        <div class="mt-8 flex flex-wrap gap-3">
+          <Button href={site.shop.bonfireUrl} external>Open the Bonfire store</Button>
+          <Button href="/contact" variant="ghost">Ask about a custom order</Button>
+        </div>
+      )
+    }
+  </Section>
+</BaseLayout>

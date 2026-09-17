@@ -1,0 +1,33 @@
+---
+/**
+ * MascotCallout — the shared empty state (§7, §9).
+ *
+ * Used for "no events scheduled", the 404 page, an empty stats table, and an
+ * empty shop. Routing all of those through one component is what keeps the
+ * empty states feeling like the same team instead of five different
+ * apologies.
+ */
+import Mascot from './brand/Mascot.astro';
+
+interface Props {
+  title: string;
+  body?: string;
+  as?: 'h2' | 'h3';
+  class?: string;
+}
+const { title, body, as: Heading = 'h2', class: className = '' } = Astro.props;
+---
+
+<div
+  class:list={[
+    'flex flex-col items-center gap-4 rounded-sm border border-dashed border-ink-600 bg-ink-800/50 px-6 py-12 text-center',
+    className,
+  ]}
+>
+  <Mascot variant="line" class="h-24 w-auto sm:h-28" />
+  <Heading class="text-2xl text-bone sm:text-3xl">{title}</Heading>
+  {body && <p class="max-w-md text-sm leading-relaxed text-bone-muted">{body}</p>}
+  <div class="mt-1 flex flex-wrap justify-center gap-3">
+    <slot />
+  </div>
+</div>

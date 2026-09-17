@@ -1,0 +1,99 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import EventCard from '@/components/EventCard.astro';
+import MascotCallout from '@/components/MascotCallout.astro';
+import Button from '@/components/Button.astro';
+import Countdown from '@/components/Countdown.svelte';
+import { getEvents } from '@/lib/events';
+import { site } from '@/lib/settings';
+import { isoDate } from '@/lib/format';
+
+const { upcoming, past, next } = await getEvents();
+
+/** Every scheduled event gets its own SportsEvent node (§10.3). */
+const schema = upcoming.map((event) => ({
+  '@type': 'SportsEvent',
+  name: `${event.data.title}${event.data.league ? ` — ${event.data.league}` : ''}`,
+  startDate: isoDate(event.data.startDate),
+  endDate: isoDate(event.data.endDate ?? event.data.startDate),
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: {
+    '@type': 'Place',
+    name: event.data.location.venue,
+    address: { '@type': 'PostalAddress', addressLocality: event.data.location.city },
+  },
+  competitor: { '@id': new URL('/#team', Astro.site).href },
+  ...(event.data.registrationUrl ? { url: event.data.registrationUrl } : {}),
+}));
+---
+
+<BaseLayout
+  title="Events & Calendar"
+  description={`Upcoming PBLeague tournaments for The Leftovers plus every event we've played. ${upcoming.length} on the schedule right now.`}
+  schema={schema}
+>
+  <PageHeader
+    eyebrow="Schedule"
+    title="Events & Calendar"
+    intro="Where we're playing next and everything we've already played. Registration links go straight to the league — we don't handle entries."
+  />
+
+  <Section tone="base" title="Upcoming" kicker={`${upcoming.length} scheduled`}>
+    {
+      upcoming.length > 0 ? (
+        <>
+          {next && (
+            <div class="mb-8 flex flex-wrap items-center gap-6 rounded-sm border border-gold/40 bg-ink-800 p-5 sm:p-6">
+              <div>
+                <p class="eyebrow mb-1">Next one up</p>
+                <p class="text-2xl text-bone sm:text-3xl" style="font-family: var(--font-display)">
+                  {next.data.title}
+                </p>
+              </div>
+              <Countdown client:visible target={next.data.startDate.toISOString()} />
+            </div>
+          )}
+
+          <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {upcoming.map((event) => (
+              <li class="flex">
+                <EventCard event={event} class="w-full" />
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <MascotCallout
+          title="Nothing scheduled yet"
+          body="Next season's dates haven't dropped. When they do, they land in the Discord first and on this page about a minute later."
+        >
+          <Button href={site.social.discord} external size="sm">Join the Discord</Button>
+        </MascotCallout>
+      )
+    }
+  </Section>
+
+  <Section tone="alt" title="Played" kicker={`${past.length} events`} divider dividerSeed={13}>
+    {
+      past.length > 0 ? (
+        <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {past.map((event) => (
+            <li class="flex">
+              <EventCard event={event} class="w-full" />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <MascotCallout title="No results on the board yet" body="Ask us again after the first tournament." />
+      )
+    }
+
+    <p class="mt-8 text-sm text-bone-muted">
+      Per-player stat lines from these events live on the
+      <a href="/stats" class="text-gold-300 underline underline-offset-4">stats page</a>.
+    </p>
+  </Section>
+</BaseLayout>

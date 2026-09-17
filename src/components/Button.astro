@@ -1,0 +1,70 @@
+---
+/**
+ * Button — the one place button styling lives. Renders as <a> when `href` is
+ * present, <button> otherwise. Every variant clears the 44x44px touch target
+ * minimum from §10.1, and link text is descriptive by construction: the
+ * label is a required slot, so there's no way to ship a bare "click here".
+ */
+import Icon, { type IconName } from './brand/Icon.astro';
+
+interface Props {
+  href?: string;
+  variant?: 'primary' | 'outline' | 'gold' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  icon?: IconName | false;
+  /** Marks the link as leaving the site: adds rel + an external glyph. */
+  external?: boolean;
+  type?: 'button' | 'submit';
+  class?: string;
+  'aria-label'?: string;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  icon = 'arrow-right',
+  external = false,
+  type = 'button',
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const base =
+  'tap group inline-flex items-center justify-center gap-2 rounded-sm font-bold uppercase tracking-[0.14em] transition-colors duration-200';
+
+const variants = {
+  primary: 'bg-crimson text-bone hover:bg-crimson-600',
+  gold: 'bg-gold text-ink hover:bg-gold-300',
+  outline: 'border border-gold text-gold-300 hover:bg-gold hover:text-ink',
+  ghost: 'border border-ink-600 text-bone hover:border-gold hover:text-gold-300',
+} as const;
+
+const sizes = {
+  sm: 'px-4 py-2.5 text-[0.7rem]',
+  md: 'px-5 py-3 text-xs',
+  lg: 'px-7 py-4 text-sm',
+} as const;
+
+const classes = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+const glyph: IconName | false = external ? 'external' : icon;
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  class={classes}
+  href={href}
+  type={href ? undefined : type}
+  rel={external ? 'noopener' : undefined}
+  {...rest}
+>
+  <slot />
+  {
+    glyph && (
+      <Icon
+        name={glyph}
+        class="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+      />
+    )
+  }
+</Tag>

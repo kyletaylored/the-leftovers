@@ -1,0 +1,28 @@
+---
+/**
+ * Callout — pull-quote / emphasis block (§7).
+ */
+interface Props {
+  cite?: string;
+  class?: string;
+}
+const { cite, class: className = '' } = Astro.props;
+---
+
+<figure
+  class:list={[
+    'border-l-4 border-gold bg-ink-800/70 px-6 py-6 sm:px-8',
+    className,
+  ]}
+>
+  <blockquote class="text-lg leading-relaxed text-bone sm:text-xl">
+    <slot />
+  </blockquote>
+  {
+    cite && (
+      <figcaption class="mt-4 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
+        {cite}
+      </figcaption>
+    )
+  }
+</figure>

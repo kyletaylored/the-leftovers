@@ -1,0 +1,138 @@
+---
+/**
+ * Nav — mobile-first site navigation (§10.1).
+ *
+ * Mobile: a hamburger panel behind ~30 lines of vanilla JS, not a nav
+ * framework. The primary CTA stays OUTSIDE the collapsed menu so "Join the
+ * Team" is always one tap away, which §10.1 calls for explicitly.
+ * Desktop (lg+): the full inline link row.
+ */
+import { site } from '@/lib/settings';
+import Wordmark from './brand/Wordmark.astro';
+import Mascot from './brand/Mascot.astro';
+import Icon from './brand/Icon.astro';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+
+<header class="sticky top-0 z-50 border-b border-ink-600/70 bg-ink/95 backdrop-blur-sm">
+  <a
+    href="#main"
+    class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded focus:bg-gold focus:px-3 focus:py-2 focus:text-sm focus:font-bold focus:text-ink"
+    >Skip to content</a
+  >
+
+  <nav aria-label="Main" class="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
+    <a
+      href="/"
+      class="tap flex shrink-0 items-center gap-2"
+      aria-current={path === '/' ? 'page' : undefined}
+    >
+      <Mascot class="h-10 w-auto" steam={false} />
+      <Wordmark class="h-9 w-auto" size="nav" label={site.title} />
+    </a>
+
+    <!-- Desktop links -->
+    <ul class="ml-auto hidden items-center gap-1 lg:flex">
+      {
+        site.nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={isCurrent(item.href) ? 'page' : undefined}
+              class:list={[
+                'tap inline-flex items-center px-3 py-2 text-[0.78rem] font-bold uppercase tracking-[0.16em] transition-colors',
+                isCurrent(item.href)
+                  ? 'text-gold-300 underline decoration-gold decoration-2 underline-offset-[10px]'
+                  : 'text-bone hover:text-gold-300',
+              ]}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- Primary CTA: always visible, never behind the hamburger -->
+    <a
+      href={site.primaryCta.href}
+      class="tap ml-auto inline-flex items-center gap-2 rounded-sm bg-crimson px-3.5 py-2.5 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-bone transition-colors hover:bg-crimson-600 sm:px-5 sm:text-xs lg:ml-0"
+    >
+      <span class="hidden sm:inline">{site.primaryCta.label}</span>
+      <span class="sm:hidden">Join</span>
+      <Icon name="arrow-right" class="size-4" />
+    </a>
+
+    <button
+      type="button"
+      id="nav-toggle"
+      class="tap inline-flex items-center justify-center rounded-sm border border-ink-600 text-bone lg:hidden"
+      aria-expanded="false"
+      aria-controls="nav-panel"
+    >
+      <Icon name="menu" class="size-6" label="Open menu" />
+    </button>
+  </nav>
+
+  <!-- Mobile panel -->
+  <div id="nav-panel" hidden class="border-t border-ink-600/70 bg-ink-900 lg:hidden">
+    <ul class="mx-auto max-w-7xl px-4 py-2 sm:px-6">
+      {
+        site.nav.map((item) => (
+          <li class="border-b border-ink-600/50 last:border-0">
+            <a
+              href={item.href}
+              aria-current={isCurrent(item.href) ? 'page' : undefined}
+              class:list={[
+                'tap flex items-center justify-between py-3.5 text-sm font-bold uppercase tracking-[0.16em]',
+                isCurrent(item.href) ? 'text-gold-300' : 'text-bone',
+              ]}
+            >
+              {item.label}
+              <Icon name="chevron" class="size-5 -rotate-90 text-gold/60" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</header>
+
+<script>
+  const toggle = document.getElementById('nav-toggle');
+  const panel = document.getElementById('nav-panel');
+
+  if (toggle && panel) {
+    let open = false;
+
+    const setOpen = (next: boolean) => {
+      open = next;
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      const icon = toggle.querySelector('svg');
+      icon?.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      // Swap the glyph between menu and close without shipping a second SVG.
+      icon
+        ?.querySelector('path')
+        ?.setAttribute('d', open ? 'M6 6l12 12M18 6 6 18' : 'M4 7h16M4 12h16M4 17h16');
+    };
+
+    toggle.addEventListener('click', () => setOpen(!open));
+
+    // Esc closes, and focus returns to the trigger.
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && open) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // Reset when the viewport crosses into the desktop layout.
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    desktop.addEventListener('change', (event) => {
+      if (event.matches) setOpen(false);
+    });
+  }
+</script>

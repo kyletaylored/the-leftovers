@@ -1,0 +1,14 @@
+# Cloudflare Pages redirects. `trailingSlash: 'never'` + build.format 'file'
+# means /about is the canonical path; these catch the slashed variants so an
+# old or hand-typed link doesn't 404.
+/about/       /about       301
+/roster/      /roster      301
+/events/      /events      301
+/stats/       /stats       301
+/shop/        /shop        301
+/community/   /community   301
+/contact/     /contact     301
+
+# The PRD's phase-2 news section isn't built yet; point early links at events.
+/news         /events      302
+/news/*       /events      302

@@ -1,0 +1,95 @@
+---
+/**
+ * SponsorMarquee — the auto-scrolling sponsor strip (§7 custom components).
+ *
+ * Pure CSS animation on a duplicated list: no JS island, and it stops dead
+ * under prefers-reduced-motion (handled globally in global.css), where it
+ * degrades to a plain static row. The duplicate copy is aria-hidden so the
+ * logos aren't announced twice.
+ */
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { resolveImage } from '@/lib/images';
+
+/**
+ * The track holds TWO copies of the list so the scroll can loop seamlessly at
+ * -50%. The second copy is aria-hidden AND `inert`: aria-hidden on its own
+ * leaves the sponsor links focusable, which means a keyboard user tabs
+ * through every logo twice and hits stops a screen reader never announces.
+ */
+interface Props {
+  sponsors: CollectionEntry<'sponsors'>[];
+  class?: string;
+}
+const { sponsors, class: className = '' } = Astro.props;
+
+const resolved = await Promise.all(
+  sponsors.map(async (sponsor) => ({
+    ...sponsor.data,
+    asset: await resolveImage(sponsor.data.logo),
+  }))
+);
+---
+
+{
+  resolved.length > 0 && (
+    <div class:list={['marquee relative overflow-hidden', className]}>
+      <p class="eyebrow mb-5">Proudly supported by</p>
+      <div class="marquee-track flex w-max items-center gap-12">
+        {[0, 1].map((copy) => (
+          <ul
+            class="flex shrink-0 items-center gap-12"
+            aria-hidden={copy === 1 ? 'true' : undefined}
+            inert={copy === 1 ? true : undefined}
+          >
+            {resolved.map((sponsor) => {
+              const inner = sponsor.asset ? (
+                <Image
+                  src={sponsor.asset}
+                  alt={sponsor.logoAlt}
+                  height={40}
+                  loading="lazy"
+                  decoding="async"
+                  class="h-9 w-auto opacity-70 transition-opacity hover:opacity-100 sm:h-10"
+                />
+              ) : (
+                <span class="text-lg font-bold uppercase tracking-[0.12em] text-bone-muted">
+                  {sponsor.name}
+                </span>
+              );
+              return (
+                <li class="shrink-0">
+                  {sponsor.url ? (
+                    <a href={sponsor.url} rel="noopener sponsored" class="tap inline-flex items-center">
+                      {inner}
+                    </a>
+                  ) : (
+                    inner
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .marquee-track {
+    animation: marquee-scroll 32s linear infinite;
+  }
+  .marquee:hover .marquee-track,
+  .marquee:focus-within .marquee-track {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee {
+      overflow-x: auto;
+    }
+    .marquee-track {
+      animation: none;
+    }
+  }
+</style>

@@ -1,0 +1,135 @@
+---
+/**
+ * EventCard — date badge, location, PBLeague tag, register/result CTA, and
+ * the terraced-mountain divider as the card footer (§7 custom components).
+ *
+ * The CTA switches on derived upcoming/past state (lib/events.ts): an
+ * upcoming event offers registration, a past one shows the result summary.
+ */
+import { Image } from 'astro:assets';
+import Icon from './brand/Icon.astro';
+import TerracedDivider from './brand/TerracedDivider.astro';
+import Button from './Button.astro';
+import { resolveImage } from '@/lib/images';
+import { dateRange, dayNum, monthShort, isoDate } from '@/lib/format';
+import { isUpcoming, type EventEntry } from '@/lib/events';
+
+interface Props {
+  event: EventEntry;
+  as?: 'h2' | 'h3' | 'h4';
+  /** `feature` is the larger "NEXT UP" treatment on the homepage. */
+  layout?: 'card' | 'feature';
+  class?: string;
+}
+
+const { event, as: Heading = 'h3', layout = 'card', class: className = '' } = Astro.props;
+const { title, league, startDate, endDate, location, registrationUrl, cover, coverAlt, resultSummary, placement } =
+  event.data;
+
+const coverAsset = await resolveImage(cover);
+const upcoming = isUpcoming(event);
+---
+
+<article
+  class:list={[
+    'group relative flex flex-col overflow-hidden rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/50',
+    className,
+  ]}
+>
+  {
+    coverAsset && (
+      <div class="relative aspect-[16/9] overflow-hidden bg-ink-900">
+        <Image
+          src={coverAsset}
+          alt={coverAlt ?? ''}
+          widths={[400, 640, 960]}
+          sizes="(min-width: 1024px) 380px, 92vw"
+          loading="lazy"
+          decoding="async"
+          class="size-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
+        />
+        {league && (
+          <span class="absolute right-3 top-3 rounded-full bg-crimson px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-bone">
+            {league}
+          </span>
+        )}
+      </div>
+    )
+  }
+
+  <div class:list={['flex flex-1 flex-col p-5', layout === 'feature' && 'sm:p-7']}>
+    <div class="flex items-start gap-4">
+      <!-- Date badge -->
+      <div
+        class="flex shrink-0 flex-col items-center rounded-sm border border-gold/50 bg-ink-900 px-3 py-2"
+      >
+        <span class="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-gold-300">
+          {monthShort(startDate)}
+        </span>
+        <span class="numeral text-3xl leading-none">{dayNum(startDate)}</span>
+      </div>
+
+      <div class="min-w-0">
+        {
+          league && !coverAsset && (
+            <span class="mb-2 inline-block rounded-full bg-crimson px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-bone">
+              {league}
+            </span>
+          )
+        }
+        <Heading
+          class:list={[
+            'text-bone',
+            layout === 'feature' ? 'text-3xl sm:text-4xl' : 'text-xl sm:text-2xl',
+          ]}
+        >
+          {title}
+        </Heading>
+        <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-bone-muted">
+          <Icon name="pin" class="size-4 shrink-0 text-gold" />
+          <span>{location.venue}</span>
+          <span aria-hidden="true">·</span>
+          <span>{location.city}</span>
+        </p>
+        <p class="mt-1 text-sm text-bone-muted">
+          <time datetime={isoDate(startDate)}>{dateRange(startDate, endDate)}</time>
+        </p>
+      </div>
+    </div>
+
+    {
+      !upcoming && (resultSummary || placement) && (
+        <div class="mt-4 border-l-2 border-gold/70 pl-3">
+          {placement && (
+            <p class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
+              Finished {placement}
+            </p>
+          )}
+          {resultSummary && <p class="mt-1 text-sm leading-relaxed text-bone-muted">{resultSummary}</p>}
+        </div>
+      )
+    }
+
+    <div class="mt-5 flex flex-wrap gap-3 pt-1">
+      {
+        upcoming && registrationUrl ? (
+          <Button href={registrationUrl} external size="sm">
+            Register for {title}
+          </Button>
+        ) : upcoming ? (
+          <Button href="/events" variant="outline" size="sm">
+            Event details
+          </Button>
+        ) : (
+          location.mapUrl && (
+            <Button href={location.mapUrl} external variant="ghost" size="sm">
+              {location.venue} on the map
+            </Button>
+          )
+        )
+      }
+    </div>
+  </div>
+
+  <TerracedDivider variant="line" seed={startDate.getDate()} class="h-6 opacity-70" />
+</article>

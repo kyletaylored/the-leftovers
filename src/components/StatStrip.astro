@@ -1,0 +1,42 @@
+---
+/**
+ * StatStrip — the homepage band of gold ribbed numerals. Every figure is
+ * derived from the `results`/`events` collections (lib/stats.ts), never typed
+ * in twice, so a stat can't contradict the stats page.
+ */
+import StatNumber from './StatNumber.astro';
+import { rate } from '@/lib/format';
+import type { TeamStats } from '@/lib/stats';
+
+interface Props {
+  stats: TeamStats;
+}
+const { stats } = Astro.props;
+
+const items = [
+  { value: stats.rosterSize, label: 'Team Size' },
+  { value: stats.eventCount, label: 'Events' },
+  { value: stats.wins, label: 'Wins' },
+  { value: rate(stats.winRate), label: 'Win Rate' },
+  { value: stats.seasons, label: 'Seasons' },
+].filter((item) => item.value !== 0 && item.value !== '.000');
+---
+
+{
+  items.length > 0 && (
+    <section aria-label="Team record" class="border-y border-ink-600/60 bg-ink-900">
+      <div class="mx-auto grid max-w-7xl grid-cols-2 gap-y-8 px-4 py-10 sm:grid-cols-3 sm:px-6 lg:grid-cols-5 lg:gap-y-0">
+        {items.map((item, index) => (
+          <div
+            class:list={[
+              'lg:border-l lg:border-ink-600/70 lg:px-4',
+              index === 0 && 'lg:border-l-0',
+            ]}
+          >
+            <StatNumber value={item.value} label={item.label} />
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}

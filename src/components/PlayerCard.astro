@@ -1,0 +1,121 @@
+---
+/**
+ * PlayerCard — the jersey-style roster card (§7 custom components).
+ *
+ * Two states, one component:
+ *  - `active`     : big ghost jersey numeral behind the photo, gold ribbed
+ *                   numeral in the corner, name bar, role tag.
+ *  - `open-slot`  : dashed-border "OPEN SLOT — JOIN THE ROSTER" card with the
+ *                   mascot in place of a photo. This is the whole point of the
+ *                   roster page for a free-agent team, so it's a first-class
+ *                   card variant rather than a banner bolted on at the end.
+ *
+ * Heading level is a prop and defaults to h3 — a card must never introduce a
+ * competing h1 (§10.3).
+ */
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import Mascot from './brand/Mascot.astro';
+import Icon from './brand/Icon.astro';
+import { resolveImage } from '@/lib/images';
+
+interface Props {
+  player: CollectionEntry<'players'>;
+  as?: 'h2' | 'h3' | 'h4';
+  /** Link the card through to the player's roster anchor. */
+  href?: string;
+  class?: string;
+}
+
+const { player, as: Heading = 'h3', href, class: className = '' } = Astro.props;
+const { name, number, role, photo, photoAlt, status } = player.data;
+const photoAsset = await resolveImage(photo);
+const isOpenSlot = status === 'open-slot';
+---
+
+{
+  isOpenSlot ? (
+    <a
+      href={href ?? '/contact'}
+      class:list={[
+        'group flex flex-col items-center justify-center gap-3 rounded-sm border-2 border-dashed border-gold/60 bg-ink-800/60 px-5 py-8 text-center transition-colors hover:border-gold hover:bg-ink-700',
+        className,
+      ]}
+    >
+      <Mascot class="h-24 w-auto transition-transform duration-300 group-hover:-translate-y-1 sm:h-28" />
+      <Heading class="text-xl text-bone sm:text-2xl">Open Slot</Heading>
+      <p class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
+        Join the roster
+      </p>
+      <span class="tap mt-1 inline-flex items-center justify-center rounded-full border border-gold text-gold transition-colors group-hover:bg-gold group-hover:text-ink">
+        <Icon name="arrow-right" class="size-5" />
+      </span>
+    </a>
+  ) : (
+    <article
+      class:list={[
+        'group relative overflow-hidden rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/60',
+        className,
+      ]}
+    >
+      <div class="relative aspect-[4/5] overflow-hidden bg-ink-900">
+        {/* Ghost jersey numeral sitting behind the photo */}
+        {photoAsset && number !== undefined && (
+          <span
+            class="numeral-ghost pointer-events-none absolute -left-2 top-0 select-none text-[11rem] leading-[0.75] sm:text-[13rem]"
+            aria-hidden="true"
+          >
+            {number}
+          </span>
+        )}
+
+        {photoAsset ? (
+          <Image
+            src={photoAsset}
+            alt={photoAlt ?? `${name}, ${role} for The Leftovers`}
+            widths={[240, 400, 640]}
+            sizes="(min-width: 1024px) 300px, (min-width: 640px) 45vw, 90vw"
+            loading="lazy"
+            decoding="async"
+            class="relative size-full object-cover object-top mix-blend-luminosity transition-all duration-500 group-hover:mix-blend-normal"
+          />
+        ) : number !== undefined ? (
+          /* No photo yet: the jersey numeral becomes the card. Reads as a
+             deliberate jersey plate rather than a missing image. */
+          <div class="relative flex size-full items-center justify-center">
+            <span class="numeral text-[7rem] leading-none sm:text-[8.5rem]" aria-hidden="true">
+              {number}
+            </span>
+          </div>
+        ) : (
+          <div class="relative flex size-full items-end justify-center pb-2">
+            <Mascot variant="line" class="h-3/5 w-auto opacity-60" steam={false} />
+          </div>
+        )}
+
+        {photoAsset && number !== undefined && (
+          <span class="numeral absolute bottom-2 right-3 text-4xl leading-none" aria-hidden="true">
+            {number}
+          </span>
+        )}
+      </div>
+
+      <div class="border-t border-ink-600 px-4 py-3.5">
+        <Heading class="truncate text-lg text-bone sm:text-xl">
+          {href ? (
+            <a href={href} class="hover:text-gold-300">
+              {number !== undefined && <span class="sr-only">Number {number}, </span>}
+              {name}
+            </a>
+          ) : (
+            <>
+              {number !== undefined && <span class="sr-only">Number {number}, </span>}
+              {name}
+            </>
+          )}
+        </Heading>
+        <p class="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">{role}</p>
+      </div>
+    </article>
+  )
+}

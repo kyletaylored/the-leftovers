@@ -1,0 +1,35 @@
+---
+/**
+ * Gallery — masonry-ish photo grid (§7). Uses CSS columns so it needs no JS
+ * and no fixed aspect ratios; each image carries width/height so the grid
+ * can't shift as photos load (CLS budget, §10.2).
+ */
+import { Image } from 'astro:assets';
+
+interface Props {
+  images: Array<{ src: ImageMetadata; alt: string; caption?: string }>;
+  class?: string;
+}
+const { images, class: className = '' } = Astro.props;
+---
+
+<div class:list={['columns-1 gap-4 sm:columns-2 lg:columns-3', className]}>
+  {
+    images.map(({ src, alt, caption }) => (
+      <figure class="mb-4 break-inside-avoid overflow-hidden rounded-sm border border-ink-600">
+        <Image
+          src={src}
+          alt={alt}
+          widths={[320, 480, 720]}
+          sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 92vw"
+          loading="lazy"
+          decoding="async"
+          class="w-full"
+        />
+        {caption && (
+          <figcaption class="bg-ink-800 px-3 py-2 text-xs text-bone-muted">{caption}</figcaption>
+        )}
+      </figure>
+    ))
+  }
+</div>

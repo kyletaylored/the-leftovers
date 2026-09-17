@@ -1,0 +1,113 @@
+---
+import { getEntry } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import SocialEmbed from '@/components/SocialEmbed.astro';
+import NewsletterBlock from '@/components/NewsletterBlock.astro';
+import Button from '@/components/Button.astro';
+import Icon, { type IconName } from '@/components/brand/Icon.astro';
+import { site } from '@/lib/settings';
+
+const page = await getEntry('pages', 'community');
+if (!page) throw new Error('Missing content file: src/content/pages/community.md');
+
+type Channel = { icon: IconName; name: string; href: string; what: string; cta: string };
+
+const channels: Channel[] = ([
+  {
+    icon: 'discord',
+    name: 'Discord',
+    href: site.social.discord,
+    what: 'Where the next event’s squad actually gets sorted — who’s in, who’s driving, who needs paint.',
+    cta: 'Open the invite',
+  },
+  {
+    icon: 'instagram',
+    name: 'Instagram',
+    href: site.social.instagram,
+    what: 'Game photos, jersey drops, and the occasional clip of something that worked.',
+    cta: 'Follow the team',
+  },
+  {
+    icon: 'facebook',
+    name: 'Facebook group',
+    href: site.social.facebookGroup,
+    what: 'The long-form version: photo dumps, post-event arguing, and local field chatter.',
+    cta: 'Join the group',
+  },
+  {
+    icon: 'youtube',
+    name: 'YouTube',
+    href: site.social.youtube,
+    what: 'Full-point footage from events when somebody remembers to bring a camera.',
+    cta: 'Watch the tape',
+  },
+] satisfies Array<Omit<Channel, 'href'> & { href?: string }>).flatMap((channel) =>
+  channel.href ? [{ ...channel, href: channel.href }] : []
+);
+---
+
+<BaseLayout
+  title={page.data.seo.title ?? page.data.title}
+  description={page.data.seo.description}
+>
+  <PageHeader eyebrow={page.data.eyebrow} title={page.data.title} intro={page.data.intro} />
+
+  <Section tone="base" title="Four Doors" kicker="Same team">
+    <ul class="grid gap-5 sm:grid-cols-2">
+      {
+        channels.map((channel) => (
+          <li class="flex flex-col rounded-sm border border-ink-600 bg-ink-800 p-6 transition-colors hover:border-gold/50">
+            <span class="mb-4 inline-flex size-12 items-center justify-center rounded-sm bg-ink-900 text-gold">
+              <Icon name={channel.icon} class="size-6" />
+            </span>
+            <h3 class="text-2xl text-bone">{channel.name}</h3>
+            <p class="mt-2 flex-1 text-sm leading-relaxed text-bone-muted">{channel.what}</p>
+            <div class="mt-5">
+              <Button href={channel.href} external size="sm" variant="outline">
+                {channel.cta} — {channel.name}
+              </Button>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section tone="alt" title="The Discord" kicker="Start here">
+    <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
+      <div>
+        <p class="text-base leading-relaxed text-bone-muted">
+          For a rotating free-agent roster, the Discord isn't a bonus channel — it's the whole
+          operating system. Event slots, carpools, paint orders and "does anyone have a spare
+          hopper" all happen there, and it's the fastest way to get on the list for the next
+          tournament.
+        </p>
+        <p class="mt-4 text-base leading-relaxed text-bone-muted">
+          It's a public server, so there's nothing to apply for. The widget below is Discord's own
+          — free, official, and live.
+        </p>
+      </div>
+      <SocialEmbed network="discord" />
+    </div>
+  </Section>
+
+  <Section tone="base" title="Instagram" kicker="Photos">
+    <SocialEmbed network="instagram" />
+  </Section>
+
+  <Section tone="alt" title="Facebook Group" kicker="Long form">
+    <div class="max-w-3xl">
+      <SocialEmbed network="facebook" />
+    </div>
+  </Section>
+
+  <Section tone="base" divider dividerSeed={31}>
+    <NewsletterBlock
+      title="Or just get the email"
+      eyebrow="Low effort option"
+      body="Event dates, roster openings and jersey drops. A few emails a season, never more, and no tracking pixels."
+    />
+  </Section>
+</BaseLayout>

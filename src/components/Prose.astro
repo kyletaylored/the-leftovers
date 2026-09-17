@@ -1,0 +1,89 @@
+---
+/**
+ * Prose — typographic defaults for CMS-authored Markdown bodies. Written by
+ * hand rather than pulling in @tailwindcss/typography: the site needs about
+ * fifteen rules, not a plugin's worth of them.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<div class:list={['prose-brand', className]}>
+  <slot />
+</div>
+
+<style>
+  .prose-brand {
+    max-width: 68ch;
+    color: var(--color-bone-muted);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+  .prose-brand :global(h2) {
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--color-bone);
+    font-size: 1.875rem;
+  }
+  .prose-brand :global(h3) {
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-bone);
+    font-size: 1.375rem;
+  }
+  .prose-brand :global(p),
+  .prose-brand :global(ul),
+  .prose-brand :global(ol) {
+    margin-bottom: 1.25rem;
+  }
+  .prose-brand :global(ul),
+  .prose-brand :global(ol) {
+    padding-left: 1.25rem;
+  }
+  .prose-brand :global(ul) {
+    list-style: none;
+  }
+  .prose-brand :global(ul > li) {
+    position: relative;
+  }
+  .prose-brand :global(ul > li)::before {
+    content: '';
+    position: absolute;
+    left: -1.1rem;
+    top: 0.65rem;
+    width: 0.4rem;
+    height: 0.4rem;
+    background: var(--color-gold);
+  }
+  .prose-brand :global(ol) {
+    list-style: decimal;
+  }
+  .prose-brand :global(li) {
+    margin-bottom: 0.4rem;
+  }
+  .prose-brand :global(strong) {
+    color: var(--color-bone);
+  }
+  .prose-brand :global(a) {
+    color: var(--color-gold-300);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .prose-brand :global(a:hover) {
+    color: var(--color-gold);
+  }
+  .prose-brand :global(blockquote) {
+    margin: 1.75rem 0;
+    padding-left: 1.25rem;
+    border-left: 3px solid var(--color-gold);
+    color: var(--color-bone);
+    font-size: 1.125rem;
+  }
+  .prose-brand :global(hr) {
+    margin: 2.5rem 0;
+    border: 0;
+    border-top: 1px solid var(--color-ink-600);
+  }
+</style>

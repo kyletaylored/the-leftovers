@@ -1,0 +1,6 @@
+# Cloudflare Pages project config (§4.1). Present so `wrangler pages deploy`
+# and the dashboard agree on the build output directory; the actual build is
+# wired in the Pages dashboard (Framework preset: Astro).
+name = "the-leftovers"
+compatibility_date = "2026-09-16"
+pages_build_output_dir = "dist"

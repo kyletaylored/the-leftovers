@@ -1,0 +1,79 @@
+---
+/**
+ * Seo — the complete per-page <head> metadata baseline (PRD §10.3).
+ *
+ * Canonical URL, title/description, OG + Twitter card, and an optional
+ * JSON-LD graph. Every page routes its metadata through here so there is
+ * exactly one place a tag can be missing from.
+ */
+import { site } from '@/lib/settings';
+
+interface Props {
+  title: string;
+  description?: string;
+  /** Absolute or site-relative image URL for the social card. */
+  ogImage?: string;
+  ogImageAlt?: string;
+  /** `article` for news/recap posts, `website` otherwise. */
+  ogType?: 'website' | 'article';
+  noindex?: boolean;
+  /** schema.org objects to emit as a single @graph. */
+  schema?: Array<Record<string, unknown>>;
+}
+
+const {
+  title,
+  description = site.description,
+  ogImage = '/og-default.png',
+  ogImageAlt = `${site.title} — ${site.tagline}`,
+  ogType = 'website',
+  noindex = false,
+  schema = [],
+} = Astro.props;
+
+/**
+ * Canonicalise the path before building the URL.
+ *
+ * With `build.format: 'file'`, Astro.url.pathname is the OUTPUT filename
+ * during prerender ("/about.html"), while the sitemap, the nav and every
+ * internal link use "/about". Emitting the raw pathname would point the
+ * canonical tag at a different URL than the one being linked and submitted —
+ * the exact self-inflicted duplicate-content problem canonicals exist to
+ * prevent. Normalising here fixes it for every page at once.
+ */
+const canonicalPath =
+  Astro.url.pathname
+    .replace(/\/index\.html$/, '/')
+    .replace(/\.html$/, '')
+    .replace(/(.+)\/$/, '$1') || '/';
+const canonical = new URL(canonicalPath, Astro.site).href;
+const ogImageUrl = new URL(ogImage, Astro.site).href;
+const fullTitle = title === site.title ? `${site.title} — ${site.tagline}` : `${title} | ${site.title}`;
+
+const graph =
+  schema.length > 0
+    ? { '@context': 'https://schema.org', '@graph': schema }
+    : null;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content={site.title} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:alt" content={ogImageAlt} />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
+<meta name="twitter:image:alt" content={ogImageAlt} />
+
+{graph && <script type="application/ld+json" set:html={JSON.stringify(graph)} is:inline />}

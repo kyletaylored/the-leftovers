@@ -1,0 +1,42 @@
+# Hand-entered after the event (PRD §8.1 — there is no public PBLeague
+# feed to sync from). Counts only; every rate on /stats is derived.
+event: 2025-06-summer-series-2
+placement: 6
+fieldSize: 10
+record: '3-3'
+players:
+  - player: kyle-taylor
+    gamesPlayed: 6
+    eliminations: 6
+    deaths: 3
+    flagPulls: 1
+    flagHangs: 0
+    penalties: 1
+  - player: m-rodriguez
+    gamesPlayed: 6
+    eliminations: 11
+    deaths: 3
+    flagPulls: 0
+    flagHangs: 0
+    penalties: 1
+  - player: j-smith
+    gamesPlayed: 6
+    eliminations: 7
+    deaths: 5
+    flagPulls: 1
+    flagHangs: 1
+    penalties: 1
+  - player: dani-okafor
+    gamesPlayed: 6
+    eliminations: 5
+    deaths: 2
+    flagPulls: 0
+    flagHangs: 0
+    penalties: 0
+  - player: t-nakamura
+    gamesPlayed: 6
+    eliminations: 7
+    deaths: 3
+    flagPulls: 0
+    flagHangs: 1
+    penalties: 1

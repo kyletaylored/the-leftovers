@@ -1,0 +1,36 @@
+---
+/**
+ * Lantern — hanging lantern flourish (§9 motif / icon set).
+ */
+interface Props {
+  class?: string;
+  /** How long the hanging cord is, in viewBox units. */
+  cord?: number;
+  color?: string;
+}
+const { class: className = '', cord = 60, color = 'var(--color-gold)' } = Astro.props;
+---
+
+<svg
+  viewBox={`0 0 60 ${cord + 110}`}
+  class={className}
+  aria-hidden="true"
+  role="presentation"
+  focusable="false"
+>
+  <g stroke={color} stroke-width="2.2" fill="none">
+    <line x1="30" y1="0" x2="30" y2={cord}></line>
+    <g transform={`translate(0 ${cord})`}>
+      <rect x="20" y="0" width="20" height="7" rx="1"></rect>
+      <ellipse cx="30" cy="34" rx="22" ry="27" fill="var(--color-forest)" fill-opacity="0.85"
+      ></ellipse>
+      <line x1="16" y1="16" x2="44" y2="16"></line>
+      <line x1="13" y1="34" x2="47" y2="34"></line>
+      <line x1="16" y1="52" x2="44" y2="52"></line>
+      <rect x="20" y="61" width="20" height="7" rx="1"></rect>
+      <line x1="30" y1="68" x2="30" y2="88"></line>
+      <line x1="24" y1="70" x2="24" y2="84"></line>
+      <line x1="36" y1="70" x2="36" y2="84"></line>
+    </g>
+  </g>
+</svg>

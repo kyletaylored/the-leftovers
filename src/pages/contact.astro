@@ -1,0 +1,97 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import Prose from '@/components/Prose.astro';
+import Button from '@/components/Button.astro';
+import Icon, { type IconName } from '@/components/brand/Icon.astro';
+import MascotCallout from '@/components/MascotCallout.astro';
+import { site } from '@/lib/settings';
+
+const page = await getEntry('pages', 'contact');
+if (!page) throw new Error('Missing content file: src/content/pages/contact.md');
+const { Content } = await render(page);
+
+const routes: Array<{ icon: IconName; label: string; value: string; href: string; note: string; external?: boolean }> = [
+  {
+    icon: 'chat',
+    label: 'Discord',
+    value: 'Event channel',
+    href: site.social.discord ?? '/community',
+    note: 'Fastest answer, usually the same evening.',
+    external: true,
+  },
+  {
+    icon: 'mail',
+    label: 'Email',
+    value: site.social.email,
+    href: `mailto:${site.social.email}`,
+    note: 'Sponsorship, press, and anything that needs a paper trail.',
+  },
+  {
+    icon: 'pin',
+    label: 'Home field',
+    value: site.homeBase,
+    href: '/events',
+    note: 'We play the PBLeague circuit across north Texas.',
+  },
+];
+
+/**
+ * Deliberately no contact <form> here. A form needs a backend or a
+ * third-party relay; email and Discord need neither, and this is the one page
+ * where that tradeoff is invisible to the visitor (§2, §4).
+ */
+---
+
+<BaseLayout
+  title={page.data.seo.title ?? page.data.title}
+  description={page.data.seo.description}
+>
+  <PageHeader eyebrow={page.data.eyebrow} title={page.data.title} intro={page.data.intro} />
+
+  <Section tone="base">
+    <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-16">
+      <ul class="space-y-4">
+        {
+          routes.map((route) => (
+            <li class="rounded-sm border border-ink-600 bg-ink-800 p-5">
+              <p class="flex items-center gap-2 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
+                <Icon name={route.icon} class="size-4" />
+                {route.label}
+              </p>
+              <a
+                href={route.href}
+                rel={route.external ? 'noopener' : undefined}
+                class="tap mt-2 inline-flex break-all text-lg text-bone underline decoration-gold/50 underline-offset-4 hover:text-gold-300"
+              >
+                {route.value}
+              </a>
+              <p class="mt-2 text-sm leading-relaxed text-bone-muted">{route.note}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div>
+        <Prose>
+          <Content />
+        </Prose>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <Button href="/roster#open-slots">See open roster slots</Button>
+          <Button href="/community" variant="outline">All the community links</Button>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section tone="alt" divider dividerSeed={37}>
+    <MascotCallout
+      title="Just want to play Saturday?"
+      body="You don't need to email anyone. Post in the Discord event channel, confirm you're coming, and show up."
+    >
+      <Button href={site.social.discord} external size="sm">Open the Discord</Button>
+    </MascotCallout>
+  </Section>
+</BaseLayout>

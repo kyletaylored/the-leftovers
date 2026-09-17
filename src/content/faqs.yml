@@ -1,0 +1,42 @@
+- id: who-can-join
+  question: Who can actually join the roster?
+  answer: >-
+    Anyone who can make the date, cover their own entry fee and paint, and
+    isn't a problem to be around. We're a rotating free-agent roster by
+    design — most of the team started as someone who filled an open slot for
+    one Saturday.
+  order: 1
+- id: skill-level
+  question: Do I need tournament experience?
+  answer: >-
+    No. About half the current roster had never played a registered event
+    before their first one with us. If you've played rec ball and you listen
+    in the huddle, you'll be fine. We play D4 PBLeague, not pro.
+  order: 2
+- id: cost
+  question: What does it cost to play an event with you?
+  answer: >-
+    Entry is typically $60–$110 per player depending on the event and format,
+    plus paint and air on the day. We don't take a cut and we don't charge
+    dues — everyone pays their own way.
+  order: 3
+- id: gear
+  question: What gear do I need?
+  answer: >-
+    Your own marker, mask, pods and a harness. If you're short a piece, ask in
+    the Discord — somebody on the roster has a spare almost every time.
+  order: 4
+- id: jersey
+  question: Do I have to buy a jersey?
+  answer: >-
+    Not to play. Jerseys run as batched pre-orders a couple of times a season
+    on Bonfire, so if you miss a window you just wait for the next one and
+    play in black in the meantime.
+  order: 5
+- id: how-to-start
+  question: How do I get on the list for the next event?
+  answer: >-
+    Join the Discord and post in the event channel, or email the captain. Slots
+    go in the order people confirm, and confirming means you're actually
+    showing up.
+  order: 6

@@ -1,0 +1,192 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ * Brand tokens — single source of truth, lifted from the style guide.
+ * Hex values are the locked palette; the -xxx ramp entries exist only
+ * to satisfy WCAG AA (§10.4) where the locked value can't (crimson on
+ * near-black fails as text, so crimson is a FILL and crimson-400 is
+ * the TEXT variant).
+ * ------------------------------------------------------------------ */
+@theme {
+  /* Palette */
+  --color-ink: #0b0a08; /* near black — page base */
+  --color-ink-900: #100e0c; /* section alt */
+  --color-ink-800: #16130f; /* card surface */
+  --color-ink-700: #221e18; /* raised / hover */
+  --color-ink-600: #322c24; /* hairline borders */
+
+  --color-crimson: #8b1e2b; /* locked crimson — fills, banners */
+  --color-crimson-600: #a32534; /* hover fill */
+  --color-crimson-400: #e06070; /* crimson as TEXT on dark (AA) */
+
+  --color-gold: #c9a227; /* locked antique gold */
+  --color-gold-300: #e0c164; /* gold as small TEXT on dark (AA) */
+  --color-gold-700: #8f721a;
+
+  --color-forest: #2e4a34;
+  --color-forest-600: #3a5c41;
+  --color-tan: #5c4a34;
+
+  --color-bone: #f4f1ea; /* primary text on dark */
+  --color-bone-muted: #b9b2a4; /* secondary text on dark (AA at 16px) */
+
+  /* Type roles (§9) — Astro's font API defines the raw --font-* vars. */
+  --font-display: var(--font-headline), Impact, sans-serif;
+  --font-sans: var(--font-body), system-ui, sans-serif;
+  --font-marker: var(--font-brush), cursive;
+
+  /* Motion */
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Headline role: condensed, heavy, wide-tracked sports impact type. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  ::selection {
+    background-color: var(--color-crimson);
+    color: var(--color-bone);
+  }
+
+  /* Visible focus everywhere — keyboard nav is a hard requirement (§10.4). */
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  /* Gold ribbed/chrome numerals (§9) — a TREATMENT, not a typeface:
+     a gold gradient plus repeating thin horizontal ribs, clipped to text. */
+  .numeral {
+    font-family: var(--font-display);
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        rgba(11, 10, 8, 0.55) 0,
+        rgba(11, 10, 8, 0.55) 1px,
+        transparent 1px,
+        transparent 5px
+      ),
+      linear-gradient(
+        to bottom,
+        #f6e3a3 0%,
+        var(--color-gold) 38%,
+        #8f721a 58%,
+        var(--color-gold) 74%,
+        #f0dda0 100%
+      );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    font-variant-numeric: lining-nums tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
+  /* Forced-colors / no-background-clip fallback: keep the digits readable. */
+  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+    .numeral {
+      background-image: none;
+      color: var(--color-gold);
+      -webkit-text-fill-color: var(--color-gold);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .numeral {
+      background-image: none;
+      color: CanvasText;
+      -webkit-text-fill-color: CanvasText;
+    }
+  }
+
+  /* Ghost jersey numeral sitting behind a player photo. */
+  .numeral-ghost {
+    font-family: var(--font-display);
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    background-image: linear-gradient(
+      to bottom,
+      rgba(244, 241, 234, 0.16),
+      rgba(244, 241, 234, 0.04)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+
+  /* Eyebrow / kicker label above headlines. */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-gold-300);
+  }
+
+  /* Topographic contour texture (§ style guide "TEXTURE & MOTIF"). */
+  .bg-topo {
+    background-color: var(--color-ink);
+    background-image: url('/img/topo.svg');
+    background-size: 720px auto;
+    background-repeat: repeat;
+  }
+
+  /* Minimum 44x44px touch targets (§10.1). */
+  .tap {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Sponsor marquee — pure CSS, no JS island needed. */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

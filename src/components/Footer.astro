@@ -1,0 +1,82 @@
+---
+import { site } from '@/lib/settings';
+import Wordmark from './brand/Wordmark.astro';
+import Mascot from './brand/Mascot.astro';
+import Icon, { type IconName } from './brand/Icon.astro';
+import TerracedDivider from './brand/TerracedDivider.astro';
+
+const socials: Array<{ name: IconName; href?: string; label: string }> = [
+  { name: 'instagram', href: site.social.instagram, label: 'Instagram' },
+  { name: 'facebook', href: site.social.facebookGroup, label: 'Facebook group' },
+  { name: 'discord', href: site.social.discord, label: 'Discord' },
+  { name: 'youtube', href: site.social.youtube, label: 'YouTube' },
+  { name: 'tiktok', href: site.social.tiktok, label: 'TikTok' },
+].filter((s): s is { name: IconName; href: string; label: string } => Boolean(s.href));
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-auto bg-ink-900">
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-14">
+    <div class="grid gap-10 lg:grid-cols-[1.2fr_1fr_1fr]">
+      <div>
+        <div class="flex items-center gap-3">
+          <Mascot variant="line" class="h-12 w-auto" steam={false} />
+          <Wordmark class="h-10 w-auto" size="footer" label={false} />
+        </div>
+        <p class="mt-4 max-w-sm text-sm leading-relaxed text-bone-muted">{site.footerNote}</p>
+        <p class="eyebrow mt-4">Est. {site.established} · {site.homeBase}</p>
+      </div>
+
+      <nav aria-label="Footer">
+        <h2 class="text-sm tracking-[0.2em] text-bone">Explore</h2>
+        <ul class="mt-4 grid grid-cols-2 gap-x-4">
+          {
+            site.nav.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="tap inline-flex items-center text-sm text-bone-muted transition-colors hover:text-gold-300"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div>
+        <h2 class="text-sm tracking-[0.2em] text-bone">Find the crew</h2>
+        <ul class="mt-4 flex flex-wrap gap-2">
+          {
+            socials.map((social) => (
+              <li>
+                <a
+                  href={social.href}
+                  rel="me noopener"
+                  class="tap inline-flex items-center justify-center rounded-sm border border-ink-600 text-gold transition-colors hover:border-gold hover:bg-ink-700"
+                >
+                  <Icon name={social.name} class="size-5" label={social.label} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+        <a
+          href={`mailto:${site.social.email}`}
+          class="tap mt-4 inline-flex items-center gap-2 text-sm text-bone-muted transition-colors hover:text-gold-300"
+        >
+          <Icon name="mail" class="size-4" />
+          {site.social.email}
+        </a>
+      </div>
+    </div>
+
+    <p class="mt-10 border-t border-ink-600/60 pt-6 text-xs tracking-wide text-bone-muted">
+      © {year} {site.title}. All rights reserved. Built as a static site — no trackers, no cookies.
+    </p>
+  </div>
+
+  <TerracedDivider seed={7} class="h-14 sm:h-20" />
+</footer>

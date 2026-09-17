@@ -1,0 +1,61 @@
+---
+/**
+ * Wordmark — the "THE LEFTOVERS" brush lockup.
+ *
+ * PRD §9 asks for the wordmark to behave like a static asset rather than live
+ * text, so it can't reflow or resize as the display face loads. That is what
+ * `textLength` + `lengthAdjust` buy here: the two words are pinned to fixed
+ * widths inside a fixed viewBox, so the mark occupies exactly the same box
+ * whether Permanent Marker has loaded, is still loading, or failed outright
+ * and fell back to a system cursive. No overflow, no layout shift, no
+ * per-browser drift — and the glyph set is subsetted to just these letters in
+ * astro.config.mjs.
+ *
+ * When licensed logo art lands, replace the two <text> nodes with <path> data
+ * here and nothing else on the site changes.
+ */
+interface Props {
+  class?: string;
+  /** Scale context. Present for callers' intent; the art is identical. */
+  size?: 'nav' | 'hero' | 'footer';
+  color?: string;
+  /** Pass a label only where the mark IS the accessible name for the link. */
+  label?: string | false;
+}
+const {
+  class: className = '',
+  size = 'nav',
+  color = 'var(--color-crimson-600)',
+  label = 'The Leftovers',
+} = Astro.props;
+
+// Deterministic per-render id: Math.random() would change the markup on every
+// build for no reason and defeat output diffing.
+const titleId = `wordmark-title-${size}`;
+---
+
+<svg
+  viewBox="0 0 320 120"
+  class={`wordmark ${className}`}
+  role={label ? 'img' : 'presentation'}
+  aria-labelledby={label ? titleId : undefined}
+  aria-hidden={label ? undefined : 'true'}
+  focusable="false"
+>
+  {label && <title id={titleId}>{label}</title>}
+  <g fill={color} transform="skewX(-8) translate(15 0)" class="wordmark-text">
+    <text x="20" y="46" font-size="46" textLength="108" lengthAdjust="spacingAndGlyphs">THE</text>
+    <text x="4" y="108" font-size="62" textLength="298" lengthAdjust="spacingAndGlyphs">
+      LEFTOVERS
+    </text>
+  </g>
+</svg>
+
+<style>
+  .wordmark {
+    display: block;
+  }
+  .wordmark-text {
+    font-family: var(--font-marker);
+  }
+</style>

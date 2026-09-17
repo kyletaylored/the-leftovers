@@ -1,0 +1,413 @@
+# ---------------------------------------------------------------------------
+# Pages CMS configuration (PRD §4, §6, §11).
+#
+# This file is the entire CMS. It maps the Astro content collections in
+# src/content.config.ts onto forms at app.pagescms.org, which commits straight
+# to this repo on the editor's behalf — no database, no backend, no admin
+# build to deploy. A save is a commit is a Cloudflare Pages deploy.
+#
+# Two rules are enforced here rather than left to whoever is typing fastest
+# after a tournament (§6):
+#   1. Every image field is followed by a REQUIRED alt-text field.
+#   2. Anything the site derives (win rates, upcoming/past) is NOT an editable
+#      field, so it can't be entered wrong or go stale.
+# ---------------------------------------------------------------------------
+
+media:
+  # Media live under src/assets so Astro's <Image> can optimize them; the
+  # output path is what gets written into the content files and resolved by
+  # src/lib/images.ts.
+  - name: images
+    label: Images
+    input: src/assets/img
+    output: /src/assets/img
+    extensions: [jpg, jpeg, png, webp, avif, svg]
+    categories: [image]
+
+content:
+  # -- Players --------------------------------------------------------------
+  - name: players
+    label: Roster
+    description: >-
+      One file per player. Set Status to "Open slot" to render the dashed
+      "OPEN SLOT — JOIN THE ROSTER" card instead of a player card.
+    type: collection
+    path: src/content/players
+    filename: '{fields.name}.md'
+    format: yaml-frontmatter
+    view:
+      fields: [name, number, role, status]
+      primary: name
+      sort: [order, name, number]
+    fields:
+      - { name: name, label: Name, type: string, required: true }
+      - {
+          name: number,
+          label: Jersey number,
+          type: number,
+          description: 'Rendered with the gold ribbed-numeral treatment.',
+        }
+      - {
+          name: role,
+          label: Position,
+          type: select,
+          options: { values: [Front, Mid, Back, Snake, Insert, Support, Any position] },
+          required: true,
+        }
+      - {
+          name: status,
+          label: Status,
+          type: select,
+          default: active,
+          options:
+            {
+              values:
+                [
+                  { value: active, label: Active player },
+                  { value: open-slot, label: Open slot (join CTA) },
+                ],
+            },
+          required: true,
+        }
+      - { name: photo, label: Photo, type: image, options: { media: images } }
+      - name: photoAlt
+        label: Photo alt text
+        type: string
+        required: true
+        description: >-
+          Describe the photo for screen readers and image search, e.g. "Kyle
+          Taylor laning the break in a Leftovers jersey". Required whenever a
+          photo is set.
+      - { name: joined, label: Joined the team, type: date }
+      - {
+          name: order,
+          label: Sort order,
+          type: number,
+          default: 100,
+          description: 'Lower sorts first on the roster page.',
+        }
+      - {
+          name: featured,
+          label: Show on the homepage,
+          type: boolean,
+          default: false,
+          description: 'The homepage shows the first three featured players.',
+        }
+      - name: socials
+        label: Socials
+        type: object
+        fields:
+          - { name: instagram, label: Instagram URL, type: string, pattern: { regex: '^https?://.+' } }
+          - { name: tiktok, label: TikTok URL, type: string, pattern: { regex: '^https?://.+' } }
+          - { name: youtube, label: YouTube URL, type: string, pattern: { regex: '^https?://.+' } }
+      - { name: body, label: Bio, type: rich-text }
+
+  # -- Events ---------------------------------------------------------------
+  - name: events
+    label: Events
+    description: >-
+      Tournaments, upcoming and past. Upcoming/past is worked out from the
+      date automatically — only set Status if you need to override it.
+    type: collection
+    path: src/content/events
+    filename: '{year}-{month}-{fields.title}.md'
+    format: yaml-frontmatter
+    view:
+      fields: [title, startDate, league]
+      primary: title
+      sort: [startDate, title]
+    fields:
+      - { name: title, label: Event name, type: string, required: true }
+      - {
+          name: league,
+          label: League / series tag,
+          type: string,
+          description: 'e.g. "PBLeague D4". Shown as the crimson pill on the card.',
+        }
+      - { name: startDate, label: Start date, type: date, required: true }
+      - { name: endDate, label: End date, type: date, description: 'Leave empty for a one-day event.' }
+      - name: location
+        label: Location
+        type: object
+        required: true
+        fields:
+          - { name: venue, label: Venue, type: string, required: true }
+          - { name: city, label: City / state, type: string, required: true }
+          - { name: mapUrl, label: Map link, type: string, pattern: { regex: '^https?://.+' } }
+      - {
+          name: registrationUrl,
+          label: Registration URL,
+          type: string,
+          pattern: { regex: '^https?://.+' },
+          description: 'Links straight to the league. We never take entries ourselves.',
+        }
+      - name: status
+        label: Status override
+        type: select
+        options: { values: [upcoming, past] }
+        description: >-
+          Normally leave this empty. The site derives upcoming/past from the
+          date, so an event can never get stuck as "upcoming".
+      - { name: cover, label: Cover image, type: image, options: { media: images } }
+      - { name: coverAlt, label: Cover image alt text, type: string, required: true }
+      - {
+          name: placement,
+          label: Finish,
+          type: string,
+          description: 'Filled in after the event, e.g. "2nd of 12".',
+        }
+      - { name: resultSummary, label: Result summary, type: text, description: 'A sentence or two, after the event.' }
+      - { name: body, label: Notes, type: rich-text }
+
+  # -- Results --------------------------------------------------------------
+  - name: results
+    label: Results & stat lines
+    description: >-
+      One file per event played. PBLeague exports results to the organiser,
+      not as a public feed, so these are entered by hand (§8.1). Enter raw
+      counts only — every rate and total on the stats page is calculated.
+    type: collection
+    path: src/content/results
+    filename: '{fields.event}.yml'
+    format: yaml
+    view:
+      fields: [event, placement, record]
+      primary: event
+    fields:
+      - {
+          name: event,
+          label: Event,
+          type: reference,
+          required: true,
+          options: { collection: events, value: '{filename}', label: '{fields.title}' },
+        }
+      - { name: placement, label: Final placement, type: number }
+      - { name: fieldSize, label: Teams in the bracket, type: number }
+      - { name: record, label: 'Win-loss record', type: string, pattern: { regex: '^\d+\s*-\s*\d+$' } }
+      - name: players
+        label: Player stat lines
+        type: object
+        list: true
+        fields:
+          - {
+              name: player,
+              label: Player,
+              type: reference,
+              required: true,
+              options: { collection: players, value: '{filename}', label: '{fields.name}' },
+            }
+          - { name: gamesPlayed, label: Games played, type: number, default: 0 }
+          - { name: eliminations, label: Eliminations, type: number, default: 0 }
+          - { name: deaths, label: Times eliminated, type: number, default: 0 }
+          - { name: flagPulls, label: Flag pulls, type: number, default: 0 }
+          - { name: flagHangs, label: Flag hangs, type: number, default: 0 }
+          - { name: penalties, label: Penalties, type: number, default: 0 }
+
+  # -- Products -------------------------------------------------------------
+  - name: products
+    label: Shop items
+    description: >-
+      Teaser cards only. Checkout happens on Bonfire/Fourthwall — this site
+      never handles payment, so there is no inventory to manage here (§8.2).
+    type: collection
+    path: src/content/products
+    filename: '{fields.name}.yml'
+    format: yaml
+    view:
+      fields: [name, price, status]
+      primary: name
+      sort: [order, name]
+    fields:
+      - { name: name, label: Product name, type: string, required: true }
+      - { name: blurb, label: Description, type: text }
+      - { name: image, label: Product image, type: image, options: { media: images } }
+      - { name: imageAlt, label: Product image alt text, type: string, required: true }
+      - { name: price, label: Price, type: number, required: true }
+      - { name: currency, label: Currency, type: string, default: USD }
+      - {
+          name: buyUrl,
+          label: Buy link,
+          type: string,
+          required: true,
+          pattern: { regex: '^https?://.+' },
+          description: 'The Bonfire or Fourthwall product/campaign URL.',
+        }
+      - {
+          name: status,
+          label: Status,
+          type: select,
+          default: available,
+          options:
+            {
+              values:
+                [
+                  { value: 'pre-order', label: 'Pre-order (batch open)' },
+                  { value: available, label: Available now },
+                  { value: 'sold-out', label: Sold out / batch closed },
+                ],
+            },
+          required: true,
+        }
+      - {
+          name: preorderCloses,
+          label: Pre-order window closes,
+          type: date,
+          description: 'Drives the countdown on the shop page.',
+        }
+      - { name: order, label: Sort order, type: number, default: 100 }
+
+  # -- Sponsors -------------------------------------------------------------
+  - name: sponsors
+    label: Sponsors
+    type: collection
+    path: src/content/sponsors
+    filename: '{fields.name}.yml'
+    format: yaml
+    view:
+      fields: [name, tier]
+      primary: name
+    fields:
+      - { name: name, label: Sponsor name, type: string, required: true }
+      - { name: logo, label: Logo, type: image, options: { media: images } }
+      - name: logoAlt
+        label: Logo alt text
+        type: string
+        required: true
+        description: 'Usually just "<Sponsor> logo".'
+      - { name: url, label: Website, type: string, pattern: { regex: '^https?://.+' } }
+      - {
+          name: tier,
+          label: Tier,
+          type: select,
+          default: supporting,
+          options: { values: [title, gold, supporting] },
+        }
+
+  # -- Pages ----------------------------------------------------------------
+  - name: pages
+    label: Page copy
+    description: 'Body copy and SEO metadata for About, Contact, Shop and Community.'
+    type: collection
+    path: src/content/pages
+    filename: '{fields.title}.md'
+    format: yaml-frontmatter
+    view:
+      fields: [title]
+      primary: title
+    fields:
+      - { name: title, label: Page title, type: string, required: true }
+      - { name: eyebrow, label: Eyebrow / kicker, type: string }
+      - { name: intro, label: Intro paragraph, type: text }
+      - name: seo
+        label: SEO
+        type: object
+        fields:
+          - {
+              name: title,
+              label: Search-result title,
+              type: string,
+              description: 'Up to ~60 characters. Falls back to the page title.',
+            }
+          - {
+              name: description,
+              label: Meta description,
+              type: text,
+              description: 'Up to ~155 characters. This is the text Google shows.',
+            }
+          - { name: ogImage, label: Social share image, type: image, options: { media: images } }
+          - { name: ogImageAlt, label: Social share image alt text, type: string }
+          - { name: noindex, label: Hide from search engines, type: boolean, default: false }
+      - { name: body, label: Body, type: rich-text }
+
+  # -- FAQs -----------------------------------------------------------------
+  - name: faqs
+    label: FAQs
+    description: 'Shown on the About page and submitted to Google as FAQ structured data.'
+    type: file
+    path: src/content/faqs.yml
+    format: yaml
+    list: true
+    fields:
+      - { name: id, label: ID, type: string, required: true, description: 'Lowercase, no spaces. Used as the anchor.' }
+      - { name: question, label: Question, type: string, required: true }
+      - { name: answer, label: Answer, type: text, required: true }
+      - { name: order, label: Sort order, type: number, default: 100 }
+
+  # -- Site settings --------------------------------------------------------
+  - name: settings
+    label: Site settings
+    description: 'Nav, social links, the mailing-list endpoint and shop URLs.'
+    type: file
+    path: src/data/site.yml
+    format: yaml
+    fields:
+      - { name: title, label: Site title, type: string, required: true }
+      - { name: tagline, label: Tagline, type: string, required: true }
+      - { name: description, label: Default meta description, type: text, required: true }
+      - { name: established, label: Established (year), type: number, required: true }
+      - { name: homeBase, label: Home base, type: string, required: true }
+      - name: nav
+        label: Navigation
+        type: object
+        list: true
+        fields:
+          - { name: label, label: Label, type: string, required: true }
+          - { name: href, label: Path, type: string, required: true }
+      - name: primaryCta
+        label: Header button
+        type: object
+        fields:
+          - { name: label, label: Label, type: string, required: true }
+          - { name: href, label: Link, type: string, required: true }
+      - name: social
+        label: Social links
+        type: object
+        fields:
+          - { name: instagram, label: Instagram, type: string }
+          - { name: facebookGroup, label: Facebook group, type: string }
+          - { name: discord, label: Discord invite, type: string }
+          - { name: youtube, label: YouTube, type: string }
+          - { name: tiktok, label: TikTok, type: string }
+          - { name: email, label: Contact email, type: string, required: true }
+      - name: discordServerId
+        label: Discord server ID
+        type: string
+        description: >-
+          Numeric server ID. Renders Discord's official free widget on the
+          Community page. Leave empty to show a link-out card instead.
+      - name: instagramWidget
+        label: Instagram feed widget
+        type: object
+        description: >-
+          Instagram has no casual live-feed API, so a grid needs a third-party
+          aggregator (Elfsight / Juicer / SnapWidget). Paste its script here.
+          Left empty, the page shows a link-out card rather than a hole.
+        fields:
+          - { name: provider, label: Provider name, type: string }
+          - { name: scriptSrc, label: Widget script URL, type: string }
+          - { name: elementClass, label: Widget element class, type: string }
+      - name: mailingList
+        label: Mailing list
+        type: object
+        description: 'The signup form posts straight to this provider — no data touches our site.'
+        fields:
+          - {
+              name: provider,
+              label: Provider,
+              type: select,
+              options: { values: [buttondown, mailchimp] },
+              required: true,
+            }
+          - { name: formAction, label: Form action URL, type: string, required: true }
+          - { name: emailFieldName, label: Email field name, type: string, default: email }
+      - name: shop
+        label: Shop links
+        type: object
+        fields:
+          - { name: bonfireUrl, label: Bonfire store URL, type: string }
+          - { name: alwaysOpenUrl, label: 'Always-open store URL', type: string }
+      - { name: footerNote, label: Footer note, type: text, required: true }
+
+settings:
+  content:
+    merge: true

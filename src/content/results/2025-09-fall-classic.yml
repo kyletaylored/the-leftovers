@@ -1,0 +1,49 @@
+# Hand-entered after the event (PRD §8.1 — there is no public PBLeague
+# feed to sync from). Counts only; every rate on /stats is derived.
+event: 2025-09-fall-classic
+placement: 3
+fieldSize: 16
+record: '6-2'
+players:
+  - player: kyle-taylor
+    gamesPlayed: 8
+    eliminations: 12
+    deaths: 5
+    flagPulls: 1
+    flagHangs: 1
+    penalties: 1
+  - player: m-rodriguez
+    gamesPlayed: 8
+    eliminations: 18
+    deaths: 5
+    flagPulls: 1
+    flagHangs: 0
+    penalties: 0
+  - player: j-smith
+    gamesPlayed: 8
+    eliminations: 9
+    deaths: 6
+    flagPulls: 2
+    flagHangs: 1
+    penalties: 1
+  - player: dani-okafor
+    gamesPlayed: 8
+    eliminations: 8
+    deaths: 3
+    flagPulls: 1
+    flagHangs: 1
+    penalties: 1
+  - player: t-nakamura
+    gamesPlayed: 8
+    eliminations: 15
+    deaths: 5
+    flagPulls: 1
+    flagHangs: 1
+    penalties: 1
+  - player: r-bell
+    gamesPlayed: 8
+    eliminations: 12
+    deaths: 6
+    flagPulls: 2
+    flagHangs: 1
+    penalties: 1

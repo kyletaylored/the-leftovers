@@ -1,0 +1,78 @@
+---
+/**
+ * BaseLayout — the single HTML shell every page renders inside.
+ *
+ * Head order is deliberate: preconnects and fonts first (fonts are the only
+ * blocking external resource on the site), then metadata. Astro's font API
+ * self-hosts the files, emits `font-display: swap`, and preloads only the
+ * faces used above the fold — the launch requirement in §10.2.
+ */
+import { Font } from 'astro:assets';
+import '@/styles/global.css';
+import { site } from '@/lib/settings';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import Seo from '@/components/Seo.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  ogType?: 'website' | 'article';
+  noindex?: boolean;
+  schema?: Array<Record<string, unknown>>;
+  /** Drop the nav's sticky offset padding for full-bleed hero pages. */
+  bodyClass?: string;
+}
+
+const { bodyClass = '', ...seo } = Astro.props;
+
+/** Emitted on every page so the team itself is one crawlable entity. */
+const organizationSchema = {
+  '@type': 'SportsTeam',
+  '@id': new URL('/#team', Astro.site).href,
+  name: site.title,
+  sport: 'Paintball',
+  description: site.description,
+  url: new URL('/', Astro.site).href,
+  logo: new URL('/og-default.png', Astro.site).href,
+  foundingDate: String(site.established),
+  areaServed: site.homeBase,
+  email: site.social.email,
+  sameAs: [
+    site.social.instagram,
+    site.social.facebookGroup,
+    site.social.youtube,
+    site.social.tiktok,
+  ].filter(Boolean),
+};
+---
+
+<!doctype html>
+<html lang="en" class="bg-ink">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0B0A08" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <Font cssVariable="--font-headline" preload />
+    <Font cssVariable="--font-body" preload />
+    <Font cssVariable="--font-brush" preload />
+
+    <Seo {...seo} schema={[organizationSchema, ...(seo.schema ?? [])]} />
+  </head>
+
+  <body class:list={['flex min-h-dvh flex-col', bodyClass]}>
+    <Nav />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

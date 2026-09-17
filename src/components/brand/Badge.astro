@@ -1,0 +1,30 @@
+---
+/** Badge / crest lockup — the circular mark used as favicon and small stamp. */
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<svg viewBox="0 0 120 120" class={className} aria-hidden="true" role="presentation">
+  <circle cx="60" cy="60" r="58" fill="var(--color-ink)" stroke="var(--color-gold)" stroke-width="3"
+  ></circle>
+  <path d="M18 76c8-10 22-8 28 2 6-12 24-12 30 0 6-10 20-12 26-2v18H18Z" fill="var(--color-crimson)"
+  ></path>
+  <g transform="translate(60 62) scale(0.34) translate(-100 -115)">
+    <path d="M56 104h88l-12 112H68Z" fill="#F7F5F0" stroke="var(--color-ink)" stroke-width="6"></path>
+    <path d="M56 106 28 82l34-10 30 26Z" fill="#F7F5F0" stroke="var(--color-ink)" stroke-width="6"
+    ></path>
+    <path d="M144 106l28-24-34-10-30 26Z" fill="#F7F5F0" stroke="var(--color-ink)" stroke-width="6"
+    ></path>
+    <path
+      d="M60 104c4-16 16-24 30-22 8 1 12 8 20 8s14-8 24-6c12 2 18 12 16 26"
+      fill="#E9C979"
+      stroke="var(--color-ink)"
+      stroke-width="6"></path>
+    <g transform="rotate(-28 72 96)">
+      <rect x="30" y="34" width="9" height="76" rx="4" fill="var(--color-crimson)"></rect>
+      <rect x="45" y="28" width="9" height="82" rx="4" fill="var(--color-crimson)"></rect>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,94 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import Prose from '@/components/Prose.astro';
+import StatNumber from '@/components/StatNumber.astro';
+import Callout from '@/components/Callout.astro';
+import CtaStrip from '@/components/CtaStrip.astro';
+import Button from '@/components/Button.astro';
+import FaqAccordion from '@/components/FaqAccordion.astro';
+import { getCollection } from 'astro:content';
+import { getTeamStats } from '@/lib/stats';
+import { site } from '@/lib/settings';
+import { rate } from '@/lib/format';
+
+const page = await getEntry('pages', 'about');
+if (!page) throw new Error('Missing content file: src/content/pages/about.md');
+const { Content } = await render(page);
+
+const [stats, faqs] = await Promise.all([
+  getTeamStats(),
+  getCollection('faqs'),
+]);
+const faqItems = faqs
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((faq) => ({ question: faq.data.question, answer: faq.data.answer }));
+
+/** FAQ rich results are one of the few schema types this content earns honestly. */
+const schema = [
+  {
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  },
+];
+---
+
+<BaseLayout
+  title={page.data.seo.title ?? page.data.title}
+  description={page.data.seo.description}
+  schema={schema}
+>
+  <PageHeader eyebrow={page.data.eyebrow} title={page.data.title} intro={page.data.intro} />
+
+  <Section tone="base">
+    <div class="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
+      <Prose>
+        <Content />
+      </Prose>
+
+      <aside class="lg:sticky lg:top-24 lg:self-start">
+        <div class="rounded-sm border border-ink-600 bg-ink-800 p-6">
+          <h2 class="text-2xl text-bone">The record</h2>
+          <div class="mt-5 grid grid-cols-2 gap-y-6">
+            <StatNumber value={stats.seasons} label="Seasons" size="sm" />
+            <StatNumber value={stats.eventCount} label="Events" size="sm" />
+            <StatNumber value={`${stats.wins}-${stats.losses}`} label="Record" size="sm" />
+            <StatNumber value={rate(stats.winRate)} label="Win rate" size="sm" />
+          </div>
+          <Button href="/stats" variant="outline" size="sm" class="mt-6 w-full">
+            Full stats & standings
+          </Button>
+        </div>
+
+        <Callout class="mt-6" cite={`— Est. ${site.established}, ${site.homeBase}`}>
+          We're the players who were left over, and we'd rather hand the next person a slot than
+          make them wait a season for one.
+        </Callout>
+      </aside>
+    </div>
+  </Section>
+
+  <Section tone="alt" title="Common Questions" kicker="Before you ask">
+    <FaqAccordion items={faqItems} class="max-w-3xl" />
+  </Section>
+
+  <Section tone="base" divider dividerSeed={23}>
+    <CtaStrip
+      tone="forest"
+      eyebrow="Rotating roster"
+      title="There's a slot open"
+      body="No tryout, no dues, no bench. Cover your entry and paint and you're playing points at the next event."
+    >
+      <Button slot="actions" href="/roster#open-slots" variant="gold" size="lg">See open slots</Button>
+      <Button slot="actions" href={site.social.discord} external variant="ghost" size="lg" class="!border-bone/40 !text-bone hover:!border-bone">
+        Ask in the Discord
+      </Button>
+    </CtaStrip>
+  </Section>
+</BaseLayout>

@@ -1,0 +1,74 @@
+---
+/**
+ * RuyiCloud — the traditional ruyi-cloud bank that rolls in from the top
+ * corners of the hero and the CTA strips (§9 motif).
+ *
+ * The silhouette is one scalloped path: flush to the top and left edges of
+ * its own viewBox, then a run of downward-bulging arcs whose baseline climbs
+ * to the right, so the bank tapers away toward the middle of the page instead
+ * of ending on a straight cut. Keeping it inside its own box is what stops it
+ * reading as a coloured header bar across the whole section.
+ */
+interface Props {
+  /** Which corner it rolls in from; controls the mirroring. */
+  side?: 'left' | 'right';
+  class?: string;
+  color?: string;
+}
+const { side = 'left', class: className = '', color = 'var(--color-crimson)' } = Astro.props;
+
+const W = 320;
+const H = 200;
+const BUMPS = 5;
+
+/**
+ * Scalloped bottom edge: the baseline climbs from `startY` all the way to the
+ * top edge, so the tail merges into it. Stopping short would leave a vertical
+ * cut down the right-hand side, which is exactly what makes a cloud read as a
+ * coloured rectangle.
+ */
+const startY = 142;
+const endY = 0;
+const step = W / BUMPS;
+const radius = step * 0.78;
+
+let silhouette = `M0,${startY}`;
+for (let i = 1; i <= BUMPS; i++) {
+  const x = i * step;
+  const y = startY + ((endY - startY) * i) / BUMPS;
+  // sweep-flag 1 running left-to-right bulges the arc downward.
+  silhouette += ` A${radius.toFixed(1)},${radius.toFixed(1)} 0 0 1 ${x.toFixed(1)},${y.toFixed(1)}`;
+}
+silhouette += ` L${W},0 L0,0 Z`;
+
+/** Ruyi curls, drawn in the shadow tone inside the bank. [cx, cy, r] */
+const curls: Array<[number, number, number]> = [
+  [44, 86, 26],
+  [126, 70, 21],
+  [200, 50, 17],
+  [88, 34, 15],
+];
+
+const flip = side === 'right' ? `scale(-1 1) translate(${-W} 0)` : '';
+---
+
+<svg
+  viewBox={`0 0 ${W} ${H}`}
+  class={className}
+  aria-hidden="true"
+  role="presentation"
+  focusable="false"
+>
+  <g transform={flip}>
+    <path d={silhouette} fill={color} />
+    <g fill="none" stroke="rgba(11,10,8,0.32)" stroke-width="5" stroke-linecap="round">
+      {
+        curls.map(([cx, cy, r]) => (
+          <path
+            d={`M${cx - r},${cy} A${r},${r} 0 1 1 ${cx},${cy - r} A${(r * 0.5).toFixed(1)},${(r * 0.5).toFixed(1)} 0 1 0 ${cx + r * 0.5},${cy}`}
+          />
+        ))
+      }
+    </g>
+  </g>
+</svg>

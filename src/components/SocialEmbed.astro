@@ -1,0 +1,96 @@
+---
+/**
+ * SocialEmbed — wraps whichever third-party widget script §8.3 settles on.
+ *
+ * Three realities this component encodes, so no page has to re-learn them:
+ *  - Facebook GROUPS cannot be embedded at all. The only honest treatment is
+ *    a link-out button, so `facebook` renders exactly that (§8.3, §13).
+ *  - Instagram has no casual live-feed API, so a grid needs a third-party
+ *    aggregator's script. Until one is configured in site settings, this
+ *    renders the link-out fallback instead of an empty hole.
+ *  - Discord ships an official, free widget for public servers — the one
+ *    embed here that costs nothing and needs no third party.
+ *
+ * Third-party scripts are loaded lazily and only when configured, so an
+ * unconfigured widget can never cost the page a Core Web Vital (§10.2).
+ */
+import { site } from '@/lib/settings';
+import Button from './Button.astro';
+import MascotCallout from './MascotCallout.astro';
+
+interface Props {
+  network: 'instagram' | 'discord' | 'facebook';
+  title?: string;
+  class?: string;
+}
+const { network, title, class: className = '' } = Astro.props;
+
+const widget = site.instagramWidget;
+const instagramReady = Boolean(widget.scriptSrc && widget.elementClass);
+const discordReady = Boolean(site.discordServerId);
+---
+
+<div class:list={[className]}>
+  {
+    network === 'instagram' &&
+      (instagramReady ? (
+        <>
+          <div class={widget.elementClass} />
+          <script is:inline async src={widget.scriptSrc} />
+        </>
+      ) : (
+        <MascotCallout
+          as="h3"
+          title="Feed coming soon"
+          body="Instagram has no live-feed API for casual use, so the grid runs through a widget provider's free tier. Until that's wired up, the real feed lives on Instagram."
+        >
+          <Button href={site.social.instagram} external variant="outline" size="sm">
+            Follow @theleftovers on Instagram
+          </Button>
+        </MascotCallout>
+      ))
+  }
+
+  {
+    network === 'discord' &&
+      (discordReady ? (
+        <iframe
+          src={`https://discord.com/widget?id=${site.discordServerId}&theme=dark`}
+          title={title ?? 'The Leftovers Discord server'}
+          width="100%"
+          height="420"
+          loading="lazy"
+          allowtransparency="true"
+          frameborder="0"
+          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+          class="rounded-sm border border-ink-600"
+        />
+      ) : (
+        <MascotCallout
+          as="h3"
+          title="Jump in the Discord"
+          body="Discord is where the next tournament's squad actually gets sorted out — who's in, who's carrying what, who's driving."
+        >
+          <Button href={site.social.discord} external size="sm">
+            Open the Discord invite
+          </Button>
+        </MascotCallout>
+      ))
+  }
+
+  {
+    network === 'facebook' && (
+      /* Meta's Page Plugin only supports public Pages, never Groups — there
+         is no embeddable group feed to build against (§8.3). */
+      <MascotCallout
+        as="h3"
+        title="The Facebook group"
+        body="Facebook doesn't let anyone embed group posts, so this one is a door rather than a window. The group is where photos and post-tournament arguing live."
+      >
+        <Button href={site.social.facebookGroup} external size="sm" variant="outline">
+          Join the Facebook group
+        </Button>
+      </MascotCallout>
+    )
+  }
+</div>

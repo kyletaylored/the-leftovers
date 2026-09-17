@@ -1,0 +1,99 @@
+---
+/**
+ * TerracedDivider — the brand's signature section break (§7 custom components).
+ *
+ * Renders the terraced-mountain silhouette: a gold zigzag ridge with the
+ * small stepped "brick" glyphs from the style guide's TERRACED MOUNTAIN TRIM
+ * motif, optionally filled forest green below the ridge.
+ *
+ * Pure inline SVG (no raster) so it costs ~1KB and scales to any width —
+ * mobile media-weight requirement, §10.1.
+ */
+interface Props {
+  /** `full` = green silhouette + gold ridge. `line` = gold ridge only. */
+  variant?: 'full' | 'line';
+  /** Point the mountains downward (for a footer/top-of-section break). */
+  flip?: boolean;
+  /** Seed the ridge so two dividers on one page aren't identical. */
+  seed?: number;
+  class?: string;
+}
+
+const { variant = 'full', flip = false, seed = 1, class: className = '' } = Astro.props;
+
+const W = 1200;
+const H = 120;
+const PEAKS = 9;
+
+// Deterministic pseudo-random so the markup is stable between builds.
+const rand = (i: number) => {
+  const x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+// Build the ridge as a stepped zigzag: up to a peak, down to a valley.
+const ridge: Array<[number, number]> = [[0, H * 0.72]];
+for (let i = 0; i < PEAKS; i++) {
+  const x0 = ((i + 0.5) / PEAKS) * W;
+  const x1 = ((i + 1) / PEAKS) * W;
+  const peakY = H * (0.16 + rand(i) * 0.3);
+  const valleyY = H * (0.6 + rand(i + 50) * 0.22);
+  ridge.push([x0, peakY], [x1, valleyY]);
+}
+
+const ridgeLine = ridge.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+const silhouette = `0,${H} ${ridgeLine} ${W},${H}`;
+
+// Trim glyphs ride the peaks — every peak plus a couple of mid-slope points.
+const glyphs = ridge.filter((_, i) => i % 2 === 1).map(([x, y]) => ({ x, y: y - 9 }));
+const flipStyle = flip ? 'transform: scaleY(-1);' : '';
+---
+
+<div class={`pointer-events-none w-full ${className}`} aria-hidden="true">
+  <svg
+    viewBox={`0 0 ${W} ${H}`}
+    width="100%"
+    height="100%"
+    preserveAspectRatio="none"
+    style={`display:block; ${flipStyle}`}
+    role="presentation"
+    focusable="false"
+  >
+    {
+      variant === 'full' && (
+        <>
+          <polygon points={silhouette} fill="var(--color-forest)" />
+          <polygon
+            points={silhouette}
+            fill="none"
+            stroke="var(--color-forest-600)"
+            stroke-width="1"
+          />
+        </>
+      )
+    }
+    <polyline
+      points={ridgeLine}
+      fill="none"
+      stroke="var(--color-gold)"
+      stroke-width="2"
+      stroke-linejoin="miter"
+      stroke-opacity={variant === 'full' ? 0.95 : 0.6}
+    />
+    {
+      glyphs.map(({ x, y }) => (
+        <g
+          transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`}
+          stroke="var(--color-gold)"
+          stroke-width="1.4"
+          fill="none"
+          stroke-opacity="0.9"
+        >
+          <rect x="-6" y="-6" width="12" height="12" />
+          <line x1="-6" y1="0" x2="6" y2="0" />
+          <line x1="0" y1="-6" x2="0" y2="6" />
+        </g>
+      ))
+    }
+  </svg>
+</div>

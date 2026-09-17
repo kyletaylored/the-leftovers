@@ -1,0 +1,59 @@
+---
+/**
+ * TwoColumn — image + text, image on either side (§7).
+ * Single-column on mobile; the second column appears at `lg` (§10.1).
+ */
+import { Image } from 'astro:assets';
+
+interface Props {
+  title?: string;
+  eyebrow?: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+  imageSide?: 'left' | 'right';
+  as?: 'h2' | 'h3';
+  class?: string;
+}
+const {
+  title,
+  eyebrow,
+  image,
+  imageAlt = '',
+  imageSide = 'right',
+  as: Heading = 'h2',
+  class: className = '',
+} = Astro.props;
+---
+
+<div class:list={['grid items-center gap-8 lg:grid-cols-2 lg:gap-14', className]}>
+  <div class:list={[imageSide === 'left' && 'lg:order-2']}>
+    {eyebrow && <p class="eyebrow mb-3">{eyebrow}</p>}
+    {title && <Heading class="text-3xl text-bone sm:text-4xl lg:text-5xl">{title}</Heading>}
+    <div class="mt-4 space-y-4 text-base leading-relaxed text-bone-muted">
+      <slot />
+    </div>
+    <div class="mt-7 flex flex-wrap gap-3 empty:mt-0">
+      <slot name="actions" />
+    </div>
+  </div>
+
+  {
+    image && (
+      <div class:list={['relative', imageSide === 'left' && 'lg:order-1']}>
+        <Image
+          src={image}
+          alt={imageAlt}
+          widths={[480, 720, 1080]}
+          sizes="(min-width: 1024px) 560px, 92vw"
+          loading="lazy"
+          decoding="async"
+          class="w-full rounded-sm border border-ink-600 object-cover"
+        />
+        <span
+          class="pointer-events-none absolute -bottom-2 -right-2 -z-10 size-full rounded-sm border border-gold/40"
+          aria-hidden="true"
+        />
+      </div>
+    )
+  }
+</div>
