@@ -229,3 +229,51 @@ evaluation, PBLI data partnership.
    could not confirm against the Pages CMS docs (their fields page 404s).
    If the CMS rejects the config, that's the first thing to remove — Zod
    already enforces the same rules at build time.
+
+---
+
+## style-2 UI sheet deltas
+
+The PRD is the contract, and where it and the mockups disagree the PRD wins.
+But `docs/design/ui-components.webp` is more prescriptive at component level
+than §7's prose, and comparing the two turns up the following. None of it is
+broken; all of it is a fidelity choice someone should make on purpose.
+
+### Sheet specifies, not built
+
+| # | Sheet | Built | Notes |
+|---|---|---|---|
+| 1 | **Sold-out badge is crimson filled** | Grey (`ink-700` + muted text) | One-line fix. Grey reads as "inactive", crimson as "gone" — the sheet's call is probably better |
+| 2 | **Leading stat row is SOLID gold with dark text** | 12% gold tint + inset gold bar | §7 only says "gold highlight on top row", so mine satisfies the PRD but undersells the sheet. Solid gold needs the row's text switched to `ink` to hold contrast |
+| 3 | **Tertiary / text-link button** (gold, underlined) | Not built | No consumer yet |
+| 4 | **Disabled button state** (grey) | Not built | No consumer yet — nothing on the site disables a button |
+| 5 | **Event date badge includes day-of-week** ("SAT" above "SEP 20") | Month + day only | `dayOfWeek()` already exists in `lib/format.ts`, unused |
+| 6 | **Ruyi clouds in event/player card corners** | Cards have no clouds | Clouds are currently section-level only (hero, CTA strips) |
+| 7 | **Toast / feedback notification** ("Thanks for joining the crew!") | Not built | Not in §7 either. Would need a reason to exist — the newsletter form posts to the provider and leaves the page, so there's nothing to confirm in-page |
+| 8 | **Visible labels above form fields** | `sr-only` label + placeholder | Mine is accessible (a real `<label>` is always present) but visually differs. A visible label is the better pattern; placeholders disappear on focus |
+
+### Where the sheet and the PRD actively conflict
+
+**PlayerCard.** §7 specifies "big ghost-type jersey number **behind** photo,
+gold ribbed-numeral treatment, name bar, role tag" — which is what's built.
+The sheet instead shows the numeral **beside** the photo in a gold frame, with
+the name in a crimson banner and the role in a pill, plus corner clouds.
+
+I followed the PRD text. Worth a decision, because the sheet's version is the
+more distinctive card.
+
+### Homepage layout
+
+`homepage-mockup-a` is what's built. `homepage-mockup-b` adds a full-bleed
+action photo with the *"Paintball builds better people"* manifesto line and
+inline stats, plus a crimson full-width next-up band. Both are photography
+problems, not code problems — and the manifesto band is the obvious home for
+the `TwoColumn` component that currently ships unused (§7 gap above).
+
+### Honest note on sequencing
+
+The brand guide and `homepage-1` drove the build. I did not review
+`style-2`/`homepage-3` in detail until after implementation, when they were
+added to the README — which is why these deltas surfaced late rather than
+being decided up front. Nothing here contradicts the PRD; it's fidelity
+against a sheet that is more specific than the spec it accompanies.

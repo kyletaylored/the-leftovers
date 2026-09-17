@@ -20,6 +20,51 @@ monthly bill or a database to keep alive.
 
 ---
 
+## Design reference
+
+The brand and layout came from four reference plates. These are committed at
+reduced size in [`docs/design/`](docs/design/) so the intent is in the repo
+rather than in someone's downloads folder — the full-resolution originals live
+in the gitignored `_reference/`. They sit in `docs/`, which is outside the
+Astro build, so none of this ships to visitors.
+
+### Brand guide — the locked palette, motifs and type roles
+
+![The Leftovers brand guide: colour palette, texture and motif swatches, typography, mascot and logo lockups, icon set, and UI component samples](docs/design/brand-guide.webp)
+
+Everything in `src/styles/global.css` and `src/components/brand/` traces back
+to this sheet: the five palette hexes, the topographic contour texture, the
+ruyi cloud motif, the terraced-mountain trim, the brush wordmark, the gold
+ribbed numerals, and the six-icon set.
+
+### UI component library — component-level states
+
+![UI component library sheet showing button states, form fields, badges, player cards, event card, stat table row, desktop and mobile navigation, footer and a toast notification](docs/design/ui-components.webp)
+
+The most prescriptive of the four, and the reference to check a component
+against before changing it — it specifies button states (default, hover,
+secondary, tertiary, disabled), form focus rings, badge colours per status,
+and the gold treatment on the leading stat row. Known deltas between this
+sheet and what's built are tracked in
+[docs/PRD-CONFORMANCE.md](docs/PRD-CONFORMANCE.md#style-2-ui-sheet-deltas).
+
+### Homepage mockups — two layout directions
+
+| A — crimson pre-order band | B — photo manifesto + gold band |
+|---|---|
+| [![Homepage mockup A: hero lockup, stat strip, next-up panel, roster row, crimson pre-order banner, newsletter, sponsors](docs/design/homepage-mockup-a.webp)](docs/design/homepage-mockup-a.webp) | [![Homepage mockup B: hero lockup, full-bleed action photo with a manifesto headline, crimson next-up band, roster row, gold pre-order banner](docs/design/homepage-mockup-b.webp)](docs/design/homepage-mockup-b.webp) |
+
+The built homepage follows **A**, which is the fuller of the two (it has the
+gold ribbed stat strip and the detailed next-up panel that B drops).
+
+Two things **B** has that aren't built yet, both waiting on photography rather
+than code:
+
+- the full-bleed action photo with the *"Paintball builds better people"*
+  manifesto line — this is the natural home for the `TwoColumn` component
+  that currently ships unused
+- the crimson full-width next-up band, an alternative to A's panel
+
 ## Stack
 
 | Layer | Choice |
