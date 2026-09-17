@@ -1,7 +1,8 @@
 ---
 import type { GetStaticPaths } from 'astro';
 import { getCollection, render } from 'astro:content';
-import { Image } from 'astro:assets';
+import { getImage } from 'astro:assets';
+import icon from '@/assets/img/brand/icon.png';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHeader from '@/components/PageHeader.astro';
 import Section from '@/components/Section.astro';
@@ -9,7 +10,7 @@ import Prose from '@/components/Prose.astro';
 import Button from '@/components/Button.astro';
 import Countdown from '@/components/Countdown.astro';
 import Icon from '@/components/brand/Icon.astro';
-import MascotMark from '@/components/brand/MascotMark.astro';
+import ProductGallery, { type GalleryImage } from '@/components/ProductGallery.tsx';
 import PreorderForm from '@/components/PreorderForm.tsx';
 import { site } from '@/lib/settings';
 import { resolveImage } from '@/lib/images';
@@ -34,6 +35,41 @@ const isOpen = d.status === 'open' && !closedByDate;
 
 const variantImages = await Promise.all(
   d.variants.map(async (variant) => ({ ...variant, asset: await resolveImage(variant.image) }))
+);
+
+/**
+ * Every variant becomes a gallery slide, whether or not it has a real photo
+ * yet. A missing photo resolves to the mascot icon rather than a special
+ * "no image" case — ProductGallery only has to know how to render a slide,
+ * not two kinds of slide. `isPlaceholder` just tones it down and lets the
+ * icon sit inset (object-contain) instead of filling the frame.
+ */
+const galleryImages: GalleryImage[] = await Promise.all(
+  variantImages.map(async (variant) => {
+    if (variant.asset) {
+      const optimized = await getImage({ src: variant.asset, widths: [480, 720, 960], format: 'webp' });
+      return {
+        src: optimized.src,
+        srcSet: optimized.srcSet.attribute || undefined,
+        width: Number(optimized.attributes.width ?? variant.asset.width),
+        height: Number(optimized.attributes.height ?? variant.asset.height),
+        alt: variant.imageAlt ?? `${d.title} ${variant.name}`,
+        title: variant.name,
+        description: variant.description,
+      };
+    }
+    const placeholder = await getImage({ src: icon, widths: [320, 640], format: 'webp' });
+    return {
+      src: placeholder.src,
+      srcSet: placeholder.srcSet.attribute || undefined,
+      width: Number(placeholder.attributes.width ?? icon.width),
+      height: Number(placeholder.attributes.height ?? icon.height),
+      alt: '',
+      title: variant.name,
+      description: variant.description,
+      isPlaceholder: true,
+    };
+  })
 );
 
 const raised = d.cause ? d.cause.unitsSold * d.cause.donationPerUnit : 0;
@@ -131,36 +167,13 @@ const schema = [
         }
       </div>
 
-      <!-- Mockups -->
-      <div class="space-y-5">
-        {
-          variantImages.map((variant) => (
-            <figure class="overflow-hidden rounded-sm border border-ink-600 bg-ink-800">
-              {variant.asset ? (
-                <Image
-                  src={variant.asset}
-                  alt={variant.imageAlt ?? `${d.title} ${variant.name}`}
-                  widths={[480, 720, 960]}
-                  sizes="(min-width: 1024px) 480px, 92vw"
-                  loading="lazy"
-                  decoding="async"
-                  class="w-full"
-                />
-              ) : (
-                <div class="flex aspect-square items-center justify-center">
-                  <MascotMark class="w-1/3" width={160} dim />
-                </div>
-              )}
-              <figcaption class="border-t border-ink-600 px-4 py-3">
-                <p class="font-display text-lg uppercase text-bone">{variant.name}</p>
-                {variant.description && (
-                  <p class="mt-1 text-sm text-bone-muted">{variant.description}</p>
-                )}
-              </figcaption>
-            </figure>
-          ))
-        }
-        <p class="text-xs text-bone-muted">Mockups are not final artwork.</p>
+      <!-- Mockups: one main image + thumbnails, so N versions no longer
+           means N full-width stacked images pushing the order form down the
+           page. Client-side only for the swap/modal interaction; the images
+           themselves are already optimized above. -->
+      <div>
+        <ProductGallery client:visible images={galleryImages} />
+        <p class="mt-4 text-xs text-bone-muted">Mockups are not final artwork.</p>
       </div>
     </div>
   </Section>
