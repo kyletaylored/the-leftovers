@@ -44,6 +44,61 @@ the "£X raised" line both derive from it.
 If nobody is going to keep it current, leave the cause section off entirely
 rather than show a stale bar.
 
+#### Could this be pulled automatically instead? (researched, not built)
+
+Checked against Google's current docs (`developers.google.com/workspace/forms/api`,
+Sept 2026) rather than assumed. Short answer: technically possible, but it's
+real infrastructure to take on, and — this is the part worth reading — even a
+perfect integration wouldn't measure the thing the bar is supposed to
+represent.
+
+**The semantic problem, which matters more than the engineering:** the order
+form never verifies payment (§ "No payment is taken on the site" above). A
+response count is *submitted orders*, not *paid orders*. `unitsSold` today is
+presumably kept as "confirmed paid," which is the honest number to run a
+donation pledge against. Automating straight from response count would
+quietly change what the bar means — it'd count someone who backed out or
+never paid the same as someone who did. That's a real regression, not a
+convenience.
+
+**The engineering, if it's ever worth doing anyway:**
+
+- **Forms API (`forms.responses.list`)** — requires a Google Cloud project,
+  the Forms API enabled, an OAuth consent screen, and (per the *current*
+  Google-published quickstart) a Desktop OAuth client with a one-time
+  interactive login to mint a refresh token that a build script then reuses
+  non-interactively. There's no API-key-only or anonymous read. Whether a
+  bare service account can be granted access by just sharing the form with
+  its email — the same pattern that works for Sheets/Docs — isn't confirmed
+  in Google's docs for Forms specifically; it would need a live test before
+  relying on it.
+- **Simpler and more useful: read the linked Google *Sheet* instead of the
+  Form.** Every response already lands in a Sheet (that's what "check the
+  Sheet, delete the row" in the testing section above refers to). Sheets API
+  access via a bare service account (share the Sheet with its email, no
+  OAuth consent flow, no refresh token) is the well-documented, simple case.
+  This also fixes the semantic problem above: have the captain tick a
+  "confirmed paid" checkbox column in the Sheet — a lighter step than editing
+  YAML — and a build script sums *that*, not raw row count.
+- **Either way, nothing updates live.** This is a static site with no
+  server; a number only changes on the next build. That means either every
+  CMS save triggers a fresh pull (fine, since a save already rebuilds), or —
+  if the bar should move between saves — a scheduled GitHub Action added
+  purely to rebuild periodically. That's a new moving part in the deploy
+  pipeline, not a one-line change.
+
+One thing already true by design, worth keeping if this is ever built: the
+order form submits **one response per jersey**, not one per order (see
+"One response per jersey" below) — so a response count already equals a
+jersey count, with no extra math needed on that front.
+
+**Where this leaves it:** worth doing once the team has a "confirmed paid"
+signal to read (the Sheet checkbox is the cheap way to get one) and is ready
+to take on a Google Cloud project + service account as a real piece of
+infrastructure — which, per the no-commitments position elsewhere in this
+project, isn't now. Manual entry stays the default until that's a deliberate
+yes.
+
 ---
 
 ## How submission works
