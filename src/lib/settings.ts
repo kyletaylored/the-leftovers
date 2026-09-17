@@ -50,6 +50,13 @@ const settingsSchema = z.object({
     emailFieldName: z.string().default('email'),
     hiddenFields: z.record(z.string(), z.string()).default({}),
   }),
+  preorderForm: z
+    .object({
+      provider: z.string().default(''),
+      endpoint: z.string().default(''),
+      turnstileSiteKey: z.string().default(''),
+    })
+    .prefault({}),
   shop: z
     .object({
       bonfireUrl: z.string().default(''),

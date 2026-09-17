@@ -80,9 +80,21 @@ mailingList:
     embed: '1'
 
 shop:
-  # Bonfire campaign for the batched jersey pre-order drop (§8.2).
-  bonfireUrl: https://www.bonfire.com/store/the-leftovers/
+  # Bonfire campaign for evergreen items (§8.2). Batch jersey drops are taken
+  # through the on-site pre-order form below instead, because they need
+  # per-jersey customisation Bonfire can't collect.
+  bonfireUrl: ''
   alwaysOpenUrl: ''
+
+# On-site pre-order form. See docs/PREORDERS.md for the two backends.
+# Empty endpoint = the form renders a "not connected" notice instead of
+# silently swallowing orders.
+preorderForm:
+  provider: ''
+  endpoint: ''
+  # Cloudflare Turnstile. Only real protection once the endpoint verifies the
+  # token server-side — a site key alone is decoration.
+  turnstileSiteKey: ''
 
 footerNote: >-
   Free agents welcome. Show up, pay your entry, play the tournament —

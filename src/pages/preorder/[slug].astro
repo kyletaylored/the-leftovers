@@ -1,0 +1,208 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import Prose from '@/components/Prose.astro';
+import Button from '@/components/Button.astro';
+import Countdown from '@/components/Countdown.astro';
+import Icon from '@/components/brand/Icon.astro';
+import MascotMark from '@/components/brand/MascotMark.astro';
+import PreorderForm from '@/components/PreorderForm.tsx';
+import { site } from '@/lib/settings';
+import { resolveImage } from '@/lib/images';
+import { money, fullDate } from '@/lib/format';
+
+export const getStaticPaths = (async () => {
+  const campaigns = await getCollection('preorders', ({ data }) => data.status !== 'draft');
+  return campaigns.map((campaign) => ({
+    params: { slug: campaign.id },
+    props: { campaign },
+  }));
+}) satisfies GetStaticPaths;
+
+const { campaign } = Astro.props;
+const { Content } = await render(campaign);
+const d = campaign.data;
+
+// Closed is DERIVED from the deadline, with `status` as an override — same
+// rule as events. Nobody should have to remember to close a drop by hand.
+const closedByDate = d.closesAt.getTime() + 24 * 60 * 60 * 1000 < Date.now();
+const isOpen = d.status === 'open' && !closedByDate;
+
+const variantImages = await Promise.all(
+  d.variants.map(async (variant) => ({ ...variant, asset: await resolveImage(variant.image) }))
+);
+
+const raised = d.cause ? d.cause.unitsSold * d.cause.donationPerUnit : 0;
+const goal = d.cause ? d.cause.goalUnits * d.cause.donationPerUnit : 0;
+const pct = goal > 0 ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
+
+const schema = [
+  {
+    '@type': 'Product',
+    name: `${site.title} — ${d.title}`,
+    description: d.seo.description,
+    brand: { '@id': new URL('/#team', Astro.site).href },
+    offers: {
+      '@type': 'Offer',
+      price: d.price,
+      priceCurrency: d.currency,
+      availability: isOpen ? 'https://schema.org/PreOrder' : 'https://schema.org/SoldOut',
+      priceValidUntil: d.closesAt.toISOString().slice(0, 10),
+      url: new URL(`/preorder/${campaign.id}`, Astro.site).href,
+    },
+  },
+];
+---
+
+<BaseLayout
+  title={d.seo.title ?? d.title}
+  description={d.seo.description}
+  schema={schema}
+>
+  <PageHeader eyebrow={d.eyebrow} title={d.title} />
+
+  <Section tone="base">
+    <div class="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+      <!-- The pitch -->
+      <div>
+        <div class="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+          <p class="numeral text-4xl leading-none sm:text-5xl">{money(d.price, d.currency)}</p>
+          {d.priceNote && <p class="text-sm text-bone-muted">{d.priceNote}</p>}
+        </div>
+
+        <p class="mt-4 flex flex-wrap items-center gap-2 text-sm text-bone-muted">
+          <Icon name="calendar" class="size-4 text-gold" />
+          {
+            isOpen ? (
+              <>
+                Orders close <time datetime={d.closesAt.toISOString()}>{fullDate(d.closesAt)}</time>
+              </>
+            ) : (
+              <>This drop closed on <time datetime={d.closesAt.toISOString()}>{fullDate(d.closesAt)}</time></>
+            )
+          }
+        </p>
+
+        {isOpen && <div class="mt-6"><Countdown target={d.closesAt} passedLabel="Orders have closed" /></div>}
+
+        <Prose class="mt-8">
+          <Content />
+        </Prose>
+
+        <!-- Cause progress. unitsSold is hand-entered; see docs/PREORDERS.md -->
+        {
+          d.cause && (
+            <div class="mt-10 rounded-sm border border-ink-600 bg-ink-800 p-6">
+              <p class="eyebrow mb-2">Raising money for</p>
+              <h2 class="text-2xl text-bone">
+                {d.cause.url ? (
+                  <a href={d.cause.url} rel="noopener" class="hover:text-gold-300">{d.cause.name}</a>
+                ) : (
+                  d.cause.name
+                )}
+              </h2>
+              <p class="mt-2 text-sm leading-relaxed text-bone-muted">
+                {money(d.cause.donationPerUnit, d.currency)} from every jersey, with a goal of
+                {' '}{money(goal, d.currency)} across {d.cause.goalUnits} jerseys.
+              </p>
+
+              <div class="mt-5">
+                <div
+                  class="h-2.5 w-full overflow-hidden rounded-full bg-ink-900"
+                  role="progressbar"
+                  aria-valuenow={raised}
+                  aria-valuemin={0}
+                  aria-valuemax={goal}
+                  aria-label={`${money(raised, d.currency)} raised of ${money(goal, d.currency)} goal`}
+                >
+                  <div class="h-full rounded-full bg-gold transition-all" style={`width: ${pct}%`}></div>
+                </div>
+                <p class="mt-2 text-sm text-bone-muted">
+                  <strong class="text-bone">{money(raised, d.currency)}</strong> raised ·
+                  {' '}{d.cause.unitsSold} of {d.cause.goalUnits} jerseys
+                </p>
+              </div>
+            </div>
+          )
+        }
+      </div>
+
+      <!-- Mockups -->
+      <div class="space-y-5">
+        {
+          variantImages.map((variant) => (
+            <figure class="overflow-hidden rounded-sm border border-ink-600 bg-ink-800">
+              {variant.asset ? (
+                <Image
+                  src={variant.asset}
+                  alt={variant.imageAlt ?? `${d.title} ${variant.name}`}
+                  widths={[480, 720, 960]}
+                  sizes="(min-width: 1024px) 480px, 92vw"
+                  loading="lazy"
+                  decoding="async"
+                  class="w-full"
+                />
+              ) : (
+                <div class="flex aspect-square items-center justify-center">
+                  <MascotMark class="w-1/3" width={160} dim />
+                </div>
+              )}
+              <figcaption class="border-t border-ink-600 px-4 py-3">
+                <p class="font-display text-lg uppercase text-bone">{variant.name}</p>
+                {variant.description && (
+                  <p class="mt-1 text-sm text-bone-muted">{variant.description}</p>
+                )}
+              </figcaption>
+            </figure>
+          ))
+        }
+        <p class="text-xs text-bone-muted">Mockups are not final artwork.</p>
+      </div>
+    </div>
+  </Section>
+
+  <!-- The form -->
+  <Section
+    id="order"
+    tone="alt"
+    title={isOpen ? 'Place Your Order' : 'Orders Closed'}
+    kicker={isOpen ? 'No payment taken here' : undefined}
+    divider
+    dividerSeed={19}
+  >
+    {
+      isOpen ? (
+        <div class="max-w-3xl">
+          <PreorderForm
+            client:visible
+            campaign={d.title}
+            variants={d.variants.map(({ name, description }) => ({ name, description }))}
+            sizes={d.sizes}
+            price={d.price}
+            currency={d.currency}
+            nameOnBack={d.customisation.nameOnBack}
+            numberOnBack={d.customisation.numberOnBack}
+            paymentMethods={d.paymentMethods}
+            endpoint={site.preorderForm.endpoint}
+            turnstileSiteKey={site.preorderForm.turnstileSiteKey || undefined}
+          />
+        </div>
+      ) : (
+        <div class="max-w-2xl rounded-sm border border-ink-600 bg-ink-800 p-6">
+          <p class="text-base leading-relaxed text-bone-muted">
+            This batch has closed and gone to print. The mailing list and Discord get the next
+            drop first.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <Button href="/community" size="sm">Get told about the next one</Button>
+            <Button href="/shop" variant="outline" size="sm">Back to the shop</Button>
+          </div>
+        </div>
+      )
+    }
+  </Section>
+</BaseLayout>

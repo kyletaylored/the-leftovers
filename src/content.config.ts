@@ -143,6 +143,81 @@ const products = defineCollection({
   }),
 });
 
+/**
+ * Pre-order campaigns (drops).
+ *
+ * Deliberately NOT the same thing as `products`. A product is a thing you can
+ * go buy; a drop is a time-boxed batch with per-order customisation (jersey
+ * version, size, name and number on the back), a deadline, and — increasingly
+ * — a cause attached.
+ *
+ * This exists because the real process was orders collected as comments on a
+ * Facebook post. The failure mode there isn't the form-filling, it's that
+ * nobody can tell whether their order was counted, what they owe, or whether
+ * the drop hit its goal.
+ */
+const preorders = defineCollection({
+  loader: glob({ base: './src/content/preorders', pattern: '**/*.md' }),
+  schema: z.object({
+    title: z.string(),
+    /** Short line under the title, e.g. "Breast Cancer Awareness drop". */
+    eyebrow: z.string().optional(),
+    status: z.enum(['draft', 'open', 'closed', 'fulfilled']).default('draft'),
+    opensAt: z.coerce.date().optional(),
+    /** The order deadline. Drives the countdown and auto-closes the form. */
+    closesAt: z.coerce.date(),
+
+    price: z.number().nonnegative(),
+    currency: z.string().default('USD'),
+    /** e.g. "shipped anywhere in the US" — rendered next to the price. */
+    priceNote: z.string().optional(),
+
+    /** The jersey cuts / colourways on offer. At least one. */
+    variants: z
+      .array(
+        z.object({
+          name: z.string(),
+          description: z.string().optional(),
+          image: imagePath.optional(),
+          imageAlt: z.string().optional(),
+        })
+      )
+      .min(1),
+
+    sizes: z.array(z.string()).min(1),
+
+    /** Which per-jersey fields the order form should collect. */
+    customisation: z
+      .object({
+        nameOnBack: z.boolean().default(true),
+        numberOnBack: z.boolean().default(true),
+      })
+      .prefault({}),
+
+    /**
+     * Optional cause. `unitsSold` is entered by hand in the CMS — there is no
+     * backend counting orders, and a fabricated progress bar would be worse
+     * than none. See docs/PREORDERS.md.
+     */
+    cause: z
+      .object({
+        name: z.string(),
+        url: z.url().optional(),
+        donationPerUnit: z.number().nonnegative(),
+        goalUnits: z.number().int().positive(),
+        unitsSold: z.number().int().min(0).default(0),
+      })
+      .optional(),
+
+    /** How people actually pay, since payment is arranged off-site. */
+    paymentMethods: z
+      .array(z.object({ label: z.string(), handle: z.string().optional() }))
+      .default([]),
+
+    seo,
+  }),
+});
+
 const pagesCollection = defineCollection({
   loader: glob({ base: './src/content/pages', pattern: '**/*.md' }),
   schema: z.object({
@@ -196,6 +271,7 @@ export const collections = {
   results,
   sponsors,
   products,
+  preorders,
   pages: pagesCollection,
   galleries,
   faqs,

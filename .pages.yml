@@ -319,6 +319,95 @@ content:
           - { name: noindex, label: Hide from search engines, type: boolean, default: false }
       - { name: body, label: Body, type: rich-text }
 
+  # -- Pre-order drops ------------------------------------------------------
+  - name: preorders
+    label: Pre-order drops
+    description: >-
+      Batch jersey drops with an on-site order form. Orders close automatically
+      on the deadline. Keep Status on "draft" until it's ready — draft drops
+      aren't published at all. See docs/PREORDERS.md.
+    type: collection
+    path: src/content/preorders
+    filename: '{year}-{fields.title}.md'
+    format: yaml-frontmatter
+    view:
+      fields: [title, status, closesAt, price]
+      primary: title
+      sort: [closesAt, title]
+    fields:
+      - { name: title, label: Drop name, type: string, required: true }
+      - { name: eyebrow, label: Kicker, type: string, description: 'e.g. "Breast Cancer Awareness"' }
+      - name: status
+        label: Status
+        type: select
+        default: draft
+        required: true
+        options:
+          values:
+            - { value: draft, label: Draft (not published) }
+            - { value: open, label: Open — taking orders }
+            - { value: closed, label: Closed }
+            - { value: fulfilled, label: Fulfilled / shipped }
+      - name: closesAt
+        label: Orders close
+        type: date
+        required: true
+        description: >-
+          The deadline. Drives the countdown and closes the form automatically
+          — you don't need to come back and switch it off.
+      - { name: opensAt, label: Orders open, type: date }
+      - { name: price, label: Price per jersey, type: number, required: true }
+      - { name: currency, label: Currency, type: string, default: USD }
+      - { name: priceNote, label: Price note, type: string, description: 'e.g. "shipped anywhere in the US"' }
+      - name: variants
+        label: Versions
+        type: object
+        list: true
+        required: true
+        fields:
+          - { name: name, label: Version name, type: string, required: true }
+          - { name: description, label: Description, type: text }
+          - { name: image, label: Mockup image, type: image, options: { media: images } }
+          - { name: imageAlt, label: Mockup alt text, type: string, required: true }
+      - name: sizes
+        label: Sizes offered
+        type: string
+        list: true
+        required: true
+      - name: customisation
+        label: Per-jersey customisation
+        type: object
+        fields:
+          - { name: nameOnBack, label: Collect name on back, type: boolean, default: true }
+          - { name: numberOnBack, label: Collect number on back, type: boolean, default: true }
+      - name: cause
+        label: Cause (optional)
+        type: object
+        description: >-
+          Leave empty for a normal drop. If you fill it in, keep "Jerseys sold
+          so far" current — the progress bar is calculated from it and nothing
+          counts orders automatically.
+        fields:
+          - { name: name, label: Charity name, type: string }
+          - { name: url, label: Charity website, type: string, pattern: { regex: '^https?://.+' } }
+          - { name: donationPerUnit, label: Donation per jersey, type: number }
+          - { name: goalUnits, label: Goal (jerseys), type: number }
+          - { name: unitsSold, label: Jerseys sold so far, type: number, default: 0 }
+      - name: paymentMethods
+        label: How people can pay
+        type: object
+        list: true
+        fields:
+          - { name: label, label: Method, type: string, required: true }
+          - { name: handle, label: Handle / details, type: string }
+      - name: seo
+        label: SEO
+        type: object
+        fields:
+          - { name: title, label: Search-result title, type: string }
+          - { name: description, label: Meta description, type: text }
+      - { name: body, label: The pitch, type: rich-text }
+
   # -- Galleries ------------------------------------------------------------
   - name: galleries
     label: Photo galleries
@@ -436,6 +525,21 @@ content:
             }
           - { name: formAction, label: Form action URL, type: string, required: true }
           - { name: emailFieldName, label: Email field name, type: string, default: email }
+      - name: preorderForm
+        label: Pre-order form
+        type: object
+        description: >-
+          Where the on-site order form posts. Empty = the form shows a "not
+          connected" notice instead of losing orders. See docs/PREORDERS.md.
+        fields:
+          - { name: provider, label: Provider name, type: string }
+          - { name: endpoint, label: Form endpoint URL, type: string }
+          - name: turnstileSiteKey
+            label: Turnstile site key
+            type: string
+            description: >-
+              Only real bot protection once the endpoint verifies the token
+              server-side. A key on its own is decoration.
       - name: shop
         label: Shop links
         type: object
