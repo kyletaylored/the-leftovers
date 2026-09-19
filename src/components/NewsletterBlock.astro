@@ -83,21 +83,29 @@ const {
             ))}
 
             <div class="flex-1">
-              <label for="newsletter-email" class="sr-only">Email address</label>
+              {/* Visible label, not sr-only — per the Sept 2026 design-handoff
+                  audit (§04 components, delta #8): a placeholder alone
+                  disappears the moment someone starts typing. */}
+              <label
+                for="newsletter-email"
+                class="mb-1.5 block text-[0.65rem] font-bold uppercase tracking-[0.18em] text-gold-300"
+              >
+                Email address
+              </label>
               <input
                 id="newsletter-email"
                 type="email"
                 name={emailFieldName}
                 required
                 autocomplete="email"
-                placeholder="Enter your email address…"
+                placeholder="you@example.com"
                 class="tap w-full rounded-sm border border-ink-600 bg-ink-900 px-4 py-3 text-sm text-bone placeholder:text-bone-muted/70 focus:border-gold focus:outline-none"
               />
             </div>
 
             <button
               type="submit"
-              class="tap inline-flex shrink-0 items-center justify-center gap-2 rounded-sm bg-crimson px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-bone transition-colors hover:bg-crimson-600"
+              class="tap inline-flex shrink-0 items-center justify-center gap-2 self-end rounded-sm bg-crimson px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-bone transition-colors hover:bg-crimson-600"
             >
               Subscribe
               <Icon name="arrow-right" class="size-4" />

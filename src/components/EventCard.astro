@@ -11,7 +11,7 @@ import Icon from './brand/Icon.astro';
 import TerracedDivider from './brand/TerracedDivider.astro';
 import Button from './Button.astro';
 import { resolveImage } from '@/lib/images';
-import { dateRange, dayNum, monthShort, isoDate } from '@/lib/format';
+import { dateRange, dayNum, dayOfWeek, monthShort, isoDate } from '@/lib/format';
 import { isUpcoming, type EventEntry } from '@/lib/events';
 
 interface Props {
@@ -63,6 +63,11 @@ const upcoming = isUpcoming(event);
       <div
         class="flex shrink-0 flex-col items-center rounded-sm border border-gold/50 bg-ink-900 px-3 py-2"
       >
+        {/* Day-of-week added per the Sept 2026 design-handoff audit (delta
+            #5) — dayOfWeek() already existed in lib/format.ts, just unused. */}
+        <span class="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-gold-300">
+          {dayOfWeek(startDate)}
+        </span>
         <span class="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-gold-300">
           {monthShort(startDate)}
         </span>

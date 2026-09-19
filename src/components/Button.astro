@@ -9,7 +9,12 @@ import Icon, { type IconName } from './brand/Icon.astro';
 
 interface Props {
   href?: string;
-  variant?: 'primary' | 'outline' | 'gold' | 'ghost';
+  variant?: 'primary' | 'outline' | 'gold' | 'ghost' | 'tertiary';
+  /** Visually and functionally disabled — a real `disabled` attribute on a
+   *  <button>; on an <a> (which has no native disabled state) this strips
+   *  the href and sets aria-disabled + tabindex=-1 instead. Added per the
+   *  Sept 2026 design-handoff audit (§04 components, delta #4). */
+  disabled?: boolean;
   size?: 'sm' | 'md' | 'lg';
   icon?: IconName | false;
   /** Marks the link as leaving the site: adds rel + an external glyph. */
@@ -22,6 +27,7 @@ interface Props {
 const {
   href,
   variant = 'primary',
+  disabled = false,
   size = 'md',
   icon = 'arrow-right',
   external = false,
@@ -38,7 +44,14 @@ const variants = {
   gold: 'bg-gold text-ink hover:bg-gold-300',
   outline: 'border border-gold text-gold-300 hover:bg-gold hover:text-ink',
   ghost: 'border border-ink-600 text-bone hover:border-gold hover:text-gold-300',
+  // Text-link style — no fill, no border, underline instead. Delta #3.
+  tertiary: 'px-1 text-gold-300 underline decoration-gold/40 underline-offset-4 hover:text-gold hover:decoration-gold',
 } as const;
+
+// A disabled button is always this flat grey, regardless of which variant
+// was requested — matches the storybook's single disabled treatment rather
+// than a disabled state per variant.
+const disabledClasses = 'cursor-not-allowed bg-ink-700 text-bone-muted hover:bg-ink-700';
 
 const sizes = {
   sm: 'px-4 py-2.5 text-[0.7rem]',
@@ -46,15 +59,18 @@ const sizes = {
   lg: 'px-7 py-4 text-sm',
 } as const;
 
-const classes = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+const classes = `${base} ${disabled ? disabledClasses : variants[variant]} ${sizes[size]} ${className}`;
 const glyph: IconName | false = external ? 'external' : icon;
 const Tag = href ? 'a' : 'button';
 ---
 
 <Tag
   class={classes}
-  href={href}
+  href={disabled ? undefined : href}
   type={href ? undefined : type}
+  disabled={!href && disabled ? true : undefined}
+  aria-disabled={href && disabled ? 'true' : undefined}
+  tabindex={href && disabled ? -1 : undefined}
   rel={external ? 'noopener' : undefined}
   {...rest}
 >

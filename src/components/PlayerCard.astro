@@ -2,13 +2,22 @@
 /**
  * PlayerCard — the jersey-style roster card (§7 custom components).
  *
+ * Reworked per the Sept 2026 design-handoff audit
+ * (`_reference/design_handoff_leftovers_audit`, §04 "PlayerCard decision").
+ * PRD §7 asked for a ghost numeral BEHIND the photo (what was built); the
+ * earlier UI sheet drew the numeral BESIDE the photo in a gold frame with a
+ * crimson name-plate — flagged back then as "the more distinctive card" but
+ * left unresolved. This pass makes that call explicitly: beside, framed,
+ * name-plate. A low-opacity ruyi-cloud corner accent ships with it (closes
+ * the "corner clouds are section-level only" delta at the same time).
+ *
  * Two states, one component:
- *  - `active`     : big ghost jersey numeral behind the photo, gold ribbed
- *                   numeral in the corner, name bar, role tag.
+ *  - `active`     : photo (or numeral/mascot fallback) + a separate gold-
+ *                   framed numeral panel beside it, crimson name-plate,
+ *                   role badge below.
  *  - `open-slot`  : dashed-border "OPEN SLOT — JOIN THE ROSTER" card with the
- *                   mascot in place of a photo. This is the whole point of the
- *                   roster page for a free-agent team, so it's a first-class
- *                   card variant rather than a banner bolted on at the end.
+ *                   mascot in place of a photo. Untouched by this pass — the
+ *                   handoff's before/after only covers the active state.
  *
  * Heading level is a prop and defaults to h3 — a card must never introduce a
  * competing h1 (§10.3).
@@ -16,6 +25,8 @@
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import MascotMark from './brand/MascotMark.astro';
+import RuyiCloud from './brand/RuyiCloud.astro';
+import type { CloudVariant } from '@/lib/clouds';
 import Icon from './brand/Icon.astro';
 import { resolveImage } from '@/lib/images';
 
@@ -31,6 +42,14 @@ const { player, as: Heading = 'h3', href, class: className = '' } = Astro.props;
 const { name, number, role, photo, photoAlt, status } = player.data;
 const photoAsset = await resolveImage(photo);
 const isOpenSlot = status === 'open-slot';
+
+// Deterministic corner-cloud variant/flip per player, derived from data the
+// card already has — no extra prop needed at any call site, and no two
+// adjacent cards land on the identical cloud by coincidence more than 1-in-6
+// of the time (six licensed variants ship; see src/lib/clouds.ts).
+const cloudSeed = number ?? name.length;
+const cloudVariant = ((cloudSeed % 6) + 1) as CloudVariant;
+const cloudFlip = cloudSeed % 2 === 0;
 ---
 
 {
@@ -54,68 +73,57 @@ const isOpenSlot = status === 'open-slot';
   ) : (
     <article
       class:list={[
-        'group relative overflow-hidden rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/60',
+        'group relative overflow-hidden rounded-sm border border-ink-600 bg-ink-800 p-3 transition-colors hover:border-gold/60',
         className,
       ]}
     >
-      <div class="relative aspect-[4/5] overflow-hidden bg-ink-900">
-        {/* Ghost jersey numeral sitting behind the photo */}
-        {photoAsset && number !== undefined && (
-          <span
-            class="numeral-ghost pointer-events-none absolute -left-2 top-0 select-none text-[11rem] leading-[0.75] sm:text-[13rem]"
-            aria-hidden="true"
-          >
-            {number}
-          </span>
-        )}
+      <RuyiCloud
+        variant={cloudVariant}
+        flip={cloudFlip}
+        class="pointer-events-none absolute -left-3 -top-3 h-16 w-auto text-crimson/20"
+      />
 
-        {photoAsset ? (
-          <Image
-            src={photoAsset}
-            alt={photoAlt ?? `${name}, ${role} for The Leftovers`}
-            widths={[240, 400, 640]}
-            sizes="(min-width: 1024px) 300px, (min-width: 640px) 45vw, 90vw"
-            loading="lazy"
-            decoding="async"
-            class="relative size-full object-cover object-top mix-blend-luminosity transition-all duration-500 group-hover:mix-blend-normal"
-          />
-        ) : number !== undefined ? (
-          /* No photo yet: the jersey numeral becomes the card. Reads as a
-             deliberate jersey plate rather than a missing image. */
-          <div class="relative flex size-full items-center justify-center">
-            <span class="numeral text-[7rem] leading-none sm:text-[8.5rem]" aria-hidden="true">
+      <div class="relative z-[1] flex gap-2.5">
+        {/* Photo (or fallback) — its own column now, not the whole card. */}
+        <div class="relative aspect-[4/5] flex-1 overflow-hidden rounded-sm border border-ink-600 bg-ink-900">
+          {photoAsset ? (
+            <Image
+              src={photoAsset}
+              alt={photoAlt ?? `${name}, ${role} for The Leftovers`}
+              widths={[240, 400, 640]}
+              sizes="(min-width: 1024px) 260px, (min-width: 640px) 40vw, 78vw"
+              loading="lazy"
+              decoding="async"
+              class="size-full object-cover object-top mix-blend-luminosity transition-all duration-500 group-hover:mix-blend-normal"
+            />
+          ) : (
+            <div class="flex size-full items-center justify-center">
+              <MascotMark class="w-2/5" width={128} dim />
+            </div>
+          )}
+        </div>
+
+        {/* Numeral panel — beside the photo, gold-framed, only when a
+            number is assigned. */}
+        {number !== undefined && (
+          <div class="flex w-14 shrink-0 items-center justify-center rounded-sm border-2 border-gold bg-ink-900 sm:w-16">
+            <span class="numeral text-3xl leading-none sm:text-4xl" aria-hidden="true">
               {number}
             </span>
+            <span class="sr-only">Number {number}</span>
           </div>
-        ) : (
-          <div class="relative flex size-full items-end justify-center pb-2">
-            <MascotMark class="w-2/5" width={128} dim />
-          </div>
-        )}
-
-        {photoAsset && number !== undefined && (
-          <span class="numeral absolute bottom-2 right-3 text-4xl leading-none" aria-hidden="true">
-            {number}
-          </span>
         )}
       </div>
 
-      <div class="border-t border-ink-600 px-4 py-3.5">
-        <Heading class="truncate text-lg text-bone sm:text-xl">
-          {href ? (
-            <a href={href} class="hover:text-gold-300">
-              {number !== undefined && <span class="sr-only">Number {number}, </span>}
-              {name}
-            </a>
-          ) : (
-            <>
-              {number !== undefined && <span class="sr-only">Number {number}, </span>}
-              {name}
-            </>
-          )}
+      <div class="relative z-[1] mt-2.5 bg-crimson px-3 py-2">
+        <Heading class="truncate text-base text-bone sm:text-lg">
+          {href ? <a href={href} class="hover:text-bone/80">{name}</a> : name}
         </Heading>
-        <p class="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">{role}</p>
       </div>
+
+      <span class="relative z-[1] mt-2 inline-flex rounded-full border border-gold px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.2em] text-gold-300">
+        {role}
+      </span>
     </article>
   )
 }

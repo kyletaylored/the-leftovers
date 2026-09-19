@@ -2,16 +2,34 @@
 /**
  * TerracedDivider — the brand's signature section break (§7 custom components).
  *
- * Renders the terraced-mountain silhouette: a gold zigzag ridge with the
- * small stepped "brick" glyphs from the style guide's TERRACED MOUNTAIN TRIM
- * motif, optionally filled forest green below the ridge.
+ * Redrawn per the Sept 2026 design-handoff audit
+ * (`_reference/design_handoff_leftovers_audit`): the original zigzag read as
+ * a mountain *skyline*, not a mountain *terrace* — sharp and blocky, the one
+ * motif the audit flagged as needing a redraw (the ruyi clouds were already
+ * fine as licensed). Three curved redraws ship behind a `style` prop rather
+ * than one hard swap, because the handoff's own flagship placements use two
+ * different ones on purpose:
+ *  - `rice-terrace` (default) — flat stepped plateaus, closest to the
+ *    motif's actual name. Used for card footers (EventCard) and full-width
+ *    section dividers in the handoff.
+ *  - `pagoda` — smooth C-curve eaves that flick up like temple rooflines,
+ *    with finial dots at each peak. Used for the homepage hero in the
+ *    handoff — more flourish for the one-per-page moment.
+ *  - `refined-peaks` — closest to the old zigzag's silhouette (sharp
+ *    peaks, hex glyphs) but with round joins and fewer, more even peaks —
+ *    the lowest-risk swap if a placement needs the old shape's footprint.
  *
- * Pure inline SVG (no raster) so it costs ~1KB and scales to any width —
- * mobile media-weight requirement, §10.1.
+ * `variant="line"` (stroke only, no fill) still works for every style — used
+ * where the divider sits over an already-coloured background (e.g.
+ * EventCard's dark card body) and a second fill would double up.
  */
+export type TerracedStyle = 'rice-terrace' | 'pagoda' | 'refined-peaks';
+
 interface Props {
-  /** `full` = green silhouette + gold ridge. `line` = gold ridge only. */
+  /** `full` = filled silhouette + stroke. `line` = stroke only. */
   variant?: 'full' | 'line';
+  /** Which redraw to render. */
+  style?: TerracedStyle;
   /** Point the mountains downward (for a footer/top-of-section break). */
   flip?: boolean;
   /** Seed the ridge so two dividers on one page aren't identical. */
@@ -19,37 +37,101 @@ interface Props {
   class?: string;
 }
 
-const { variant = 'full', flip = false, seed = 1, class: className = '' } = Astro.props;
+const {
+  variant = 'full',
+  style = 'rice-terrace',
+  flip = false,
+  seed = 1,
+  class: className = '',
+} = Astro.props;
 
 const W = 1200;
 const H = 120;
-const PEAKS = 9;
+const strokeOpacity = variant === 'full' ? 0.95 : 0.6;
 
-// Deterministic pseudo-random so the markup is stable between builds.
+// Deterministic pseudo-random so the markup is stable between builds — the
+// seed picks a phase/offset per instance, not a different shape per style.
 const rand = (i: number) => {
   const x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453;
   return x - Math.floor(x);
 };
 
-// Build the ridge as a stepped zigzag: up to a peak, down to a valley.
-const ridge: Array<[number, number]> = [[0, H * 0.72]];
-for (let i = 0; i < PEAKS; i++) {
-  const x0 = ((i + 0.5) / PEAKS) * W;
-  const x1 = ((i + 1) / PEAKS) * W;
-  const peakY = H * (0.16 + rand(i) * 0.3);
-  const valleyY = H * (0.6 + rand(i + 50) * 0.22);
-  ridge.push([x0, peakY], [x1, valleyY]);
+type Point = [number, number];
+const pts = (points: Point[]) => points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+
+// --- rice-terrace: flat stepped plateaus ----------------------------------
+function riceTerrace() {
+  const STEPS = 6;
+  const baseline = H * 0.72;
+  let x = 0;
+  let y = baseline;
+  const ridge: Point[] = [];
+  for (let i = 0; i < STEPS; i++) {
+    const stepWidth = W / STEPS;
+    ridge.push([x, y]);
+    x += stepWidth * 0.55;
+    ridge.push([x, y]);
+    y = baseline - H * 0.16 * (0.4 + (i % 3) * 0.32 + rand(i) * 0.1);
+    ridge.push([x, y]);
+    x += stepWidth * 0.45;
+    ridge.push([x, y]);
+  }
+  ridge.push([W, y]);
+  return {
+    ridge,
+    glyphKind: 'square' as const,
+    glyphs: ridge.filter((_, i) => i % 4 === 2).map(([gx, gy]) => [gx, gy - 6] as Point),
+  };
 }
 
-const ridgeLine = ridge.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
-const silhouette = `0,${H} ${ridgeLine} ${W},${H}`;
+// --- refined-peaks: sharp peaks, fewer & more even ------------------------
+function refinedPeaks() {
+  const PEAKS = 6;
+  const baseline = H * 0.73;
+  const ridge: Point[] = [[0, baseline]];
+  for (let i = 0; i < PEAKS; i++) {
+    const x0 = ((i + 0.5) / PEAKS) * W;
+    const x1 = ((i + 1) / PEAKS) * W;
+    const peakY = H * (0.2 + rand(i) * 0.22);
+    const valleyY = baseline - H * rand(i + 40) * 0.06;
+    ridge.push([x0, peakY], [x1, valleyY]);
+  }
+  return {
+    ridge,
+    glyphKind: 'hex' as const,
+    glyphs: ridge.filter((_, i) => i % 2 === 1).map(([gx, gy]) => [gx, gy] as Point),
+  };
+}
 
-// Trim glyphs ride the peaks — every peak plus a couple of mid-slope points.
-const glyphs = ridge.filter((_, i) => i % 2 === 1).map(([x, y]) => ({ x, y: y - 9 }));
+// --- pagoda: smooth C-curve eaves ------------------------------------------
+const PEAKS_PAGODA = 5;
+let pagodaPath = '';
+let pagodaPeaks: Point[] = [];
+if (style === 'pagoda') {
+  const baseline = H * 0.67;
+  const eaveWidth = W / PEAKS_PAGODA;
+  let d = `M0,${baseline.toFixed(1)}`;
+  for (let i = 0; i < PEAKS_PAGODA; i++) {
+    const x0 = i * eaveWidth;
+    const peakX = x0 + eaveWidth * 0.5;
+    const peakY = baseline - H * (0.34 + rand(i) * 0.14);
+    const nextX = x0 + eaveWidth;
+    d += ` C${(x0 + eaveWidth * 0.2).toFixed(1)},${baseline.toFixed(1)} ${(peakX - eaveWidth * 0.1).toFixed(1)},${peakY.toFixed(1)} ${peakX.toFixed(1)},${peakY.toFixed(1)}`;
+    d += ` C${(peakX + eaveWidth * 0.1).toFixed(1)},${peakY.toFixed(1)} ${(nextX - eaveWidth * 0.2).toFixed(1)},${baseline.toFixed(1)} ${nextX.toFixed(1)},${baseline.toFixed(1)}`;
+    pagodaPeaks.push([peakX, peakY]);
+  }
+  pagodaPath = d;
+}
+
+const built = style === 'refined-peaks' ? refinedPeaks() : riceTerrace();
+const ridgeLine = style !== 'pagoda' ? pts(built.ridge) : '';
+const silhouette = style !== 'pagoda' ? `0,${H} ${ridgeLine} ${W},${H}` : '';
+const pagodaFillD = `${pagodaPath} L${W},${H} L0,${H} Z`;
+
 const flipStyle = flip ? 'transform: scaleY(-1);' : '';
 ---
 
-<div class={`pointer-events-none w-full ${className}`} aria-hidden="true">
+<div class={`pointer-events-none relative w-full ${className}`} aria-hidden="true">
   <svg
     viewBox={`0 0 ${W} ${H}`}
     width="100%"
@@ -59,41 +141,63 @@ const flipStyle = flip ? 'transform: scaleY(-1);' : '';
     role="presentation"
     focusable="false"
   >
-    {
-      variant === 'full' && (
-        <>
-          <polygon points={silhouette} fill="var(--color-forest)" />
-          <polygon
-            points={silhouette}
-            fill="none"
-            stroke="var(--color-forest-600)"
-            stroke-width="1"
-          />
-        </>
-      )
-    }
-    <polyline
-      points={ridgeLine}
-      fill="none"
-      stroke="var(--color-gold)"
-      stroke-width="2"
-      stroke-linejoin="miter"
-      stroke-opacity={variant === 'full' ? 0.95 : 0.6}
-    />
-    {
-      glyphs.map(({ x, y }) => (
-        <g
-          transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`}
-          stroke="var(--color-gold)"
-          stroke-width="1.4"
-          fill="none"
-          stroke-opacity="0.9"
-        >
-          <rect x="-6" y="-6" width="12" height="12" />
-          <line x1="-6" y1="0" x2="6" y2="0" />
-          <line x1="0" y1="-6" x2="0" y2="6" />
+    {style === 'pagoda' ? (
+      <>
+        {variant === 'full' && (
+          <>
+            <path d={pagodaFillD} fill="var(--color-forest)" />
+            <path d={pagodaFillD} fill="none" stroke="var(--color-forest-600)" stroke-width="1" />
+          </>
+        )}
+        <path d={pagodaPath} fill="none" stroke="var(--color-gold)" stroke-width="2.5" stroke-opacity={strokeOpacity} />
+        <g fill="var(--color-gold)" opacity={strokeOpacity}>
+          {pagodaPeaks.map(([x, y]) => (
+            <circle cx={x.toFixed(1)} cy={y.toFixed(1)} r="4.5" />
+          ))}
         </g>
-      ))
-    }
+      </>
+    ) : (
+      <>
+        {variant === 'full' && (
+          <>
+            <polygon points={silhouette} fill="var(--color-forest)" />
+            <polygon points={silhouette} fill="none" stroke="var(--color-forest-600)" stroke-width="1" />
+          </>
+        )}
+        <polyline
+          points={ridgeLine}
+          fill="none"
+          stroke="var(--color-gold)"
+          stroke-width={style === 'refined-peaks' ? 2.5 : 2}
+          stroke-linejoin="round"
+          stroke-linecap={style === 'refined-peaks' ? 'round' : undefined}
+          stroke-opacity={strokeOpacity}
+        />
+        {built.glyphs.map(([x, y]) =>
+          built.glyphKind === 'square' ? (
+            <g
+              transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`}
+              stroke="var(--color-gold)"
+              stroke-width="1.2"
+              fill="none"
+              stroke-opacity="0.9"
+            >
+              <rect x="-5" y="-5" width="10" height="10" />
+              <line x1="-5" y1="0" x2="5" y2="0" />
+              <line x1="0" y1="-5" x2="0" y2="5" />
+            </g>
+          ) : (
+            <polygon
+              points="0,-7 6,-3.5 6,3.5 0,7 -6,3.5 -6,-3.5"
+              transform={`translate(${x.toFixed(1)} ${y.toFixed(1)})`}
+              stroke="var(--color-gold)"
+              stroke-width="1.4"
+              fill="none"
+              stroke-opacity="0.9"
+            />
+          )
+        )}
+      </>
+    )}
   </svg>
 </div>

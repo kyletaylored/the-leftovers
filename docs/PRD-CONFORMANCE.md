@@ -253,28 +253,29 @@ But `docs/design/ui-components.webp` is more prescriptive at component level
 than §7's prose, and comparing the two turns up the following. None of it is
 broken; all of it is a fidelity choice someone should make on purpose.
 
-### Sheet specifies, not built
+### Sheet specifies, not built (status as of the Sept 2026 design-handoff pass — see below)
 
 | # | Sheet | Built | Notes |
 |---|---|---|---|
 | 1 | **Sold-out badge is crimson filled** | **Now matches** — crimson fill, bone text | Grey read as "inactive"; crimson reads as "gone" |
 | 2 | **Leading stat row is SOLID gold with dark text** | **Now matches** — solid gold, ink text | Done while porting the table to React. The ribbed gold numeral would vanish on a gold row, so the leader's jersey number renders as flat ink digits |
-| 3 | **Tertiary / text-link button** (gold, underlined) | Not built | No consumer yet |
-| 4 | **Disabled button state** (grey) | Not built | No consumer yet — nothing on the site disables a button |
-| 5 | **Event date badge includes day-of-week** ("SAT" above "SEP 20") | Month + day only | `dayOfWeek()` already exists in `lib/format.ts`, unused |
-| 6 | **Ruyi clouds in event/player card corners** | Cards have no clouds | Clouds are currently section-level only (hero, CTA strips) |
-| 7 | **Toast / feedback notification** ("Thanks for joining the crew!") | Not built | Not in §7 either. Would need a reason to exist — the newsletter form posts to the provider and leaves the page, so there's nothing to confirm in-page |
-| 8 | **Visible labels above form fields** | `sr-only` label + placeholder | Mine is accessible (a real `<label>` is always present) but visually differs. A visible label is the better pattern; placeholders disappear on focus |
+| 3 | **Tertiary / text-link button** (gold, underlined) | **Built** — `Button` `variant="tertiary"` | Shipped in the design-handoff pass. Still no page uses it yet |
+| 4 | **Disabled button state** (grey) | **Built** — `Button` `disabled` prop | Real `disabled` attribute on `<button>`; `aria-disabled` + `tabindex="-1"` on `<a>`, since anchors have no native disabled state |
+| 5 | **Event date badge includes day-of-week** ("SAT" above "SEP 20") | **Built** — `EventCard` | `dayOfWeek()` already existed in `lib/format.ts`, just unused until now |
+| 6 | **Ruyi clouds in event/player card corners** | **Built on `PlayerCard`** | Deterministic variant/flip derived from the player's own data (number/name), so no call site needs a new prop. `EventCard` still has none — the handoff's before/after didn't show one there |
+| 7 | **Toast / feedback notification** ("Thanks for joining the crew!") | Not built | Still no consumer with a reason to trigger one — the newsletter form posts to the provider and leaves the page. Held for the same reason as before, not overlooked |
+| 8 | **Visible labels above form fields** | **Now matches everywhere** | `PreorderForm` already used real labels. The one remaining `sr-only` instance (`NewsletterBlock`'s email field) is fixed in the design-handoff pass |
 
-### Where the sheet and the PRD actively conflict
+### Where the sheet and the PRD actively conflict — now resolved
 
-**PlayerCard.** §7 specifies "big ghost-type jersey number **behind** photo,
-gold ribbed-numeral treatment, name bar, role tag" — which is what's built.
-The sheet instead shows the numeral **beside** the photo in a gold frame, with
-the name in a crimson banner and the role in a pill, plus corner clouds.
-
-I followed the PRD text. Worth a decision, because the sheet's version is the
-more distinctive card.
+**PlayerCard.** §7 specified "big ghost-type jersey number **behind** photo,
+gold ribbed-numeral treatment, name bar, role tag"; the sheet showed the
+numeral **beside** the photo in a gold frame, with the name in a crimson
+banner and the role in a pill, plus corner clouds. Previously built to the
+PRD text. **The Sept 2026 design-handoff explicitly resolves this as a
+deliberate decision** — "going with the sheet's version as the new canonical
+card" — and `PlayerCard.astro` now matches it: photo/numeral-panel side by
+side, crimson name-plate, pill role badge, low-opacity corner cloud.
 
 ### Homepage layout
 
@@ -283,6 +284,100 @@ action photo with the *"Paintball builds better people"* manifesto line and
 inline stats, plus a crimson full-width next-up band. Both are photography
 problems, not code problems — and the manifesto band is the obvious home for
 the `TwoColumn` component that currently ships unused (§7 gap above).
+
+---
+
+## Design-handoff audit (Sept 2026)
+
+A second design pass landed as
+`_reference/design_handoff_leftovers_audit/` — a Storybook plus rebuilt
+mockups for all 7 top-level pages, explicitly "condensed from
+docs/PRD-CONFORMANCE.md" (its own words). It resolves most of the style-2
+deltas above (updated in the table) and adds new material the PRD never
+speced. Published as Artifacts for the team to browse — see the links at the
+end of this section — since these are reference HTML, not production code
+(the bundle's own README says so explicitly: "do not copy the HTML/inline-
+styles directly into the repo").
+
+### What shipped from this pass
+
+- **`TerracedDivider`** redrawn. The original was a sharp procedural zigzag —
+  a mountain *skyline*, not a mountain *terrace*. Now a `style` prop with
+  three redraws (`rice-terrace` default, `pagoda`, `refined-peaks`); the
+  ruyi clouds needed no change (already licensed vector art, already fine).
+- **6 new icons** — `cart`, `leaderboard`, `sponsor`, `camera`, `check`,
+  `sold-out` — added to `Icon.astro`, same 24×24/1.8-stroke language as the
+  existing 12.
+- **`Button`** gained `variant="tertiary"` and a `disabled` prop (deltas #3,
+  #4 above).
+- **`PlayerCard`** reworked per the resolved PRD/sheet conflict above.
+- **`EventCard`** gained the day-of-week line (delta #5).
+- **`NewsletterBlock`**'s one remaining `sr-only` label fixed (delta #8).
+
+Verified: `astro check` clean, mobile Lighthouse re-run on home/roster/events
+(97–100 perf, 100 a11y, CLS 0 across repeated runs — one 0.147 CLS reading
+didn't reproduce across three clean re-runs, consistent with this box's
+known Lighthouse noise rather than a real shift).
+
+### Discrepancies found between the handoff's README and its own content
+
+Worth recording because the README is prose *about* the bundle, and prose
+drifts from the thing it describes:
+
+- **Terraced trim.** The README's summary says to replace the divider "with
+  the smooth pagoda-roofline silhouette." The Storybook itself presents
+  **three** options and says "pick one," defaults its own live previews and
+  code appendix to **rice-terrace** (Option A), and the actual `EventCard`
+  mockup explicitly says "terraced footer updated to Option A." Meanwhile
+  the `Home.dc.html` hero mockup's own divider uses the **pagoda** path.
+  Read charitably, this isn't a contradiction — it's a per-placement choice
+  the system was built to support (`style` is a prop, not a global switch) —
+  but the README's one-line summary overstates it as a single global
+  decision. Implemented as: `rice-terrace` default everywhere, `pagoda`
+  only on the homepage `Hero`, matching what the mockups actually show
+  rather than what the prose claims.
+- **New icon list.** The README lists "cart, location pin, stat/leaderboard,
+  calendar-date, gear/marker, chat, check, chevron, social" as needed
+  additions. `pin`, `calendar`, `chat`, `chevron` and all four social icons
+  already existed (confirmed against `Icon.astro` before touching it); the
+  Storybook's own "12 existing + 6 new" icon grid is the accurate count and
+  is what got built.
+
+### New material not yet built — needs a decision, not a guess
+
+None of this shipped in this pass. Each needs either a real photography
+answer or a call the team should make, not one I should make for them:
+
+- **Brush-stroke `Button` variant** (`brush-primary`/`brush-outline`) — an
+  irregular hand-drawn SVG background behind the label. Exact path data is
+  in the bundle's Home hero CTAs; not wired up because making it the
+  homepage default is a bigger visual departure than the other button
+  additions and deserves a look first, not a silent swap.
+- **`Toast.astro`** — static component only, no trigger anywhere on the
+  site yet (same reasoning as delta #7 above).
+- **`FormField` / `RadioGroup` / `CheckboxGroup`** — speculative: no page
+  currently has a form that needs them. The bundle frames these as prep for
+  a future contact/roster-enquiry form that doesn't exist yet.
+- **5 net-new marketing organisms** (`FeatureRow`, `PricingCard`, 3×
+  `Gallery`, `ProductGrid`) and the **full 7-page reassembly**
+  (manifesto section, crew slider, "From the Field" teaser, etc.) — the
+  large remaining piece. Every image slot in the mockups is a labelled
+  striped placeholder; real photography has to land before these can ship
+  as actual pages, not mockup HTML with fake content standing in as if real.
+- **Worth a business-side look, not just a design one:** the `PricingCard`
+  section's example set includes a **"Sponsor a Slot" tier** ($125/event,
+  covers one free agent's entry, name on the roster page, socials
+  shoutout) — a real monetisation idea shown as a mockup example, not
+  sourced from any existing content file. Flagging it here so it doesn't
+  get lost as "just an example."
+
+### Reference links (private Artifacts, this account)
+
+- [Design Storybook](https://claude.ai/artifact/U7z7FKdBokERWqJD5XSHoa) — start here
+- [Home](https://claude.ai/artifact/AtephDpywCKpW8d977HQN9) · [Roster](https://claude.ai/artifact/BKsYm7F2x879MPa4fWj4tC) · [Events](https://claude.ai/artifact/GYSwah3RSHryUvo4194fE9) · [Shop](https://claude.ai/artifact/5VyMEPBeEBNGuizQaPrCcd) · [About](https://claude.ai/artifact/SCwDP3SZiSN53ghRRUNsXr) · [Contact](https://claude.ai/artifact/HCBM1aWUuW8cedyvgfc5ce) · [Community](https://claude.ai/artifact/DFSYteUw27XmC4aXGeYirY)
+
+The source bundle lives at `_reference/design_handoff_leftovers_audit/`
+(gitignored, matching the other `_reference/` material — not committed).
 
 ### Honest note on sequencing
 
