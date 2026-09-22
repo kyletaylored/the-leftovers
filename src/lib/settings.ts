@@ -66,6 +66,17 @@ const settingsSchema = z.object({
     })
     .prefault({}),
   footerNote: z.string(),
+  designStorybookUrl: z.string().default(''),
+  pblidb: z
+    .object({
+      /** Fuzzy query sent to pblidb.org's team search (`GET /v1/teams?q=`).
+       *  "leftovers" matches every "The Leftovers"/"Leftovers" team pblidb
+       *  has indexed across seasons/divisions, not just ours — that's the
+       *  point (§6, multi-widget stats). Leave blank to turn the stats
+       *  section off without a code change. */
+      query: z.string().default(''),
+    })
+    .prefault({}),
 });
 
 const raw = parseYaml(rawSettings);

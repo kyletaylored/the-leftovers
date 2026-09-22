@@ -1,27 +1,119 @@
 ---
 /**
- * PageHeader — the <h1> block for every interior page. Exactly one per page
- * (§10.3), which is why it owns the h1 and Section never does.
+ * PageHeader — the hero block every interior page opens with (Oct 2026
+ * follow-up to the design-handoff audit: "every page should start with a
+ * hero header with a swappable image or images, or a styled hero header").
+ * Exactly one per page (§10.3), which is why it owns the <h1> and `Section`
+ * never does.
+ *
+ * Zero images: the original styled motif header (topo texture + ruyi
+ * cloud) — unchanged, so a page never has to wait on photography to look
+ * finished. One image: a static photo backdrop. More than one: a slow,
+ * pure-CSS cross-fade loop between them — no JS, same staggered-opacity
+ * technique as `SponsorMarquee`. "Swappable" is a CMS thing, not a runtime
+ * control: an editor adds/reorders `heroImages` and the loop picks it up on
+ * the next build.
  */
+import { Image } from 'astro:assets';
 import RuyiCloud from './brand/RuyiCloud.astro';
+
+interface HeroImage {
+  src: ImageMetadata;
+  alt?: string;
+}
 
 interface Props {
   title: string;
   eyebrow?: string;
   intro?: string;
+  images?: HeroImage[];
 }
-const { title, eyebrow, intro } = Astro.props;
+const { title, eyebrow, intro, images = [] } = Astro.props;
+
+// Each layer holds the frame for SLIDE_SECONDS, so the total loop length
+// scales with the photo count automatically. `visiblePercent` is how much of
+// ONE layer's own animation cycle it spends fully opaque before fading for
+// the rest of the loop — since it varies with the photo count, it's computed
+// here and injected as raw CSS below (Astro <style> blocks are static; this
+// is what `set:html` is for).
+const SLIDE_SECONDS = 6;
+const FADE_SECONDS = 1.5;
+const cycleSeconds = images.length * SLIDE_SECONDS;
+const visiblePercent = images.length > 0 ? (SLIDE_SECONDS / cycleSeconds) * 100 : 0;
+const fadeOutEndPercent = images.length > 0 ? visiblePercent + (FADE_SECONDS / cycleSeconds) * 100 : 0;
+const crossfadeCss = `
+  @keyframes hero-crossfade {
+    0% { opacity: 1; }
+    ${visiblePercent.toFixed(3)}% { opacity: 1; }
+    ${fadeOutEndPercent.toFixed(3)}% { opacity: 0; }
+    100% { opacity: 0; }
+  }
+`;
 ---
 
-<header class="bg-topo relative overflow-hidden border-b border-ink-600/60">
-  <RuyiCloud
-    variant={3}
-    flip
-    class="pointer-events-none absolute -right-16 -top-10 h-28 w-auto text-crimson opacity-25 sm:h-40"
-  />
+<header class="relative overflow-hidden border-b border-ink-600/60">
+  {
+    images.length > 0 ? (
+      <div class="absolute inset-0" aria-hidden="true">
+        {images.map((img, i) => (
+          <Image
+            src={img.src}
+            alt={img.alt ?? ''}
+            widths={[640, 960, 1440, 1920]}
+            sizes="100vw"
+            loading={i === 0 ? 'eager' : 'lazy'}
+            decoding="async"
+            class="hero-photo absolute inset-0 size-full object-cover"
+            style={
+              images.length > 1
+                ? `animation: hero-crossfade ${cycleSeconds}s infinite; animation-delay: ${-i * SLIDE_SECONDS}s;`
+                : undefined
+            }
+          />
+        ))}
+        <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/40" />
+      </div>
+    ) : (
+      <div class="bg-topo absolute inset-0">
+        <RuyiCloud
+          variant={3}
+          flip
+          class="pointer-events-none absolute -right-16 -top-10 h-28 w-auto text-crimson opacity-25 sm:h-40"
+        />
+      </div>
+    )
+  }
+
   <div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:py-24">
     {eyebrow && <p class="eyebrow mb-3">{eyebrow}</p>}
     <h1 class="max-w-4xl text-4xl text-bone sm:text-5xl lg:text-6xl">{title}</h1>
     {intro && <p class="mt-5 max-w-2xl text-base leading-relaxed text-bone-muted sm:text-lg">{intro}</p>}
   </div>
 </header>
+
+{
+  images.length > 1 && (
+    <style set:html={crossfadeCss} />
+  )
+}
+
+<style>
+  /* Every layer starts invisible; the per-layer inline animation (with its
+     staggered negative animation-delay, set above) is what puts each photo
+     in a different slot of the shared keyframe loop. */
+  .hero-photo {
+    opacity: 0;
+  }
+  .hero-photo:first-of-type {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-photo {
+      animation: none !important;
+      opacity: 0;
+    }
+    .hero-photo:first-of-type {
+      opacity: 1;
+    }
+  }
+</style>

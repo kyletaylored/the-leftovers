@@ -1,0 +1,77 @@
+---
+/**
+ * PricingCard — tier card for jersey/sponsorship pricing grids (Sept 2026
+ * design-handoff audit, §04.5). Net-new; no page wires this in yet since no
+ * content collection models pricing tiers today — this ships as a reusable
+ * primitive for whichever page (jersey batch, sponsorship deck) needs it
+ * first, same as `TwoColumn`/`ProfileCard` were already sitting unused
+ * per the audit's own notes.
+ *
+ * `featured` gets the gold 2px border + ribbon + filled-crimson CTA;
+ * standard tiers get a 1px grey border + gold-outline CTA. Intended to be
+ * laid out by the call site in a
+ * `grid-template-columns:repeat(auto-fit,minmax(240px,1fr))` wrapper — no
+ * separate grid component, to avoid a pointless one-child wrapper.
+ */
+import Button from '@/components/Button.astro';
+
+interface Props {
+  tierName: string;
+  price: string;
+  unit?: string;
+  bullets: string[];
+  ctaLabel: string;
+  ctaHref: string;
+  featured?: boolean;
+  class?: string;
+}
+
+const {
+  tierName,
+  price,
+  unit,
+  bullets,
+  ctaLabel,
+  ctaHref,
+  featured = false,
+  class: className = '',
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'relative flex flex-col p-6',
+    featured ? 'border-2 border-gold bg-ink-800' : 'border border-ink-600 bg-ink-800',
+    className,
+  ]}
+>
+  {
+    featured && (
+      <span class="absolute right-0 top-0 rounded-bl-sm bg-gold px-3 py-1 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-ink">
+        Most Popular
+      </span>
+    )
+  }
+  <p class="font-display text-lg uppercase tracking-wide text-bone">{tierName}</p>
+  <p class="mt-3 flex items-baseline gap-1.5">
+    <span class="numeral text-4xl leading-none">{price}</span>
+    {unit && <span class="text-sm text-bone-muted">{unit}</span>}
+  </p>
+  <ul class="mt-6 flex-1 space-y-2.5">
+    {
+      bullets.map((bullet) => (
+        <li class:list={['flex gap-2 text-sm', featured ? 'text-bone' : 'text-bone-muted']}>
+          <span aria-hidden="true" class="text-gold-300">
+            —
+          </span>
+          {bullet}
+        </li>
+      ))
+    }
+  </ul>
+  <div class="mt-7">
+    <Button href={ctaHref} variant={featured ? 'primary' : 'outline'} class="w-full">
+      {ctaLabel}
+    </Button>
+  </div>
+</div>

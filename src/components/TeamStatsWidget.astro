@@ -1,0 +1,42 @@
+---
+/**
+ * TeamStatsWidget — one card per pblidb.org team match (§6, live team
+ * stats). pblidb has indexed several teams named "Leftovers"/"The
+ * Leftovers" across different seasons/divisions — not all of them are us —
+ * so this renders one widget per match rather than assuming a single team,
+ * and leans on the visible name + match count to disambiguate rather than
+ * guessing which one is "the real one".
+ */
+import type { TeamWidgetData } from '@/lib/pblidb';
+
+interface Props {
+  widget: TeamWidgetData;
+  class?: string;
+}
+
+const { widget, class: className = '' } = Astro.props;
+const { team, stats } = widget;
+const record = `${stats.wins}-${stats.losses}${stats.ties ? `-${stats.ties}` : ''}`;
+---
+
+<div
+  class:list={['rounded-sm border border-ink-600 bg-ink-800 p-5', className]}
+  data-team-name={team.canonicalName.toLowerCase()}
+>
+  <p class="eyebrow mb-1">pblidb.org</p>
+  <h3 class="text-xl text-bone">{team.canonicalName}</h3>
+  <dl class="mt-4 grid grid-cols-3 gap-3 text-center">
+    <div>
+      <dt class="text-[0.65rem] uppercase tracking-[0.14em] text-bone-muted">Record</dt>
+      <dd class="numeral mt-1 text-2xl leading-none">{record}</dd>
+    </div>
+    <div>
+      <dt class="text-[0.65rem] uppercase tracking-[0.14em] text-bone-muted">Matches</dt>
+      <dd class="numeral mt-1 text-2xl leading-none">{stats.matchesPlayed}</dd>
+    </div>
+    <div>
+      <dt class="text-[0.65rem] uppercase tracking-[0.14em] text-bone-muted">Events</dt>
+      <dd class="numeral mt-1 text-2xl leading-none">{stats.byEvent.length}</dd>
+    </div>
+  </dl>
+</div>

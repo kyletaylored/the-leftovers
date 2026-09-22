@@ -17,6 +17,7 @@ import { site } from '@/lib/settings';
 import Lantern from './brand/Lantern.astro';
 import MascotMark from './brand/MascotMark.astro';
 import Icon from './brand/Icon.astro';
+import FormField from './form/FormField.astro';
 
 interface Props {
   title?: string;
@@ -86,20 +87,13 @@ const {
               {/* Visible label, not sr-only — per the Sept 2026 design-handoff
                   audit (§04 components, delta #8): a placeholder alone
                   disappears the moment someone starts typing. */}
-              <label
-                for="newsletter-email"
-                class="mb-1.5 block text-[0.65rem] font-bold uppercase tracking-[0.18em] text-gold-300"
-              >
-                Email address
-              </label>
-              <input
-                id="newsletter-email"
-                type="email"
+              <FormField
+                label="Email address"
                 name={emailFieldName}
+                type="email"
                 required
-                autocomplete="email"
                 placeholder="you@example.com"
-                class="tap w-full rounded-sm border border-ink-600 bg-ink-900 px-4 py-3 text-sm text-bone placeholder:text-bone-muted/70 focus:border-gold focus:outline-none"
+                autocomplete="email"
               />
             </div>
 

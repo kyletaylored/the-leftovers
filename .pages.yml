@@ -286,7 +286,7 @@ content:
   # -- Pages ----------------------------------------------------------------
   - name: pages
     label: Page copy
-    description: 'Body copy and SEO metadata for About, Contact, Shop and Community.'
+    description: 'Body copy, hero images and SEO metadata for Team, Contact, Shop and Community.'
     type: collection
     path: src/content/pages
     filename: '{fields.title}.md'
@@ -298,6 +298,24 @@ content:
       - { name: title, label: Page title, type: string, required: true }
       - { name: eyebrow, label: Eyebrow / kicker, type: string }
       - { name: intro, label: Intro paragraph, type: text }
+      - name: heroImages
+        label: Hero images
+        type: object
+        list: true
+        description: >-
+          Every page opens with a hero. Leave this empty for the styled
+          motif header (works fine on its own — a page never has to wait on
+          photography). One photo is a static backdrop. Two or more slowly
+          cross-fade between them.
+        fields:
+          - { name: image, label: Photo, type: image, options: { media: images }, required: true }
+          - name: alt
+            label: Alt text
+            type: string
+            description: >-
+              Leave blank for a purely decorative background (the page
+              title already says what the page is about). Fill in only if
+              the photo shows something the heading doesn't say.
       - name: seo
         label: SEO
         type: object

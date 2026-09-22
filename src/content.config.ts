@@ -232,6 +232,26 @@ const pagesCollection = defineCollection({
     /** Optional kicker shown above the page title. */
     eyebrow: z.string().optional(),
     intro: z.string().optional(),
+    /**
+     * Every page opens with a hero header (Oct 2026 follow-up to the
+     * design-handoff audit). Zero images falls back to the existing styled
+     * motif header (topo texture + ruyi cloud) — a page never has to wait on
+     * photography to look finished. One image is a static backdrop; more
+     * than one cross-fades between them on a slow loop (pure CSS, no JS —
+     * same technique as the sponsor marquee) — the "swappable" part is that
+     * an editor can add or reorder photos in the CMS without touching code.
+     */
+    heroImages: z
+      .array(
+        z.object({
+          image: imagePath,
+          /** Decorative by default (the <h1> already says what the page is
+           *  about) — fill in real alt text only if a photo carries content
+           *  the heading doesn't. */
+          alt: z.string().default(''),
+        })
+      )
+      .default([]),
     seo,
   }),
 });

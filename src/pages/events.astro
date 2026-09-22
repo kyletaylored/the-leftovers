@@ -1,14 +1,21 @@
 ---
+import { getEntry } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHeader from '@/components/PageHeader.astro';
+import { resolveHeroImages } from '@/lib/images';
 import Section from '@/components/Section.astro';
 import EventCard from '@/components/EventCard.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
 import Button from '@/components/Button.astro';
 import Countdown from '@/components/Countdown.astro';
+import EventsCalendar from '@/components/EventsCalendar.astro';
 import { getEvents } from '@/lib/events';
 import { site } from '@/lib/settings';
 import { isoDate } from '@/lib/format';
+
+const page = await getEntry('pages', 'events');
+if (!page) throw new Error('Missing content file: src/content/pages/events.md');
+const heroImages = await resolveHeroImages(page.data.heroImages);
 
 const { upcoming, past, next } = await getEvents();
 
@@ -35,17 +42,22 @@ const schema = upcoming.map((event) => ({
 ---
 
 <BaseLayout
-  title="Events & Calendar"
-  description={`Upcoming PBLeague tournaments for The Leftovers plus every event we've played. ${upcoming.length} on the schedule right now.`}
+  title={page.data.seo.title ?? page.data.title}
+  description={page.data.seo.description ?? `Upcoming PBLeague tournaments for The Leftovers plus every event we've played. ${upcoming.length} on the schedule right now.`}
   schema={schema}
 >
   <PageHeader
-    eyebrow="Schedule"
-    title="Events & Calendar"
-    intro="Where we're playing next and everything we've already played. Registration links go straight to the league — we don't handle entries."
+    eyebrow={page.data.eyebrow}
+    title={page.data.title}
+    intro={page.data.intro}
+    images={heroImages}
   />
 
-  <Section tone="base" title="Upcoming" kicker={`${upcoming.length} scheduled`}>
+  <Section tone="base" title="Calendar" kicker="Tap a marked day">
+    <EventsCalendar events={[...upcoming, ...past]} next={next} class="mx-auto max-w-md" />
+  </Section>
+
+  <Section tone="alt" title="Upcoming" kicker={`${upcoming.length} scheduled`}>
     {
       upcoming.length > 0 ? (
         <>
@@ -80,7 +92,7 @@ const schema = upcoming.map((event) => ({
     }
   </Section>
 
-  <Section tone="alt" title="Played" kicker={`${past.length} events`} divider dividerSeed={13}>
+  <Section tone="base" title="Played" kicker={`${past.length} events`} divider dividerSeed={13}>
     {
       past.length > 0 ? (
         <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -97,7 +109,7 @@ const schema = upcoming.map((event) => ({
 
     <p class="mt-8 text-sm text-bone-muted">
       Per-player stat lines from these events live on the
-      <a href="/stats" class="text-gold-300 underline underline-offset-4">stats page</a>.
+      <a href="/team#stats" class="text-gold-300 underline underline-offset-4">stats page</a>.
     </p>
   </Section>
 </BaseLayout>

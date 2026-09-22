@@ -9,7 +9,7 @@
  *
  * The order now answers a newcomer's questions in the order they'd ask them:
  * what is this → how do I get in → when's the next one → where does everyone
- * hang out. Stats live on /stats; merch lives on /shop.
+ * hang out. Stats live on /team#stats; merch lives on /shop.
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -19,14 +19,48 @@ import ThreeColumn from '@/components/ThreeColumn.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
 import Button from '@/components/Button.astro';
+import PlayerCard from '@/components/PlayerCard.astro';
+import Gallery from '@/components/Gallery.astro';
 import Icon, { type IconName } from '@/components/brand/Icon.astro';
 import { site } from '@/lib/settings';
 import { getEvents } from '@/lib/events';
 import { dateRange, isoDate } from '@/lib/format';
+import { getTeamStats } from '@/lib/stats';
+import { resolveImage } from '@/lib/images';
 
-const [{ next }, players] = await Promise.all([getEvents(), getCollection('players')]);
+const [{ next }, players, galleries, teamStats] = await Promise.all([
+  getEvents(),
+  getCollection('players'),
+  getCollection('galleries'),
+  getTeamStats(),
+]);
 
 const openSlots = players.filter((player) => player.data.status === 'open-slot').length;
+
+// "Meet the Crew" slider — active roster in display order, capped so the
+// strip stays a teaser rather than duplicating the full /team roster grid.
+// Ends on a real "open slot" roster entry when one exists, same as the full
+// grid on /team — no synthetic card, PlayerCard's open-slot state is data.
+const crew = players
+  .filter((player) => player.data.status === 'active')
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, 8);
+const openSlotPlayer = players.find((player) => player.data.status === 'open-slot');
+
+// "From the Field" teaser — a handful of photos across every gallery, same
+// source as /team#gallery's full slideshow, resolved for the masonry grid.
+const teaserPhotos = (
+  await Promise.all(
+    galleries
+      .sort((a, b) => a.data.order - b.data.order)
+      .flatMap((gallery) => gallery.data.photos)
+      .slice(0, 6)
+      .map(async (photo) => {
+        const src = await resolveImage(photo.image);
+        return src ? { src, alt: photo.alt, caption: photo.caption } : null;
+      })
+  )
+).flatMap((photo) => (photo ? [photo] : []));
 
 const premise = [
   {
@@ -94,15 +128,47 @@ const eventSchema = next
 
 <BaseLayout title={site.title} description={site.description} schema={eventSchema}>
   <Hero variant="brand" tagline={site.tagline}>
-    <Button slot="actions" href="/roster#open-slots" size="lg">Join the crew</Button>
+    <Button slot="actions" href="/team#open-slots" variant="brush-primary" size="lg" seed={2}>
+      Join the crew
+    </Button>
     {
       site.social.discord && (
-        <Button slot="actions" href={site.social.discord} external variant="outline" size="lg">
+        <Button
+          slot="actions"
+          href={site.social.discord}
+          external
+          variant="brush-outline"
+          size="lg"
+          seed={5}
+        >
           Open the Discord
         </Button>
       )
     }
   </Hero>
+
+  <!-- MANIFESTO --------------------------------------------------------------->
+  <section class="bg-topo relative overflow-hidden border-y border-ink-600 bg-ink-900">
+    <div
+      class="relative flex min-h-[340px] flex-col justify-end bg-gradient-to-t from-ink via-ink/60 to-ink/10 px-6 py-12 sm:px-10 sm:py-16"
+    >
+      <p class="eyebrow mb-3">{site.tagline}</p>
+      <h2 class="max-w-3xl text-3xl uppercase leading-tight text-bone sm:text-5xl">
+        Paintball builds better people.
+      </h2>
+      <ul class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm text-bone-muted">
+        <li>
+          <span class="numeral text-2xl">{teamStats.rosterSize}</span> team members
+        </li>
+        <li>
+          <span class="numeral text-2xl">{teamStats.seasons}</span> seasons
+        </li>
+        <li>
+          <span class="numeral text-2xl">1</span> crew
+        </li>
+      </ul>
+    </div>
+  </section>
 
   <!-- WHAT THIS IS ---------------------------------------------------------->
   <Section tone="base" eyebrow="Free agents welcome" title="Anyone Can Play">
@@ -111,6 +177,35 @@ const eventSchema = next
     </p>
     <ThreeColumn items={premise} class="mt-10" />
   </Section>
+
+  <!-- MEET THE CREW ----------------------------------------------------------->
+  {
+    crew.length > 0 && (
+      <Section tone="alt">
+        <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4 lg:mb-12">
+          <div>
+            <p class="eyebrow mb-3">Who's playing</p>
+            <h2 class="text-3xl text-bone sm:text-4xl lg:text-5xl">Meet the Crew</h2>
+          </div>
+          <Button href="/team#roster" variant="tertiary" icon="arrow-right">
+            See full roster
+          </Button>
+        </div>
+        <ul class="flex snap-x snap-proximity gap-4 overflow-x-auto pb-2">
+          {crew.map((player) => (
+            <li class="w-[150px] shrink-0 snap-start">
+              <PlayerCard player={player} href="/team#roster" class="text-sm" />
+            </li>
+          ))}
+          {openSlotPlayer && (
+            <li class="w-[150px] shrink-0 snap-start">
+              <PlayerCard player={openSlotPlayer} href="/team#open-slots" />
+            </li>
+          )}
+        </ul>
+      </Section>
+    )
+  }
 
   <!-- NEXT UP --------------------------------------------------------------->
   <Section tone="alt" eyebrow="Next up" title="On the Calendar">
@@ -138,7 +233,7 @@ const eventSchema = next
           </div>
           <div class="flex shrink-0 flex-wrap gap-3">
             {next.data.registrationUrl && (
-              <Button href={next.data.registrationUrl} external size="sm">
+              <Button href={next.data.registrationUrl} external variant="brush-primary" size="sm" seed={9}>
                 Register
               </Button>
             )}
@@ -193,6 +288,24 @@ const eventSchema = next
     </div>
   </Section>
 
+  <!-- FROM THE FIELD ---------------------------------------------------------->
+  {
+    teaserPhotos.length > 0 && (
+      <Section tone="alt">
+        <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4 lg:mb-12">
+          <div>
+            <p class="eyebrow mb-3">Game day</p>
+            <h2 class="text-3xl text-bone sm:text-4xl lg:text-5xl">From the Field</h2>
+          </div>
+          <Button href="/team#gallery" variant="tertiary" icon="arrow-right">
+            More photos
+          </Button>
+        </div>
+        <Gallery images={teaserPhotos} />
+      </Section>
+    )
+  }
+
   <!-- OPEN SLOTS ------------------------------------------------------------>
   {
     openSlots > 0 && (
@@ -207,7 +320,7 @@ const eventSchema = next
               Every name on the roster started as one of these.
             </p>
           </div>
-          <Button href="/roster#open-slots" variant="gold" class="shrink-0">
+          <Button href="/team#open-slots" variant="gold" class="shrink-0">
             See open slots
           </Button>
         </div>

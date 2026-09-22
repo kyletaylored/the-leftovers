@@ -1,0 +1,83 @@
+---
+/**
+ * FeatureRow — alternating media+copy block (Sept 2026 design-handoff audit,
+ * §04.5). Net-new: nothing in the existing component set covered a deeper
+ * "why join us" section. Reuses `Button.astro` for the CTA rather than
+ * building its own link styling.
+ *
+ * `reverse` flips the visual order by swapping `flex-wrap` between `wrap`
+ * and `wrap-reverse` (the trick used in the handoff's own markup) rather
+ * than reordering the DOM, so the media/copy reading order stays consistent
+ * for screen readers regardless of which side the image lands on.
+ */
+import { Image } from 'astro:assets';
+import Button from '@/components/Button.astro';
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  body: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  image?: ImageMetadata;
+  imageAlt?: string;
+  reverse?: boolean;
+  class?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  body,
+  ctaLabel,
+  ctaHref,
+  image,
+  imageAlt = '',
+  reverse = false,
+  class: className = '',
+} = Astro.props;
+---
+
+<div
+  class:list={[
+    'flex items-center gap-8 sm:gap-10',
+    reverse ? 'flex-wrap-reverse' : 'flex-wrap',
+    className,
+  ]}
+>
+  <div class="min-w-[280px] flex-1">
+    {
+      image ? (
+        <Image
+          src={image}
+          alt={imageAlt}
+          widths={[400, 640, 960]}
+          sizes="(min-width: 1024px) 45vw, 92vw"
+          loading="lazy"
+          decoding="async"
+          class="aspect-video w-full rounded-sm border border-ink-600 object-cover"
+        />
+      ) : (
+        <div
+          class="bg-topo aspect-video w-full rounded-sm border border-ink-600 bg-ink-900"
+          role="img"
+          aria-label={imageAlt}
+        />
+      )
+    }
+  </div>
+  <div class="min-w-[280px] flex-1">
+    {eyebrow && <p class="eyebrow mb-2">{eyebrow}</p>}
+    <h3 class="text-2xl text-bone sm:text-3xl">{title}</h3>
+    <p class="mt-3 text-base leading-relaxed text-bone-muted">{body}</p>
+    {
+      ctaLabel && ctaHref && (
+        <div class="mt-5">
+          <Button href={ctaHref} variant="tertiary" icon="arrow-right">
+            {ctaLabel}
+          </Button>
+        </div>
+      )
+    }
+  </div>
+</div>

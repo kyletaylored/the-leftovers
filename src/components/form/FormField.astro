@@ -1,0 +1,115 @@
+---
+/**
+ * FormField — label + input/textarea/select + optional hint/error (Sept
+ * 2026 design-handoff audit, §04.6). Builds on the `.field-label`/
+ * `.field-input` tokens already shared with `NewsletterBlock`/
+ * `PreorderForm` (`src/styles/global.css`) rather than reinventing input
+ * chrome — this component adds the missing error/disabled states and a
+ * consistent label+hint layout around them.
+ *
+ * `as="select"` renders a native <select> with the native arrow suppressed
+ * and a themed chevron overlaid, since `appearance:none` removes it.
+ * `as="textarea"` renders a <textarea>. Anything else renders an <input
+ * type={type}>.
+ */
+import Icon from '@/components/brand/Icon.astro';
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends Omit<HTMLAttributes<'input'>, 'name' | 'type' | 'value' | 'class' | 'required' | 'disabled'> {
+  label: string;
+  name: string;
+  as?: 'input' | 'textarea' | 'select';
+  type?: HTMLAttributes<'input'>['type'];
+  value?: string;
+  placeholder?: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+  rows?: number;
+  class?: string;
+}
+
+const {
+  label,
+  name,
+  as = 'input',
+  type = 'text',
+  value,
+  placeholder,
+  hint,
+  error,
+  required = false,
+  disabled = false,
+  rows = 4,
+  class: className = '',
+  ...rest
+} = Astro.props;
+
+const id = `field-${name}`;
+const hintId = `${id}-hint`;
+const invalid = Boolean(error);
+---
+
+<div class={className}>
+  <label for={id} class="field-label">{label}{required && <span aria-hidden="true"> *</span>}</label>
+  {
+    as === 'textarea' ? (
+      <textarea
+        id={id}
+        name={name}
+        rows={rows}
+        required={required}
+        disabled={disabled}
+        placeholder={placeholder}
+        aria-invalid={invalid ? 'true' : undefined}
+        aria-describedby={hint || error ? hintId : undefined}
+        class="field-input tap"
+        style="resize:vertical; line-height:1.6;"
+        {...rest}
+      >
+        {value}
+      </textarea>
+    ) : as === 'select' ? (
+      <div class="relative">
+        <select
+          id={id}
+          name={name}
+          required={required}
+          disabled={disabled}
+          aria-invalid={invalid ? 'true' : undefined}
+          aria-describedby={hint || error ? hintId : undefined}
+          class="field-input tap appearance-none pr-9"
+          {...rest}
+        >
+          <slot />
+        </select>
+        <Icon
+          name="chevron"
+          class="pointer-events-none absolute right-3.5 top-1/2 size-3.5 -translate-y-1/2 text-gold"
+        />
+      </div>
+    ) : (
+      <input
+        id={id}
+        name={name}
+        type={type}
+        value={value}
+        required={required}
+        disabled={disabled}
+        placeholder={placeholder}
+        aria-invalid={invalid ? 'true' : undefined}
+        aria-describedby={hint || error ? hintId : undefined}
+        class="field-input tap"
+        {...rest}
+      />
+    )
+  }
+  {
+    (hint || error) && (
+      <p id={hintId} class="field-hint" data-error={invalid ? 'true' : undefined}>
+        {error ?? hint}
+      </p>
+    )
+  }
+</div>

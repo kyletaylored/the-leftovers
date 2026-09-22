@@ -12,6 +12,21 @@ const assets = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/img/**/*.{jpeg,jpg,png,webp,avif,svg}'
 );
 
+/**
+ * Resolves a `pages` collection entry's `heroImages` field into what
+ * `PageHeader` needs. Shared by every page that pulls its hero from the CMS
+ * (contact, community, shop, events, team) so the resolve-and-drop-missing
+ * logic exists once.
+ */
+export async function resolveHeroImages(
+  heroImages: Array<{ image: string; alt: string }>
+): Promise<Array<{ src: ImageMetadata; alt: string }>> {
+  const resolved = await Promise.all(
+    heroImages.map(async (h) => ({ src: await resolveImage(h.image), alt: h.alt }))
+  );
+  return resolved.flatMap((h) => (h.src ? [{ src: h.src, alt: h.alt }] : []));
+}
+
 export async function resolveImage(path?: string): Promise<ImageMetadata | undefined> {
   if (!path) return undefined;
   const key = path.startsWith('/') ? path : `/${path}`;

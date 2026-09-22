@@ -253,6 +253,61 @@
     min-height: 44px;
     min-width: 44px;
   }
+
+  /**
+   * Form field — visible label + input, per the Sept 2026 design-handoff
+   * audit (§04 components, "Form field — visible label"). Single source of
+   * truth for both the Astro forms (NewsletterBlock) and the React island
+   * (PreorderForm) — they were drifting from the spec and from each other
+   * before this existed (wrong background shade, wrong letter-spacing, and
+   * the focus state had suppressed the visible ring the audit calls for).
+   * Reference the class, don't retype the values.
+   */
+  .field-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-gold-300);
+  }
+
+  .field-input {
+    width: 100%;
+    min-height: 44px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-ink-600);
+    border-radius: 2px;
+    background: var(--color-ink-800);
+    color: var(--color-bone);
+    font-size: 14px;
+  }
+  .field-input::placeholder {
+    color: color-mix(in srgb, var(--color-bone-muted) 70%, transparent);
+  }
+  .field-input:focus {
+    border-color: var(--color-gold);
+    outline: 2px solid var(--color-gold);
+    outline-offset: 1px;
+  }
+  .field-input[aria-invalid='true'] {
+    border-color: var(--color-crimson);
+  }
+  .field-input:disabled {
+    background: var(--color-ink-900);
+    border-color: var(--color-ink-700);
+    color: var(--color-bone-muted);
+    cursor: not-allowed;
+  }
+  .field-hint {
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--color-bone-muted);
+  }
+  .field-hint[data-error='true'] {
+    color: var(--color-crimson-400);
+  }
 }
 
 /* Sponsor marquee — pure CSS, no JS island needed. */

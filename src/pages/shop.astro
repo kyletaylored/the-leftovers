@@ -2,8 +2,10 @@
 import { getCollection, getEntry, render } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHeader from '@/components/PageHeader.astro';
+import { resolveHeroImages } from '@/lib/images';
 import Section from '@/components/Section.astro';
 import ProductCard from '@/components/ProductCard.astro';
+import ProductGrid from '@/components/marketing/ProductGrid.astro';
 import ThreeColumn from '@/components/ThreeColumn.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
 import Button from '@/components/Button.astro';
@@ -14,6 +16,7 @@ import { money, fullDate } from '@/lib/format';
 
 const page = await getEntry('pages', 'shop');
 if (!page) throw new Error('Missing content file: src/content/pages/shop.md');
+const heroImages = await resolveHeroImages(page.data.heroImages);
 const { Content } = await render(page);
 
 const products = (await getCollection('products')).sort((a, b) => a.data.order - b.data.order);
@@ -76,7 +79,7 @@ const howPreordersWork = [
   description={page.data.seo.description}
   schema={schema}
 >
-  <PageHeader eyebrow={page.data.eyebrow} title={page.data.title} intro={page.data.intro} />
+  <PageHeader eyebrow={page.data.eyebrow} title={page.data.title} intro={page.data.intro} images={heroImages} />
 
   <!-- On-site jersey drops, which take orders through our own form -->
   {
@@ -156,13 +159,7 @@ const howPreordersWork = [
   <Section tone="alt" title="Always Available" kicker="Small stuff">
     {
       evergreen.length > 0 ? (
-        <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {evergreen.map((product) => (
-            <li class="flex">
-              <ProductCard product={product} class="w-full" />
-            </li>
-          ))}
-        </ul>
+        <ProductGrid products={evergreen} />
       ) : (
         <MascotCallout
           title="Nothing in the store right now"

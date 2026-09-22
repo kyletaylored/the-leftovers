@@ -1,0 +1,426 @@
+---
+/**
+ * /team — About + Roster + Stats, combined (Oct 2026 follow-up to the
+ * design-handoff audit). The three pages covered the same subject from
+ * three angles (who we are, who's playing, how we're doing) and split that
+ * across three clicks. One page, one story, in the order a visitor actually
+ * asks the questions: who are you → who's on the team → is there room for
+ * me → how's the season going → prove it.
+ *
+ * /about, /roster and /stats still exist as thin redirect pages (see those
+ * files) rather than disappearing outright — old links and bookmarks land
+ * here instead of 404ing.
+ */
+import { getCollection, getEntry, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import Prose from '@/components/Prose.astro';
+import StatNumber from '@/components/StatNumber.astro';
+import Callout from '@/components/Callout.astro';
+import CtaStrip from '@/components/CtaStrip.astro';
+import Button from '@/components/Button.astro';
+import FaqAccordion from '@/components/FaqAccordion.astro';
+import PlayerCard from '@/components/PlayerCard.astro';
+import ThreeColumn from '@/components/ThreeColumn.astro';
+import GallerySlideshow from '@/components/GallerySlideshow.astro';
+import StatLeaderboardTable from '@/components/StatLeaderboardTable';
+import MascotCallout from '@/components/MascotCallout.astro';
+import Icon from '@/components/brand/Icon.astro';
+import TeamStatsWidget from '@/components/TeamStatsWidget.astro';
+import { resolveHeroImages } from '@/lib/images';
+import { getTeamStats, getPlayerStats, getResultsWithEvents } from '@/lib/stats';
+import { getTeamWidgets, ATTRIBUTION as PBLIDB_ATTRIBUTION } from '@/lib/pblidb';
+import { site } from '@/lib/settings';
+import { rate, ordinal, dateRange, fullDate } from '@/lib/format';
+
+const page = await getEntry('pages', 'team');
+if (!page) throw new Error('Missing content file: src/content/pages/team.md');
+const { Content } = await render(page);
+
+const heroImages = await resolveHeroImages(page.data.heroImages);
+
+const [players, faqs, galleries, teamStats, playerRows, results, pblidbWidgets] = await Promise.all([
+  getCollection('players'),
+  getCollection('faqs'),
+  getCollection('galleries'),
+  getTeamStats(),
+  getPlayerStats(),
+  getResultsWithEvents(),
+  getTeamWidgets(site.pblidb.query),
+]);
+
+const active = players
+  .filter((p) => p.data.status === 'active')
+  .sort((a, b) => a.data.order - b.data.order || (a.data.number ?? 99) - (b.data.number ?? 99));
+const openSlots = players.filter((p) => p.data.status === 'open-slot');
+
+const bios = await Promise.all(
+  active.map(async (player) => ({ player, ...(await render(player)) }))
+);
+
+const faqItems = faqs
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((faq) => ({ question: faq.data.question, answer: faq.data.answer }));
+
+const roles = [...new Set(playerRows.map((row) => row.role))].sort();
+
+const headline = [
+  { value: teamStats.eventCount, label: 'Events played' },
+  { value: `${teamStats.wins}-${teamStats.losses}`, label: 'Record' },
+  { value: rate(teamStats.winRate), label: 'Win rate' },
+  { value: teamStats.podiums, label: 'Podiums' },
+  { value: teamStats.bestPlacement ? ordinal(teamStats.bestPlacement) : '—', label: 'Best finish' },
+];
+
+const howItWorks = [
+  {
+    icon: 'chat' as const,
+    title: 'Say you’re in',
+    body: 'Post in the Discord event channel or email the captain. No application, no tryout date to wait for.',
+  },
+  {
+    icon: 'calendar' as const,
+    title: 'Confirm the date',
+    body: 'Slots go in the order people confirm. Confirming means you’re actually showing up — we plan the squad around it.',
+  },
+  {
+    icon: 'jersey' as const,
+    title: 'Show up and play',
+    body: 'Cover your entry and paint, bring your own marker and mask, and you’re playing points. Nobody sits.',
+  },
+];
+
+/** SportsTeam + roster + FAQ, all on the one page that covers all three now. */
+const schema = [
+  {
+    '@type': 'SportsTeam',
+    '@id': new URL('/#team', Astro.site).href,
+    athlete: active.map((player) => ({
+      '@type': 'Person',
+      name: player.data.name,
+      jobTitle: player.data.role,
+      ...(player.data.socials.instagram ? { sameAs: [player.data.socials.instagram] } : {}),
+    })),
+  },
+  {
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: { '@type': 'Answer', text: item.answer },
+    })),
+  },
+];
+
+const jumpLinks = [
+  { href: '#story', label: 'Story' },
+  { href: '#crew', label: 'Crew' },
+  { href: '#open-slots', label: 'Open Slots' },
+  { href: '#gallery', label: 'Gallery' },
+  { href: '#stats', label: 'Stats' },
+  { href: '#faq', label: 'FAQ' },
+];
+---
+
+<BaseLayout title={page.data.seo.title ?? page.data.title} description={page.data.seo.description} schema={schema}>
+  <PageHeader
+    eyebrow={page.data.eyebrow}
+    title={page.data.title}
+    intro={page.data.intro}
+    images={heroImages}
+  />
+
+  {/* One page, six sections — a jump row so it doesn't just feel like an
+      endless scroll with no wayfinding. */}
+  <nav aria-label="On this page" class="border-b border-ink-600/60 bg-ink-900">
+    <ul class="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 sm:px-6">
+      {
+        jumpLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="tap inline-flex items-center whitespace-nowrap px-3 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-bone-muted transition-colors hover:text-gold-300"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
+  <!-- STORY ------------------------------------------------------------------>
+  <Section id="story" tone="base">
+    <div class="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:gap-16">
+      <Prose>
+        <Content />
+      </Prose>
+
+      <aside class="lg:sticky lg:top-24 lg:self-start">
+        <div class="rounded-sm border border-ink-600 bg-ink-800 p-6">
+          <h2 class="text-2xl text-bone">The record</h2>
+          <div class="mt-5 grid grid-cols-2 gap-y-6">
+            <StatNumber value={teamStats.seasons} label="Seasons" size="sm" />
+            <StatNumber value={teamStats.eventCount} label="Events" size="sm" />
+            <StatNumber value={`${teamStats.wins}-${teamStats.losses}`} label="Record" size="sm" />
+            <StatNumber value={rate(teamStats.winRate)} label="Win rate" size="sm" />
+          </div>
+          <Button href="#stats" variant="outline" size="sm" class="mt-6 w-full">
+            Full stats & standings
+          </Button>
+        </div>
+
+        <Callout class="mt-6" cite={`— Est. ${site.established}${site.homeBase ? `, ${site.homeBase}` : ''}`}>
+          We're the players who were left over, and we'd rather hand the next person a slot than
+          make them wait a season for one.
+        </Callout>
+      </aside>
+    </div>
+  </Section>
+
+  <!-- CREW --------------------------------------------------------------------->
+  <Section id="crew" tone="alt" title="The Crew" kicker={`${active.length} rostered`}>
+    <div class="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+      {active.map((player) => <PlayerCard player={player} />)}
+    </div>
+
+    <h3 class="mt-14 mb-6 text-2xl text-bone sm:text-3xl">Player Notes</h3>
+    <ul class="grid gap-8 lg:grid-cols-2 lg:gap-x-12">
+      {
+        bios.map(({ player, Content: PlayerContent }) => (
+          <li id={player.id} class="border-l-2 border-ink-600 pl-5">
+            <h4 class="flex items-baseline gap-3 text-xl text-bone">
+              {player.data.number !== undefined && (
+                <span class="numeral text-2xl leading-none">{player.data.number}</span>
+              )}
+              {player.data.name}
+            </h4>
+            <p class="mt-1 flex flex-wrap items-center gap-x-3 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
+              <span>{player.data.role}</span>
+              {player.data.joined && (
+                <span class="text-bone-muted">
+                  <Icon name="calendar" class="mr-1 inline size-3.5 align-[-2px]" />
+                  Since {fullDate(player.data.joined)}
+                </span>
+              )}
+            </p>
+            <Prose class="mt-3">
+              <PlayerContent />
+            </Prose>
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <!-- OPEN SLOTS ----------------------------------------------------------->
+  <Section id="open-slots" tone="base" eyebrow="Free agents welcome" title="Open Slots" kicker={`${openSlots.length} available`}>
+    {
+      openSlots.length > 0 ? (
+        <>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {openSlots.map((slot) => (
+              <PlayerCard player={slot} href={`mailto:${site.social.email}?subject=Open%20slot%20for%20the%20next%20event`} />
+            ))}
+            <Callout class="self-start sm:col-span-2" cite="— The whole tryout process">
+              If you can make the date and cover your own entry and paint, you can play.
+            </Callout>
+          </div>
+
+          <h3 class="mt-14 mb-6 text-2xl text-bone sm:text-3xl">How it works</h3>
+          <ThreeColumn items={howItWorks} as="h4" />
+
+          <div class="mt-8 flex flex-wrap gap-3">
+            <Button href={site.social.discord} external>Ask in the Discord</Button>
+            <Button href="/contact" variant="outline">Email the captain</Button>
+          </div>
+        </>
+      ) : (
+        <p class="text-base text-bone-muted">
+          Every slot for the next event is filled. Jump in the
+          <a href={site.social.discord} rel="noopener" class="text-gold-300 underline underline-offset-4">Discord</a>
+          and you'll hear about the next one first.
+        </p>
+      )
+    }
+  </Section>
+
+  <!-- GALLERY --------------------------------------------------------------->
+  <Section id="gallery" tone="alt" title="From the Crew" kicker="Photos" divider dividerSeed={31}>
+    <GallerySlideshow
+      galleries={galleries}
+      emptyTitle="No team photos up yet"
+      emptyBody="Game days, roster nights, whatever's on someone's phone after a tournament. Add them in the CMS and they show up here."
+      class="mx-auto max-w-4xl"
+    />
+  </Section>
+
+  <!-- STATS ------------------------------------------------------------------->
+  <Section id="stats" tone="base" eyebrow="By the numbers" title="Stats & Standings">
+    <p class="max-w-2xl text-base leading-relaxed text-bone-muted">
+      Every figure here is derived from stat lines typed in by hand after each tournament.
+      Nothing is estimated, and nothing is rounded up in our favour.
+    </p>
+
+    <div class="mt-8 grid grid-cols-2 gap-y-8 sm:grid-cols-3 lg:grid-cols-5">
+      {headline.map((item) => <StatNumber value={item.value} label={item.label} size="sm" />)}
+    </div>
+  </Section>
+
+  <Section tone="alt" title="Player Leaderboard" kicker="Career totals">
+    {
+      playerRows.length > 0 ? (
+        <StatLeaderboardTable client:visible rows={playerRows} roles={roles} />
+      ) : (
+        <MascotCallout
+          title="No stat lines yet"
+          body="Stats go up after each tournament. Once the first event's sheet is entered, this fills in."
+        >
+          <Button href="/events" size="sm" variant="outline">See the schedule</Button>
+        </MascotCallout>
+      )
+    }
+  </Section>
+
+  <Section tone="base" title="Event by Event" kicker="Team results" divider dividerSeed={17}>
+    {
+      results.length > 0 ? (
+        <div class="overflow-x-auto rounded-sm border border-ink-600">
+          <table class="w-full border-collapse text-sm">
+            <caption class="sr-only">Team placement and record at every event played.</caption>
+            <thead>
+              <tr class="bg-ink-900 text-left">
+                <th scope="col" class="px-4 py-3 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone">Event</th>
+                <th scope="col" class="px-4 py-3 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone">Dates</th>
+                <th scope="col" class="px-4 py-3 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone">League</th>
+                <th scope="col" class="px-4 py-3 text-right text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone">Record</th>
+                <th scope="col" class="px-4 py-3 text-right text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone">Finish</th>
+              </tr>
+            </thead>
+            <tbody>
+              {results.map(({ result, event }, index) => (
+                <tr
+                  class:list={[
+                    'border-t border-ink-600/60',
+                    index === 0 && 'bg-gold/10 shadow-[inset_3px_0_0_var(--color-gold)]',
+                  ]}
+                >
+                  <th scope="row" class="px-4 py-3 text-left font-semibold text-bone">
+                    <a href="/events" class="hover:text-gold-300">{event.data.title}</a>
+                  </th>
+                  <td class="whitespace-nowrap px-4 py-3 text-bone-muted">
+                    {dateRange(event.data.startDate, event.data.endDate)}
+                  </td>
+                  <td class="px-4 py-3 text-bone-muted">{event.data.league ?? '—'}</td>
+                  <td class="px-4 py-3 text-right tabular-nums text-bone-muted">
+                    {result.data.record ?? '—'}
+                  </td>
+                  <td class="px-4 py-3 text-right text-bone">
+                    {result.data.placement
+                      ? `${ordinal(result.data.placement)}${result.data.fieldSize ? ` of ${result.data.fieldSize}` : ''}`
+                      : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <MascotCallout title="No events scored yet" />
+      )
+    }
+
+    <aside class="mt-8 flex gap-4 rounded-sm border border-ink-600 bg-ink-800 p-5">
+      <Icon name="chat" class="size-6 shrink-0 text-gold" />
+      <div class="text-sm leading-relaxed text-bone-muted">
+        <p class="mb-1 font-semibold text-bone">Where these numbers come from</p>
+        <p>
+          PBLeague's tournament system exports results to the event organiser, not as a public
+          feed, so there's nothing to sync against. After each event the captain enters the sheet
+          by hand and the totals, rates and standings on this page are calculated from it. If a
+          line looks wrong, it probably is — tell us and it gets corrected.
+        </p>
+      </div>
+    </aside>
+  </Section>
+
+  <!-- PBLIDB (third-party, live) ------------------------------------------------>
+  {
+    pblidbWidgets.length > 0 && (
+      <Section tone="alt" eyebrow="Public record" title="On pblidb.org">
+        <p class="max-w-2xl text-base leading-relaxed text-bone-muted">
+          pblidb.org is an independent, unofficial database built from public PBLeague pages —
+          it's not the source for the numbers above, just a second, outside record. It has
+          indexed more than one team named "Leftovers" over the years, so every match shows up
+          below rather than us guessing which one is "the real one."
+        </p>
+
+        {
+          pblidbWidgets.length > 3 && (
+            <div class="mt-6 max-w-sm">
+              <label for="pblidb-filter" class="field-label">Filter by team name</label>
+              <input
+                id="pblidb-filter"
+                type="search"
+                placeholder="e.g. III, NOV, OG…"
+                class="field-input tap"
+                data-pblidb-filter
+              />
+            </div>
+          )
+        }
+
+        <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" data-pblidb-grid>
+          {pblidbWidgets.map((widget) => (
+            <li>
+              <TeamStatsWidget widget={widget} class="h-full" />
+            </li>
+          ))}
+        </ul>
+
+        <p class="mt-4 text-xs text-bone-muted">{PBLIDB_ATTRIBUTION}</p>
+      </Section>
+    )
+  }
+
+  {
+    pblidbWidgets.length > 3 && (
+      <script>
+        // Progressive enhancement only — every widget is visible without this.
+        document.querySelectorAll<HTMLInputElement>('[data-pblidb-filter]').forEach((input) => {
+          const grid = input.closest('section')?.querySelector<HTMLElement>('[data-pblidb-grid]');
+          if (!grid) return;
+          const items = grid.querySelectorAll<HTMLElement>('[data-team-name]');
+          input.addEventListener('input', () => {
+            const needle = input.value.trim().toLowerCase();
+            items.forEach((item) => {
+              const li = item.closest('li');
+              if (!li) return;
+              li.style.display = !needle || item.dataset.teamName?.includes(needle) ? '' : 'none';
+            });
+          });
+        });
+      </script>
+    )
+  }
+
+  <!-- FAQ ----------------------------------------------------------------------->
+  <Section id="faq" tone="alt" title="Common Questions" kicker="Before you ask">
+    <FaqAccordion items={faqItems} class="max-w-3xl" />
+  </Section>
+
+  <Section tone="base" divider dividerSeed={23}>
+    <CtaStrip
+      tone="forest"
+      eyebrow="Rotating roster"
+      title="There's a slot open"
+      body="No tryout, no dues, no bench. Cover your entry and paint and you're playing points at the next event."
+    >
+      <Button slot="actions" href="#open-slots" variant="gold" size="lg">See open slots</Button>
+      <Button slot="actions" href={site.social.discord} external variant="ghost" size="lg" class="!border-bone/40 !text-bone hover:!border-bone">
+        Ask in the Discord
+      </Button>
+    </CtaStrip>
+  </Section>
+</BaseLayout>

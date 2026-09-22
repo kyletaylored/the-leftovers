@@ -1,0 +1,36 @@
+---
+/**
+ * EventsCalendar — server half of the Calendar island.
+ *
+ * Flattens the events collection into plain, serializable data (ISO date
+ * strings, no Date objects, no CollectionEntry) and picks the starting
+ * month: the month of the next upcoming event, or the current month if
+ * nothing's scheduled — never a blank "January" a visitor has to click
+ * away from.
+ */
+import Calendar, { type CalendarEvent } from './Calendar.tsx';
+import { isUpcoming, type EventEntry } from '@/lib/events';
+import { isoDate } from '@/lib/format';
+
+interface Props {
+  events: EventEntry[];
+  next?: EventEntry;
+  class?: string;
+}
+
+const { events, next, class: className = '' } = Astro.props;
+
+const calendarEvents: CalendarEvent[] = events.map((event) => ({
+  slug: event.id,
+  title: event.data.title,
+  startDate: isoDate(event.data.startDate),
+  endDate: isoDate(event.data.endDate ?? event.data.startDate),
+  // Same derivation as everywhere else on the site (lib/events.ts) — never
+  // a second, subtly different definition of "upcoming".
+  upcoming: isUpcoming(event),
+}));
+
+const initialMonth = isoDate(next?.data.startDate ?? new Date()).slice(0, 7);
+---
+
+<Calendar client:visible events={calendarEvents} initialMonth={initialMonth} className={className} />

@@ -112,14 +112,15 @@ export default function StatLeaderboardTable({ rows, roles }: Props) {
   const ariaSort = (key: ColumnKey): 'ascending' | 'descending' | 'none' =>
     sortKey === key ? (ascending ? 'ascending' : 'descending') : 'none';
 
-  const fieldClasses =
-    'min-h-11 rounded-sm border border-input bg-card px-3 text-sm text-foreground focus:border-ring focus:outline-none';
-  const labelClasses = 'text-[0.65rem] font-bold uppercase tracking-[0.18em] text-gold-300';
+  // Shared with NewsletterBlock/PreorderForm via .field-label/.field-input in
+  // global.css — per the Sept 2026 design-handoff audit's form-field spec.
+  const fieldClasses = 'field-input';
+  const labelClasses = 'field-label';
 
   return (
     <div>
       <div className="mb-4 grid gap-3 sm:grid-cols-[minmax(0,14rem)_minmax(0,18rem)]">
-        <label className="flex flex-col gap-1.5">
+        <label className="flex flex-col">
           <span className={labelClasses}>Filter by role</span>
           <select
             className={fieldClasses}
@@ -135,7 +136,7 @@ export default function StatLeaderboardTable({ rows, roles }: Props) {
           </select>
         </label>
 
-        <label className="flex flex-col gap-1.5">
+        <label className="flex flex-col">
           <span className={labelClasses}>Search players</span>
           <input
             className={fieldClasses}

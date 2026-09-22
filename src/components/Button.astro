@@ -9,7 +9,7 @@ import Icon, { type IconName } from './brand/Icon.astro';
 
 interface Props {
   href?: string;
-  variant?: 'primary' | 'outline' | 'gold' | 'ghost' | 'tertiary';
+  variant?: 'primary' | 'outline' | 'gold' | 'ghost' | 'tertiary' | 'brush-primary' | 'brush-outline';
   /** Visually and functionally disabled — a real `disabled` attribute on a
    *  <button>; on an <a> (which has no native disabled state) this strips
    *  the href and sets aria-disabled + tabindex=-1 instead. Added per the
@@ -22,6 +22,9 @@ interface Props {
   type?: 'button' | 'submit';
   class?: string;
   'aria-label'?: string;
+  /** brush-* variants only: seeds the hand-drawn outline so buttons on the
+   *  same page don't all wobble identically. */
+  seed?: number;
 }
 
 const {
@@ -33,11 +36,15 @@ const {
   external = false,
   type = 'button',
   class: className = '',
+  seed = 1,
   ...rest
 } = Astro.props;
 
+const isBrush = variant === 'brush-primary' || variant === 'brush-outline';
+
 const base =
-  'tap group inline-flex items-center justify-center gap-2 rounded-sm font-bold uppercase tracking-[0.14em] transition-colors duration-200';
+  'tap group relative inline-flex items-center justify-center gap-2 font-bold uppercase tracking-[0.14em] transition-colors duration-200';
+const baseNonBrush = `${base} rounded-sm`;
 
 const variants = {
   primary: 'bg-crimson text-bone hover:bg-crimson-600',
@@ -46,12 +53,18 @@ const variants = {
   ghost: 'border border-ink-600 text-bone hover:border-gold hover:text-gold-300',
   // Text-link style — no fill, no border, underline instead. Delta #3.
   tertiary: 'px-1 text-gold-300 underline decoration-gold/40 underline-offset-4 hover:text-gold hover:decoration-gold',
+  // Brush-stroke variants render their own SVG background layer below, so no
+  // bg/border utility classes here — just text color.
+  'brush-primary': 'text-bone',
+  'brush-outline': 'text-gold-300',
 } as const;
 
 // A disabled button is always this flat grey, regardless of which variant
 // was requested — matches the storybook's single disabled treatment rather
-// than a disabled state per variant.
-const disabledClasses = 'cursor-not-allowed bg-ink-700 text-bone-muted hover:bg-ink-700';
+// than a disabled state per variant. Brush variants fall back to the plain
+// rounded-rect disabled look too; a wobbly grey outline reads as broken, not
+// disabled.
+const disabledClasses = 'cursor-not-allowed rounded-sm bg-ink-700 text-bone-muted hover:bg-ink-700';
 
 const sizes = {
   sm: 'px-4 py-2.5 text-[0.7rem]',
@@ -59,9 +72,66 @@ const sizes = {
   lg: 'px-7 py-4 text-sm',
 } as const;
 
-const classes = `${base} ${disabled ? disabledClasses : variants[variant]} ${sizes[size]} ${className}`;
+const classes = `${disabled ? baseNonBrush : isBrush ? base : baseNonBrush} ${disabled ? disabledClasses : variants[variant]} ${sizes[size]} ${className}`;
 const glyph: IconName | false = external ? 'external' : icon;
 const Tag = href ? 'a' : 'button';
+
+/**
+ * Brush-stroke background — a hand-drawn wobble outline behind the label,
+ * per the Sept 2026 design-handoff audit (§04, Home.dc.html hero/CTA
+ * buttons): irregular bezier blob, not a rectangle. Rather than hardcoding
+ * the handoff's one-off per-button path strings, this generates one the
+ * same way `TerracedDivider.astro` generates its ridge lines — a
+ * deterministic pseudo-random walk seeded per instance, smoothed through a
+ * Catmull-Rom-to-Bezier pass so the wobble stays soft. Fixed viewBox works
+ * for every button size because `preserveAspectRatio="none"` stretches it
+ * to fill the rendered box, same trick the divider uses at 1200x120.
+ */
+const BW = 200;
+const BH = 64;
+
+function brushPath(brushSeed: number) {
+  const rand = (i: number) => {
+    const x = Math.sin(i * 12.9898 + brushSeed * 78.233) * 43758.5453;
+    return x - Math.floor(x);
+  };
+  const cx = BW / 2;
+  const cy = BH / 2;
+  const rx = BW / 2 - 6;
+  const ry = BH / 2 - 6;
+  const n = 4; // superellipse exponent — rounded-rect-ish base shape
+  const jitterMag = Math.min(rx, ry) * 0.14;
+  const N = 10;
+
+  const points: [number, number][] = [];
+  for (let i = 0; i < N; i++) {
+    const angle = (i / N) * Math.PI * 2;
+    const cosT = Math.cos(angle);
+    const sinT = Math.sin(angle);
+    const baseX = cx + Math.sign(cosT) * Math.abs(cosT) ** (2 / n) * rx;
+    const baseY = cy + Math.sign(sinT) * Math.abs(sinT) ** (2 / n) * ry;
+    const jitter = (rand(i) - 0.5) * jitterMag;
+    points.push([baseX + cosT * jitter, baseY + sinT * jitter]);
+  }
+
+  const at = (i: number) => points[((i % N) + N) % N];
+  let d = `M${points[0][0].toFixed(1)},${points[0][1].toFixed(1)}`;
+  for (let i = 0; i < N; i++) {
+    const [p0x, p0y] = at(i - 1);
+    const [p1x, p1y] = at(i);
+    const [p2x, p2y] = at(i + 1);
+    const [p3x, p3y] = at(i + 2);
+    const c1x = p1x + (p2x - p0x) / 6;
+    const c1y = p1y + (p2y - p0y) / 6;
+    const c2x = p2x - (p3x - p1x) / 6;
+    const c2y = p2y - (p3y - p1y) / 6;
+    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2x.toFixed(1)},${p2y.toFixed(1)}`;
+  }
+  d += ' Z';
+  return d;
+}
+
+const brushD = isBrush && !disabled ? brushPath(seed) : '';
 ---
 
 <Tag
@@ -74,13 +144,35 @@ const Tag = href ? 'a' : 'button';
   rel={external ? 'noopener' : undefined}
   {...rest}
 >
-  <slot />
   {
-    glyph && (
-      <Icon
-        name={glyph}
-        class="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
-      />
+    isBrush && !disabled && (
+      <svg
+        viewBox={`0 0 ${BW} ${BH}`}
+        preserveAspectRatio="none"
+        class="pointer-events-none absolute inset-0 h-full w-full"
+        aria-hidden="true"
+        focusable="false"
+      >
+        {variant === 'brush-primary' && <path d={brushD} fill="var(--color-crimson)" />}
+        <path
+          d={brushD}
+          fill="none"
+          stroke={variant === 'brush-primary' ? 'var(--color-gold-300)' : 'var(--color-gold)'}
+          stroke-width="2.2"
+          stroke-linejoin="round"
+        />
+      </svg>
     )
   }
+  <span class="relative z-[1] inline-flex items-center gap-2">
+    <slot />
+    {
+      glyph && (
+        <Icon
+          name={glyph}
+          class="size-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+        />
+      )
+    }
+  </span>
 </Tag>

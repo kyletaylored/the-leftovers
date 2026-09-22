@@ -217,20 +217,22 @@ Lighthouse, **mobile** preset, against `npm run preview` (PRD §10.2 target was
 
 | Page | Perf | A11y | Best practices | SEO | LCP | CLS | TBT |
 |---|---|---|---|---|---|---|---|
-| `/` | 100 | 100 | 100 | 100 | 1.7 s | 0 | 0 ms |
-| `/roster` | 100 | 100 | 100 | 100 | 1.5 s | 0 | 0 ms |
-| `/stats` | 100 | 100 | 100 | 100 | 1.5 s | 0 | 0 ms |
-| `/events` | 100 | 100 | 100 | 100 | 1.7 s | 0 | 0 ms |
-| `/shop` | 100 | 100 | 100 | 100 | 1.7 s | 0 | 0 ms |
-| `/community` | 100 | 100 | 100 | 100 | 1.5 s | 0 | 0 ms |
-| `/contact` | 100 | 100 | 100 | 100 | 1.5 s | 0 | 0 ms |
-| `/about` | 100 | 100 | 100 | 100 | 1.5 s | 0 | 0 ms |
+| `/` | 99 | 100 | 100 | 100 | 2.1 s | 0 | 0 ms |
+| `/team` | 98 | 100 | 100 | 100 | 2.2 s | 0 | 0 ms |
+| `/events` | 97 | 100 | 100 | 100 | 2.5 s | 0 | 0 ms |
+| `/shop` | 99 | 100 | 100 | 100 | 2.0 s | 0 | 0 ms |
+| `/community` | 99 | 100 | 100 | 100 | 2.0 s | 0 | 0 ms |
+| `/contact` | 99 | 100 | 100 | 100 | 2.0 s | 0 | 0 ms |
+
+`/about`, `/roster` and `/stats` merged into `/team` (Oct 2026 — see
+[docs/PRD-CONFORMANCE.md](docs/PRD-CONFORMANCE.md#page-merge-about--roster--stats--team-oct-2026)).
+The old URLs still resolve, as thin redirect stubs, so nothing 404s.
 
 Re-run any of these with:
 
 ```bash
 npm run build && npm run preview &
-npx lighthouse http://localhost:4321/roster --chrome-flags="--headless"
+npx lighthouse http://localhost:4321/team --chrome-flags="--headless"
 ```
 
 ### Contrast (WCAG AA)

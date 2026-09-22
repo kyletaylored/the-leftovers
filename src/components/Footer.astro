@@ -81,6 +81,21 @@ const year = new Date().getFullYear();
         © {year} {site.title}. All rights reserved. Built as a static site — no trackers, no
         cookies.
       </p>
+      {
+        site.designStorybookUrl && (
+          <p>
+            <a
+              href={site.designStorybookUrl}
+              rel="noopener"
+              target="_blank"
+              class="underline decoration-ink-600 underline-offset-2 hover:text-gold-300"
+            >
+              Design storybook
+            </a>{' '}
+            — internal visual reference for the team.
+          </p>
+        )
+      }
       {/* Attribution is a condition of the Vecteezy licence, not a courtesy.
           See ATTRIBUTIONS.md before removing it. */}
       <p>

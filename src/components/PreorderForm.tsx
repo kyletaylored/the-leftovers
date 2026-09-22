@@ -88,9 +88,11 @@ const money = (amount: number, currency: string) =>
     maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
   }).format(amount);
 
-const field =
-  'w-full min-h-11 rounded-sm border border-input bg-ink-900 px-3 py-2 text-sm text-foreground placeholder:text-bone-muted/60 focus:border-ring focus:outline-none';
-const label = 'mb-1.5 block text-[0.65rem] font-bold uppercase tracking-[0.18em] text-gold-300';
+// Shared with NewsletterBlock (Astro) and StatLeaderboardTable via the same
+// .field-label/.field-input classes in global.css — per the Sept 2026
+// design-handoff audit's form-field spec. Don't retype the values here.
+const field = 'field-input';
+const label = 'field-label';
 
 export default function PreorderForm({
   campaign,

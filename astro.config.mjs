@@ -23,7 +23,15 @@ export default defineConfig({
   // trailingSlash: 'never' exactly — canonical URLs and the served paths are
   // then the same string, with no redirect hop for a crawler to follow.
   build: { format: 'file' },
-  integrations: [sitemap(), react()],
+  integrations: [
+    sitemap({
+      // /about, /roster, /stats are thin meta-refresh stubs now (folded into
+      // /team — see src/pages/team.astro). They 200, so the sitemap
+      // generator would otherwise list them as if they were real pages.
+      filter: (page) => !['/about', '/roster', '/stats'].some((p) => page.endsWith(p)),
+    }),
+    react(),
+  ],
   vite: { plugins: [tailwindcss()] },
   image: {
     // Brand motifs are SVG; only photography goes through the image service.

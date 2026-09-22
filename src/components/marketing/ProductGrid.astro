@@ -1,0 +1,99 @@
+---
+/**
+ * ProductGrid — filterable multi-item wrapper around `ProductCard.astro`
+ * (Sept 2026 design-handoff audit, §04.5: "the multi-item version of
+ * ProductCard"). Renders the filter-chip row only when `categories` is
+ * given a real taxonomy to filter over — the current `products` collection
+ * schema (`src/content.config.ts`) has no category field, so most call
+ * sites just get the plain grid until/unless that's added; this component
+ * doesn't invent categories to fill the chip row.
+ *
+ * Filtering is a plain client-side `data-category` toggle (no framework
+ * island needed for show/hide), progressively enhanced — with JS disabled
+ * every card stays visible.
+ */
+import type { CollectionEntry } from 'astro:content';
+import ProductCard from '@/components/ProductCard.astro';
+
+interface Props {
+  products: CollectionEntry<'products'>[];
+  /** Category label per product, same length/order as `products`. Omit to
+   *  render a plain grid with no filter row. */
+  categories?: (string | undefined)[];
+  class?: string;
+}
+
+const { products, categories, class: className = '' } = Astro.props;
+const chips = categories ? Array.from(new Set(categories.filter((c): c is string => Boolean(c)))) : [];
+const withCategory = products.map((product, i) => ({ product, category: categories?.[i] }));
+---
+
+<div class:list={[className]} data-product-grid>
+  {
+    chips.length > 0 && (
+      <div class="mb-6 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          data-filter-chip
+          data-value="all"
+          aria-pressed="true"
+          class="rounded-full bg-gold px-3.5 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-ink data-[pressed=false]:border data-[pressed=false]:border-ink-600 data-[pressed=false]:bg-transparent data-[pressed=false]:text-bone-muted"
+        >
+          All
+        </button>
+        {chips.map((chip) => (
+          <button
+            type="button"
+            data-filter-chip
+            data-value={chip}
+            aria-pressed="false"
+            class="rounded-full border border-ink-600 px-3.5 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-bone-muted data-[pressed=true]:border-0 data-[pressed=true]:bg-gold data-[pressed=true]:text-ink"
+          >
+            {chip}
+          </button>
+        ))}
+        <span class="ml-auto text-xs text-bone-muted" data-result-count>
+          {products.length} items
+        </span>
+      </div>
+    )
+  }
+
+  <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    {
+      withCategory.map(({ product, category }) => (
+        <li class="flex" data-category={category ?? 'all'}>
+          <ProductCard product={product} class="w-full" />
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+{
+  chips.length > 0 && (
+    <script>
+      // Progressive enhancement only — every card is visible without this.
+      document.querySelectorAll<HTMLElement>('[data-product-grid]').forEach((grid) => {
+        const chips = grid.querySelectorAll<HTMLButtonElement>('[data-filter-chip]');
+        const items = grid.querySelectorAll<HTMLElement>('[data-category]');
+        const countEl = grid.querySelector<HTMLElement>('[data-result-count]');
+
+        chips.forEach((chip) => {
+          chip.addEventListener('click', () => {
+            const value = chip.dataset.value!;
+            chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+            chips.forEach((c) => (c.dataset.pressed = String(c === chip)));
+            let visible = 0;
+            items.forEach((item) => {
+              const show = value === 'all' || item.dataset.category === value;
+              item.style.display = show ? '' : 'none';
+              if (show) visible += 1;
+            });
+            if (countEl) countEl.textContent = `${visible} item${visible === 1 ? '' : 's'}`;
+          });
+        });
+      });
+    </script>
+  )
+}

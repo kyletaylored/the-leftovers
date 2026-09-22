@@ -16,14 +16,10 @@ homeBase: ""
 nav:
   - label: Home
     href: /
-  - label: About
-    href: /about
-  - label: Roster
-    href: /roster
+  - label: Team
+    href: /team
   - label: Events
     href: /events
-  - label: Stats
-    href: /stats
   - label: Shop
     href: /shop
   - label: Community
@@ -33,7 +29,7 @@ nav:
 
 primaryCta:
   label: Join the Team
-  href: /roster#open-slots
+  href: /team#open-slots
 
 # The handle is `leftoverspb` nearly everywhere.
 #
@@ -121,3 +117,17 @@ preorderForm:
 footerNote: >-
   Free agents welcome. Show up, pay your entry, play the tournament —
   that's the whole tryout.
+
+# Internal design reference, linked in the footer for the team. Not
+# customer-facing nav, so it lives here rather than in `nav`. Leave blank to
+# hide the footer link entirely.
+designStorybookUrl: https://claude.ai/artifact/U7z7FKdBokERWqJD5XSHoa
+
+# pblidb.org team stats (unofficial, third-party — derived from public
+# PBLeague pages, not affiliated with PBLI). `query` is sent to their team
+# search at build time; every matching team gets its own stats widget on
+# /team, since pblidb has indexed several unrelated-but-similarly-named
+# "Leftovers" teams across seasons and divisions. Leave blank to turn the
+# section off without a code change.
+pblidb:
+  query: leftovers

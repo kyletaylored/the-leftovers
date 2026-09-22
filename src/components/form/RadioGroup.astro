@@ -1,0 +1,49 @@
+---
+/**
+ * RadioGroup — custom-styled radio set (Sept 2026 design-handoff audit,
+ * §04.6): gold ring + filled inner dot when checked. The mock's raw HTML
+ * has no real <input> (it's a static design reference), but a production
+ * version needs one for keyboard/AT support — this renders a real
+ * `<input type="radio">`, visually hidden (`sr-only`), with a sibling
+ * `<span>` styled via `peer-checked:` so the checked look tracks real
+ * input state rather than a hand-maintained class.
+ */
+interface Option {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  legend: string;
+  name: string;
+  options: Option[];
+  defaultValue?: string;
+  class?: string;
+}
+
+const { legend, name, options, defaultValue, class: className = '' } = Astro.props;
+---
+
+<fieldset class={className}>
+  <legend class="field-label">{legend}</legend>
+  <div class="flex flex-col gap-2.5">
+    {
+      options.map((option) => (
+        <label class="flex items-center gap-2.5 text-sm text-bone-muted cursor-pointer [&:has(:checked)]:text-bone">
+          <input
+            type="radio"
+            name={name}
+            value={option.value}
+            checked={defaultValue === option.value}
+            class="peer sr-only"
+          />
+          <span
+            aria-hidden="true"
+            class="flex size-[18px] shrink-0 items-center justify-center rounded-full border-2 border-ink-700 peer-checked:border-gold peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-gold peer-focus-visible:outline-offset-1 after:block after:size-[9px] after:rounded-full after:bg-gold after:opacity-0 peer-checked:after:opacity-100"
+          />
+          {option.label}
+        </label>
+      ))
+    }
+  </div>
+</fieldset>

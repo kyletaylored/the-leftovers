@@ -23,6 +23,8 @@ interface Props {
 }
 
 const { event, as: Heading = 'h3', layout = 'card', class: className = '' } = Astro.props;
+// Lets the Calendar's day links (#slug) jump straight to this card.
+const anchorId = event.id;
 const { title, league, startDate, endDate, location, registrationUrl, cover, coverAlt, resultSummary, placement } =
   event.data;
 
@@ -31,8 +33,9 @@ const upcoming = isUpcoming(event);
 ---
 
 <article
+  id={anchorId}
   class:list={[
-    'group relative flex flex-col overflow-hidden rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/50',
+    'group relative flex flex-col overflow-hidden rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/50 target:border-gold target:ring-2 target:ring-gold/50',
     className,
   ]}
 >

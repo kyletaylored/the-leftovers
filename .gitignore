@@ -8,3 +8,5 @@ npm-debug.log*
 .vercel
 .wrangler
 _reference/
+*storybook.log
+storybook-static

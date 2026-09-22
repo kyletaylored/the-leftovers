@@ -72,8 +72,10 @@ are `client:visible`.
 
 ## §5 Site map
 
+**Superseded Oct 2026** — see "Page merge" below. Originally built as speced:
 `/` `/about` `/roster` `/stats` `/events` `/shop` `/community` `/contact` —
-**all done**, plus a 404.
+**all done**, plus a 404. `/about`, `/roster` and `/stats` now redirect to
+`/team`, which combines all three.
 
 `/news` is marked *(phase 2, optional)* in the PRD and is **not built**.
 `public/_redirects` 302s `/news` → `/events` so early links don't 404 (inert
@@ -399,3 +401,59 @@ Things now in the repo that §6/§7 don't mention, and why.
 | `faqs` collection | Feeds the About accordion and the `FAQPage` structured data in §10.3 |
 | Facebook **Page** embed | §8.3 ruled out an embedded feed on the assumption the team ran a *Group*, which genuinely cannot be embedded. The team's presence is a **Page** (`facebook.com/leftoverspb`), and Meta's Page Plugin does embed Pages. Wired behind `facebookPagePlugin.enabled`, **off by default**: the plugin loads Meta's SDK and sets cookies, which would make the footer's "no trackers, no cookies" line untrue. Turning it on means changing that copy and allowlisting `facebook.net`/`facebook.com` in `_headers` |
 | shadcn token bridge | Keeps one colour system instead of two (see the §4 deviation) |
+
+---
+
+## Page merge: About + Roster + Stats → Team (Oct 2026)
+
+The three pages covered the same subject (who we are / who's playing / how
+we're doing) split across three clicks. Combined into one `/team` page with
+an in-page jump nav (Story / Crew / Open Slots / Gallery / Stats / FAQ),
+plus a new Gallery section reusing `GallerySlideshow` — team photos are
+"team content" the merged page is better positioned to show than a standalone
+roster list was.
+
+**§5 deviation, tracked explicitly:** the site map is now `/` `/team`
+`/events` `/shop` `/community` `/contact`, five nav items instead of eight.
+
+**Old URLs don't 404.** `/about`, `/roster` and `/stats` are now thin
+meta-refresh redirect pages (`src/pages/{about,roster,stats}.ts`, not
+`.astro` — no reason to load the full layout/font set for a page nobody
+reads) pointing at `/team#story`, `/team#crew` and `/team#stats`
+respectively. This exists because **GitHub Pages ignores
+`public/_redirects` entirely** (Cloudflare-only feature — see
+docs/DEPLOY.md), so a meta-refresh is the redirect mechanism that actually
+works on the current host. `public/_redirects` is updated to the correct
+mapping anyway, so the Cloudflare move needs no follow-up edit. The three
+stub routes are excluded from the sitemap (`astro.config.mjs`'s `sitemap()`
+filter) since they 200 but aren't real pages.
+
+**Every page now opens with a hero, not just a title block.** `PageHeader`
+gained an `images` prop: zero images keeps the original styled motif header
+(topo texture + ruyi cloud — never blocked on photography), one image is a
+static backdrop, and two or more cross-fade on a slow pure-CSS loop (no JS —
+same staggered `animation-delay` technique as `SponsorMarquee`). Fed from a
+new `heroImages` field on the `pages` collection, decorative by default. All
+of `/team`, `/events`, `/contact`, `/community` and `/shop` are wired to it;
+`/events` gained a `pages/events.md` entry it didn't have before, for the
+same CMS-editable-hero consistency. `preorder/[slug]` is a deliberate
+exception — it already has its own jersey-mockup gallery, so a second
+rotating hero would compete with it rather than add anything.
+
+**Events also gained a real calendar** (`Calendar.tsx` +
+`EventsCalendar.astro`): a month grid, not just upcoming/played lists.
+Marked days are plain `#slug` anchors that jump to the matching `EventCard`
+below and work with zero JS; only month-to-month navigation is a client
+island. Opens on the month of the next upcoming event — never a blank
+"January." Added to the design-handoff Storybook (§04) as a reference too,
+republished to the same Artifact URL.
+
+**Form-field style drift, caught and fixed.** Three separate places
+(`NewsletterBlock`, `PreorderForm`, `StatLeaderboardTable`) had each
+independently typed out an approximation of the design-handoff's "visible
+label" form-field spec, and all three had drifted from it (and from each
+other) — wrong background shade (`ink-900` instead of `ink-800`), wrong
+label letter-spacing (`0.18em` instead of `0.12em`), and a suppressed focus
+ring where the spec wants a visible 2px gold outline. Consolidated into
+`.field-label` / `.field-input` in `global.css`, one source of truth all
+three now reference instead of retyping.
