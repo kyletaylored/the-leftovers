@@ -8,25 +8,23 @@ seo:
   title: Contact The Leftovers Paintball Team
   description: >-
     Reach The Leftovers about open roster slots, upcoming PBLeague events,
-    sponsorship, or team merch. Fastest answer is always the Discord.
+    sponsorship, or team merch.
 ---
 
-## Fastest way to reach us
+## Want to play?
 
-The **Discord** is where the team actually coordinates. If you're asking about
-an open slot for an upcoming event, ask there and you'll usually have an answer
-the same evening — the captain's email gets checked far less often than the
-event channel does.
+Send a [join request](/join) with the event you're interested in, your
+division, and what you play. There's no application and nothing else to
+fill in — we follow up by email once we've had a chance to look at the
+roster.
 
 ## Roster enquiries
 
-Tell us:
+Tell us, on the join request:
 
 1. Which event you're interested in
 2. What position you play (or "wherever you need me", which is a real answer)
 3. Whether you have your own marker, mask and pods
-
-That's it. There's no application and nothing to fill in.
 
 ## Sponsorship and field partnerships
 

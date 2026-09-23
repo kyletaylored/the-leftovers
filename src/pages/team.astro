@@ -77,7 +77,7 @@ const howItWorks = [
   {
     icon: 'chat' as const,
     title: 'Say you’re in',
-    body: 'Post in the Discord event channel or email the captain. No application, no tryout date to wait for.',
+    body: 'Send a join request or email the captain. No application, no tryout date to wait for.',
   },
   {
     icon: 'calendar' as const,
@@ -232,14 +232,14 @@ const jumpLinks = [
           <ThreeColumn items={howItWorks} as="h4" />
 
           <div class="mt-8 flex flex-wrap gap-3">
-            <Button href={site.social.discord} external>Ask in the Discord</Button>
+            <Button href="/join">Send a join request</Button>
             <Button href="/contact" variant="outline">Email the captain</Button>
           </div>
         </>
       ) : (
         <p class="text-base text-bone-muted">
-          Every slot for the next event is filled. Jump in the
-          <a href={site.social.discord} rel="noopener" class="text-gold-300 underline underline-offset-4">Discord</a>
+          Every slot for the next event is filled.
+          <a href="/join" class="text-gold-300 underline underline-offset-4">Send a join request</a>
           and you'll hear about the next one first.
         </p>
       )
@@ -418,8 +418,8 @@ const jumpLinks = [
       body="No tryout, no dues, no bench. Cover your entry and paint and you're playing points at the next event."
     >
       <Button slot="actions" href="#open-slots" variant="gold" size="lg">See open slots</Button>
-      <Button slot="actions" href={site.social.discord} external variant="ghost" size="lg" class="!border-bone/40 !text-bone hover:!border-bone">
-        Ask in the Discord
+      <Button slot="actions" href="/join" variant="ghost" size="lg" class="!border-bone/40 !text-bone hover:!border-bone">
+        Send a join request
       </Button>
     </CtaStrip>
   </Section>

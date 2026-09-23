@@ -17,12 +17,11 @@ const { Content } = await render(page);
 
 const routes: Array<{ icon: IconName; label: string; value: string; href: string; note: string; external?: boolean }> = [
   {
-    icon: 'chat',
-    label: 'Discord',
-    value: 'Event channel',
-    href: site.social.discord ?? '/community',
-    note: 'Fastest answer, usually the same evening.',
-    external: true,
+    icon: 'jersey',
+    label: 'Want to play',
+    value: 'Send a join request',
+    href: '/join',
+    note: 'Tell us the event, division and what you play.',
   },
   {
     icon: 'mail',
@@ -36,14 +35,14 @@ const routes: Array<{ icon: IconName; label: string; value: string; href: string
     label: 'Where we play',
     value: 'See the schedule',
     href: '/events',
-    note: 'Events are posted as they\u2019re confirmed. Registration goes through the league.',
+    note: 'Events are posted as they’re confirmed. Registration goes through the league.',
   },
 ];
 
 /**
- * Deliberately no contact <form> here. A form needs a backend or a
- * third-party relay; email and Discord need neither, and this is the one page
- * where that tradeoff is invisible to the visitor (§2, §4).
+ * Deliberately no general contact <form> here — email needs no backend or
+ * relay, and this is the one page where that tradeoff is invisible to the
+ * visitor (§2, §4). Roster/event requests go through /join instead.
  */
 ---
 
@@ -81,7 +80,7 @@ const routes: Array<{ icon: IconName; label: string; value: string; href: string
           <Content />
         </Prose>
         <div class="mt-8 flex flex-wrap gap-3">
-          <Button href="/team#open-slots">See open roster slots</Button>
+          <Button href="/join">Send a join request</Button>
           <Button href="/community" variant="outline">All the community links</Button>
         </div>
       </div>
@@ -91,9 +90,9 @@ const routes: Array<{ icon: IconName; label: string; value: string; href: string
   <Section tone="alt" divider dividerSeed={37}>
     <MascotCallout
       title="Just want to play Saturday?"
-      body="You don't need to email anyone. Post in the Discord event channel, confirm you're coming, and show up."
+      body="Send a join request with the event you want, and we'll follow up once we've had a chance to look at the roster."
     >
-      <Button href={site.social.discord} external size="sm">Open the Discord</Button>
+      <Button href="/join" size="sm">Send a join request</Button>
     </MascotCallout>
   </Section>
 </BaseLayout>

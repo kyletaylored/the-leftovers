@@ -28,8 +28,8 @@ nav:
     href: /contact
 
 primaryCta:
-  label: Join the Team
-  href: /team#open-slots
+  label: Join a squad
+  href: /join
 
 # The handle is `leftoverspb` nearly everywhere.
 #
@@ -40,7 +40,12 @@ primaryCta:
 social:
   instagram: https://www.instagram.com/leftoverspb/
   facebookGroup: https://www.facebook.com/leftoverspb
-  discord: https://discord.gg/
+  # We do not officially run a Discord right now. Leave this blank — every
+  # Discord-specific UI element (nav/footer icon, community page section,
+  # "ask in the Discord" CTAs) already checks for a value here and hides
+  # itself when it's empty, same pattern as `mailingList.formAction` below.
+  # Fill it back in whenever there's a real invite link to point at.
+  discord: ""
   tiktok: https://www.tiktok.com/@leftoverspb
   email: team@theleftoverspb.com
 
@@ -131,3 +136,27 @@ designStorybookUrl: https://claude.ai/artifact/U7z7FKdBokERWqJD5XSHoa
 # section off without a code change.
 pblidb:
   query: leftovers
+
+# /join — request-to-play form. Leave `endpoint` EMPTY and the form still
+# works: it formats the request and hands it to the requester to send
+# themselves (same handoff pattern as `preorderForm` below). To collect
+# requests straight into a Google Sheet instead, create a Google Form with
+# fields matching the ones below (full name, email, phone, event, division,
+# player class, payment method, notes), set `provider: google-form`,
+# `endpoint` to its `formResponse` URL, and `fieldMap` to its `entry.NNN`
+# ids — see docs/PREORDERS.md for how to read those ids off a form.
+join:
+  provider: ""
+  endpoint: ""
+  fieldMap: {}
+  # Payment is arranged directly with the captain once a spot is confirmed —
+  # nothing is charged through the site. Add/remove methods here; they show
+  # up as a dropdown on the join form. Fill in the real handle for each —
+  # placeholders below are examples, not live payment info.
+  paymentMethods:
+    - label: Venmo
+      handle: "@your-venmo-handle"
+    - label: Zelle
+      handle: "phone number or email on the Zelle account"
+    - label: PayPal
+      handle: "paypal.me/your-link"

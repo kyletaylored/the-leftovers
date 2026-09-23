@@ -77,6 +77,22 @@ const settingsSchema = z.object({
       query: z.string().default(''),
     })
     .prefault({}),
+  // /join — request-to-play form (name, contact, division, player class,
+  // event, payment method). Same handoff/post pattern as `preorderForm`:
+  // leave `endpoint` empty and the form still works, formatting the request
+  // for the visitor to send themselves. Point `endpoint` at a Google Form's
+  // `formResponse` URL (provider: google-form) once one exists, with
+  // `fieldMap` mapping our field names to its `entry.NNN` ids.
+  join: z
+    .object({
+      provider: z.string().default(''),
+      endpoint: z.string().default(''),
+      fieldMap: z.record(z.string(), z.string()).default({}),
+      paymentMethods: z
+        .array(z.object({ label: z.string(), handle: z.string().optional() }))
+        .default([]),
+    })
+    .prefault({}),
 });
 
 const raw = parseYaml(rawSettings);

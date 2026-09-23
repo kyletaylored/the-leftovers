@@ -10,7 +10,6 @@ import Button from '@/components/Button.astro';
 import Countdown from '@/components/Countdown.astro';
 import EventsCalendar from '@/components/EventsCalendar.astro';
 import { getEvents } from '@/lib/events';
-import { site } from '@/lib/settings';
 import { isoDate } from '@/lib/format';
 
 const page = await getEntry('pages', 'events');
@@ -84,9 +83,9 @@ const schema = upcoming.map((event) => ({
       ) : (
         <MascotCallout
           title="Nothing scheduled yet"
-          body="Next season's dates haven't dropped. When they do, they land in the Discord first and on this page about a minute later."
+          body="Next season's dates haven't dropped. Send a join request and we'll follow up as soon as one's on the calendar."
         >
-          <Button href={site.social.discord} external size="sm">Join the Discord</Button>
+          <Button href="/join" size="sm">Send a join request</Button>
         </MascotCallout>
       )
     }

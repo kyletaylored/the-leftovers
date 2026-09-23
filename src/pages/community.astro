@@ -80,23 +80,26 @@ const channels: Channel[] = ([
     </ul>
   </Section>
 
-  <Section tone="alt" title="The Discord" kicker="Start here">
-    <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
-      <div>
-        <p class="text-base leading-relaxed text-bone-muted">
-          For a rotating free-agent roster, the Discord isn't a bonus channel — it's the whole
-          operating system. Event slots, carpools, paint orders and "does anyone have a spare
-          hopper" all happen there, and it's the fastest way to get on the list for the next
-          tournament.
-        </p>
-        <p class="mt-4 text-base leading-relaxed text-bone-muted">
-          It's a public server, so there's nothing to apply for. The widget below is Discord's own
-          — free, official, and live.
-        </p>
-      </div>
-      <SocialEmbed network="discord" />
-    </div>
-  </Section>
+  {
+    site.social.discord && (
+      <Section tone="alt" title="The Discord" kicker="Start here">
+        <div class="grid gap-8 lg:grid-cols-2 lg:gap-12">
+          <div>
+            <p class="text-base leading-relaxed text-bone-muted">
+              For a rotating free-agent roster, the Discord isn't a bonus channel — it's the whole
+              operating system. Event slots, carpools, paint orders and "does anyone have a spare
+              hopper" all happen there.
+            </p>
+            <p class="mt-4 text-base leading-relaxed text-bone-muted">
+              It's a public server, so there's nothing to apply for. The widget below is Discord's
+              own — free, official, and live.
+            </p>
+          </div>
+          <SocialEmbed network="discord" />
+        </div>
+      </Section>
+    )
+  }
 
   <Section tone="base" title="From the Field" kicker="Photos">
     <GallerySlideshow galleries={galleries} class="mx-auto max-w-4xl" />

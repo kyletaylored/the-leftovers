@@ -19,7 +19,6 @@ import ThreeColumn from '@/components/ThreeColumn.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
 import Button from '@/components/Button.astro';
-import PlayerCard from '@/components/PlayerCard.astro';
 import Gallery from '@/components/Gallery.astro';
 import Icon, { type IconName } from '@/components/brand/Icon.astro';
 import { site } from '@/lib/settings';
@@ -36,16 +35,6 @@ const [{ next }, players, galleries, teamStats] = await Promise.all([
 ]);
 
 const openSlots = players.filter((player) => player.data.status === 'open-slot').length;
-
-// "Meet the Crew" slider — active roster in display order, capped so the
-// strip stays a teaser rather than duplicating the full /team roster grid.
-// Ends on a real "open slot" roster entry when one exists, same as the full
-// grid on /team — no synthetic card, PlayerCard's open-slot state is data.
-const crew = players
-  .filter((player) => player.data.status === 'active')
-  .sort((a, b) => a.data.order - b.data.order)
-  .slice(0, 8);
-const openSlotPlayer = players.find((player) => player.data.status === 'open-slot');
 
 // "From the Field" teaser — a handful of photos across every gallery, same
 // source as /team#gallery's full slideshow, resolved for the masonry grid.
@@ -128,23 +117,8 @@ const eventSchema = next
 
 <BaseLayout title={site.title} description={site.description} schema={eventSchema}>
   <Hero variant="brand" tagline={site.tagline}>
-    <Button slot="actions" href="/team#open-slots" variant="brush-primary" size="lg" seed={2}>
-      Join the crew
-    </Button>
-    {
-      site.social.discord && (
-        <Button
-          slot="actions"
-          href={site.social.discord}
-          external
-          variant="brush-outline"
-          size="lg"
-          seed={5}
-        >
-          Open the Discord
-        </Button>
-      )
-    }
+    <Button slot="actions" href="/join" size="lg">Join a squad</Button>
+    <Button slot="actions" href="/team#faq" variant="outline" size="lg">View FAQ</Button>
   </Hero>
 
   <!-- MANIFESTO --------------------------------------------------------------->
@@ -178,35 +152,6 @@ const eventSchema = next
     <ThreeColumn items={premise} class="mt-10" />
   </Section>
 
-  <!-- MEET THE CREW ----------------------------------------------------------->
-  {
-    crew.length > 0 && (
-      <Section tone="alt">
-        <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4 lg:mb-12">
-          <div>
-            <p class="eyebrow mb-3">Who's playing</p>
-            <h2 class="text-3xl text-bone sm:text-4xl lg:text-5xl">Meet the Crew</h2>
-          </div>
-          <Button href="/team#roster" variant="tertiary" icon="arrow-right">
-            See full roster
-          </Button>
-        </div>
-        <ul class="flex snap-x snap-proximity gap-4 overflow-x-auto pb-2">
-          {crew.map((player) => (
-            <li class="w-[150px] shrink-0 snap-start">
-              <PlayerCard player={player} href="/team#roster" class="text-sm" />
-            </li>
-          ))}
-          {openSlotPlayer && (
-            <li class="w-[150px] shrink-0 snap-start">
-              <PlayerCard player={openSlotPlayer} href="/team#open-slots" />
-            </li>
-          )}
-        </ul>
-      </Section>
-    )
-  }
-
   <!-- NEXT UP --------------------------------------------------------------->
   <Section tone="alt" eyebrow="Next up" title="On the Calendar">
     {
@@ -233,7 +178,7 @@ const eventSchema = next
           </div>
           <div class="flex shrink-0 flex-wrap gap-3">
             {next.data.registrationUrl && (
-              <Button href={next.data.registrationUrl} external variant="brush-primary" size="sm" seed={9}>
+              <Button href={next.data.registrationUrl} external size="sm">
                 Register
               </Button>
             )}
@@ -245,13 +190,9 @@ const eventSchema = next
       ) : (
         <MascotCallout
           title="Nothing on the board yet"
-          body="The next tournament hasn't been posted. The Discord always knows first."
+          body="The next tournament hasn't been posted. Send a join request and we'll follow up as soon as one's on the calendar."
         >
-          {site.social.discord && (
-            <Button href={site.social.discord} external size="sm">
-              Join the Discord
-            </Button>
-          )}
+          <Button href="/join" size="sm">Request to join</Button>
         </MascotCallout>
       )
     }
