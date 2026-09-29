@@ -148,9 +148,22 @@ pblidb:
 # `endpoint` to its `formResponse` URL, and `fieldMap` to its `entry.NNN`
 # ids — see docs/PREORDERS.md for how to read those ids off a form.
 join:
-  provider: ""
-  endpoint: ""
-  fieldMap: {}
+  provider: google-form
+  endpoint: https://docs.google.com/forms/d/e/1FAIpQLScXBRfpLmXtatUdaNnr0ZoZVjsj37KAlhDHCFx7g8sBRC6XJQ/formResponse
+  # Our field name -> the form's entry id. Read off the live form's own
+  # definition rather than guessed, same process as `preorderForm` above.
+  fieldMap:
+    firstName: entry.191847278
+    lastName: entry.2076025780
+    email: entry.1948955686
+    phone: entry.1208301590
+    playerClass: entry.1242491412
+    country: entry.645828190
+    event: entry.1976036833
+    division: entry.1734295414
+    teamSize: entry.1974396290
+    paymentMethod: entry.453493553
+    notes: entry.1626376368
   # Payment is arranged directly with the captain once a spot is confirmed —
   # nothing is charged through the site. Add/remove methods here; they show
   # up as a dropdown on the join form. Fill in the real handle for each —
