@@ -166,12 +166,11 @@ join:
     notes: entry.1626376368
   # Payment is arranged directly with the captain once a spot is confirmed —
   # nothing is charged through the site. Add/remove methods here; they show
-  # up as a dropdown on the join form. Fill in the real handle for each —
-  # placeholders below are examples, not live payment info.
+  # up as a dropdown on the join form. `handle` is optional: this just needs
+  # to know the requester's preferred method so the captain can send a
+  # payment request through it — the actual handle isn't needed here for
+  # that. Add one later if it's ever useful to show up front.
   paymentMethods:
     - label: Venmo
-      handle: "@your-venmo-handle"
     - label: Zelle
-      handle: "phone number or email on the Zelle account"
     - label: PayPal
-      handle: "paypal.me/your-link"
