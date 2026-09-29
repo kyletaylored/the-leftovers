@@ -10,14 +10,16 @@ priceNote: shipped anywhere in the US
 variants:
   - name: V1
     description: Black home cut with the cloud panel front, name and number on the back.
-    image: /src/assets/img/leftovers-v1.png
-    imageAlt: The Leftovers V1 jersey in black and red
+    image: /src/assets/img/leftovers-v1-v2.png
+    imageAlt: The Leftovers V1 and V2 jerseys
     # Google Form's "Jersey Variation" question option text.
     formValue: Version 1
   - name: V2
     description: Full ruyi-cloud print with lantern detailing.
-    image: /src/assets/img/leftovers-v2.png
-    imageAlt: The Leftovers V2 jersey in black and burgundy
+    # Same image as V1 — shown as one combined gallery slide rather than
+    # two, since they were designed and photographed together.
+    image: /src/assets/img/leftovers-v1-v2.png
+    imageAlt: The Leftovers V1 and V2 jerseys
     formValue: Version 2
   - name: BCA
     description: Pink Breast Cancer Awareness colourway. $25 of this one goes to the National Breast Cancer Foundation.

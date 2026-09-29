@@ -38,24 +38,44 @@ const variantImages = await Promise.all(
 );
 
 /**
- * Every variant becomes a gallery slide, whether or not it has a real photo
+ * Variants that share the same `image` (e.g. V1 and V2 shot together) are
+ * one gallery slide, not two duplicates — grouped by the raw content path
+ * before resolving/optimizing, since that's stable regardless of whether
+ * the image actually exists.
+ */
+const variantGroups = variantImages.reduce<(typeof variantImages)[]>((groups, variant) => {
+  const group = groups.find((g) => g[0].image === variant.image);
+  if (group) group.push(variant);
+  else groups.push([variant]);
+  return groups;
+}, []);
+
+/**
+ * Every group becomes a gallery slide, whether or not it has a real photo
  * yet. A missing photo resolves to the mascot icon rather than a special
  * "no image" case — ProductGallery only has to know how to render a slide,
  * not two kinds of slide. `isPlaceholder` just tones it down and lets the
  * icon sit inset (object-contain) instead of filling the frame.
  */
 const galleryImages: GalleryImage[] = await Promise.all(
-  variantImages.map(async (variant) => {
-    if (variant.asset) {
-      const optimized = await getImage({ src: variant.asset, widths: [480, 720, 960], format: 'webp' });
+  variantGroups.map(async (group) => {
+    const names = group.map((v) => v.name).join(' / ');
+    const description = group
+      .map((v) => v.description)
+      .filter(Boolean)
+      .join(' ');
+    const asset = group[0].asset;
+
+    if (asset) {
+      const optimized = await getImage({ src: asset, widths: [480, 720, 960], format: 'webp' });
       return {
         src: optimized.src,
         srcSet: optimized.srcSet.attribute || undefined,
-        width: Number(optimized.attributes.width ?? variant.asset.width),
-        height: Number(optimized.attributes.height ?? variant.asset.height),
-        alt: variant.imageAlt ?? `${d.title} ${variant.name}`,
-        title: variant.name,
-        description: variant.description,
+        width: Number(optimized.attributes.width ?? asset.width),
+        height: Number(optimized.attributes.height ?? asset.height),
+        alt: group[0].imageAlt ?? `${d.title} ${names}`,
+        title: names,
+        description,
       };
     }
     const placeholder = await getImage({ src: icon, widths: [320, 640], format: 'webp' });
@@ -65,8 +85,8 @@ const galleryImages: GalleryImage[] = await Promise.all(
       width: Number(placeholder.attributes.width ?? icon.width),
       height: Number(placeholder.attributes.height ?? icon.height),
       alt: '',
-      title: variant.name,
-      description: variant.description,
+      title: names,
+      description,
       isPlaceholder: true,
     };
   })
