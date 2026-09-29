@@ -22,3 +22,7 @@
 # The PRD's phase-2 news section isn't built yet; point early links at events.
 /news         /events      302
 /news/*       /events      302
+
+# BCA-only "Pink Jersey Drop" renamed to the general "Leftovers Jersey"
+# pre-order (Sept 2026).
+/preorder/2026-pink-breast-cancer-awareness    /preorder/2026-leftovers-jersey    301
