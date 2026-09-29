@@ -37,6 +37,8 @@ import { cn } from '@/lib/utils';
 export interface Variant {
   name: string;
   description?: string;
+  /** Google Forms only: the multiple-choice option text, if it differs from `name`. */
+  formValue?: string;
 }
 
 export interface PaymentMethod {
@@ -246,8 +248,9 @@ export default function PreorderForm({
         put('paymentMethod', String(data.get('paymentMethod') ?? '').trim());
         put('notes', String(data.get('notes') ?? '').trim());
 
+        const variantMeta = variants.find((v) => v.name === row.variant);
         put('size', row.size);
-        put('variant', row.variant);
+        put('variant', variantMeta?.formValue ?? row.variant);
         put('nameOnBack', row.nameOnBack);
         put('numberOnBack', row.numberOnBack);
         // The form asks this as an explicit Yes/No, so derive it rather than

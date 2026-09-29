@@ -142,8 +142,8 @@ const schema = [
                 )}
               </h2>
               <p class="mt-2 text-sm leading-relaxed text-bone-muted">
-                {money(d.cause.donationPerUnit, d.currency)} from every jersey, with a goal of
-                {' '}{money(goal, d.currency)} across {d.cause.goalUnits} jerseys.
+                {money(d.cause.donationPerUnit, d.currency)} from every BCA jersey, with a goal of
+                {' '}{money(goal, d.currency)} across {d.cause.goalUnits} BCA jerseys.
               </p>
 
               <div class="mt-5">
@@ -159,7 +159,7 @@ const schema = [
                 </div>
                 <p class="mt-2 text-sm text-bone-muted">
                   <strong class="text-bone">{money(raised, d.currency)}</strong> raised ·
-                  {' '}{d.cause.unitsSold} of {d.cause.goalUnits} jerseys
+                  {' '}{d.cause.unitsSold} of {d.cause.goalUnits} BCA jerseys
                 </p>
               </div>
             </div>
@@ -193,7 +193,7 @@ const schema = [
           <PreorderForm
             client:visible
             campaign={d.title}
-            variants={d.variants.map(({ name, description }) => ({ name, description }))}
+            variants={d.variants.map(({ name, description, formValue }) => ({ name, description, formValue }))}
             sizes={d.sizes}
             price={d.price}
             currency={d.currency}

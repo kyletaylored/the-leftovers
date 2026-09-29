@@ -112,12 +112,14 @@ preorderForm:
     fullName: entry.1131801463
     email: entry.290171208
     phone: entry.594193250
+    variant: entry.684063294
     size: entry.464995239
     wantsCustomName: entry.1643166177
     nameOnBack: entry.1188798159
     numberOnBack: entry.2064202525
     delivery: entry.941658169
     address: entry.1692716281
+    paymentMethod: entry.1394264392
 
 footerNote: >-
   Free agents welcome. Show up, pay your entry, play the tournament —

@@ -179,6 +179,13 @@ const preorders = defineCollection({
           description: z.string().optional(),
           image: imagePath.optional(),
           imageAlt: z.string().optional(),
+          /**
+           * Only needed when it differs from `name` — e.g. the backing
+           * Google Form's multiple-choice option text. Google silently
+           * discards a value it doesn't recognise, so this must match the
+           * form's option EXACTLY. See docs/PREORDERS.md.
+           */
+          formValue: z.string().optional(),
         })
       )
       .min(1),

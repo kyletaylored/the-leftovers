@@ -1,6 +1,6 @@
 ---
-title: Pink Jersey Drop
-eyebrow: Breast Cancer Awareness
+title: Leftovers Jersey
+eyebrow: Pre-Order
 status: open
 closesAt: 2026-09-28
 opensAt: 2026-09-17
@@ -9,12 +9,21 @@ currency: USD
 priceNote: shipped anywhere in the US
 variants:
   - name: V1
-    description: Cloud panel front, name and number on the back.
-    image: /src/assets/img/bca-leftover.jpg
-    imageAlt: The Leftovers V1 jersey in pink with cloud panelling
+    description: Black home cut with the cloud panel front, name and number on the back.
+    image: /src/assets/img/leftovers-v1.png
+    imageAlt: The Leftovers V1 jersey in black and red
+    # Google Form's "Jersey Variation" question option text.
+    formValue: Version 1
   - name: V2
     description: Full ruyi-cloud print with lantern detailing.
-    imageAlt: The Leftovers V2 jersey in pink with full cloud print
+    image: /src/assets/img/leftovers-v2.png
+    imageAlt: The Leftovers V2 jersey in black and burgundy
+    formValue: Version 2
+  - name: BCA
+    description: Pink Breast Cancer Awareness colourway. $25 of this one goes to the National Breast Cancer Foundation.
+    image: /src/assets/img/bca-leftover.jpg
+    imageAlt: The Leftovers Breast Cancer Awareness jersey in pink
+    formValue: Breast Cancer Awareness
 # These strings must match the Google Form's options exactly.
 # Note the form offers no youth sizes.
 sizes: [Small, Medium, Large, X-Large, 2XL, 3XL]
@@ -24,6 +33,8 @@ deliveryOptions:
 customisation:
   nameOnBack: true
   numberOnBack: true
+# Scoped to the BCA variant only — unitsSold is BCA jerseys sold, not the
+# whole drop. See docs/PREORDERS.md.
 cause:
   name: National Breast Cancer Foundation
   url: https://www.nbcf.org/
@@ -35,13 +46,13 @@ paymentMethods:
   - label: Zelle
   - label: Cash in person
 seo:
-  title: Pink Jersey Pre-Order — Breast Cancer Awareness
-  description: Pre-order The Leftovers pink V1 or V2 jersey. $25 per jersey goes
-    to the National Breast Cancer Foundation, with a goal of $1,000 this
-    October.
+  title: Leftovers Jersey Pre-Order
+  description: Pre-order The Leftovers jersey — V1, V2, or the pink Breast
+    Cancer Awareness colourway. $25 from every BCA jersey goes to the
+    National Breast Cancer Foundation, with a goal of $1,000 this October.
 ---
 
-We're doing a pink colourway of the V1 and V2 jerseys for Breast Cancer Awareness Month. **$25 from every jersey sold goes to the National Breast Cancer Foundation**, and the goal is 40 jerseys — $1,000 donated this October.
+Pre-order The Leftovers jersey in V1 or V2, or pick the pink Breast Cancer Awareness colourway for October. **$25 from every BCA jersey sold goes to the National Breast Cancer Foundation**, and the goal is 40 BCA jerseys — $1,000 donated this October.
 
 Mockups on this page aren't final; the artwork will shift slightly before print.
 

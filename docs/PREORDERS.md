@@ -133,7 +133,7 @@ costing real orders, that's the signal to move to a tier below — not before.
 ### Connected now — the Breast Cancer Awareness Google Form
 
 `preorderForm` in site settings is wired to the live form
-(`1FAIpQLSf…FRjWOxFLw`). The nine `entry.NNN` ids were read off the form's own
+(`1FAIpQLSf…FRjWOxFLw`). The `entry.NNN` ids were read off the form's own
 published definition, not guessed, and **every question on it is optional**, so
 a blank value can't cause a silent rejection.
 
@@ -146,23 +146,28 @@ responses**, with the contact details and address repeated.
 That's the right shape rather than a workaround: the Sheet ends up as one row
 per garment, which is the list you hand a printer.
 
-#### ⚠️ Two questions the form is missing
+#### Jersey version is wired through a `formValue`, not the display name
 
-| Missing | Impact |
-|---|---|
-| **Jersey version (V1 / V2)** | **This one matters.** The drop sells both, and the form has no question for it — so responses can't tell you which cut to print. The site collects it and currently has nowhere to send it |
-| Payment method | Minor, since payment is arranged personally anyway. Collected on-site and shown on the receipt |
-
-To capture version, add a **multiple choice** question to the form titled
-e.g. "Jersey Version" with options exactly `V1` and `V2`, then take a fresh
-pre-filled link, find its new `entry.NNN`, and add to site settings:
+The form's "Jersey Variation" question (`entry.684063294`) uses option text
+`Version 1` / `Version 2` / `Breast Cancer Awareness` — not the short `V1` /
+`V2` / `BCA` shown on the site. Google discards a multiple-choice answer it
+doesn't recognise, so each variant in a preorder's front matter carries an
+optional `formValue` that overrides what gets sent, e.g.:
 
 ```yaml
-    variant: entry.NNNNNNNNN
+variants:
+  - name: V1
+    formValue: Version 1
 ```
 
-The code already sends `variant` per jersey — it's only unmapped, so adding
-the id is the entire change. Same pattern for `paymentMethod` and `notes`.
+`PreorderForm` sends `formValue ?? name`. If a form's option text ever
+changes, update `formValue` here to match — not `name`, which is what
+buyers see on the site.
+
+Payment method is likewise mapped (`entry.1394264392`) now that the form's
+options (`PayPal` / `Venmo` / `Zelle` / `Apple Pay` / `Cash in person`) include
+everything this drop offers. `notes` is the only field still unmapped — the
+form has no question for it, so it stays receipt-only.
 
 #### ⚠️ Multiple-choice values must match EXACTLY
 
