@@ -24,20 +24,32 @@ confirmations, exactly like the pre-order form (see `docs/PREORDERS.md`).
   exactly how to find those ids — the process is identical.
 
 Our field names, for the `fieldMap`: `firstName`, `lastName`, `playerClass`,
-`email`, `phone`, `event`, `division`, `paymentMethod`, `notes`.
+`country`, `email`, `phone`, `event`, `division`, `teamSize`,
+`paymentMethod`, `notes`.
 
 **Player class vs. division — two separate PBLeagues concepts, not one:**
 
 - **Player class** is *what the requester is* — their own current
-  classification (Beginner, Young Guns, Intermediate, High School, College,
-  Regional, Advanced, Rookie, Intro, Tactical, Elite, Novice, Premiere,
-  Open, Amateur, ProAm, Semi-Pro, or Pro — the `PLAYER_CLASSES` list in
-  `JoinRequestForm.tsx`).
+  classification.
 - **Division** is *what they want to play* — the actual division of the
-  specific event (D6 through D1, then Semi-Pro, then Pro — `DIVISIONS` in
-  the same file). Usually the one their class translates to per PBLeagues'
+  specific event. Usually the one their class translates to per PBLeagues'
   own class-translation table, but a player can play up a division, so
   it's asked separately rather than derived from class.
+
+Both questions draw from the same option list — D6, D5, D4, D3, D2, D1,
+Semi-Pro, Pro (`DIVISIONS` in `JoinRequestForm.tsx`) — rather than player
+class having its own separate skill-tier list. That's a deliberate
+simplification: one option list to keep in sync with the Google Form
+instead of two.
+
+**Team size / format** (`teamSize`) is the format of the event/team being
+asked about, grouped with Division since it's part of "what you want to
+play": Any size, 3-man, 5-man, 7-man, 10-man, X-Ball (`TEAM_SIZES`).
+
+**Country** (`country`) is a broad territory, not a full country list —
+United States gets its own option since that's where most events run, with
+AMER, EMEA and APAC covering everywhere else (`REGIONS`). Grouped with the
+contact fields since it's about the requester, not the event.
 
 ### Setting up the Google Form
 
@@ -55,8 +67,8 @@ One form, kept current rather than one per event:
    string to this question's `entry.NNN`, and Google's `formResponse`
    endpoint doesn't hard-validate free-form POSTs against the option list,
    so matching wording is a legibility choice, not a strict requirement.
-3. **Player class** and **Division** are each their own dropdown, with the
-   options listed above.
+3. **Player class**, **Division**, **Team size / format**, and **Country**
+   are each their own dropdown, with the options listed above.
 4. Every response lands in a linked Google Sheet as a new row — that's the
    list you filter and sort.
 5. Add three columns to that Sheet by hand, filled in as requests are

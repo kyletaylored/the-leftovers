@@ -46,36 +46,23 @@ interface JoinRequestFormProps {
 const MIN_FILL_MS = 3000;
 
 /**
- * Two related but separate PBLeagues concepts — NOT a playing position:
- *  - Player class ("what you are"): the requester's own current
- *    classification, per the league's class-translation table.
- *  - Division ("what you want to play"): the actual division of the event
- *    they're entering — usually the one their class translates to, but a
- *    player can play up a division, so it's asked separately rather than
- *    derived.
+ * Player class ("what you are") and division ("what you want to play") are
+ * two separate PBLeagues concepts, not one — a player can play up a
+ * division, so it's asked separately rather than derived from class. Both
+ * now draw from the same D6-through-Pro list rather than a separate
+ * skill-class list, since that's what the backing Google Form uses.
  */
-const PLAYER_CLASSES = [
-  'Beginner',
-  'Young Guns',
-  'Intermediate',
-  'High School',
-  'College',
-  'Regional',
-  'Advanced',
-  'Rookie',
-  'Intro',
-  'Tactical',
-  'Elite',
-  'Novice',
-  'Premiere',
-  'Open',
-  'Amateur',
-  'ProAm',
-  'Semi-Pro',
-  'Pro',
-];
-
 const DIVISIONS = ['D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'Semi-Pro', 'Pro'];
+
+/** Format of the specific event/team they're asking about. */
+const TEAM_SIZES = ['Any size', '3-man', '5-man', '7-man', '10-man', 'X-Ball'];
+
+/**
+ * Broad territory, not a full country list — see `docs/JOIN.md`. United
+ * States gets its own option since that's where most events run; AMER
+ * covers the rest of the Americas.
+ */
+const REGIONS = ['United States', 'AMER', 'EMEA', 'APAC'];
 
 const field = 'field-input';
 const label = 'field-label';
@@ -104,9 +91,11 @@ export default function JoinRequestForm({
       '',
       `Event: ${eventLabel}`,
       `Division: ${get('division') || 'Not specified'}`,
+      `Team size / format: ${get('teamSize') || 'Not specified'}`,
       '',
       `Name:  ${get('firstName')} ${get('lastName')}`.trim(),
       `Player class: ${get('playerClass') || 'Not specified'}`,
+      `Country: ${get('country') || 'Not specified'}`,
       `Email: ${get('email')}`,
       ...(get('phone') ? [`Phone: ${get('phone')}`] : []),
       '',
@@ -154,10 +143,12 @@ export default function JoinRequestForm({
       put('firstName', String(data.get('firstName') ?? '').trim());
       put('lastName', String(data.get('lastName') ?? '').trim());
       put('playerClass', String(data.get('playerClass') ?? '').trim());
+      put('country', String(data.get('country') ?? '').trim());
       put('email', String(data.get('email') ?? '').trim());
       put('phone', String(data.get('phone') ?? '').trim());
       put('event', eventLabel);
       put('division', String(data.get('division') ?? '').trim());
+      put('teamSize', String(data.get('teamSize') ?? '').trim());
       put('paymentMethod', String(data.get('paymentMethod') ?? '').trim());
       put('notes', String(data.get('notes') ?? '').trim());
 
@@ -378,7 +369,7 @@ export default function JoinRequestForm({
             </label>
             <input id="phone" name="phone" className={field} type="tel" autoComplete="tel" />
           </div>
-          <div className="sm:col-span-2">
+          <div>
             <label className={label} htmlFor="playerClass">
               Player class
             </label>
@@ -386,9 +377,24 @@ export default function JoinRequestForm({
               <option value="" disabled>
                 Choose one…
               </option>
-              {PLAYER_CLASSES.map((playerClass) => (
+              {DIVISIONS.map((playerClass) => (
                 <option key={playerClass} value={playerClass}>
                   {playerClass}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={label} htmlFor="country">
+              Country
+            </label>
+            <select id="country" name="country" className={field} required defaultValue="">
+              <option value="" disabled>
+                Choose one…
+              </option>
+              {REGIONS.map((region) => (
+                <option key={region} value={region}>
+                  {region}
                 </option>
               ))}
             </select>
@@ -426,6 +432,21 @@ export default function JoinRequestForm({
               {DIVISIONS.map((division) => (
                 <option key={division} value={division}>
                   {division}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={label} htmlFor="teamSize">
+              Team size / format
+            </label>
+            <select id="teamSize" name="teamSize" className={field} required defaultValue="">
+              <option value="" disabled>
+                Choose one…
+              </option>
+              {TEAM_SIZES.map((size) => (
+                <option key={size} value={size}>
+                  {size}
                 </option>
               ))}
             </select>
