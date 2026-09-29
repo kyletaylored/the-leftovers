@@ -10,3 +10,13 @@ npm-debug.log*
 _reference/
 *storybook.log
 storybook-static
+
+# LLM agent tooling — local/editor-specific, not project config
+.claude/
+.codegraph/
+.codex/
+.cursor/
+.gemini/
+.mcp.json
+AGENTS.md
+GEMINI.md
