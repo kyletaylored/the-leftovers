@@ -2,7 +2,7 @@
 title: Leftovers Jersey
 eyebrow: Pre-Order
 status: open
-closesAt: 2026-09-28
+closesAt: 2026-10-02
 opensAt: 2026-09-17
 price: 125
 currency: USD

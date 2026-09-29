@@ -44,7 +44,38 @@ interface JoinRequestFormProps {
 }
 
 const MIN_FILL_MS = 3000;
-const PLAYER_CLASSES = ['Sniper', 'Support', 'Rush', 'Back', 'Insert', 'No preference'];
+
+/**
+ * Two related but separate PBLeagues concepts — NOT a playing position:
+ *  - Player class ("what you are"): the requester's own current
+ *    classification, per the league's class-translation table.
+ *  - Division ("what you want to play"): the actual division of the event
+ *    they're entering — usually the one their class translates to, but a
+ *    player can play up a division, so it's asked separately rather than
+ *    derived.
+ */
+const PLAYER_CLASSES = [
+  'Beginner',
+  'Young Guns',
+  'Intermediate',
+  'High School',
+  'College',
+  'Regional',
+  'Advanced',
+  'Rookie',
+  'Intro',
+  'Tactical',
+  'Elite',
+  'Novice',
+  'Premiere',
+  'Open',
+  'Amateur',
+  'ProAm',
+  'Semi-Pro',
+  'Pro',
+];
+
+const DIVISIONS = ['D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'Semi-Pro', 'Pro'];
 
 const field = 'field-input';
 const label = 'field-label';
@@ -73,9 +104,9 @@ export default function JoinRequestForm({
       '',
       `Event: ${eventLabel}`,
       `Division: ${get('division') || 'Not specified'}`,
-      `Player class: ${get('playerClass') || 'Not specified'}`,
       '',
-      `Name:  ${get('fullName')}`,
+      `Name:  ${get('firstName')} ${get('lastName')}`.trim(),
+      `Player class: ${get('playerClass') || 'Not specified'}`,
       `Email: ${get('email')}`,
       ...(get('phone') ? [`Phone: ${get('phone')}`] : []),
       '',
@@ -120,12 +151,13 @@ export default function JoinRequestForm({
         events.find((e) => e.id === String(data.get('event') ?? ''))?.label ||
         String(data.get('event') ?? '');
 
-      put('fullName', String(data.get('fullName') ?? '').trim());
+      put('firstName', String(data.get('firstName') ?? '').trim());
+      put('lastName', String(data.get('lastName') ?? '').trim());
+      put('playerClass', String(data.get('playerClass') ?? '').trim());
       put('email', String(data.get('email') ?? '').trim());
       put('phone', String(data.get('phone') ?? '').trim());
       put('event', eventLabel);
       put('division', String(data.get('division') ?? '').trim());
-      put('playerClass', String(data.get('playerClass') ?? '').trim());
       put('paymentMethod', String(data.get('paymentMethod') ?? '').trim());
       put('notes', String(data.get('notes') ?? '').trim());
 
@@ -308,11 +340,31 @@ export default function JoinRequestForm({
       <fieldset>
         <legend className="font-display text-xl uppercase text-bone">Who you are</legend>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <label className={label} htmlFor="fullName">
-              Full name
+          <div>
+            <label className={label} htmlFor="firstName">
+              First name
             </label>
-            <input id="fullName" name="fullName" className={field} type="text" required autoComplete="name" />
+            <input
+              id="firstName"
+              name="firstName"
+              className={field}
+              type="text"
+              required
+              autoComplete="given-name"
+            />
+          </div>
+          <div>
+            <label className={label} htmlFor="lastName">
+              Last name
+            </label>
+            <input
+              id="lastName"
+              name="lastName"
+              className={field}
+              type="text"
+              required
+              autoComplete="family-name"
+            />
           </div>
           <div>
             <label className={label} htmlFor="email">
@@ -325,6 +377,21 @@ export default function JoinRequestForm({
               Phone <span className="text-bone-muted">(optional)</span>
             </label>
             <input id="phone" name="phone" className={field} type="tel" autoComplete="tel" />
+          </div>
+          <div className="sm:col-span-2">
+            <label className={label} htmlFor="playerClass">
+              Player class
+            </label>
+            <select id="playerClass" name="playerClass" className={field} required defaultValue="">
+              <option value="" disabled>
+                Choose one…
+              </option>
+              {PLAYER_CLASSES.map((playerClass) => (
+                <option key={playerClass} value={playerClass}>
+                  {playerClass}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </fieldset>
@@ -349,32 +416,19 @@ export default function JoinRequestForm({
             </select>
           </div>
           <div>
-            <label className={label} htmlFor="playerClass">
-              Player class
-            </label>
-            <select id="playerClass" name="playerClass" className={field} required defaultValue="">
-              <option value="" disabled>
-                Choose one…
-              </option>
-              {PLAYER_CLASSES.map((role) => (
-                <option key={role} value={role}>
-                  {role}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="sm:col-span-2">
             <label className={label} htmlFor="division">
               Division
             </label>
-            <input
-              id="division"
-              name="division"
-              className={field}
-              type="text"
-              required
-              placeholder="e.g. Novice 5-man, D4 Open, Mechanical…"
-            />
+            <select id="division" name="division" className={field} required defaultValue="">
+              <option value="" disabled>
+                Choose one…
+              </option>
+              {DIVISIONS.map((division) => (
+                <option key={division} value={division}>
+                  {division}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </fieldset>

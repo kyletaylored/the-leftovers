@@ -23,21 +23,43 @@ confirmations, exactly like the pre-order form (see `docs/PREORDERS.md`).
   See `docs/PREORDERS.md`'s "reading the entry ids off a prefill link" for
   exactly how to find those ids — the process is identical.
 
-Our field names, for the `fieldMap`: `fullName`, `email`, `phone`, `event`,
-`division`, `playerClass`, `paymentMethod`, `notes`.
+Our field names, for the `fieldMap`: `firstName`, `lastName`, `playerClass`,
+`email`, `phone`, `event`, `division`, `paymentMethod`, `notes`.
+
+**Player class vs. division — two separate PBLeagues concepts, not one:**
+
+- **Player class** is *what the requester is* — their own current
+  classification (Beginner, Young Guns, Intermediate, High School, College,
+  Regional, Advanced, Rookie, Intro, Tactical, Elite, Novice, Premiere,
+  Open, Amateur, ProAm, Semi-Pro, or Pro — the `PLAYER_CLASSES` list in
+  `JoinRequestForm.tsx`).
+- **Division** is *what they want to play* — the actual division of the
+  specific event (D6 through D1, then Semi-Pro, then Pro — `DIVISIONS` in
+  the same file). Usually the one their class translates to per PBLeagues'
+  own class-translation table, but a player can play up a division, so
+  it's asked separately rather than derived from class.
 
 ### Setting up the Google Form
 
 One form, kept current rather than one per event:
 
-1. Create a Google Form with a question per field above. For **Event**, use
-   a short-answer question, not a dropdown — the form on the site sends the
-   event's title and dates as plain text (e.g. "Series Finals — Nov 14–15,
-   2026"), so a Forms dropdown with hardcoded options would just drift out
-   of sync with the actual `events` content collection.
-2. Every response lands in a linked Google Sheet as a new row — that's the
+1. Create a Google Form with a question per field above.
+2. **Event** is a dropdown (multiple choice) you maintain by hand in the
+   Google Form directly — add the option when a new event goes up, remove
+   it once it's passed. Deliberately manual: it keeps the Sheet's Event
+   column to a fixed set of exact strings instead of whatever a requester
+   might type, at the cost of someone remembering to keep the list current.
+   Word each option the same way the site's own event dropdown shows it
+   (title + dates, e.g. "Series Finals — Nov 14–15, 2026") so responses
+   read the same whichever side sent them — the site posts that same
+   string to this question's `entry.NNN`, and Google's `formResponse`
+   endpoint doesn't hard-validate free-form POSTs against the option list,
+   so matching wording is a legibility choice, not a strict requirement.
+3. **Player class** and **Division** are each their own dropdown, with the
+   options listed above.
+4. Every response lands in a linked Google Sheet as a new row — that's the
    list you filter and sort.
-3. Add three columns to that Sheet by hand, filled in as requests are
+5. Add three columns to that Sheet by hand, filled in as requests are
    worked: **Paid** (yes/no), **Confirmed By** (name of whoever approved
    it), **Confirmed Date**. Nothing on the site writes to these — they're
    the actual confirmation record, and it's deliberately a manual step: see
