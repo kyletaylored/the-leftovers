@@ -17,5 +17,6 @@ storybook-static
 .codex/
 .cursor/
 .gemini/
+.worktrees/
 .mcp.json
 GEMINI.md

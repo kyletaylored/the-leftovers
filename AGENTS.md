@@ -162,7 +162,17 @@ Docs that drift are worse than no docs. In the same change:
 
 ## Git
 
-Commit straight to `main` (this repo's convention), and only when the owner
-asks. A push deploys to production. Commits are SSH-signed, so if signing
-fails the agent is locked: ask the owner to unlock it, and don't disable
-signing.
+- **Isolate concurrent agent work in separate git worktrees / workspaces.**
+  Never edit the primary working tree at the same time as another agent or task:
+  - Before starting changes, check `git status` and `git worktree list`. If the
+    working tree already has uncommitted work from another task, or when running
+    parallel tasks, work in an isolated worktree (`git worktree add .worktrees/<task-slug> -b <task-slug>`
+    or subagent `Workspace: 'share'` / `'branch'`) so agents don't overwrite
+    each other's index or files.
+  - When ready to land on `main`, rebase/merge cleanly and remove temporary
+    worktrees (`git worktree remove .worktrees/<task-slug>`).
+- **Commit straight to `main` (this repo's convention), and only when the owner
+  asks.** Always `git pull --rebase` before pushing (Pages CMS commits arrive on
+  `main`). A push deploys to production.
+- **Commits are SSH-signed.** If signing fails, the SSH agent is locked: ask
+  the owner to unlock it, and never disable signing.
