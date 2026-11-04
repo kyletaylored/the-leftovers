@@ -45,7 +45,7 @@ social:
   # Fill it back in whenever there's a real invite link to point at.
   discord: ""
   tiktok: https://www.tiktok.com/@leftoverspb
-  email: team@theleftoverspb.com
+  email: info@theleftoverspb.com
 
 # Meta's Page Plugin can embed a public Page's feed, unlike a Group. It is
 # OFF by default on purpose: the plugin loads Meta's SDK, which sets third-party

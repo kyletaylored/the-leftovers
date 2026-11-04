@@ -30,9 +30,11 @@ organizer.
   Every player is solely responsible for their own safety, equipment (marker,
   mask, air system, pods), travel, league memberships, event waivers, and
   insurance at any practice or tournament.
-- **Shared costs:** We do not charge team dues or take a cut. Confirmed players
-  cover their own share of event entry, paint, and league fees as arranged
-  directly with the squad organizer.
+- **Shared costs and payment deadlines:** We do not charge recurring team dues.
+  Confirmed players cover their own share of event entry, paint, and league fees
+  as arranged directly with the squad organizer. Full payment for your share
+  must be received by the stated event deadline for each event in order to be
+  assigned to the active roster.
 
 ## Jersey pre-orders and merchandise
 
@@ -68,4 +70,4 @@ any paintball event.
 ## Contact
 
 Questions about these terms? Email us at
-[team@theleftoverspb.com](mailto:team@theleftoverspb.com).
+[info@theleftoverspb.com](mailto:info@theleftoverspb.com).

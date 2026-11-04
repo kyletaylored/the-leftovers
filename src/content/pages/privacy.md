@@ -22,7 +22,7 @@ corporation or commercial storefront; we run this website so players can find
 upcoming events, request to join a squad, and coordinate batch team jerseys.
 
 For any privacy questions or data requests, email us directly at
-[team@theleftoverspb.com](mailto:team@theleftoverspb.com).
+[info@theleftoverspb.com](mailto:info@theleftoverspb.com).
 
 ## Analytics and cookies (EU & US compliance)
 
@@ -77,5 +77,5 @@ honour rights under the EU/UK GDPR and applicable US state privacy laws:
   **Cookie settings** in the footer.
 - **Access, correction, or deletion:** If you submitted a join request or
   pre-order form and want to see, update, or delete your entry from our Google
-  Sheet, email [team@theleftoverspb.com](mailto:team@theleftoverspb.com) and we
+  Sheet, email [info@theleftoverspb.com](mailto:info@theleftoverspb.com) and we
   will remove it promptly.
