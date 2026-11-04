@@ -74,7 +74,6 @@ const settingsSchema = z.object({
     .array(z.object({ name: z.string(), logo: z.string(), logoAlt: z.string() }))
     .default([]),
   footerNote: z.string(),
-  designStorybookUrl: z.string().default(''),
   pblidb: z
     .object({
       /** Fuzzy query sent to pblidb.org's team search (`GET /v1/teams?q=`).

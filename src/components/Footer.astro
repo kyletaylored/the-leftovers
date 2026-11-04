@@ -1,8 +1,13 @@
 ---
 /**
  * Footer — site-wide close: brand note, footer nav, socials and email,
- * legal links, the cookie-settings re-opener, and the Vecteezy attribution
- * the cloud licence requires.
+ * legal links (Privacy, Terms, Credits) and the cookie-settings re-opener.
+ *
+ * The Vecteezy cloud attribution the licence requires lives on /credits, and
+ * the Credits link in the legal row is what keeps it reachable from every
+ * page: don't remove that link without putting the credit back here. The
+ * design-storybook link was removed at the team's request; /design still
+ * works by URL.
  *
  * Nov 2026: on the raked-sand texture (bg-sand, text-safe) to match the
  * ornate hero, and closed by one RiceTerraces band. Pages used to end on a
@@ -14,7 +19,6 @@ import Wordmark from './brand/Wordmark.astro';
 import MascotMark from './brand/MascotMark.astro';
 import Icon, { type IconName } from './brand/Icon.astro';
 import RiceTerraces from './brand/RiceTerraces.astro';
-import { CLOUD_ATTRIBUTION } from '@/lib/clouds';
 
 const socials: Array<{ name: IconName; href?: string; label: string }> = [
   { name: 'instagram', href: site.social.instagram, label: 'Instagram' },
@@ -102,6 +106,13 @@ const year = new Date().getFullYear();
           >
             Terms &amp; Conditions
           </a>
+          {/* Required: carries the Vecteezy licence credit (see /credits). */}
+          <a
+            href="/credits"
+            class="underline decoration-ink-600 underline-offset-2 transition-colors hover:text-gold-300"
+          >
+            Credits
+          </a>
           {
             site.gtmId && (
               <button
@@ -115,34 +126,6 @@ const year = new Date().getFullYear();
           }
         </nav>
       </div>
-      {
-        site.designStorybookUrl && (
-          <p>
-            <a
-              href={site.designStorybookUrl}
-              {...(/^https?:\/\//.test(site.designStorybookUrl)
-                ? { rel: 'noopener', target: '_blank' }
-                : {})}
-              class="underline decoration-ink-600 underline-offset-2 hover:text-gold-300"
-            >
-              Design storybook
-            </a>{' '}
-            — internal visual reference for the team.
-          </p>
-        )
-      }
-      {/* Attribution is a condition of the Vecteezy licence, not a courtesy.
-          See ATTRIBUTIONS.md before removing it. */}
-      <p>
-        Cloud motifs:{' '}
-        <a
-          href={CLOUD_ATTRIBUTION.href}
-          rel="noopener nofollow"
-          class="underline decoration-ink-600 underline-offset-2 hover:text-gold-300"
-        >
-          {CLOUD_ATTRIBUTION.label}
-        </a>
-      </p>
     </div>
   </div>
 

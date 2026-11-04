@@ -1,8 +1,11 @@
 # Attributions
 
 Third-party assets used on this site, and the terms they're used under.
-**Do not remove the corresponding credit from the site footer** — for the
-Vecteezy art, attribution is a licence condition, not a courtesy.
+**Do not remove the corresponding credit from the site** — for the Vecteezy
+art, attribution is a licence condition, not a courtesy. Since Nov 2026 the
+credits live on `/credits` (`src/pages/credits.astro`), linked from the
+"Credits" item in every page's footer legal row; that link is what keeps the
+attribution reachable, so it must stay.
 
 ## Ruyi cloud motifs
 
@@ -14,7 +17,8 @@ Vecteezy art, attribution is a licence condition, not a courtesy.
   `width`/`height="100%"` attributes are stripped so CSS controls sizing. See
   `src/lib/clouds.ts`.
 - **Terms:** Vecteezy Free License, which **requires attribution**. The credit
-  is rendered in the site footer on every page and links to the source.
+  is on `/credits`, linked from the footer on every page, and links to the
+  source.
 
 ## Fonts
 

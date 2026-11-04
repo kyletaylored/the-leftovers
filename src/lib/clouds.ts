@@ -3,8 +3,9 @@
  *
  * Source art: "Ancient Pattern Vectors by Vecteezy"
  * https://www.vecteezy.com/free-vector/ancient-pattern
- * Vecteezy's free licence requires attribution, which is rendered in the site
- * footer and recorded in ATTRIBUTIONS.md. Do not remove either.
+ * Vecteezy's free licence requires attribution, which is rendered on /credits
+ * (linked from every page's footer) and recorded in ATTRIBUTIONS.md. Do not
+ * remove either.
  *
  * The files ship with a hardcoded red fill (rgb(209,32,38)) and
  * width/height="100%". Both are stripped here so the motif inherits
