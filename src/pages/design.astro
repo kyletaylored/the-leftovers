@@ -40,6 +40,7 @@ import Badge from '@/components/brand/Badge.astro';
 import Button from '@/components/Button.astro';
 import Pill from '@/components/ui/Pill.astro';
 import Toast from '@/components/Toast.astro';
+import CookieConsent from '@/components/CookieConsent.tsx';
 import PlayerCard from '@/components/PlayerCard.astro';
 import EventCard from '@/components/EventCard.astro';
 import EventsCalendar from '@/components/EventsCalendar.astro';
@@ -133,6 +134,7 @@ const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Ast
   { name: 'Button', file: 'Button.astro', kind: 'Astro', section: 'components', use: 'Every button and CTA link. Never hand-roll one.' },
   { name: 'Pill', file: 'ui/Pill.astro', kind: 'Astro', section: 'components', use: 'Status badges: Open Slot, Pre-Order, Sold Out, Active, Next Up.' },
   { name: 'Toast', file: 'Toast.astro', kind: 'Astro', section: 'components', use: 'On-page confirmation after a form or join action.' },
+  { name: 'CookieConsent', file: 'CookieConsent.tsx', kind: 'React island', section: 'components', story: true, use: 'EU/GDPR cookie & Google Tag Manager consent banner + preference toggle.' },
   { name: 'PlayerCard', file: 'PlayerCard.astro', kind: 'Astro', section: 'components', use: 'Roster card (active + open-slot states).' },
   { name: 'EventCard', file: 'EventCard.astro', kind: 'Astro', section: 'components', use: 'Event with date chip, venue, CTA. card | feature.' },
   { name: 'StatNumber', file: 'StatNumber.astro', kind: 'Astro', section: 'components', use: 'Big ribbed-gold figure + label.' },
@@ -464,6 +466,32 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
             <StatNumber value="3" label="Podiums" size="lg" />
           </div>
         </Specimen>
+        <Specimen
+          title="CookieConsent (EU / GDPR + Google Tag Manager)"
+          tag="NEW"
+          class="lg:col-span-2"
+          file="src/components/CookieConsent.tsx"
+          note={'Gates Google Tag Manager (site.gtmId) behind opt-in consent via Google Consent Mode v2. Equal-weight "Essential only" and "Accept analytics" buttons satisfy EU ePrivacy/GDPR rules. Re-opens from any [data-cookie-consent-open] button (such as "Cookie settings" in the footer).'}
+        >
+          <div class="flex flex-col gap-4">
+            <CookieConsent
+              client:visible
+              position="inline"
+              initialChoice="undecided"
+              storageKey="design_specimen_cookie_undecided"
+              showManageWhenDecided
+              disableScriptLoad
+            />
+            <CookieConsent
+              client:visible
+              position="inline"
+              initialChoice="accepted"
+              storageKey="design_specimen_cookie_accepted"
+              showManageWhenDecided
+              disableScriptLoad
+            />
+          </div>
+        </Specimen>
       </div>
     </DocSection>
 
@@ -603,7 +631,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
       <Specimen title="Field states" file={['src/components/form/FormField.astro', 'src/styles/global.css (.field-*)']}>
         <div class="grid gap-x-10 gap-y-8 md:grid-cols-2 xl:grid-cols-4">
           <FormField label="Text input" name="demo-text" placeholder="Kyle Taylor" hint="Default state" />
-          <FormField label="Email" name="demo-email" type="email" value="team@theleftoverspb.com" hint="Gold border + ring on focus" />
+          <FormField label="Email" name="demo-email" type="email" value="info@theleftoverspb.com" hint="Gold border + ring on focus" />
           <FormField label="Text input: error" name="demo-error" value="not-an-email" error="Enter a valid email address" />
           <FormField label="Text input: disabled" name="demo-disabled" value="Locked until roster confirms" disabled />
           <FormField label="Select: position" name="demo-position" as="select">

@@ -39,8 +39,11 @@ Don't break these without the owner explicitly deciding to:
 - **No backend, database, accounts or self-hosted checkout.** Dynamic needs go
   to a free third party: forms go to Google Forms, the mailing list goes to its
   provider, and the store is an external link.
-- **No trackers or cookie-setting scripts.** The footer promises it. The
-  Facebook Page plugin stays off for this reason.
+- **Analytics is opt-in (EU / GDPR compliant).** Google Tag Manager (`site.gtmId`)
+  runs behind `CookieConsent` using Google Consent Mode v2 (`analytics_storage`
+  defaults to `'denied'` and `gtm.js` only loads after the visitor clicks
+  **Accept analytics**). Any new cookie-setting script must likewise be gated
+  by consent and disclosed in `/privacy`.
 - **Strict CSP** (`public/_headers`): `img-src 'self' data:` and
   `font-src 'self'`. Images and fonts must be local, and any third-party
   embed needs its origin allowlisted there.
@@ -169,10 +172,16 @@ Docs that drift are worse than no docs. In the same change:
     parallel tasks, work in an isolated worktree (`git worktree add .worktrees/<task-slug> -b <task-slug>`
     or subagent `Workspace: 'share'` / `'branch'`) so agents don't overwrite
     each other's index or files.
-  - When ready to land on `main`, rebase/merge cleanly and remove temporary
-    worktrees (`git worktree remove .worktrees/<task-slug>`).
-- **Commit straight to `main` (this repo's convention), and only when the owner
-  asks.** Always `git pull --rebase` before pushing (Pages CMS commits arrive on
-  `main`). A push deploys to production.
+  - Open a Pull Request (`gh pr create`) from your worktree branch so changes
+    can be reviewed independently before landing on `main`, and remove temporary
+    worktrees once merged (`git worktree remove .worktrees/<task-slug>`).
+- **Include screenshots on PRs for visual changes.** Whenever a change affects
+  UI, layout, typography, motifs, or components (including `/design` specimens),
+  capture screenshots (desktop and mobile where relevant) and attach or embed
+  them in the PR description or a PR comment so the owner can review the visual
+  result directly in GitHub.
+- **Pull before pushing.** Pages CMS commits arrive on `main`, so always
+  `git pull --rebase origin main` before pushing or merging. A push/merge to
+  `main` deploys to production.
 - **Commits are SSH-signed.** If signing fails, the SSH agent is locked: ask
   the owner to unlock it, and never disable signing.

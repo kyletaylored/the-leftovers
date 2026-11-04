@@ -13,6 +13,7 @@ import { site } from '@/lib/settings';
 import Nav from '@/components/Nav.astro';
 import Footer from '@/components/Footer.astro';
 import Seo from '@/components/Seo.astro';
+import CookieConsent from '@/components/CookieConsent.tsx';
 
 interface Props {
   title: string;
@@ -72,6 +73,36 @@ const organizationSchema = {
     <Font cssVariable="--font-brush" />
 
     <Seo {...seo} schema={[organizationSchema, ...(seo.schema ?? [])]} />
+
+    {
+      site.gtmId && (
+        <script is:inline define:vars={{ gtmId: site.gtmId }}>
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            window.dataLayer.push(arguments);
+          }
+          var storedConsent = null;
+          try {
+            storedConsent = window.localStorage.getItem('leftovers_cookie_consent');
+          } catch (e) {}
+          gtag('consent', 'default', {
+            analytics_storage: storedConsent === 'accepted' ? 'granted' : 'denied',
+            ad_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+          });
+          gtag('js', new Date());
+          if (storedConsent === 'accepted') {
+            window.dataLayer.push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://www.googletagmanager.com/gtm.js?id=' + encodeURIComponent(gtmId);
+            s.dataset.gtmId = gtmId;
+            document.head.appendChild(s);
+          }
+        </script>
+      )
+    }
   </head>
 
   <body class:list={['flex min-h-dvh flex-col', bodyClass]}>
@@ -80,5 +111,6 @@ const organizationSchema = {
       <slot />
     </main>
     <Footer />
+    {site.gtmId && <CookieConsent gtmId={site.gtmId} client:visible />}
   </body>
 </html>
