@@ -24,14 +24,25 @@ There are no separate CMS accounts to manage — GitHub access *is* CMS access.
 
 **Settings → Pages → Build and deployment → Source: GitHub Actions.**
 
-That's the whole setup. `.github/workflows/deploy.yml` does the rest:
+That's the whole setup. Two workflows do the rest:
 
-- Every push to `main` — including a content save from Pages CMS, which
-  commits straight to `main` — builds and deploys.
-- Pull requests build but don't publish, so a broken PR is caught without
+- `.github/workflows/deploy.yml`: every push to `main` — including a
+  content save from Pages CMS, which commits straight to `main` — builds and
+  deploys. `workflow_dispatch` lets you re-deploy the current `main` from
+  the Actions tab without pushing an empty commit.
+- `.github/workflows/ci.yml`: pull requests get one check, **CI / Build**,
+  which runs the same install and build and nothing else. No Pages artifact,
+  no deploy job, read-only permissions, so a broken PR is caught without
   touching the live site.
-- `workflow_dispatch` lets you re-deploy the current `main` from the Actions
-  tab without pushing an empty commit.
+- Both run on a pinned `ubuntu-24.04` runner (not `ubuntu-latest`). Move
+  both files together when you bump it.
+
+**If a deploy hangs** on the `actions/deploy-pages` step, that's GitHub
+Pages processing the upload, not the build. Don't cancel it: a cancelled
+deployment is marked `error` on GitHub's side and the next one can then
+sit "in progress" too. `deploy-pages` gives up on its own after 10 minutes
+(the job itself is capped at 15). Then re-run it from the Actions tab, and
+check [githubstatus.com](https://www.githubstatus.com) if it hangs again.
 
 The build step is `npm run build` (`astro check && astro build`), so a type
 error or a content file that doesn't match its schema fails the build. **A
@@ -155,8 +166,8 @@ To switch:
 3. Move the domain's DNS to Cloudflare and add the custom domain in the Pages
    project.
 4. Disable the GitHub Pages source (Settings → Pages → Source: None) so two
-   hosts aren't fighting over the same domain, and either delete
-   `.github/workflows/deploy.yml` or leave it building PRs.
+   hosts aren't fighting over the same domain, and delete
+   `.github/workflows/deploy.yml`. Keep `ci.yml` building PRs.
 
 No application code changes. `_headers` and `_redirects` start working on the
 first deploy, which is the point.
