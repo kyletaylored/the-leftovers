@@ -17,7 +17,11 @@
  * noindex + excluded from the sitemap (astro.config.mjs): it's a tool for
  * the people building the site, not a page for visitors.
  */
-import { getImage } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
+import contourWaves from '@/assets/img/brand/golden-contour-waves.png';
+import seigaihaArt from '@/assets/img/brand/seigaiha.png';
+import { palette } from '@/lib/palette';
+import { textures } from '@/lib/textures';
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import DocSection from '@/components/design/DocSection.astro';
@@ -103,25 +107,6 @@ const slides: Slide[] = await Promise.all(
 );
 
 // ------------------------------------------------------------- catalog --
-const palette = [
-  { name: 'ink', hex: '#0B0A08', swatch: 'bg-ink', role: 'page base' },
-  { name: 'ink-900', hex: '#100E0C', swatch: 'bg-ink-900', role: 'section alt' },
-  { name: 'ink-800', hex: '#16130F', swatch: 'bg-ink-800', role: 'card surface' },
-  { name: 'ink-700', hex: '#221E18', swatch: 'bg-ink-700', role: 'raised / hover' },
-  { name: 'ink-600', hex: '#322C24', swatch: 'bg-ink-600', role: 'hairlines' },
-  { name: 'crimson', hex: '#8B1E2B', swatch: 'bg-crimson', role: 'fill only' },
-  { name: 'crimson-600', hex: '#A32534', swatch: 'bg-crimson-600', role: 'hover fill' },
-  { name: 'crimson-400', hex: '#E06070', swatch: 'bg-crimson-400', role: 'crimson as text' },
-  { name: 'brand-red', hex: '#D12026', swatch: 'bg-brand-red', role: 'wordmark only' },
-  { name: 'gold', hex: '#C9A227', swatch: 'bg-gold', role: 'accent / stroke' },
-  { name: 'gold-300', hex: '#E0C164', swatch: 'bg-gold-300', role: 'gold as text' },
-  { name: 'gold-700', hex: '#8F721A', swatch: 'bg-gold-700', role: 'gradient shade' },
-  { name: 'forest', hex: '#2E4A34', swatch: 'bg-forest', role: 'mountain fill' },
-  { name: 'forest-600', hex: '#3A5C41', swatch: 'bg-forest-600', role: 'fill edge' },
-  { name: 'tan', hex: '#5C4A34', swatch: 'bg-tan', role: 'earth accent' },
-  { name: 'bone', hex: '#F4F1EA', swatch: 'bg-bone', role: 'text on dark' },
-  { name: 'bone-muted', hex: '#B9B2A4', swatch: 'bg-bone-muted', role: 'secondary text' },
-];
 
 const cloudVariants: CloudVariant[] = [1, 2, 3, 4, 5, 6];
 const terracedStyles: { style: TerracedStyle; label: string; note: string }[] = [
@@ -271,7 +256,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* =========================================================== MOTIFS */}
-    <DocSection id="motifs" number="02" title="Motifs" kicker="Ruyi cloud · terraced trim · brand marks">
+    <DocSection id="motifs" number="02" title="Motifs" kicker="Ruyi cloud · terraced trim · textures · brand marks">
       <div class="grid gap-5">
         <Specimen
           title="Ruyi cloud: 6 licensed variants"
@@ -305,6 +290,56 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
                 <p class="mt-1.5 text-[0.6875rem] text-bone-muted">{note}</p>
               </div>
             ))}
+          </div>
+        </Specimen>
+
+        <Specimen
+          title="Background textures"
+          file={['src/lib/textures.ts', 'src/styles/global.css', 'scripts/make-pattern-tiles.mjs']}
+          note={'Each texture is a CSS utility backed by an SVG tile. "text-safe" ones can sit behind body text (or use <Section tone="topo|sand|seigaiha">). "decorative" ones never go under text. To change sand or seigaiha, edit the script and re-run node scripts/make-pattern-tiles.mjs. To add one, add a row to src/lib/textures.ts.'}
+        >
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {textures.map((t) => (
+              <div>
+                <div class:list={[t.className, 'h-40 border border-ink-600']} />
+                <p class="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  <code class="font-mono text-[0.625rem] text-gold-300">.{t.className}</code>
+                  <Pill tone={t.textSafe ? 'forest' : 'muted'} size="sm">{t.textSafe ? 'text-safe' : 'decorative'}</Pill>
+                </p>
+                <p class="mt-1 text-[0.625rem] leading-snug text-bone-muted">{t.use}</p>
+              </div>
+            ))}
+          </div>
+        </Specimen>
+
+        <Specimen
+          title="Source art: one-off images"
+          file={['src/assets/img/brand/golden-contour-waves.png', 'src/assets/img/brand/seigaiha.png']}
+          note={'The original artwork the tiles were derived from. Use via <Image> for a single hero or feature panel, never as a repeating background. seigaiha.png is white on transparent, so it works over any fill (crimson shown) and can be tinted down with opacity.'}
+        >
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div>
+              <Image
+                src={contourWaves}
+                alt=""
+                widths={[480, 960]}
+                sizes="(min-width: 640px) 50vw, 100vw"
+                class="h-52 w-full border border-ink-600 object-cover"
+              />
+              <code class="mt-1.5 block font-mono text-[0.625rem] text-bone-muted">golden-contour-waves.png</code>
+            </div>
+            <div>
+              <div class="h-52 overflow-hidden border border-ink-600 bg-crimson">
+                <Image
+                  src={seigaihaArt}
+                  alt=""
+                  widths={[480, 960]}
+                  sizes="(min-width: 640px) 50vw, 100vw"
+                  class="h-full w-full object-cover opacity-30"
+                />
+              </div>
+              <code class="mt-1.5 block font-mono text-[0.625rem] text-bone-muted">seigaiha.png · on bg-crimson, opacity-30</code>
+            </div>
           </div>
         </Specimen>
 
@@ -426,7 +461,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* =========================================================== BLOCKS */}
-    <DocSection id="blocks" number="04.4" title="Page blocks" kicker="Scaffolding most pages are built from" intro="Section (tone base | alt | topo, optional terraced divider), PageHeader and Hero wrap every page. They're full-bleed, so they're not boxed here. Open any page in src/pages to see them composed. The blocks below sit inside a Section.">
+    <DocSection id="blocks" number="04.4" title="Page blocks" kicker="Scaffolding most pages are built from" intro="Section (tone base | alt | topo | sand | seigaiha, optional terraced divider), PageHeader and Hero wrap every page. They're full-bleed, so they're not boxed here. Open any page in src/pages to see them composed. The blocks below sit inside a Section.">
       <div class="grid gap-5 lg:grid-cols-2">
         <Specimen title="Callout" file="src/components/Callout.astro" note="A pull quote with optional cite.">
           <Callout cite="Every player on the roster">Paintball builds better people.</Callout>

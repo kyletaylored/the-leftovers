@@ -4,6 +4,8 @@ import type { Preview } from '@storybook/react-vite'
 // BaseLayout.astro. Stories render with the actual design tokens, not a
 // Storybook-only approximation.
 import '../src/styles/global.css'
+// Brand fonts. Astro's font API defines these on the site; see fonts.css.
+import './fonts.css'
 
 const preview: Preview = {
   parameters: {

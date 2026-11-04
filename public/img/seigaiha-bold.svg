@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="48" viewBox="0 0 96 48" aria-hidden="true">
+  <rect width="96" height="48" fill="#0B0A08"/>
+  <g fill="none" stroke="#C9A227" stroke-width="3" stroke-opacity="0.85">
+    <circle cx="0" cy="-48" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="0" cy="-48" r="46.5"/>
+    <circle cx="0" cy="-48" r="34.5"/>
+    <circle cx="0" cy="-48" r="22.5"/>
+    <circle cx="0" cy="-48" r="10.5"/>
+    <circle cx="96" cy="-48" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="96" cy="-48" r="46.5"/>
+    <circle cx="96" cy="-48" r="34.5"/>
+    <circle cx="96" cy="-48" r="22.5"/>
+    <circle cx="96" cy="-48" r="10.5"/>
+    <circle cx="-48" cy="-24" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="-48" cy="-24" r="46.5"/>
+    <circle cx="-48" cy="-24" r="34.5"/>
+    <circle cx="-48" cy="-24" r="22.5"/>
+    <circle cx="-48" cy="-24" r="10.5"/>
+    <circle cx="48" cy="-24" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="48" cy="-24" r="46.5"/>
+    <circle cx="48" cy="-24" r="34.5"/>
+    <circle cx="48" cy="-24" r="22.5"/>
+    <circle cx="48" cy="-24" r="10.5"/>
+    <circle cx="144" cy="-24" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="144" cy="-24" r="46.5"/>
+    <circle cx="144" cy="-24" r="34.5"/>
+    <circle cx="144" cy="-24" r="22.5"/>
+    <circle cx="144" cy="-24" r="10.5"/>
+    <circle cx="0" cy="0" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="0" cy="0" r="46.5"/>
+    <circle cx="0" cy="0" r="34.5"/>
+    <circle cx="0" cy="0" r="22.5"/>
+    <circle cx="0" cy="0" r="10.5"/>
+    <circle cx="96" cy="0" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="96" cy="0" r="46.5"/>
+    <circle cx="96" cy="0" r="34.5"/>
+    <circle cx="96" cy="0" r="22.5"/>
+    <circle cx="96" cy="0" r="10.5"/>
+    <circle cx="-48" cy="24" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="-48" cy="24" r="46.5"/>
+    <circle cx="-48" cy="24" r="34.5"/>
+    <circle cx="-48" cy="24" r="22.5"/>
+    <circle cx="-48" cy="24" r="10.5"/>
+    <circle cx="48" cy="24" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="48" cy="24" r="46.5"/>
+    <circle cx="48" cy="24" r="34.5"/>
+    <circle cx="48" cy="24" r="22.5"/>
+    <circle cx="48" cy="24" r="10.5"/>
+    <circle cx="144" cy="24" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="144" cy="24" r="46.5"/>
+    <circle cx="144" cy="24" r="34.5"/>
+    <circle cx="144" cy="24" r="22.5"/>
+    <circle cx="144" cy="24" r="10.5"/>
+    <circle cx="0" cy="48" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="0" cy="48" r="46.5"/>
+    <circle cx="0" cy="48" r="34.5"/>
+    <circle cx="0" cy="48" r="22.5"/>
+    <circle cx="0" cy="48" r="10.5"/>
+    <circle cx="96" cy="48" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="96" cy="48" r="46.5"/>
+    <circle cx="96" cy="48" r="34.5"/>
+    <circle cx="96" cy="48" r="22.5"/>
+    <circle cx="96" cy="48" r="10.5"/>
+    <circle cx="-48" cy="72" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="-48" cy="72" r="46.5"/>
+    <circle cx="-48" cy="72" r="34.5"/>
+    <circle cx="-48" cy="72" r="22.5"/>
+    <circle cx="-48" cy="72" r="10.5"/>
+    <circle cx="48" cy="72" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="48" cy="72" r="46.5"/>
+    <circle cx="48" cy="72" r="34.5"/>
+    <circle cx="48" cy="72" r="22.5"/>
+    <circle cx="48" cy="72" r="10.5"/>
+    <circle cx="144" cy="72" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="144" cy="72" r="46.5"/>
+    <circle cx="144" cy="72" r="34.5"/>
+    <circle cx="144" cy="72" r="22.5"/>
+    <circle cx="144" cy="72" r="10.5"/>
+    <circle cx="0" cy="96" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="0" cy="96" r="46.5"/>
+    <circle cx="0" cy="96" r="34.5"/>
+    <circle cx="0" cy="96" r="22.5"/>
+    <circle cx="0" cy="96" r="10.5"/>
+    <circle cx="96" cy="96" r="48" fill="#0B0A08" stroke="none"/>
+    <circle cx="96" cy="96" r="46.5"/>
+    <circle cx="96" cy="96" r="34.5"/>
+    <circle cx="96" cy="96" r="22.5"/>
+    <circle cx="96" cy="96" r="10.5"/>
+  </g>
+</svg>

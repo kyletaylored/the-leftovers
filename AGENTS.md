@@ -17,10 +17,17 @@ source of truth for what already exists:
 | Where | What it covers | How to view |
 | --- | --- | --- |
 | **`/design`** (`src/pages/design.astro`) | Tokens, motifs, icons, and a live specimen of **every** component (Astro and React), plus the **component index** table | `npm run dev` → <http://localhost:4321/design> |
-| **Storybook** (`src/components/*.stories.tsx`) | **React islands only**: interactive states and `play` tests | `npm run storybook` · tests: `npx vitest run` |
+| **Storybook** (`src/components/*.stories.tsx`, `src/stories/foundations/`) | **Foundations** (colours, typography, icons, textures) and **React islands**: interactive states and `play` tests | `npm run storybook` · tests: `npx vitest run` |
 
 Storybook can't render `.astro` files, so Astro components are documented
-only on `/design`. React islands appear in both places.
+only on `/design`. React islands appear in both places. Foundations appear in
+both too, because both render from the same data files in `src/lib/`
+(`palette.ts`, `icons.ts`, `textures.ts`). Edit the data file, not either page.
+
+New colour token? Add it to `@theme` in `global.css` **and** a row to
+`src/lib/palette.ts`. New background texture? Add the utility in
+`global.css`, its tile in `public/img/` (sand and seigaiha come from
+`scripts/make-pattern-tiles.mjs`), and a row to `src/lib/textures.ts`.
 
 ### Building a new page
 
@@ -34,7 +41,7 @@ only on `/design`. React islands appear in both places.
    extend it with a prop and keep existing call sites' output unchanged.
    Don't fork it or restyle it inline.
 3. **Use tokens, never raw hex.** Colours, fonts and the `.numeral`,
-   `.eyebrow`, `.field-*`, `.bg-topo` and `.tap` utilities live in
+   `.eyebrow`, `.field-*`, `.bg-*` texture (see `src/lib/textures.ts`) and `.tap` utilities live in
    `src/styles/global.css`. Respect the fill/text split: `crimson` and `gold`
    are fills, while `crimson-400` and `gold-300` are their AA-passing text
    colours. (The `/design` page's cream "paper" chrome is the one deliberate

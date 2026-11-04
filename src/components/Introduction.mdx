@@ -4,10 +4,16 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # The Leftovers — component stories
 
-This Storybook covers the **React islands** only: `Calendar`, `Slideshow`,
-`PreorderForm`, `JoinRequestForm`, `StatLeaderboardTable`. They are the
-components with interactive state, and every story carries a `play` test that
-`npx vitest run` executes.
+This Storybook covers two things, and every story carries a `play` test that
+`npx vitest run` executes:
+
+- **Foundations**: colours, typography, icons and background textures, rendered from the
+  same data files `/design` uses (`src/lib/palette.ts`, `src/lib/icons.ts`,
+  `src/lib/textures.ts`). The tests check that the CSS tokens and texture
+  tiles really resolve.
+- **React islands**: `Calendar`, `Slideshow`, `PreorderForm`,
+  `JoinRequestForm`, `StatLeaderboardTable`, the components with interactive
+  state.
 
 Most of the design system is **Astro components**, which Storybook can't
 render. Those are documented live on the site at **`/design`**

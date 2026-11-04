@@ -1,0 +1,28 @@
+/*
+ * Storybook stand-in for Astro's font API.
+ *
+ * On the site, astro.config.mjs `fonts` + <Font> in BaseLayout.astro define
+ * --font-headline / --font-body / --font-brush. Storybook doesn't run Astro,
+ * so without this file those vars are unset and every story falls back to
+ * system fonts. Anton and Inter come from Fontsource (dev dependencies, served
+ * locally so headless `npx vitest run` needs no network). The brush face is
+ * the same licensed WOFF2 the site ships, untouched (no subsetting).
+ *
+ * Keep the families and fallbacks in step with astro.config.mjs.
+ */
+@import '@fontsource/anton/latin-400.css';
+@import '@fontsource-variable/inter/wght.css';
+
+@font-face {
+  font-family: 'CC Monster Mash Worn';
+  src: url('../src/assets/fonts/CCMonsterMash-Worn.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-headline: 'Anton', Impact, Haettenschweiler, sans-serif;
+  --font-body: 'Inter Variable', system-ui, sans-serif;
+  --font-brush: 'CC Monster Mash Worn', Impact, fantasy;
+}

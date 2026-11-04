@@ -16,7 +16,7 @@ interface Props {
   as?: 'h2' | 'h3';
   id?: string;
   /** Alternate background for visual rhythm between sections. */
-  tone?: 'base' | 'alt' | 'topo';
+  tone?: 'base' | 'alt' | 'topo' | 'sand' | 'seigaiha';
   /** Close the section with the terraced-mountain divider. */
   divider?: boolean;
   dividerSeed?: number;
@@ -35,7 +35,7 @@ const {
   class: className = '',
 } = Astro.props;
 
-const tones = { base: 'bg-ink', alt: 'bg-ink-900', topo: 'bg-topo' } as const;
+const tones = { base: 'bg-ink', alt: 'bg-ink-900', topo: 'bg-topo', sand: 'bg-sand', seigaiha: 'bg-seigaiha' } as const;
 ---
 
 <section id={id} class:list={[tones[tone], 'relative', divider && 'pb-0', className]}>

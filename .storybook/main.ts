@@ -23,6 +23,9 @@ const config: StorybookConfig = {
     viteConfig.esbuild = { ...viteConfig.esbuild, jsx: 'automatic' };
     return viteConfig;
   },
+  // Serve public/ like Astro does, so CSS url('/img/…') tiles (the .bg-*
+  // textures) resolve inside stories.
+  staticDirs: ['../public'],
   "stories": [
     "../src/**/*.mdx",
     "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
