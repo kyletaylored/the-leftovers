@@ -17,6 +17,8 @@ const linkSchema = z.object({ label: z.string(), href: z.string() });
 const settingsSchema = z.object({
   title: z.string(),
   tagline: z.string(),
+  /** Homepage search-result title; falls back to "Title — Tagline". */
+  homeTitle: z.string().optional(),
   description: z.string(),
   established: z.number(),
   homeBase: z.string().default(''),

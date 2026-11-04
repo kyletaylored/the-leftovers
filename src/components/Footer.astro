@@ -1,9 +1,19 @@
 ---
+/**
+ * Footer — site-wide close: brand note, footer nav, socials and email,
+ * legal links, the cookie-settings re-opener, and the Vecteezy attribution
+ * the cloud licence requires.
+ *
+ * Nov 2026: on the raked-sand texture (bg-sand, text-safe) to match the
+ * ornate hero, and closed by one RiceTerraces band. Pages used to end on a
+ * `<Section divider>` as well, which stacked two identical terrace bands a
+ * screen apart; the last Section on a page no longer takes `divider`.
+ */
 import { site } from '@/lib/settings';
 import Wordmark from './brand/Wordmark.astro';
 import MascotMark from './brand/MascotMark.astro';
 import Icon, { type IconName } from './brand/Icon.astro';
-import TerracedDivider from './brand/TerracedDivider.astro';
+import RiceTerraces from './brand/RiceTerraces.astro';
 import { CLOUD_ATTRIBUTION } from '@/lib/clouds';
 
 const socials: Array<{ name: IconName; href?: string; label: string }> = [
@@ -17,7 +27,7 @@ const socials: Array<{ name: IconName; href?: string; label: string }> = [
 const year = new Date().getFullYear();
 ---
 
-<footer class="mt-auto bg-ink-900">
+<footer class="relative mt-auto border-t border-ink-600 bg-sand">
   <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-14">
     <div class="grid gap-10 lg:grid-cols-[1.2fr_1fr_1fr]">
       <div>
@@ -136,5 +146,8 @@ const year = new Date().getFullYear();
     </div>
   </div>
 
-  <TerracedDivider seed={7} class="h-14 sm:h-20" />
+  {/* The page's one closing terrace band (pages no longer end on a Section
+      divider, so it never stacks). Mirrors the hero's RiceTerraces: the
+      site opens and closes on the same motif. */}
+  <RiceTerraces seed={4} simple class="h-20 sm:h-28 lg:h-auto lg:aspect-[2400/260]" />
 </footer>

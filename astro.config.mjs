@@ -40,7 +40,9 @@ export default defineConfig({
       // /design is the internal design-system storybook (noindex) — a tool
       // for whoever's building the site, not a page for visitors.
       filter: (page) =>
-        !['/about', '/roster', '/stats', '/design', ...HIDDEN_PAGES].some((p) => page.endsWith(p)),
+        !['/about', '/roster', '/stats', '/design', ...HIDDEN_PAGES].some((p) => page.endsWith(p)) &&
+        // /design/* holds internal tools such as the OG-card source page.
+        !page.includes('/design/'),
     }),
     react(),
   ],

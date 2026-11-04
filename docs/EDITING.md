@@ -118,6 +118,18 @@ links, the contact email, the Discord invite, the mailing-list endpoint and the
 Bonfire store URL. Changing a social URL here changes it in the footer, the
 community page and the contact page at once.
 
+Two fields control how the site shows up in Google:
+
+- **Homepage search title** is the blue headline Google shows for the
+  homepage. Keep it under about 60 characters, brand first.
+- **Default meta description** is the grey text under it, used by any page
+  that doesn't have its own. Keep it under about 155 characters, or Google
+  cuts it off with "…".
+
+The image shown when someone shares a link (on Facebook, iMessage, Discord)
+is a designed card, not a setting. If it needs changing, ask whoever
+maintains the code.
+
 Two fields unlock features that are currently showing link-out cards instead:
 
 - **Discord server ID** — *the team doesn't run a Discord right now, so leave

@@ -4,10 +4,14 @@
 # ---------------------------------------------------------------------------
 title: The Leftovers
 tagline: Play / Compete / Leftovers
+# The search-result title for the homepage. Other pages use "Page | The
+# Leftovers". Keep it under ~60 characters.
+homeTitle: The Leftovers — Community Paintball Team for Free Agents
+# The default meta description, used wherever a page doesn't set its own.
+# Keep it under ~155 characters: that's what Google shows before cutting off.
 description: >-
-  The Leftovers are a community-run paintball team built from rotating free
-  agents. There's no tryout and no bench — if you can make the date and cover
-  your own entry, you can play a tournament with us.
+  A community-run paintball team built from rotating free agents. No tryout,
+  no bench: make the date, cover your entry and play a tournament with us.
 established: 2022
 # Optional. Leave blank until the team decides how it wants to describe its
 # region; it feeds the footer and the SportsTeam structured data.

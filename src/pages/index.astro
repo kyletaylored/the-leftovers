@@ -38,6 +38,18 @@ import huddle from '@/assets/img/events/nxl-lsm25/frinxllsm25ls-1427-x5.webp';
 const galleries = await getCollection('galleries');
 const sliderGalleries = galleries.filter((gallery) => gallery.id === 'game-day');
 
+// The site itself as an entity, published by the team entity BaseLayout
+// emits on every page (linked by @id rather than repeated).
+const websiteSchema = {
+  '@type': 'WebSite',
+  '@id': new URL('/#website', Astro.site).href,
+  url: new URL('/', Astro.site).href,
+  name: site.title,
+  description: site.description,
+  inLanguage: 'en-US',
+  publisher: { '@id': new URL('/#team', Astro.site).href },
+};
+
 const leagues = await Promise.all(
   site.leagues.map(async (league) => ({
     name: league.name,
@@ -47,7 +59,7 @@ const leagues = await Promise.all(
 );
 ---
 
-<BaseLayout title={site.title} description={site.description}>
+<BaseLayout title={site.title} description={site.description} schema={[websiteSchema]}>
   <Hero variant="ornate" tagline={`Paintball team / ${site.tagline}`}>
     <Button slot="actions" href="/join" size="lg">Join a squad</Button>
   </Hero>
@@ -126,7 +138,7 @@ const leagues = await Promise.all(
     </div>
   </Section>
 
-  <Section tone="base" divider dividerSeed={11}>
+  <Section tone="base">
     <NewsletterBlock />
   </Section>
 </BaseLayout>

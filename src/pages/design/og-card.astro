@@ -1,0 +1,88 @@
+---
+/**
+ * /design/og-card — the source of the site's default social share card.
+ *
+ * Not a page for visitors. It renders a fixed 1200×630 canvas from the REAL
+ * brand components (official logo lockup, CloudCorner, RiceTerraces, the
+ * sand texture, Gasoek headline type), and `npm run og`
+ * (scripts/make-og-default.mjs) screenshots it into public/og-default.png.
+ * Rendering the card from the components, instead of redrawing the brand in
+ * a script, is what keeps the share preview from drifting away from the site
+ * again (the previous card had a hand-drawn mascot and the old zigzag ridge).
+ *
+ * After changing this page or the brand art: `npm run build && npm run og`,
+ * then commit the new PNG.
+ *
+ * noindex, out of the sitemap (astro.config.mjs filters /design*), and no
+ * nav, footer or scripts, so the screenshot is exactly the card.
+ */
+import { Font, Image } from 'astro:assets';
+import '@/styles/global.css';
+import logo from '@/assets/img/brand/logo.png';
+import CloudCorner from '@/components/brand/CloudCorner.astro';
+import RiceTerraces from '@/components/brand/RiceTerraces.astro';
+import { site } from '@/lib/settings';
+
+const host = new URL(Astro.site ?? 'https://theleftoverspb.com').host;
+---
+
+<!doctype html>
+<html lang="en" class="bg-ink">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=1200" />
+    <title>OG card · {site.title}</title>
+    <Font cssVariable="--font-headline" preload />
+    <Font cssVariable="--font-body" preload />
+    <style is:global>
+      /* Freeze motion so the screenshot is deterministic. */
+      .lantern-sway {
+        animation: none !important;
+      }
+    </style>
+  </head>
+  <body class="m-0 bg-ink">
+    <main
+      id="card"
+      class="bg-sand relative overflow-hidden"
+      style="width:1200px;height:630px"
+    >
+      <div
+        class="absolute inset-0"
+        style="background:radial-gradient(ellipse 50% 60% at 30% 42%, color-mix(in srgb, var(--color-gold) 18%, transparent), transparent 70%)"
+        aria-hidden="true"
+      >
+      </div>
+
+      <CloudCorner side="left" lanterns={2} class="absolute -left-12 -top-4 w-[22rem]" />
+      <CloudCorner side="right" lanterns={2} class="absolute -right-12 -top-4 w-[22rem]" />
+
+      <div class="relative flex h-full items-center gap-12 px-20 pb-28 pt-16">
+        <Image
+          src={logo}
+          alt=""
+          widths={[340, 680]}
+          sizes="340px"
+          loading="eager"
+          class="h-auto w-[340px] shrink-0 drop-shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
+        />
+        <div class="min-w-0">
+          <p class="eyebrow flex items-center gap-3 text-[0.9rem]">
+            <span class="block h-[3px] w-10 bg-crimson" aria-hidden="true"></span>
+            Community paintball team
+          </p>
+          <p class="mt-4 font-display text-[3.6rem] uppercase leading-[0.92] text-bone">
+            Paintball builds<br />better people.
+          </p>
+          <p class="mt-6 flex flex-wrap items-center gap-x-3 text-[1.05rem] font-bold uppercase tracking-[0.24em] text-bone">
+            <span>No tryout</span><span class="text-gold">/</span><span>No bench</span><span class="text-gold">/</span><span>Free agents</span>
+          </p>
+          <p class="mt-5 text-[1.05rem] font-bold tracking-[0.12em] text-gold-300">{host}</p>
+        </div>
+      </div>
+
+      <RiceTerraces seed={7} class="absolute bottom-0 left-0 aspect-[2400/260]" />
+    </main>
+  </body>
+</html>

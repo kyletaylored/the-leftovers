@@ -227,7 +227,7 @@ npm run build            # astro check + astro build: must be 0 errors
 npx vitest run           # every Storybook play test, headless Chromium
 npm run storybook        # http://localhost:6006
 node scripts/make-pattern-tiles.mjs   # regenerate the sand/seigaiha tiles
-npm run og               # regenerate public/og-default.png
+npm run og               # after npm run build: screenshot /design/og-card into public/og-default.png
 ```
 
 - **Deploy = push to `main`.** GitHub Actions builds and publishes in about two

@@ -508,7 +508,15 @@ content:
     fields:
       - { name: title, label: Site title, type: string, required: true }
       - { name: tagline, label: Tagline, type: string, required: true }
-      - { name: description, label: Default meta description, type: text, required: true }
+      - name: homeTitle
+        label: Homepage search title
+        type: string
+        description: 'The title Google shows for the homepage. Under ~60 characters.'
+      - name: description
+        label: Default meta description
+        type: text
+        required: true
+        description: 'Up to ~155 characters. Used by any page that has no description of its own.'
       - { name: established, label: Established (year), type: number, required: true }
       - { name: homeBase, label: Home base, type: string, required: true }
       - name: nav
