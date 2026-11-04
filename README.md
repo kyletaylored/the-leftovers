@@ -102,7 +102,7 @@ The contour lines on the jersey body are the source of the `.bg-sand` texture.
 | Islands | **React 19 + shadcn/ui**, only where there's real state (see below) |
 | Content | Astro content collections — Markdown/YAML in `src/content` |
 | CMS | [Pages CMS](https://pagescms.org) — config in `.pages.yml` |
-| Fonts | Astro's font API, self-hosted: Anton and Inter (subset), plus the licensed CC Monster Mash Worn wordmark face (not subset, per its licence) |
+| Fonts | Astro's font API, self-hosted: Gasoek One and Inter (subset), plus the licensed CC Monster Mash Worn wordmark face (not subset, per its licence) |
 | Design system | `/design` page (every component) + Storybook 10 (foundations + islands, play tests via Vitest) |
 | Hosting | **GitHub Pages** today (`.github/workflows/deploy.yml`); Cloudflare Pages config is committed and ready |
 

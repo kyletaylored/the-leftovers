@@ -16,6 +16,15 @@ import tailwindcss from '@tailwindcss/vite';
  */
 export const SITE = 'https://theleftoverspb.com';
 
+/**
+ * Pages the team has hidden for now (website feedback, Nov 2026). They still
+ * build, but they are `noindex`, out of the sitemap, out of the nav and
+ * footer, and nothing visible links to them. To bring one back: remove it
+ * here, remove its `noindex` from the page's <BaseLayout>, and add it to
+ * `nav` in src/data/site.yml.
+ */
+const HIDDEN_PAGES = ['/team', '/events', '/shop', '/community'];
+
 export default defineConfig({
   site: SITE,
   trailingSlash: 'never',
@@ -30,7 +39,8 @@ export default defineConfig({
       // generator would otherwise list them as if they were real pages.
       // /design is the internal design-system storybook (noindex) — a tool
       // for whoever's building the site, not a page for visitors.
-      filter: (page) => !['/about', '/roster', '/stats', '/design'].some((p) => page.endsWith(p)),
+      filter: (page) =>
+        !['/about', '/roster', '/stats', '/design', ...HIDDEN_PAGES].some((p) => page.endsWith(p)),
     }),
     react(),
   ],
@@ -41,9 +51,12 @@ export default defineConfig({
   },
   fonts: [
     {
-      // Bold headline sans — section headers, big statement lines.
+      // Headline face for every h1–h4, numerals and card titles. Gasoek One
+      // replaced Anton in Nov 2026 at the team's request (website feedback
+      // doc). Self-hosted at build time by Astro's font API, so the CSP's
+      // `font-src 'self'` still holds. Open Font Licence: no licence limits.
       provider: fontProviders.google(),
-      name: 'Anton',
+      name: 'Gasoek One',
       cssVariable: '--font-headline',
       weights: [400],
       styles: ['normal'],

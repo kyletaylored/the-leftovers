@@ -524,3 +524,34 @@ mockup HTML.
 - **Process.** `AGENTS.md` is now tracked and carries the rules: check
   `/design` first, and ship each component change together with its example,
   index row and story.
+
+## Nov 2026: the team's website feedback
+
+From the team's feedback doc (`_reference/The Leftovers Paintball/LEFTOVERS
+WEBSITE EDITS.pdf`) and its Google Form. Each of these departs from the PRD or
+from earlier decisions here.
+
+- **Headline font: Gasoek One replaces Anton (§9).** The doc asks for Gasoek
+  One on all headers. It was already loaded as a preview option, so it is now
+  `--font-headline` and Anton, its Fontsource dev dependency and the `/design`
+  comparison are gone. It is wide and heavy, so keep headlines short.
+- **Team, Events, Shop and Community are hidden.** The doc asks to hide them
+  "entirely for now". They still build but are `noindex`, out of the sitemap,
+  out of the nav and footer, and unlinked from visible pages (`HIDDEN_PAGES` in
+  `astro.config.mjs`). This overrides PRD §5's page list for now. The
+  community-channels, open-slots and "From the Field" blocks left the homepage
+  for the same reason, and so did the homepage's team-member and season
+  counters (they counted placeholder players).
+- **Homepage hero uses `.bg-sand`.** First public use of the sand texture.
+- **Homepage calendar reads "2027 Season Loading…".** It no longer shows the
+  placeholder event, so the page no longer emits `SportsEvent` structured data.
+- **Join form wording follows the Google Form.** Ranking, division and format
+  options match the form exactly (it now offers 3v3, 5v5, X-Ball, 10v10 and
+  Mechanical, and a Beginner / Unranked ranking). Country is free text and
+  there is a new optional Facebook profile link. The Event dropdown is
+  `join.events` in `site.yml`, not the events collection.
+- **Two real sponsors added.** Infamous Paintball and Kinetic Paintball, from
+  the doc's partnership paragraph. They show on Contact through the new
+  `LogoStrip` component. League logos are `leagues` in `site.yml`.
+- **New component: `LogoStrip`.** A static centred logo row, because the
+  scrolling `SponsorMarquee` doesn't suit two or three logos.

@@ -4,13 +4,13 @@
  * On the site, astro.config.mjs `fonts` + <Font> in BaseLayout.astro define
  * --font-headline / --font-body / --font-brush. Storybook doesn't run Astro,
  * so without this file those vars are unset and every story falls back to
- * system fonts. Anton and Inter come from Fontsource (dev dependencies, served
+ * system fonts. Gasoek One and Inter come from Fontsource (dev dependencies, served
  * locally so headless `npx vitest run` needs no network). The brush face is
  * the same licensed WOFF2 the site ships, untouched (no subsetting).
  *
  * Keep the families and fallbacks in step with astro.config.mjs.
  */
-@import '@fontsource/anton/latin-400.css';
+@import '@fontsource/gasoek-one/latin-400.css';
 @import '@fontsource-variable/inter/wght.css';
 
 @font-face {
@@ -22,7 +22,7 @@
 }
 
 :root {
-  --font-headline: 'Anton', Impact, Haettenschweiler, sans-serif;
+  --font-headline: 'Gasoek One', Impact, Haettenschweiler, sans-serif;
   --font-body: 'Inter Variable', system-ui, sans-serif;
   --font-brush: 'CC Monster Mash Worn', Impact, fantasy;
 }

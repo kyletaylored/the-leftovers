@@ -12,8 +12,6 @@ import Section from '@/components/Section.astro';
 import Prose from '@/components/Prose.astro';
 import JoinRequestForm from '@/components/JoinRequestForm.tsx';
 import { resolveHeroImages } from '@/lib/images';
-import { getEvents } from '@/lib/events';
-import { dateRange } from '@/lib/format';
 import { site } from '@/lib/settings';
 
 const page = await getEntry('pages', 'join');
@@ -21,11 +19,10 @@ if (!page) throw new Error('Missing content file: src/content/pages/join.md');
 const heroImages = await resolveHeroImages(page.data.heroImages);
 const { Content } = await render(page);
 
-const { upcoming } = await getEvents();
-const events = upcoming.map((event) => ({
-  id: event.id,
-  label: `${event.data.title} — ${dateRange(event.data.startDate, event.data.endDate)}`,
-}));
+// The Event dropdown is `join.events` in site.yml, not the events collection:
+// it has to match the Google Form's Event question word for word (docs/JOIN.md),
+// and the Events page is hidden for now.
+const events = site.join.events.map((label) => ({ id: label, label }));
 ---
 
 <BaseLayout title={page.data.seo.title ?? page.data.title} description={page.data.seo.description}>

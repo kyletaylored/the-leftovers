@@ -65,6 +65,10 @@ const settingsSchema = z.object({
       alwaysOpenUrl: z.string().default(''),
     })
     .prefault({}),
+  /** Leagues shown as a logo row on the homepage. `logo` is a CMS image path. */
+  leagues: z
+    .array(z.object({ name: z.string(), logo: z.string(), logoAlt: z.string() }))
+    .default([]),
   footerNote: z.string(),
   designStorybookUrl: z.string().default(''),
   pblidb: z
@@ -88,6 +92,8 @@ const settingsSchema = z.object({
       provider: z.string().default(''),
       endpoint: z.string().default(''),
       fieldMap: z.record(z.string(), z.string()).default({}),
+      /** Event dropdown, worded exactly as the Google Form's Event question. */
+      events: z.array(z.string()).default([]),
       paymentMethods: z
         .array(z.object({ label: z.string(), handle: z.string().optional() }))
         .default([]),

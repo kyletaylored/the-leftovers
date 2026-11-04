@@ -41,6 +41,7 @@ const schema = upcoming.map((event) => ({
 ---
 
 <BaseLayout
+  noindex
   title={page.data.seo.title ?? page.data.title}
   description={page.data.seo.description ?? `Upcoming PBLeague tournaments for The Leftovers plus every event we've played. ${upcoming.length} on the schedule right now.`}
   schema={schema}

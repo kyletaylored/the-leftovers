@@ -1,10 +1,12 @@
 # sponsors
 
-Empty on purpose. The placeholder sponsor logos that were here during build-out
-were removed — listing sponsors who haven't agreed to sponsor anything is a
-false claim, not filler.
+Real partners only. Listing sponsors who haven't agreed to sponsor anything is
+a false claim, not filler, so every entry here was confirmed by the team:
 
-Astro logs *"The collection sponsors does not exist or is empty"* on every build
-while this is empty. Expected; it goes away with the first real entry.
+- **Infamous Paintball** supplies the tournament-grade paint the team shoots at
+  NXL events.
+- **Kinetic Paintball** makes the team's custom jerseys.
 
-`SponsorMarquee` renders nothing when this is empty, so pages stay correct.
+Both are shown on the Contact page's sponsorship section (`LogoStrip`). The
+`SponsorMarquee` component renders nothing for an empty collection, so pages
+stay correct if every entry is removed.

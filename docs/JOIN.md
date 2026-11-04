@@ -24,32 +24,34 @@ confirmations, exactly like the pre-order form (see `docs/PREORDERS.md`).
   exactly how to find those ids — the process is identical.
 
 Our field names, for the `fieldMap`: `firstName`, `lastName`, `playerClass`,
-`country`, `email`, `phone`, `event`, `division`, `teamSize`,
-`paymentMethod`, `notes`.
+`country`, `email`, `phone`, `facebookProfile`, `event`, `division`,
+`teamSize`, `paymentMethod`, `notes`.
 
-**Player class vs. division — two separate PBLeagues concepts, not one:**
+**The site's option lists mirror the Google Form word for word** (Nov 2026).
+The site posts those strings as the answers, and Google can drop a choice the
+form doesn't list. If you change an option on the form, change it in
+`JoinRequestForm.tsx` too (and the `FormOptions` story). Today:
 
-- **Player class** is *what the requester is* — their own current
-  classification.
-- **Division** is *what they want to play* — the actual division of the
-  specific event. Usually the one their class translates to per PBLeagues'
-  own class-translation table, but a player can play up a division, so
-  it's asked separately rather than derived from class.
+| Form question | Site label | Options |
+|---|---|---|
+| Current Player Ranking | Current player ranking | Beginner / Unranked, D5, D4, D3, D2, D1 |
+| Division | Division | D6, D5, D4, D3, D2, D1, Semi-Pro, Pro |
+| Playing Format Requested | Playing format requested | 3v3, 5v5, X-Ball, 10v10, Mechanical |
+| Country | Country | free text |
+| Facebook Profile Link | Facebook profile link | free text, optional |
+| Event | Event | `join.events` in `site.yml` |
+| Payment Method | Preferred method | `join.paymentMethods` in `site.yml` |
 
-Both questions draw from the same option list — D6, D5, D4, D3, D2, D1,
-Semi-Pro, Pro (`DIVISIONS` in `JoinRequestForm.tsx`) — rather than player
-class having its own separate skill-tier list. That's a deliberate
-simplification: one option list to keep in sync with the Google Form
-instead of two.
+**Ranking vs. division are two separate PBLeagues concepts:** ranking is what
+the requester is, division is what they want to play. A player can play up a
+division, so it is asked separately rather than derived. The ranking list has
+"Beginner / Unranked" and no D6 or Pro; the division list has all eight.
 
-**Team size / format** (`teamSize`) is the format of the event/team being
-asked about, grouped with Division since it's part of "what you want to
-play": Any size, 3-man, 5-man, 7-man, 10-man, X-Ball (`TEAM_SIZES`).
-
-**Country** (`country`) is a broad territory, not a full country list —
-United States gets its own option since that's where most events run, with
-AMER, EMEA and APAC covering everywhere else (`REGIONS`). Grouped with the
-contact fields since it's about the requester, not the event.
+**Event** is not drawn from the events collection (the Events page is hidden,
+and its entry is a placeholder). It is `join.events` in `site.yml`, which you
+keep in step with the form's Event dropdown by hand. "Not sure yet / general
+interest" is offered on the site only; it is posted as a blank Event because
+the form has no such option.
 
 ### Setting up the Google Form
 
@@ -67,8 +69,9 @@ One form, kept current rather than one per event:
    string to this question's `entry.NNN`, and Google's `formResponse`
    endpoint doesn't hard-validate free-form POSTs against the option list,
    so matching wording is a legibility choice, not a strict requirement.
-3. **Player class**, **Division**, **Team size / format**, and **Country**
-   are each their own dropdown, with the options listed above.
+3. **Current Player Ranking**, **Division** and **Playing Format Requested**
+   are each their own dropdown or multiple-choice question, with the options
+   listed above. **Country** and **Facebook Profile Link** are short text.
 4. Every response lands in a linked Google Sheet as a new row — that's the
    list you filter and sort.
 5. Add three columns to that Sheet by hand, filled in as requests are

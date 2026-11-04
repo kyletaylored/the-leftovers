@@ -46,23 +46,23 @@ interface JoinRequestFormProps {
 const MIN_FILL_MS = 3000;
 
 /**
- * Player class ("what you are") and division ("what you want to play") are
- * two separate PBLeagues concepts, not one — a player can play up a
- * division, so it's asked separately rather than derived from class. Both
- * now draw from the same D6-through-Pro list rather than a separate
- * skill-class list, since that's what the backing Google Form uses.
+ * Every option list below is worded EXACTLY as the backing Google Form words
+ * it (Nov 2026, the team's own wording). The site posts these strings as the
+ * answers, and Google can drop a choice the form doesn't list, so a change to
+ * the Google Form's options means the same change here.
+ *
+ * Current player ranking ("what you are") and division ("what you want to
+ * play") are two separate PBLeagues concepts: a player can play up a division,
+ * so it's asked separately rather than derived from ranking.
  */
+const RANKINGS = ['Beginner / Unranked', 'D5', 'D4', 'D3', 'D2', 'D1'];
 const DIVISIONS = ['D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'Semi-Pro', 'Pro'];
 
-/** Format of the specific event/team they're asking about. */
-const TEAM_SIZES = ['Any size', '3-man', '5-man', '7-man', '10-man', 'X-Ball'];
+/** "Playing Format Requested" on the form. */
+const FORMATS = ['3v3', '5v5', 'X-Ball', '10v10', 'Mechanical'];
 
-/**
- * Broad territory, not a full country list — see `docs/JOIN.md`. United
- * States gets its own option since that's where most events run; AMER
- * covers the rest of the Americas.
- */
-const REGIONS = ['United States', 'AMER', 'EMEA', 'APAC'];
+const NOT_SURE = 'not-sure';
+const NOT_SURE_LABEL = 'Not sure yet / general interest';
 
 const field = 'field-input';
 const label = 'field-label';
@@ -84,20 +84,23 @@ export default function JoinRequestForm({
   function buildSummary(data: FormData) {
     const get = (key: string) => String(data.get(key) ?? '').trim();
     const eventLabel =
-      events.find((e) => e.id === get('event'))?.label || get('event') || 'Not specified';
+      get('event') === NOT_SURE
+        ? NOT_SURE_LABEL
+        : events.find((e) => e.id === get('event'))?.label || get('event') || 'Not specified';
 
     return [
       'Join request — The Leftovers',
       '',
       `Event: ${eventLabel}`,
       `Division: ${get('division') || 'Not specified'}`,
-      `Team size / format: ${get('teamSize') || 'Not specified'}`,
+      `Playing format requested: ${get('teamSize') || 'Not specified'}`,
       '',
       `Name:  ${get('firstName')} ${get('lastName')}`.trim(),
-      `Player class: ${get('playerClass') || 'Not specified'}`,
+      `Current player ranking: ${get('playerClass') || 'Not specified'}`,
       `Country: ${get('country') || 'Not specified'}`,
       `Email: ${get('email')}`,
       ...(get('phone') ? [`Phone: ${get('phone')}`] : []),
+      ...(get('facebookProfile') ? [`Facebook: ${get('facebookProfile')}`] : []),
       '',
       ...(get('paymentMethod') ? [`Preferred payment: ${get('paymentMethod')}`] : []),
       ...(get('notes') ? [`Notes: ${get('notes')}`] : []),
@@ -136,9 +139,13 @@ export default function JoinRequestForm({
         if (id && value) params.set(id, value);
       };
 
+      // "Not sure yet" isn't an option on the Google Form, so it is left
+      // blank rather than posted as a value the form might reject.
+      const chosenEvent = String(data.get('event') ?? '');
       const eventLabel =
-        events.find((e) => e.id === String(data.get('event') ?? ''))?.label ||
-        String(data.get('event') ?? '');
+        chosenEvent === NOT_SURE
+          ? ''
+          : events.find((e) => e.id === chosenEvent)?.label || chosenEvent;
 
       put('firstName', String(data.get('firstName') ?? '').trim());
       put('lastName', String(data.get('lastName') ?? '').trim());
@@ -146,6 +153,7 @@ export default function JoinRequestForm({
       put('country', String(data.get('country') ?? '').trim());
       put('email', String(data.get('email') ?? '').trim());
       put('phone', String(data.get('phone') ?? '').trim());
+      put('facebookProfile', String(data.get('facebookProfile') ?? '').trim());
       put('event', eventLabel);
       put('division', String(data.get('division') ?? '').trim());
       put('teamSize', String(data.get('teamSize') ?? '').trim());
@@ -369,17 +377,32 @@ export default function JoinRequestForm({
             </label>
             <input id="phone" name="phone" className={field} type="tel" autoComplete="tel" />
           </div>
+          <div className="sm:col-span-2">
+            <label className={label} htmlFor="facebookProfile">
+              Facebook profile link <span className="text-bone-muted">(optional)</span>
+            </label>
+            <input
+              id="facebookProfile"
+              name="facebookProfile"
+              className={field}
+              type="url"
+              inputMode="url"
+              placeholder="https://www.facebook.com/…"
+              autoComplete="url"
+            />
+            <p className="field-hint">Helps us add you to the team chat.</p>
+          </div>
           <div>
             <label className={label} htmlFor="playerClass">
-              Player class
+              Current player ranking
             </label>
             <select id="playerClass" name="playerClass" className={field} required defaultValue="">
               <option value="" disabled>
                 Choose one…
               </option>
-              {DIVISIONS.map((playerClass) => (
-                <option key={playerClass} value={playerClass}>
-                  {playerClass}
+              {RANKINGS.map((ranking) => (
+                <option key={ranking} value={ranking}>
+                  {ranking}
                 </option>
               ))}
             </select>
@@ -388,16 +411,14 @@ export default function JoinRequestForm({
             <label className={label} htmlFor="country">
               Country
             </label>
-            <select id="country" name="country" className={field} required defaultValue="">
-              <option value="" disabled>
-                Choose one…
-              </option>
-              {REGIONS.map((region) => (
-                <option key={region} value={region}>
-                  {region}
-                </option>
-              ))}
-            </select>
+            <input
+              id="country"
+              name="country"
+              className={field}
+              type="text"
+              required
+              autoComplete="country-name"
+            />
           </div>
         </div>
       </fieldset>
@@ -418,7 +439,7 @@ export default function JoinRequestForm({
                   {e.label}
                 </option>
               ))}
-              <option value="not-sure">Not sure yet / general interest</option>
+              <option value={NOT_SURE}>{NOT_SURE_LABEL}</option>
             </select>
           </div>
           <div>
@@ -438,13 +459,13 @@ export default function JoinRequestForm({
           </div>
           <div>
             <label className={label} htmlFor="teamSize">
-              Team size / format
+              Playing format requested
             </label>
             <select id="teamSize" name="teamSize" className={field} required defaultValue="">
               <option value="" disabled>
                 Choose one…
               </option>
-              {TEAM_SIZES.map((size) => (
+              {FORMATS.map((size) => (
                 <option key={size} value={size}>
                   {size}
                 </option>

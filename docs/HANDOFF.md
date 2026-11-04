@@ -59,16 +59,23 @@ team deciding to:
 
 | Route | What it is | Notes |
 |---|---|---|
-| `/` | Home: brand hero, ThreeColumn, gallery teaser, newsletter | Follows homepage mockup A |
-| `/team` | About + Roster + Stats + FAQ on one page, with a jump nav | `/about`, `/roster`, `/stats` redirect here (Oct 2026 merge) |
-| `/events` | Countdown, month calendar, upcoming and past `EventCard`s | |
-| `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | Products collection is empty on purpose |
+| `/` | Home: sand hero, photo slider, "Anyone Can Play", "2027 Season Loading…" + league logos, newsletter | Reworked Nov 2026 from the team's feedback doc |
+| `/team` | About + Roster + Stats + FAQ on one page, with a jump nav | **Hidden** (Nov 2026). `/about`, `/roster`, `/stats` redirect here |
+| `/events` | Countdown, month calendar, upcoming and past `EventCard`s | **Hidden** |
+| `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | **Hidden.** Products collection is empty on purpose |
 | `/preorder/[slug]` | One page per jersey drop, with an on-site order form | `PreorderForm` island → Google Form |
 | `/join` | "Request to play" form | `JoinRequestForm` island → Google Form ([JOIN.md](JOIN.md)) |
-| `/community` | Social links, optional Instagram/Facebook embeds, newsletter | No Discord right now (see below) |
-| `/contact` | Contact | |
+| `/community` | Social links, optional Instagram/Facebook embeds, newsletter | **Hidden.** No Discord right now (see below) |
+| `/contact` | Contact, with the partner logos (Infamous, Kinetic) | |
 | `/design` | Design system reference | `noindex`, not in the sitemap. For builders, not visitors |
 | `404` | Mascot empty state | |
+
+**Hidden pages** (Team, Events, Shop, Community) still build but are `noindex`,
+out of the sitemap, out of the nav and footer, and unlinked from visible pages.
+The list is `HIDDEN_PAGES` in `astro.config.mjs`; `astro.config.mjs` and
+`site.yml`'s `nav` say how to bring one back. `/preorder/[slug]` is not
+linked from anywhere either, but its closed state still points at `/shop` and
+`/community`.
 
 ### Built and working
 
@@ -192,9 +199,10 @@ The full rules are in [`AGENTS.md`](../AGENTS.md#design-system). In short:
   (text), `gold` (fill and stroke) / `gold-300` (text), `forest`, `tan`,
   `bone`. Never type a raw hex in a component. The `/design` page's cream
   "paper" chrome is the only exception.
-- **Type:** Anton (`font-display`, uppercase headings), Inter (`font-sans`,
-  body text), CC Monster Mash Worn (`font-marker`, wordmark only). The gold
-  ribbed numeral is the `.numeral` CSS class, not a font.
+- **Type:** Gasoek One (`font-display`, every uppercase heading; replaced
+  Anton in Nov 2026), Inter (`font-sans`, body text), CC Monster Mash Worn
+  (`font-marker`, wordmark/logo only). The gold ribbed numeral is the
+  `.numeral` CSS class, not a font.
 - **Motifs:** `RuyiCloud` (licensed Vecteezy art, attribution required),
   `TerracedDivider` (`rice-terrace` default, `pagoda` for the homepage hero
   only), `Lantern`, `MascotMark` (empty states).
@@ -291,14 +299,15 @@ inline-styled HTML into the repo.
    `/events`.
 3. **Phase 3: a CSV importer** that turns a PBLI results export into the
    `results` collection format.
-4. **Use the new textures on real pages.** `<Section tone="sand|seigaiha">` is
-   ready, but no public page uses it yet. Good candidates: a seigaiha band on
+4. **More texture on real pages.** The homepage `Hero` now uses `.bg-sand`.
+   `<Section tone="sand|seigaiha">` is ready for more: a seigaiha band on
    `/events`, sand behind `/team#story`.
 5. **Components that are built and documented on `/design` but not used on
    any public page yet.** Place each one once its content exists:
    - `TwoColumn`, `FeatureRow` and `ProfileCard`: waiting on photos or a bio.
    - `StatStrip`: waiting on results.
-   - `SponsorMarquee`: waiting on sponsors.
+   - `SponsorMarquee`: waiting on enough sponsors to scroll. Two partners
+     (Infamous, Kinetic) now show on Contact through `LogoStrip`.
    - `PricingCard`: its "Sponsor a Slot" tier idea needs a business decision.
    - `Toast`: nothing triggers it yet.
    - `AgendaList`, `ImagePlaceholder`, `RadioGroup`, `CheckboxGroup`.

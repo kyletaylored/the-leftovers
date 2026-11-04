@@ -1,5 +1,5 @@
 ---
-import { getEntry, render } from 'astro:content';
+import { getCollection, getEntry, render } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHeader from '@/components/PageHeader.astro';
 import { resolveHeroImages } from '@/lib/images';
@@ -8,6 +8,8 @@ import Prose from '@/components/Prose.astro';
 import Button from '@/components/Button.astro';
 import Icon, { type IconName } from '@/components/brand/Icon.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
+import LogoStrip from '@/components/LogoStrip.astro';
+import { resolveImage } from '@/lib/images';
 import { site } from '@/lib/settings';
 
 const page = await getEntry('pages', 'contact');
@@ -15,13 +17,24 @@ if (!page) throw new Error('Missing content file: src/content/pages/contact.md')
 const heroImages = await resolveHeroImages(page.data.heroImages);
 const { Content } = await render(page);
 
+// Partners named in the sponsorship copy, as logos. Same source as the
+// sponsor marquee, so adding a sponsor in the CMS adds it here.
+const partners = await Promise.all(
+  (await getCollection('sponsors')).map(async (sponsor) => ({
+    name: sponsor.data.name,
+    alt: sponsor.data.logoAlt,
+    href: sponsor.data.url,
+    src: await resolveImage(sponsor.data.logo),
+  }))
+);
+
 const routes: Array<{ icon: IconName; label: string; value: string; href: string; note: string; external?: boolean }> = [
   {
     icon: 'jersey',
     label: 'Want to play',
     value: 'Send a join request',
     href: '/join',
-    note: 'Tell us the event, division and what you play.',
+    note: 'Tell us the event, division and the format you want to play.',
   },
   {
     icon: 'mail',
@@ -30,13 +43,18 @@ const routes: Array<{ icon: IconName; label: string; value: string; href: string
     href: `mailto:${site.social.email}`,
     note: 'Sponsorship, press, and anything that needs a paper trail.',
   },
-  {
-    icon: 'calendar',
-    label: 'Where we play',
-    value: 'See the schedule',
-    href: '/events',
-    note: 'Events are posted as they’re confirmed. Registration goes through the league.',
-  },
+  ...(site.social.instagram
+    ? [
+        {
+          icon: 'instagram' as const,
+          label: 'Follow along',
+          value: 'Instagram',
+          href: site.social.instagram,
+          note: 'Event dates, roster openings and photos get posted here first.',
+          external: true,
+        },
+      ]
+    : []),
 ];
 
 /**
@@ -81,13 +99,20 @@ const routes: Array<{ icon: IconName; label: string; value: string; href: string
         </Prose>
         <div class="mt-8 flex flex-wrap gap-3">
           <Button href="/join">Send a join request</Button>
-          <Button href="/community" variant="outline">All the community links</Button>
         </div>
       </div>
     </div>
   </Section>
 
-  <Section tone="alt" divider dividerSeed={37}>
+  {
+    partners.length > 0 && (
+      <Section tone="alt" eyebrow="Partners" title="Who keeps us on the field">
+        <LogoStrip items={partners} />
+      </Section>
+    )
+  }
+
+  <Section tone="base" divider dividerSeed={37}>
     <MascotCallout
       title="Just want to play Saturday?"
       body="Send a join request with the event you want, and we'll follow up once we've had a chance to look at the roster."

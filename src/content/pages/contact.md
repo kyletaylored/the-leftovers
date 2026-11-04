@@ -14,7 +14,7 @@ seo:
 ## Want to play?
 
 Send a [join request](/join) with the event you're interested in, your
-division, and what you play. There's no application and nothing else to
+division, and the format you want to play. There's no application and nothing else to
 fill in — we follow up by email once we've had a chance to look at the
 roster.
 
@@ -28,10 +28,13 @@ Tell us, on the join request:
 
 ## Sponsorship and field partnerships
 
-We run tournament events with jerseys, a Discord community and a growing local
-following. If you're a field, a paint distributor or a gear shop and that's
-interesting to you, email the captain directly and we'll send through what we
-can offer.
+We are currently partnered with Infamous Paintball and shoot their
+tournament-grade Voltanium Paintballs during NXL events. Meanwhile, Kinetic
+Paintball provides our fully custom team jerseys to keep us looking fresh on
+the field.
+
+Interested in partnering with us? Email the captain directly and we'll send
+through what we can offer.
 
 ## Press and photos
 

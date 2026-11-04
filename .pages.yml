@@ -574,4 +574,13 @@ content:
         fields:
           - { name: bonfireUrl, label: Bonfire store URL, type: string }
           - { name: alwaysOpenUrl, label: 'Always-open store URL', type: string }
+      - name: leagues
+        label: Leagues
+        type: object
+        list: true
+        description: 'Logo row on the homepage calendar block: the leagues the team wants to play in.'
+        fields:
+          - { name: name, label: League name, type: string, required: true }
+          - { name: logo, label: Logo, type: image, options: { media: images }, required: true }
+          - { name: logoAlt, label: Logo alt text, type: string, required: true }
       - { name: footerNote, label: Footer note, type: text, required: true }

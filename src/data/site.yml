@@ -13,17 +13,15 @@ established: 2022
 # region; it feeds the footer and the SportsTeam structured data.
 homeBase: ""
 
+# Team, Events, Shop and Community are hidden for now (website feedback,
+# Nov 2026): the team wants to build them out properly first. The pages still
+# build, but they are noindex, out of the sitemap, and nothing links to them.
+# To bring one back: re-add it here, remove `noindex` from the page's
+# <BaseLayout> in src/pages/, and take it out of HIDDEN_PAGES in
+# astro.config.mjs.
 nav:
   - label: Home
     href: /
-  - label: Team
-    href: /team
-  - label: Events
-    href: /events
-  - label: Shop
-    href: /shop
-  - label: Community
-    href: /community
   - label: Contact
     href: /contact
 
@@ -121,6 +119,19 @@ preorderForm:
     address: entry.1692716281
     paymentMethod: entry.1394264392
 
+# Leagues the team wants to build a presence in. Shown as a logo row on the
+# homepage calendar block. Logos live in src/assets/img/leagues/.
+leagues:
+  - name: NXL (US)
+    logo: /src/assets/img/leagues/nxl-us.png
+    logoAlt: NXL Paintball logo
+  - name: NXL Europe
+    logo: /src/assets/img/leagues/nxl-eu.png
+    logoAlt: NXL Paintball Europe logo
+  - name: ICPL
+    logo: /src/assets/img/leagues/icpl.png
+    logoAlt: ICPL, International Classic Paintball League, logo
+
 footerNote: >-
   Free agents welcome. Show up, pay your entry, play the tournament —
   that's the whole tryout.
@@ -157,6 +168,7 @@ join:
     lastName: entry.2076025780
     email: entry.1948955686
     phone: entry.1208301590
+    facebookProfile: entry.534807610
     playerClass: entry.1242491412
     country: entry.645828190
     event: entry.1976036833
@@ -164,6 +176,12 @@ join:
     teamSize: entry.1974396290
     paymentMethod: entry.453493553
     notes: entry.1626376368
+  # The Event dropdown. Word each one EXACTLY as the Google Form's Event
+  # question does: the site posts this string as the answer, and a value the
+  # form doesn't list can be dropped. Add the event here and in the Google
+  # Form together, and remove both once it has passed.
+  events:
+    - NXL World Cup 2026
   # Payment is arranged directly with the captain once a spot is confirmed —
   # nothing is charged through the site. Add/remove methods here; they show
   # up as a dropdown on the join form. `handle` is optional: this just needs

@@ -2,14 +2,16 @@
 /**
  * Home.
  *
- * Deliberately a COMMUNITY page, not a team dashboard. Earlier versions led
- * with a stat strip, a countdown panel, a roster row, a merch banner and a
- * sponsor marquee — six competing blocks before a first-time visitor learned
- * what the team even is.
+ * Deliberately a COMMUNITY page, not a team dashboard. The order answers a
+ * newcomer's questions in the order they'd ask them: what is this → how do I
+ * get in → when's the next one → can I get updates.
  *
- * The order now answers a newcomer's questions in the order they'd ask them:
- * what is this → how do I get in → when's the next one → where does everyone
- * hang out. Stats live on /team#stats; merch lives on /shop.
+ * Nov 2026 (website feedback): the manifesto band now carries the photo
+ * slider, the calendar block reads "2027 Season Loading…" with the leagues the
+ * team wants to build in, and the community-channels, open-slots and
+ * "From the Field" blocks are gone because the pages they pointed at (Team,
+ * Community) are hidden. The placeholder event no longer drives anything here,
+ * so there is no SportsEvent structured data on this page.
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -17,50 +19,35 @@ import Hero from '@/components/Hero.astro';
 import Section from '@/components/Section.astro';
 import ThreeColumn from '@/components/ThreeColumn.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
-import MascotCallout from '@/components/MascotCallout.astro';
+import GallerySlideshow from '@/components/GallerySlideshow.astro';
+import LogoStrip from '@/components/LogoStrip.astro';
 import Button from '@/components/Button.astro';
-import Gallery from '@/components/Gallery.astro';
-import Icon, { type IconName } from '@/components/brand/Icon.astro';
 import { site } from '@/lib/settings';
-import { getEvents } from '@/lib/events';
-import { dateRange, isoDate } from '@/lib/format';
-import { getTeamStats } from '@/lib/stats';
 import { resolveImage } from '@/lib/images';
 
-const [{ next }, players, galleries, teamStats] = await Promise.all([
-  getEvents(),
-  getCollection('players'),
-  getCollection('galleries'),
-  getTeamStats(),
-]);
+const galleries = await getCollection('galleries');
+// The slider is the `game-day` gallery only, so curating the homepage never
+// depends on what other galleries exist.
+const sliderGalleries = galleries.filter((gallery) => gallery.id === 'game-day');
 
-const openSlots = players.filter((player) => player.data.status === 'open-slot').length;
-
-// "From the Field" teaser — a handful of photos across every gallery, same
-// source as /team#gallery's full slideshow, resolved for the masonry grid.
-const teaserPhotos = (
-  await Promise.all(
-    galleries
-      .sort((a, b) => a.data.order - b.data.order)
-      .flatMap((gallery) => gallery.data.photos)
-      .slice(0, 6)
-      .map(async (photo) => {
-        const src = await resolveImage(photo.image);
-        return src ? { src, alt: photo.alt, caption: photo.caption } : null;
-      })
-  )
-).flatMap((photo) => (photo ? [photo] : []));
+const leagues = await Promise.all(
+  site.leagues.map(async (league) => ({
+    name: league.name,
+    alt: league.logoAlt,
+    src: await resolveImage(league.logo),
+  }))
+);
 
 const premise = [
   {
     icon: 'chat' as const,
     title: 'No tryout',
-    body: 'There is no selection process and no waiting for a season to start. Say you’re coming and you’re on the sheet.',
+    body: 'Say you’re coming, tell us what you want to compete in, pay the event deposit and you will be added to the list. Team chats are created to start connecting players.',
   },
   {
     icon: 'jersey' as const,
     title: 'Bring your own gear',
-    body: 'Your marker, mask and pods. Cover your entry and paint on the day. We don’t take a cut and there are no dues.',
+    body: 'Your marker, your mask, your style. Various team jersey designs are available, but NOT mandatory… but when you see them, you’ll want one!',
   },
   {
     icon: 'trophy' as const,
@@ -68,206 +55,64 @@ const premise = [
     body: 'No bench and no practice squad. If you confirmed, you’re playing points in a registered tournament.',
   },
 ];
-
-const channels: Array<{ icon: IconName; name: string; href?: string; blurb: string }> = [
-  {
-    icon: 'discord',
-    name: 'Discord',
-    href: site.social.discord,
-    blurb: 'Where the next squad gets sorted. Start here.',
-  },
-  {
-    icon: 'facebook',
-    name: 'Facebook',
-    href: site.social.facebookGroup,
-    blurb: 'Photos and post-event arguing.',
-  },
-  {
-    icon: 'instagram',
-    name: 'Instagram',
-    href: site.social.instagram,
-    blurb: 'Game day, in pictures.',
-  },
-];
-
-const eventSchema = next
-  ? [
-      {
-        '@type': 'SportsEvent',
-        name: `${next.data.title}${next.data.league ? ` — ${next.data.league}` : ''}`,
-        startDate: isoDate(next.data.startDate),
-        endDate: isoDate(next.data.endDate ?? next.data.startDate),
-        eventStatus: 'https://schema.org/EventScheduled',
-        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-        competitor: { '@id': new URL('/#team', Astro.site).href },
-        ...(next.data.location
-          ? {
-              location: {
-                '@type': 'Place',
-                name: next.data.location.venue,
-                address: { '@type': 'PostalAddress', addressLocality: next.data.location.city },
-              },
-            }
-          : {}),
-        ...(next.data.registrationUrl ? { url: next.data.registrationUrl } : {}),
-      },
-    ]
-  : [];
 ---
 
-<BaseLayout title={site.title} description={site.description} schema={eventSchema}>
+<BaseLayout title={site.title} description={site.description}>
   <Hero variant="brand" tagline={site.tagline}>
     <Button slot="actions" href="/join" size="lg">Join a squad</Button>
-    <Button slot="actions" href="/team#faq" variant="outline" size="lg">View FAQ</Button>
   </Hero>
 
-  <!-- MANIFESTO --------------------------------------------------------------->
-  <section class="bg-topo relative overflow-hidden border-y border-ink-600 bg-ink-900">
-    <div
-      class="relative flex min-h-[340px] flex-col justify-end bg-gradient-to-t from-ink via-ink/60 to-ink/10 px-6 py-12 sm:px-10 sm:py-16"
-    >
-      <p class="eyebrow mb-3">{site.tagline}</p>
-      <h2 class="max-w-3xl text-3xl uppercase leading-tight text-bone sm:text-5xl">
-        Paintball builds better people.
+  <!-- MANIFESTO + PHOTO SLIDER --------------------------------------------------->
+  <section class="border-y border-ink-600 bg-ink-900">
+    <div class="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 lg:py-24">
+      <p class="eyebrow mb-4">{site.tagline}</p>
+      <h2 class="mx-auto max-w-3xl text-2xl leading-tight text-bone sm:text-4xl lg:text-5xl">
+        <span class="block">Don’t miss the action.</span>
+        <span class="block">Expand your network.</span>
+        <span class="block">Make memories.</span>
       </h2>
-      <ul class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm text-bone-muted">
-        <li>
-          <span class="numeral text-2xl">{teamStats.rosterSize}</span> team members
-        </li>
-        <li>
-          <span class="numeral text-2xl">{teamStats.seasons}</span> seasons
-        </li>
-        <li>
-          <span class="numeral text-2xl">1</span> crew
-        </li>
-      </ul>
+      <GallerySlideshow
+        galleries={sliderGalleries}
+        layout="single"
+        captionStyle="flag"
+        autoplayMs={6000}
+        class="mx-auto mt-10 text-left sm:mt-14"
+      />
     </div>
   </section>
 
   <!-- WHAT THIS IS ---------------------------------------------------------->
   <Section tone="base" eyebrow="Free agents welcome" title="Anyone Can Play">
-    <p class="max-w-2xl text-base leading-relaxed text-bone-muted sm:text-lg">
-      {site.description}
-    </p>
+    <div class="max-w-3xl space-y-4 text-base leading-relaxed text-bone-muted sm:text-lg">
+      <p>
+        The Leftovers are a community-run paintball team built from rotating free agents. There’s
+        no tryout and no bench. If you can make the date and cover your own entry, you can play a
+        tournament with us.
+      </p>
+      <p>
+        If you have no team at all, or your team is missing a specific event that you still want to
+        attend, we have a spot for <strong class="text-bone">YOU</strong>.
+      </p>
+    </div>
     <ThreeColumn items={premise} class="mt-10" />
   </Section>
 
-  <!-- NEXT UP --------------------------------------------------------------->
+  <!-- THE SEASON -------------------------------------------------------------->
   <Section tone="alt" eyebrow="Next up" title="On the Calendar">
-    {
-      next ? (
-        <div class="flex flex-col gap-6 rounded-sm border border-ink-600 bg-ink-800 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
-          <div class="min-w-0">
-            {next.data.league && (
-              <span class="mb-3 inline-block rounded-full bg-crimson px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-bone">
-                {next.data.league}
-              </span>
-            )}
-            <h3 class="text-2xl text-bone sm:text-3xl">{next.data.title}</h3>
-            <p class="mt-2 text-sm text-bone-muted">
-              <time datetime={isoDate(next.data.startDate)}>
-                {dateRange(next.data.startDate, next.data.endDate)}
-              </time>
-              {next.data.location && (
-                <>
-                  <span aria-hidden="true"> · </span>
-                  {next.data.location.venue}
-                </>
-              )}
-            </p>
-          </div>
-          <div class="flex shrink-0 flex-wrap gap-3">
-            {next.data.registrationUrl && (
-              <Button href={next.data.registrationUrl} external size="sm">
-                Register
-              </Button>
-            )}
-            <Button href="/events" variant="outline" size="sm">
-              Full schedule
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <MascotCallout
-          title="Nothing on the board yet"
-          body="The next tournament hasn't been posted. Send a join request and we'll follow up as soon as one's on the calendar."
-        >
-          <Button href="/join" size="sm">Request to join</Button>
-        </MascotCallout>
-      )
-    }
-  </Section>
-
-  <!-- COMMUNITY ------------------------------------------------------------->
-  <Section tone="base" eyebrow="Find the crew" title="Where Everyone Is">
-    <ul class="grid gap-4 sm:grid-cols-3">
-      {
-        channels
-          .filter((channel) => channel.href)
-          .map((channel) => (
-            <li>
-              <a
-                href={channel.href}
-                rel="noopener"
-                class="group flex h-full flex-col rounded-sm border border-ink-600 bg-ink-800 p-6 transition-colors hover:border-gold/60 hover:bg-ink-700"
-              >
-                <span class="mb-4 inline-flex size-11 items-center justify-center rounded-sm bg-ink-900 text-gold">
-                  <Icon name={channel.icon} class="size-5" />
-                </span>
-                <span class="font-display text-xl uppercase text-bone group-hover:text-gold-300">
-                  {channel.name}
-                </span>
-                <span class="mt-1.5 text-sm leading-relaxed text-bone-muted">{channel.blurb}</span>
-              </a>
-            </li>
-          ))
-      }
-    </ul>
-
-    <div class="mt-8">
-      <Button href="/community" variant="ghost">Everything in one place</Button>
+    <div
+      class="rounded-sm border border-ink-600 bg-ink-800 px-6 py-10 text-center sm:px-10 sm:py-14"
+    >
+      <h3 class="text-3xl text-bone sm:text-5xl">2027 Season Loading…</h3>
+      <p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-bone-muted sm:text-base">
+        Dates go up as the leagues release them. Send a join request and we’ll follow up as soon
+        as there’s an event to play.
+      </p>
+      <div class="mt-6">
+        <Button href="/join" size="sm">Request to join</Button>
+      </div>
+      <LogoStrip items={leagues} label="Leagues we want to build in" size="sm" class="mt-12" />
     </div>
   </Section>
-
-  <!-- FROM THE FIELD ---------------------------------------------------------->
-  {
-    teaserPhotos.length > 0 && (
-      <Section tone="alt">
-        <div class="mb-8 flex flex-wrap items-baseline justify-between gap-4 lg:mb-12">
-          <div>
-            <p class="eyebrow mb-3">Game day</p>
-            <h2 class="text-3xl text-bone sm:text-4xl lg:text-5xl">From the Field</h2>
-          </div>
-          <Button href="/team#gallery" variant="tertiary" icon="arrow-right">
-            More photos
-          </Button>
-        </div>
-        <Gallery images={teaserPhotos} />
-      </Section>
-    )
-  }
-
-  <!-- OPEN SLOTS ------------------------------------------------------------>
-  {
-    openSlots > 0 && (
-      <Section tone="alt">
-        <div class="flex flex-col items-start gap-6 rounded-sm border-2 border-dashed border-gold/50 bg-ink-800/50 p-7 sm:flex-row sm:items-center sm:justify-between sm:p-9">
-          <div>
-            <p class="eyebrow mb-2">
-              {openSlots} open {openSlots === 1 ? 'slot' : 'slots'}
-            </p>
-            <h2 class="text-2xl text-bone sm:text-3xl">There's room on the roster</h2>
-            <p class="mt-2 max-w-xl text-sm leading-relaxed text-bone-muted">
-              Every name on the roster started as one of these.
-            </p>
-          </div>
-          <Button href="/team#open-slots" variant="gold" class="shrink-0">
-            See open slots
-          </Button>
-        </div>
-      </Section>
-    )
-  }
 
   <!-- NEWSLETTER ------------------------------------------------------------>
   <Section tone="base" divider dividerSeed={11}>

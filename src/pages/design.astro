@@ -52,6 +52,7 @@ import CtaStrip from '@/components/CtaStrip.astro';
 import ThreeColumn from '@/components/ThreeColumn.astro';
 import FaqAccordion from '@/components/FaqAccordion.astro';
 import Gallery from '@/components/Gallery.astro';
+import LogoStrip from '@/components/LogoStrip.astro';
 import Slideshow, { type Slide } from '@/components/Slideshow.tsx';
 import FeatureRow from '@/components/marketing/FeatureRow.astro';
 import PricingCard from '@/components/marketing/PricingCard.astro';
@@ -68,6 +69,11 @@ import type { TerracedStyle } from '@/components/brand/TerracedDivider.astro';
 import jerseyImg from '@/assets/img/leftovers-v1-v2.png';
 import bcaImg from '@/assets/img/bca-leftover.jpg';
 import logoImg from '@/assets/img/brand/logo.png';
+import nxlUsLogo from '@/assets/img/leagues/nxl-us.png';
+import nxlEuLogo from '@/assets/img/leagues/nxl-eu.png';
+import icplLogo from '@/assets/img/leagues/icpl.png';
+import infamousLogo from '@/assets/img/sponsors/infamous-paintball.png';
+import kineticLogo from '@/assets/img/sponsors/kinetic-paintball.png';
 
 // ---------------------------------------------------------------- data --
 const [players, faqs, products, { upcoming, past, next }] = await Promise.all([
@@ -135,6 +141,7 @@ const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Ast
   { name: 'Section · PageHeader · Hero', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Page scaffolding. Every page is built from these.' },
   { name: 'FeatureRow', file: 'marketing/FeatureRow.astro', kind: 'Astro', section: 'marketing', use: 'Alternating media + copy. Flip with reverse.' },
   { name: 'PricingCard', file: 'marketing/PricingCard.astro', kind: 'Astro', section: 'marketing', use: 'Tier card; featured gets gold border + ribbon.' },
+  { name: 'LogoStrip', file: 'LogoStrip.astro', kind: 'Astro', section: 'marketing', use: 'Static centred logo row: leagues on the homepage, partners on Contact. sm | md.' },
   { name: 'Gallery', file: 'Gallery.astro', kind: 'Astro', section: 'marketing', use: 'Masonry photo grid, zero JS.' },
   { name: 'Slideshow / GallerySlideshow', file: 'Slideshow.tsx', kind: 'Astro + island', section: 'marketing', story: true, use: 'Carousel: peek | single | hero; dashes | thumbnails.' },
   { name: 'ProductCard · ProductGrid', file: 'marketing/ProductGrid.astro', kind: 'Astro', section: 'marketing', use: 'Shop grid with optional filter chips.' },
@@ -224,7 +231,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
           </ul>
         </Specimen>
 
-        <Specimen title="Gold ribbed numeral" note="Not a font: a gradient + repeating ribs clipped to text. Use the .numeral class on Anton digits only.">
+        <Specimen title="Gold ribbed numeral" note="Not a font: a gradient + repeating ribs clipped to text. Use the .numeral class on Gasoek One digits only.">
           <div class="flex flex-col items-center justify-center py-4">
             <span class="numeral text-[5.625rem] leading-[0.9]">22</span>
             <code class="mt-3 font-mono text-[0.6875rem] text-gold-300">class="numeral"</code>
@@ -232,19 +239,19 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
         </Specimen>
 
         <Specimen
-          title="Typography: 3 roles"
+          title="Typography: roles & header options"
           surface="paper"
           class="md:col-span-2 xl:col-span-3"
-          note="Headings h1–h4 get Anton uppercase automatically from the base layer. Use .eyebrow for kicker labels above headlines."
+          note="CC Monster Mash Worn is reserved strictly for the logo/wordmark. Headings h1–h4 get Gasoek One uppercase from the base layer. Use .eyebrow for kicker labels above headlines."
         >
           <div class="grid gap-6 sm:grid-cols-3">
             <div>
               <p class="font-marker text-[2.375rem] leading-none text-brand-red">The Leftovers</p>
-              <p class="mt-1.5 text-[0.6875rem] text-[#6b6356]">CC Monster Mash Worn · <code>font-marker</code>. Wordmark only, licensed, never body text.</p>
+              <p class="mt-1.5 text-[0.6875rem] text-[#6b6356]">CC Monster Mash Worn · <code>font-marker</code>. Logo &amp; wordmark only, licensed, never headings or body text.</p>
             </div>
             <div>
               <p class="font-display text-[1.875rem] uppercase leading-none text-ink">Meet the Crew</p>
-              <p class="mt-1.5 text-[0.6875rem] text-[#6b6356]">Anton · <code>font-display</code>. All headings, uppercase, tight leading.</p>
+              <p class="mt-1.5 text-[0.6875rem] text-[#6b6356]">Gasoek One · <code>font-display</code>. Every heading, uppercase, tight leading. Wide and heavy: keep headlines short.</p>
             </div>
             <div>
               <p class="font-sans text-base text-[#1a1712]">Paintball builds better people. Aa Bb Cc 123</p>
@@ -523,6 +530,31 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
             <PricingCard tierName="Standard" price="$45" unit="/jersey" bullets={['Full sublimation print', 'Name on back', 'Ships in 4–6 weeks']} ctaLabel="Pre-Order" ctaHref="/shop" />
             <PricingCard featured tierName="Player Kit" price="$85" unit="/kit" bullets={['Jersey + matching pants', 'Name + number on back', 'Ships in 4–6 weeks', '$10 goes to the season fund']} ctaLabel="Pre-Order" ctaHref="/shop" />
             <PricingCard tierName="Sponsor a Slot" price="$125" unit="/event" bullets={["Covers one free agent's entry", 'Name listed on the roster page', 'Thank-you shoutout on socials']} ctaLabel="Sponsor" ctaHref="/contact" />
+          </div>
+        </Specimen>
+
+        <Specimen
+          title="LogoStrip: leagues and partners"
+          file="src/components/LogoStrip.astro"
+          note="A static row of logos with an optional label. Use it for two to six logos, where the scrolling SponsorMarquee has nothing to scroll. size='sm' for a dense league row, 'md' (default) for partners. Pass href to make a logo a link."
+        >
+          <div class="grid gap-10">
+            <LogoStrip
+              label="Leagues we want to build in"
+              size="sm"
+              items={[
+                { name: 'NXL (US)', src: nxlUsLogo, alt: 'NXL Paintball logo' },
+                { name: 'NXL Europe', src: nxlEuLogo, alt: 'NXL Paintball Europe logo' },
+                { name: 'ICPL', src: icplLogo, alt: 'ICPL logo' },
+              ]}
+            />
+            <LogoStrip
+              label="Partners"
+              items={[
+                { name: 'Infamous Paintball', src: infamousLogo, alt: 'Infamous Paintball logo' },
+                { name: 'Kinetic Paintball', src: kineticLogo, alt: 'Kinetic Paintball logo' },
+              ]}
+            />
           </div>
         </Specimen>
 

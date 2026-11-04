@@ -1,0 +1,79 @@
+---
+/**
+ * LogoStrip — a static, centred row of logos with an optional heading.
+ *
+ * Added Nov 2026 for two places the sponsor marquee doesn't fit: the homepage
+ * "which leagues we play in" row and the contact page's partner logos. A
+ * marquee is wrong for two or three logos (nothing to scroll), and its
+ * "Proudly supported by" label is wrong for leagues.
+ *
+ * Items are resolved by the caller (`resolveImage`), so the strip works for
+ * the `sponsors` collection and for `site.yml`'s `leagues` list alike. A logo
+ * without a `href` is a plain image; with one it is a link with a 44px target.
+ * A missing asset falls back to the name as text rather than a broken image.
+ */
+import { Image } from 'astro:assets';
+
+export interface LogoItem {
+  name: string;
+  /** Resolved asset, or undefined to fall back to the name as text. */
+  src?: ImageMetadata;
+  alt: string;
+  href?: string;
+}
+
+interface Props {
+  items: LogoItem[];
+  /** Small label above the row. */
+  label?: string;
+  /** Logo height. `md` suits partners, `sm` suits a dense league row. */
+  size?: 'sm' | 'md';
+  class?: string;
+}
+
+const { items, label, size = 'md', class: className = '' } = Astro.props;
+const heights = { sm: 'h-12 sm:h-14', md: 'h-16 sm:h-20' } as const;
+---
+
+{
+  items.length > 0 && (
+    <div class:list={['text-center', className]}>
+      {label && <p class="eyebrow mb-5">{label}</p>}
+      <ul class="flex flex-wrap items-center justify-center gap-x-10 gap-y-6 sm:gap-x-14">
+        {items.map((item) => {
+          const inner = item.src ? (
+            <Image
+              src={item.src}
+              alt={item.alt}
+              height={160}
+              widths={[96, 160, 240]}
+              sizes="160px"
+              loading="lazy"
+              decoding="async"
+              class:list={[heights[size], 'w-auto object-contain']}
+            />
+          ) : (
+            <span class="text-lg font-bold uppercase tracking-[0.12em] text-bone-muted">
+              {item.name}
+            </span>
+          );
+          return (
+            <li class="flex items-center">
+              {item.href ? (
+                <a
+                  href={item.href}
+                  rel="noopener"
+                  class="tap inline-flex items-center opacity-90 transition-opacity hover:opacity-100"
+                >
+                  {inner}
+                </a>
+              ) : (
+                inner
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  )
+}

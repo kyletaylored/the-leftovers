@@ -21,7 +21,7 @@ Vecteezy art, attribution is a licence condition, not a courtesy.
 | Font | Use | Source / licence |
 |---|---|---|
 | **CC Monster Mash** (**Worn**) | The "THE LEFTOVERS" wordmark, matching the distressed lettering in the official logo art | Comic Book Fonts LLC — **commercial web licence purchased.** Source download kept in the (gitignored) `_reference/` folder |
-| **Anton** | Headlines | Google Fonts, SIL Open Font License 1.1 |
+| **Gasoek One** | Headlines | Google Fonts, SIL Open Font License 1.1 |
 | **Inter** | Body and UI text | Google Fonts, SIL Open Font License 1.1 |
 
 ### CC Monster Mash — licence terms that affect the code
