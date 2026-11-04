@@ -96,6 +96,21 @@ When a batch closes, flip the item to **Sold out** rather than deleting it.
 
 ---
 
+## Homepage photo slider
+
+**Photo galleries → Game day.** Every photo in this gallery shows in the
+homepage slider, in list order.
+
+- **Alt text** is required. Describe what's visible and name nobody.
+- **Headline** is the big line on that photo, like *"Off the break"*. Keep it
+  to two or three words: on a phone it fills the width.
+- **Kicker** is the small gold line above it, like *"NXL · 2026"*. Leave it
+  empty and the slide uses the gallery title instead.
+- A photo with no headline shows only its kicker, so leaving both empty
+  gives you the gallery title ("Game day") on that slide.
+
+---
+
 ## Site settings
 
 **Site settings** holds the things that aren't content: nav labels, social

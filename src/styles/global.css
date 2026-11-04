@@ -353,3 +353,29 @@
     transform: translateX(-50%);
   }
 }
+
+/* Paper lanterns (Lantern variant="paper" sway): a slow pendulum from the
+   cord's top. The global reduced-motion rule above stops it. */
+@keyframes lantern-sway {
+  from {
+    transform: rotate(-3.5deg);
+  }
+  to {
+    transform: rotate(3.5deg);
+  }
+}
+.lantern-sway {
+  transform-origin: 50% 0;
+  animation: lantern-sway 5.5s ease-in-out infinite alternate;
+}
+
+/* Slideshow layout="showcase": the active segment fills over the autoplay
+   interval, and its animationend is what advances the slide. */
+@keyframes slide-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

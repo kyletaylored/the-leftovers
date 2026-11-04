@@ -40,7 +40,9 @@ export default defineConfig({
       // /design is the internal design-system storybook (noindex) — a tool
       // for whoever's building the site, not a page for visitors.
       filter: (page) =>
-        !['/about', '/roster', '/stats', '/design', ...HIDDEN_PAGES].some((p) => page.endsWith(p)),
+        !['/about', '/roster', '/stats', '/design', ...HIDDEN_PAGES].some((p) => page.endsWith(p)) &&
+        // /preview/* are design review pages (noindex), never linked.
+        !page.includes('/preview/'),
     }),
     react(),
   ],

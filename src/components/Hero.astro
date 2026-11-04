@@ -8,19 +8,27 @@
  * wordmark side by side at 64/52 units tall, which is what made the homepage
  * feel magnified.
  *
+ * `ornate` (Nov 2026 design pass, after `docs/design/homepage-mockup-b.webp`)
+ * is the same logo lockup dressed for a showpiece: gilded ruyi-cloud banks
+ * with swaying paper lanterns in both top corners (CloudCorner), a warm gold
+ * glow behind the logo, and the layered RiceTerraces landscape along the
+ * bottom in place of the single-line TerracedDivider.
+ *
  * `image` and `video` put photography behind the copy; `text` is copy only.
  *
  * The logo is the LCP element on the homepage, so it is eager, high-priority,
- * and width/height-locked. Everything decorative around it is SVG.
+ * and width/height-locked. Everything decorative around it is SVG/CSS.
  */
 import { Image } from 'astro:assets';
 import logo from '@/assets/img/brand/logo.png';
 import RuyiCloud from './brand/RuyiCloud.astro';
 import TerracedDivider from './brand/TerracedDivider.astro';
+import CloudCorner from './brand/CloudCorner.astro';
+import RiceTerraces from './brand/RiceTerraces.astro';
 import { site } from '@/lib/settings';
 
 interface Props {
-  variant?: 'brand' | 'image' | 'video' | 'text';
+  variant?: 'brand' | 'ornate' | 'image' | 'video' | 'text';
   title?: string;
   tagline?: string;
   image?: ImageMetadata;
@@ -48,9 +56,13 @@ if (variant === 'video' && (!video || !poster)) {
 }
 
 const backdrop = variant === 'video' ? poster : image;
+const isLogo = variant === 'brand' || variant === 'ornate';
+const ornate = variant === 'ornate';
+// "Play / Compete / Leftovers" → spaced segments with gold slashes.
+const taglineParts = tagline?.split('/').map((part) => part.trim()).filter(Boolean) ?? [];
 ---
 
-<section class:list={['bg-sand relative overflow-hidden', className]}>
+<section class:list={[ornate ? 'bg-topo' : 'bg-sand', 'relative overflow-hidden', className]}>
   {
     (variant === 'image' || variant === 'video') && backdrop && (
       <>
@@ -82,20 +94,41 @@ const backdrop = variant === 'video' ? poster : image;
     )
   }
 
-  <!-- Ruyi-cloud banks rolling in from the top corners (§9 motif). -->
-  <RuyiCloud
-    variant={1}
-    class="pointer-events-none absolute -left-10 -top-5 h-14 w-auto text-crimson sm:h-24 lg:h-36"
-  />
-  <RuyiCloud
-    variant={2}
-    flip
-    class="pointer-events-none absolute -right-10 -top-5 h-14 w-auto text-crimson sm:h-24 lg:h-36"
-  />
+  {
+    ornate ? (
+      <>
+        {/* Warm lantern-light glow behind the logo. */}
+        <div
+          class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_50%_45%,color-mix(in_srgb,var(--color-gold)_16%,transparent),transparent_70%)]"
+          aria-hidden="true"
+        />
+        <CloudCorner side="left" class="absolute -left-12 top-0 w-52 sm:-left-12 sm:-top-6 sm:w-72 lg:w-[26rem] xl:w-[30rem]" />
+        <CloudCorner side="right" class="absolute -right-12 top-0 w-52 sm:-right-12 sm:-top-6 sm:w-72 lg:w-[26rem] xl:w-[30rem]" />
+      </>
+    ) : (
+      <>
+        {/* Ruyi-cloud banks rolling in from the top corners (§9 motif). */}
+        <RuyiCloud
+          variant={1}
+          class="pointer-events-none absolute -left-10 -top-5 h-14 w-auto text-crimson sm:h-24 lg:h-36"
+        />
+        <RuyiCloud
+          variant={2}
+          flip
+          class="pointer-events-none absolute -right-10 -top-5 h-14 w-auto text-crimson sm:h-24 lg:h-36"
+        />
+      </>
+    )
+  }
 
-  <div class="relative mx-auto max-w-5xl px-4 pb-24 pt-12 text-center sm:px-6 sm:pb-28 lg:pb-32 lg:pt-16">
+  <div
+    class:list={[
+      'relative mx-auto max-w-5xl px-4 text-center sm:px-6',
+      ornate ? 'pb-24 pt-20 sm:pb-36 sm:pt-20 lg:pb-44 lg:pt-20' : 'pb-24 pt-12 sm:pb-28 lg:pb-32 lg:pt-16',
+    ]}
+  >
     {
-      variant === 'brand' ? (
+      isLogo ? (
         <>
           {/* The logo carries the accessible name, so the h1 is visually
               hidden rather than duplicated on screen. */}
@@ -108,13 +141,26 @@ const backdrop = variant === 'video' ? poster : image;
             quality={68}
             loading="eager"
             fetchpriority="high"
-            class="mx-auto h-auto w-56 sm:w-72 lg:w-80"
+            class:list={[
+              'mx-auto h-auto w-56 sm:w-72 lg:w-80',
+              ornate && 'drop-shadow-[0_10px_30px_rgba(0,0,0,0.6)]',
+            ]}
           />
-          {tagline && (
-            <p class="mx-auto mt-6 max-w-xl text-[0.62rem] font-bold uppercase tracking-[0.28em] text-bone-muted sm:text-xs sm:tracking-[0.32em]">
-              {tagline}
-            </p>
-          )}
+          {tagline &&
+            (ornate ? (
+              <p class="mx-auto mt-7 flex max-w-xl flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[0.65rem] font-bold uppercase tracking-[0.3em] text-bone sm:text-xs sm:tracking-[0.36em]">
+                {taglineParts.map((part, i) => (
+                  <>
+                    {i > 0 && <span class="text-gold" aria-hidden="true">/</span>}
+                    <span>{part}</span>
+                  </>
+                ))}
+              </p>
+            ) : (
+              <p class="mx-auto mt-6 max-w-xl text-[0.62rem] font-bold uppercase tracking-[0.28em] text-bone-muted sm:text-xs sm:tracking-[0.32em]">
+                {tagline}
+              </p>
+            ))}
         </>
       ) : (
         <div class="mx-auto max-w-3xl">
@@ -131,7 +177,13 @@ const backdrop = variant === 'video' ? poster : image;
     </div>
   </div>
 
-  <TerracedDivider seed={3} style="pagoda" class="absolute bottom-0 left-0 h-14 sm:h-20 lg:h-24" />
+  {
+    ornate ? (
+      <RiceTerraces seed={7} class="absolute bottom-0 left-0 h-28 sm:h-36 lg:h-48" />
+    ) : (
+      <TerracedDivider seed={3} style="pagoda" class="absolute bottom-0 left-0 h-14 sm:h-20 lg:h-24" />
+    )
+  }
 </section>
 
 <style>

@@ -58,3 +58,45 @@ export const Hero: Story = {
     await expect(canvas.getByRole('button', { name: /next slide/i })).toBeVisible();
   },
 };
+
+// --- Nov 2026: per-slide kicker + headline, and the showcase layout ---
+
+const posterSlides: Slide[] = [
+  { src: 'https://picsum.photos/seed/leftovers-4/1600/1000', width: 1600, height: 1000, alt: 'Players sprint off the break', caption: 'Off the break', kicker: 'NXL · 2026' },
+  { src: 'https://picsum.photos/seed/leftovers-5/1600/1000', width: 1600, height: 1000, alt: 'A team huddle', caption: 'Lock in', kicker: 'NXL · 2025' },
+  { src: 'https://picsum.photos/seed/leftovers-6/1600/1000', width: 1600, height: 1000, alt: 'Team photo under a tent', kicker: 'Game day' },
+];
+
+/** Flag carries the per-slide caption with its kicker above; grows on desktop. */
+export const FlagWithKicker: Story = {
+  args: { slides: posterSlides, layout: 'single', captionStyle: 'flag' },
+  play: async ({ canvas }) => {
+    await expect(canvas.getAllByText('Off the break')[0]).toBeInTheDocument();
+    await expect(canvas.getAllByText('NXL · 2026')[0]).toBeInTheDocument();
+  },
+};
+
+/** Full-bleed poster slider: headline per slide, counter, progress bars. */
+export const Showcase: Story = {
+  args: { slides: posterSlides, layout: 'showcase' },
+  parameters: { layout: 'fullscreen' },
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByText('Off the break')).toBeInTheDocument();
+    const second = canvas.getByRole('button', { name: /go to slide 2/i });
+    await userEvent.click(canvas.getByRole('button', { name: /next slide/i }));
+    await expect(second).toHaveAttribute('aria-current', 'true');
+    // No autoplay, so no pause control.
+    await expect(canvas.queryByRole('button', { name: /pause slideshow/i })).toBeNull();
+  },
+};
+
+/** With autoplay: a visible pause/play toggle (WCAG 2.2.2). */
+export const ShowcaseAutoplay: Story = {
+  args: { slides: posterSlides, layout: 'showcase', autoplayMs: 6000 },
+  parameters: { layout: 'fullscreen' },
+  play: async ({ canvas, userEvent }) => {
+    const pause = await canvas.findByRole('button', { name: /pause slideshow/i });
+    await userEvent.click(pause);
+    await expect(canvas.getByRole('button', { name: /play slideshow/i })).toBeVisible();
+  },
+};
