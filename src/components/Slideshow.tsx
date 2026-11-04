@@ -272,7 +272,8 @@ export default function Slideshow({
                       width={slide.width}
                       height={slide.height}
                       alt={slide.alt}
-                      loading={index === 0 ? 'eager' : 'lazy'}
+                      // Showcase sits below the fold: never compete with the hero (LCP).
+                      loading="lazy"
                       decoding="async"
                       className={cn(
                         'absolute inset-0 size-full object-cover transition-transform duration-[7000ms] ease-out',
@@ -426,7 +427,8 @@ export default function Slideshow({
                   width={slide.width}
                   height={slide.height}
                   alt={slide.alt}
-                  loading={index === 0 ? 'eager' : 'lazy'}
+                  // Only the hero layout can be above the fold.
+                  loading={index === 0 && isHero ? 'eager' : 'lazy'}
                   decoding="async"
                   className={cn(aspectFor[layout], 'w-full object-cover')}
                 />

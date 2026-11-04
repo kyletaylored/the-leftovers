@@ -6,28 +6,36 @@
  * newcomer's questions in the order they'd ask them: what is this → how do I
  * get in → when's the next one → can I get updates.
  *
- * Nov 2026 (website feedback): the manifesto band now carries the photo
- * slider, the calendar block reads "2027 Season Loading…" with the leagues the
- * team wants to build in, and the community-channels, open-slots and
- * "From the Field" blocks are gone because the pages they pointed at (Team,
- * Community) are hidden. The placeholder event no longer drives anything here,
- * so there is no SportsEvent structured data on this page.
+ * Nov 2026: this is the "direction B" layout from
+ * `docs/design/homepage-mockup-b.webp`, reviewed at /preview/home-b and
+ * promoted here by the team. Ornate hero on bg-sand → ImpactBand (manifesto
+ * + why it's different) → full-width showcase slider of the game-day gallery
+ * → a boxed TwoColumn "How it works" CTA (so the two full-bleed photo blocks
+ * never touch) → crimson ImpactBand for free agents → "2027 Season
+ * Loading…" with the leagues → newsletter.
+ *
+ * Earlier the same month (website feedback) the community-channels,
+ * open-slots and "From the Field" blocks were removed because the pages they
+ * pointed at (Team, Community) are hidden. The placeholder event drives
+ * nothing here, so there is no SportsEvent structured data on this page.
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/Hero.astro';
 import Section from '@/components/Section.astro';
-import ThreeColumn from '@/components/ThreeColumn.astro';
-import NewsletterBlock from '@/components/NewsletterBlock.astro';
+import TwoColumn from '@/components/TwoColumn.astro';
+import ImpactBand from '@/components/marketing/ImpactBand.astro';
 import GallerySlideshow from '@/components/GallerySlideshow.astro';
+import NewsletterBlock from '@/components/NewsletterBlock.astro';
 import LogoStrip from '@/components/LogoStrip.astro';
 import Button from '@/components/Button.astro';
 import { site } from '@/lib/settings';
 import { resolveImage } from '@/lib/images';
+import shooter from '@/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp';
+import aiming from '@/assets/img/events/nxl-lso26/lo2nxllso26-219-x5.webp';
+import huddle from '@/assets/img/events/nxl-lsm25/frinxllsm25ls-1427-x5.webp';
 
 const galleries = await getCollection('galleries');
-// The slider is the `game-day` gallery only, so curating the homepage never
-// depends on what other galleries exist.
 const sliderGalleries = galleries.filter((gallery) => gallery.id === 'game-day');
 
 const leagues = await Promise.all(
@@ -37,71 +45,75 @@ const leagues = await Promise.all(
     src: await resolveImage(league.logo),
   }))
 );
-
-const premise = [
-  {
-    icon: 'chat' as const,
-    title: 'No tryout',
-    body: 'Say you’re coming, tell us what you want to compete in, pay the event deposit and you will be added to the list. Team chats are created to start connecting players.',
-  },
-  {
-    icon: 'jersey' as const,
-    title: 'Bring your own gear',
-    body: 'Your marker, your mask, your style. Various team jersey designs are available, but NOT mandatory… but when you see them, you’ll want one!',
-  },
-  {
-    icon: 'trophy' as const,
-    title: 'You actually play',
-    body: 'No bench and no practice squad. If you confirmed, you’re playing points in a registered tournament.',
-  },
-];
 ---
 
 <BaseLayout title={site.title} description={site.description}>
-  <Hero variant="brand" tagline={site.tagline}>
+  <Hero variant="ornate" tagline={`Paintball team / ${site.tagline}`}>
     <Button slot="actions" href="/join" size="lg">Join a squad</Button>
   </Hero>
 
-  <!-- MANIFESTO + PHOTO SLIDER --------------------------------------------------->
-  <section class="border-y border-ink-600 bg-ink-900">
-    <div class="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 lg:py-24">
+  <ImpactBand
+    image={shooter}
+    imageAlt="A Leftovers player in a mask and team jersey aims a paintball marker across a field."
+    eyebrow="Play hard"
+    title={'Paintball builds\nbetter people.'}
+    body="A community-run team built from rotating free agents. Show up, play points, make friends on the field."
+    stats={[
+      { value: '0', label: 'Tryouts' },
+      { value: '0', label: 'Bench spots' },
+      { value: '100%', label: 'Playing time' },
+    ]}
+    ghost="Play"
+  >
+    <Button slot="actions" href="/join" size="lg">Join a squad</Button>
+  </ImpactBand>
+
+  <section class="bg-ink">
+    <div class="mx-auto max-w-5xl px-4 pb-10 pt-16 text-center sm:px-6 lg:pt-24">
       <p class="eyebrow mb-4">{site.tagline}</p>
       <h2 class="mx-auto max-w-3xl text-2xl leading-tight text-bone sm:text-4xl lg:text-5xl">
         <span class="block">Don’t miss the action.</span>
         <span class="block">Expand your network.</span>
         <span class="block">Make memories.</span>
       </h2>
-      <GallerySlideshow
-        galleries={sliderGalleries}
-        layout="single"
-        captionStyle="flag"
-        autoplayMs={6000}
-        class="mx-auto mt-10 text-left sm:mt-14"
-      />
     </div>
+    <GallerySlideshow galleries={sliderGalleries} layout="showcase" autoplayMs={6000} />
   </section>
 
-  <!-- WHAT THIS IS ---------------------------------------------------------->
-  <Section tone="base" eyebrow="Free agents welcome" title="Anyone Can Play">
-    <div class="max-w-3xl space-y-4 text-base leading-relaxed text-bone-muted sm:text-lg">
-      <p>
-        The Leftovers are a community-run paintball team built from rotating free agents. There’s
-        no tryout and no bench. If you can make the date and cover your own entry, you can play a
-        tournament with us.
-      </p>
-      <p>
-        If you have no team at all, or your team is missing a specific event that you still want to
-        attend, we have a spot for <strong class="text-bone">YOU</strong>.
-      </p>
-    </div>
-    <ThreeColumn items={premise} class="mt-10" />
+  {/* A calm, boxed two-column CTA between the two full-bleed photo blocks,
+      so the slider and the crimson band never butt up against each other. */}
+  <Section tone="seigaiha">
+    <TwoColumn
+      eyebrow="How it works"
+      title="Three steps to the field"
+      image={huddle}
+      imageAlt="Leftovers players in a tight huddle with their arms together and paint pods on their hips."
+      imageSide="right"
+    >
+      <ol class="space-y-3">
+        <li><strong class="text-bone">No tryout.</strong> Say you’re coming and tell us what you want to compete in.</li>
+        <li><strong class="text-bone">Bring your own gear.</strong> Your marker, your mask, your style.</li>
+        <li><strong class="text-bone">You actually play.</strong> No bench: if you confirmed, you’re playing points.</li>
+      </ol>
+      <Button slot="actions" href="/join">Join a squad</Button>
+      <Button slot="actions" href="/contact" variant="outline">Ask a question</Button>
+    </TwoColumn>
   </Section>
 
-  <!-- THE SEASON -------------------------------------------------------------->
+  <ImpactBand
+    image={aiming}
+    imageAlt="A Leftovers player crouched behind an inflatable bunker sights down a paintball marker."
+    align="right"
+    tone="crimson"
+    eyebrow="Free agents welcome"
+    title={'No team?\nNo problem.'}
+    body="If you have no team at all, or your team is missing an event you still want to attend, we have a spot for you."
+  >
+    <Button slot="actions" href="/join" variant="gold" size="lg">Request to join</Button>
+  </ImpactBand>
+
   <Section tone="alt" eyebrow="Next up" title="On the Calendar">
-    <div
-      class="rounded-sm border border-ink-600 bg-ink-800 px-6 py-10 text-center sm:px-10 sm:py-14"
-    >
+    <div class="rounded-sm border border-ink-600 bg-ink-800 px-6 py-10 text-center sm:px-10 sm:py-14">
       <h3 class="text-3xl text-bone sm:text-5xl">2027 Season Loading…</h3>
       <p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-bone-muted sm:text-base">
         Dates go up as the leagues release them. Send a join request and we’ll follow up as soon
@@ -114,7 +126,6 @@ const premise = [
     </div>
   </Section>
 
-  <!-- NEWSLETTER ------------------------------------------------------------>
   <Section tone="base" divider dividerSeed={11}>
     <NewsletterBlock />
   </Section>

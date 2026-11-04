@@ -568,8 +568,8 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
         tag="NEW"
         class="mb-5"
         flush
-        file={['src/components/Hero.astro', 'src/pages/preview/home-b.astro']}
-        note={'The logo hero on bg-sand, dressed for a showpiece: CloudCorner in both top corners, a gold glow behind the logo, RiceTerraces along the bottom, and the tagline split on "/" with gold slashes. The real Hero owns the page h1, so it is mocked here from its parts; see it live at /preview/home-b.'}
+        file={['src/components/Hero.astro', 'src/pages/index.astro']}
+        note={'The logo hero on bg-sand, dressed for a showpiece: CloudCorner in both top corners, a gold glow behind the logo, RiceTerraces along the bottom, and the tagline split on "/" with gold slashes. The real Hero owns the page h1, so it is mocked here from its parts; see it live on the homepage.'}
       >
         <div class="relative h-[26rem] overflow-hidden bg-sand sm:h-[30rem]">
           <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_50%_45%,color-mix(in_srgb,var(--color-gold)_16%,transparent),transparent_70%)]" />
@@ -578,7 +578,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
           <Image src={logoImg} alt="" widths={[224, 448]} sizes="224px" class="absolute left-1/2 top-14 h-auto w-44 -translate-x-1/2 sm:w-56" />
           <RiceTerraces seed={7} class="absolute bottom-0 left-0 h-24 sm:h-36 lg:h-auto lg:aspect-[2400/260]" />
         </div>
-        <p class="px-5 pt-3 sm:px-[22px]"><a class="tap inline-flex items-center text-xs font-bold uppercase tracking-[0.14em] text-gold-300 underline" href="/preview/home-b">Open /preview/home-b</a></p>
+        <p class="px-5 pt-3 sm:px-[22px]"><a class="tap inline-flex items-center text-xs font-bold uppercase tracking-[0.14em] text-gold-300 underline" href="/">Open the homepage</a></p>
       </Specimen>
       <div class="grid gap-5 lg:grid-cols-2">
         <Specimen title="Callout" file="src/components/Callout.astro" note="A pull quote with optional cite.">
@@ -603,7 +603,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
           title="TwoColumn: image + copy CTA"
           class="lg:col-span-2"
           file="src/components/TwoColumn.astro"
-          note={'The standard boxed two-column block: copy, actions and an image with a gold offset frame. Stacks image-under-copy on phones. Use it inside a textured Section (seigaiha / sand) to break up two full-bleed blocks, like the slider and an ImpactBand on /preview/home-b. imageSide flips it.'}
+          note={'The standard boxed two-column block: copy, actions and an image with a gold offset frame. Stacks image-under-copy on phones. Use it inside a textured Section (seigaiha / sand) to break up two full-bleed blocks, like the slider and an ImpactBand on the homepage. imageSide flips it.'}
         >
           <TwoColumn as="h3" eyebrow="How it works" title="Three steps to the field" image={sprintImg} imageAlt="Three Leftovers players sprint out from behind a red inflatable bunker.">
             <p>No tryout, bring your own gear, and you actually play.</p>
@@ -654,7 +654,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
           tag="NEW"
           flush
           file="src/components/marketing/ImpactBand.astro"
-          note={'The bold one: the photo owns the full width and fades into a SOLID wash under the copy, so body text always sits on flat colour (AA). tone = ink | crimson | forest; on crimson/forest the body copy is full bone. treatment="duotone" also tints the whole photo. Mobile first: on phones the photo stacks on top and fades down into the copy. Keep titles to two short lines. Use one or two per page, never back to back: put a boxed block (TwoColumn) between them. Place it outside any Section container.'}
+          note={'The bold one: the photo owns the full width and fades into a SOLID wash under the copy, so body text always sits on flat colour (AA). tone = ink (black, default) | crimson | forest; on crimson/forest the body copy is full bone. treatment="duotone" also tints the whole photo (ink = black and white; crimson tints at half strength). Mobile first: on phones the photo stacks on top and fades down into the copy. Keep titles to two short lines. Use one or two per page, never back to back: put a boxed block (TwoColumn) between them. Place it outside any Section container.'}
         >
           <ImpactBand
             as="h3"
@@ -701,6 +701,17 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
             treatment="duotone"
             eyebrow={'tone="crimson" treatment="duotone"'}
             title={'Eyes\nup.'}
+            body="Crimson tints at half strength so the photo still reads; it is the most saturated brand colour."
+          />
+          <ImpactBand
+            as="h3"
+            image={aimingImg}
+            imageAlt="A Leftovers player behind an inflatable bunker sights down a marker."
+            tone="ink"
+            treatment="duotone"
+            eyebrow={'tone="ink" treatment="duotone" (black)'}
+            title={'Black &\nwhite.'}
+            body="The black option: ink is the default tone, and with duotone the photo goes black and white."
           />
         </Specimen>
 

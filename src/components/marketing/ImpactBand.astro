@@ -17,14 +17,16 @@
  *    (`align`), vertically centred.
  *
  * Colour (both props, any combination):
- *  - `tone` is the wash the photo fades into: `ink` (default), `crimson` or
- *    `forest`. The wash is SOLID under the copy, not a gradient, so body
+ *  - `tone` is the wash the photo fades into: `ink` (black, the default),
+ *    `crimson` or `forest`. The wash is SOLID under the copy, not a gradient, so body
  *    text always sits on a flat brand colour and passes AA. On `crimson`
  *    and `forest` the body copy is full bone, not bone-muted.
  *  - `treatment="duotone"` also tints the whole photo in the tone (greyscale
  *    + a 'color' blend that swaps in the tone's hue but keeps the photo's
  *    brightness), for a poster look or when a photo's own colours
- *    fight the brand.
+ *    fight the brand. With `ink` that's a black-and-white photo. The tint
+ *    strength is set per tone (`tint` below): crimson is the most
+ *    saturated colour, so it tints at half strength or it floods the photo.
  *
  * Pick a photo whose subject is on the side AWAY from the copy, and nudge it
  * with `focus` (CSS object-position). `ghost` puts an outlined word huge
@@ -86,9 +88,9 @@ const lines = title.split('\n');
 const position = focus ?? (right ? '30% 35%' : '70% 35%');
 
 const tones = {
-  ink: { wash: 'var(--color-ink)', bg: 'bg-ink', body: 'text-bone-muted', bar: 'bg-crimson', label: 'text-bone-muted' },
-  crimson: { wash: 'var(--color-crimson)', bg: 'bg-crimson', body: 'text-bone', bar: 'bg-gold', label: 'text-bone' },
-  forest: { wash: 'var(--color-forest)', bg: 'bg-forest', body: 'text-bone', bar: 'bg-gold', label: 'text-bone' },
+  ink: { wash: 'var(--color-ink)', bg: 'bg-ink', body: 'text-bone-muted', bar: 'bg-crimson', label: 'text-bone-muted', tint: 1 },
+  crimson: { wash: 'var(--color-crimson)', bg: 'bg-crimson', body: 'text-bone', bar: 'bg-gold', label: 'text-bone', tint: 0.45 },
+  forest: { wash: 'var(--color-forest)', bg: 'bg-forest', body: 'text-bone', bar: 'bg-gold', label: 'text-bone', tint: 0.75 },
 } as const;
 const t = tones[tone];
 const mix = (pct: number) => `color-mix(in srgb, ${t.wash} ${pct}%, transparent)`;
@@ -118,7 +120,7 @@ const hasActions = Astro.slots.has('actions');
     />
     {
       treatment === 'duotone' && (
-        <div class="absolute inset-0 mix-blend-color" style={`background:${t.wash}`} aria-hidden="true" />
+        <div class="absolute inset-0 mix-blend-color" style={`background:${t.wash};opacity:${t.tint}`} aria-hidden="true" />
       )
     }
     {/* Phones/tablets: fade down into the copy below. */}
