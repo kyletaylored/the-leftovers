@@ -278,9 +278,12 @@ inline-styled HTML into the repo.
 ### Needs the team (decisions or content, not code)
 
 0. **Pick a homepage direction.** `/preview/home-b` (noindex, unlinked) puts
-   the Nov 2026 bolder pieces together: the ornate hero (gilded cloud
-   corners, paper lanterns, `RiceTerraces`), full-bleed `ImpactBand`s, and the
-   full-width `showcase` slider. If the team picks it, move its blocks into
+   the Nov 2026 bolder pieces together: the ornate hero on `bg-sand` (gilded
+   cloud corners, paper lanterns, `RiceTerraces`), full-bleed `ImpactBand`s
+   (tones ink / crimson / forest, optional duotone), the full-width
+   `showcase` slider, and a boxed `TwoColumn` CTA between the slider and the
+   crimson band so two full-bleed photos never touch. Every piece was checked
+   at 375px first. If the team picks it, move its blocks into
    `src/pages/index.astro` and delete the preview page. Also review the
    slider headlines in `src/content/galleries/game-day.yml`. They're
    placeholder copy written from what each photo shows.

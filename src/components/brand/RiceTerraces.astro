@@ -8,19 +8,23 @@
  * never repeats itself:
  *  - far    — soft rounded mountains, dimmed, with sparkles over the peaks;
  *  - mid    — hills quantised into rounded rice-paddy steps;
- *  - front  — a run of mixed segments (swells, stepped plateaus, pagoda-eave
- *             flicks with finials, flat paddies), so no two spans match.
+ *  - front  — a steady rhythm of segments (swell, terrace, eave, terrace,
+ *             swell, flat) whose sizes vary only a little, so it reads as
+ *             designed rather than random.
  * Every layer carries nested gold contour lines clipped inside its own
- * silhouette (the paddy walls), and 田 ("rice field") glyphs sit on the
- * plateaus, singly or in pairs.
+ * silhouette (the paddy walls), and single 田 ("rice field") glyphs sit on
+ * the plateaus, always at least GLYPH_GAP apart.
  *
  * Everything is generated at build time from `seed` (deterministic, so the
- * markup is stable between builds). Pure decoration: aria-hidden, no JS.
+ * markup is stable between builds). Every layer keeps headroom under the top
+ * of the viewBox, so no peak, sparkle or finial is ever clipped.
+ * Pure decoration: aria-hidden, no JS.
  *
- * Sizing: the viewBox is wide and uses `xMidYMax slice`, so give it a
- * height (`h-28 sm:h-36 lg:h-48`) and full width. On a phone it crops the
- * sides instead of squashing the glyphs, which `preserveAspectRatio="none"`
- * would do.
+ * Sizing (mobile first): the viewBox is very wide (2400×260) with
+ * `xMidYMax slice`. Give it a fixed height on small screens, where it crops
+ * the SIDES rather than squashing the glyphs, and let the height follow the
+ * width from lg up so nothing is cropped top or bottom:
+ * `h-28 sm:h-36 lg:h-auto lg:aspect-[2400/260]`.
  */
 import { uid } from '@/lib/uid';
 
@@ -35,9 +39,12 @@ interface Props {
 
 const { seed = 1, flip = false, simple = false, class: className = '' } = Astro.props;
 
-const W = 1600;
+const W = 2400;
 const H = 260;
 const STEP = 5;
+/** Highest any ridge may reach (smallest y), leaving room for ornaments. */
+const CEILING = 44;
+const GLYPH_GAP = 170;
 
 const rand = (i: number) => {
   const x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453;
@@ -74,37 +81,54 @@ function gaussians(count: number, salt: number, ampLo: number, ampHi: number, wL
 const sumOf = (bumps: { c: number; a: number; w: number }[], x: number) =>
   bumps.reduce((acc, { c, a, w }) => acc + a * Math.exp(-(((x - c) / w) ** 2)), 0);
 
+/** Squash a ridge toward its base so its highest point sits at `top`. */
+function headroom(ys: number[], base: number, top: number): number[] {
+  const min = Math.min(...ys);
+  if (min >= top) return ys;
+  const k = (base - top) / (base - min);
+  return ys.map((y) => base - (base - y) * k);
+}
+
 // --- far: rounded mountains ------------------------------------------------
-const farBumps = gaussians(7, 100, 45, 115, 70, 150);
-const farY = xs.map((x) => 168 - sumOf(farBumps, x));
+const farBumps = gaussians(10, 100, 50, 100, 90, 160);
+const farY = headroom(xs.map((x) => 168 - sumOf(farBumps, x)), 168, CEILING);
 
 // --- mid: quantised paddy steps --------------------------------------------
-const midBumps = gaussians(9, 200, 22, 62, 55, 120);
-const midY = smooth(
-  xs.map((x) => 206 - Math.round(sumOf(midBumps, x) / 15) * 15),
-  3
+const midBumps = gaussians(13, 200, 24, 56, 70, 120);
+const midY = headroom(
+  smooth(
+    xs.map((x) => 206 - Math.round(sumOf(midBumps, x) / 15) * 15),
+    3
+  ),
+  206,
+  CEILING + 40
 );
 
 // --- front: a run of mixed segments ----------------------------------------
 type Kind = 'swell' | 'terrace' | 'eave' | 'flat';
-const kinds: Kind[] = ['swell', 'terrace', 'eave', 'flat'];
+// A fixed rhythm; the seed only picks where in the cycle the band starts.
+const rhythm: Kind[] = ['swell', 'terrace', 'eave', 'terrace', 'swell', 'flat'];
+const amp: Record<Kind, [number, number]> = {
+  swell: [18, 26],
+  terrace: [22, 30],
+  eave: [36, 44],
+  flat: [4, 6],
+};
 const segments: { x0: number; x1: number; kind: Kind; a: number; steps: number }[] = [];
 {
   let x = -40;
   let i = 0;
-  let last: Kind | undefined;
+  const start = Math.floor(rand(330) * rhythm.length);
   while (x < W + 40) {
-    const width = between(300 + i, 130, 250);
-    let kind = kinds[Math.floor(rand(330 + i) * kinds.length)];
-    if (kind === last) kind = kinds[(kinds.indexOf(kind) + 1) % kinds.length];
+    const kind = rhythm[(start + i) % rhythm.length];
+    const width = between(300 + i, 210, 260);
     segments.push({
       x0: x,
       x1: x + width,
       kind,
-      a: between(360 + i, kind === 'flat' ? 2 : 16, kind === 'eave' ? 46 : 34),
-      steps: 2 + Math.floor(rand(390 + i) * 2),
+      a: between(360 + i, ...amp[kind]),
+      steps: 2,
     });
-    last = kind;
     x += width;
     i++;
   }
@@ -145,25 +169,23 @@ function peaks(ys: number[], gap: number): [number, number][] {
 }
 const yAt = (ys: number[], x: number) => ys[Math.min(ys.length - 1, Math.max(0, Math.round(x / STEP)))];
 
-// 田 glyphs on the front plateaus (terrace tops + flat paddies) and mid peaks.
+// 田 glyphs: one per front plateau (terrace tops + flat paddies), then mid
+// peaks fill the gaps. Every glyph keeps GLYPH_GAP from every other, across
+// both layers, so two never sit side by side.
 type Glyph = { x: number; y: number; s: number; o: number };
 const glyphs: Glyph[] = [];
-segments.forEach((seg, i) => {
+const roomFor = (x: number) => glyphs.every((g) => Math.abs(g.x - x) >= GLYPH_GAP);
+segments.forEach((seg) => {
   const cx = (seg.x0 + seg.x1) / 2;
-  if (cx < 30 || cx > W - 30) return;
+  if (cx < 40 || cx > W - 40 || !roomFor(cx)) return;
   if (seg.kind === 'terrace' || seg.kind === 'flat') {
-    const s = between(500 + i, 11, 16);
-    const y = yAt(frontY, cx) - s / 2 - 2;
-    glyphs.push({ x: cx, y, s, o: 0.95 });
-    if (rand(520 + i) > 0.45) {
-      const dx = (s + 4) * (rand(540 + i) > 0.5 ? 1 : -1);
-      glyphs.push({ x: cx + dx, y: yAt(frontY, cx + dx) - s / 2 - 2, s: s * 0.8, o: 0.8 });
-    }
+    const s = 14;
+    glyphs.push({ x: cx, y: yAt(frontY, cx) - s / 2 - 2, s, o: 0.95 });
   }
 });
-peaks(midY, 150).forEach(([x, y], i) => {
-  if (rand(600 + i) < 0.35) return;
-  const s = between(620 + i, 8, 11);
+peaks(midY, GLYPH_GAP).forEach(([x, y]) => {
+  if (!roomFor(x) || x < 40 || x > W - 40) return;
+  const s = 10;
   glyphs.push({ x, y: y - s / 2 - 1.5, s, o: 0.6 });
 });
 
@@ -179,9 +201,9 @@ const finials = segments
 // Sparkles over the far peaks.
 const sparkles = simple
   ? []
-  : peaks(farY, 180).map(([x, y], i) => ({
+  : peaks(farY, 260).map(([x, y], i) => ({
       x: x + between(700 + i, -30, 30),
-      y: y - between(720 + i, 14, 34),
+      y: Math.max(10, y - between(720 + i, 14, 28)),
       r: between(740 + i, 3, 6),
     }));
 

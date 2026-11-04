@@ -15,6 +15,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Hero from '@/components/Hero.astro';
 import Section from '@/components/Section.astro';
+import TwoColumn from '@/components/TwoColumn.astro';
 import ImpactBand from '@/components/marketing/ImpactBand.astro';
 import GallerySlideshow from '@/components/GallerySlideshow.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
@@ -24,6 +25,7 @@ import { site } from '@/lib/settings';
 import { resolveImage } from '@/lib/images';
 import shooter from '@/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp';
 import aiming from '@/assets/img/events/nxl-lso26/lo2nxllso26-219-x5.webp';
+import huddle from '@/assets/img/events/nxl-lsm25/frinxllsm25ls-1427-x5.webp';
 
 const galleries = await getCollection('galleries');
 const sliderGalleries = galleries.filter((gallery) => gallery.id === 'game-day');
@@ -69,6 +71,26 @@ const leagues = await Promise.all(
     </div>
     <GallerySlideshow galleries={sliderGalleries} layout="showcase" autoplayMs={6000} />
   </section>
+
+  {/* A calm, boxed two-column CTA between the two full-bleed photo blocks,
+      so the slider and the crimson band never butt up against each other. */}
+  <Section tone="seigaiha">
+    <TwoColumn
+      eyebrow="How it works"
+      title="Three steps to the field"
+      image={huddle}
+      imageAlt="Leftovers players in a tight huddle with their arms together and paint pods on their hips."
+      imageSide="right"
+    >
+      <ol class="space-y-3">
+        <li><strong class="text-bone">No tryout.</strong> Say you’re coming and tell us what you want to compete in.</li>
+        <li><strong class="text-bone">Bring your own gear.</strong> Your marker, your mask, your style.</li>
+        <li><strong class="text-bone">You actually play.</strong> No bench: if you confirmed, you’re playing points.</li>
+      </ol>
+      <Button slot="actions" href="/join">Join a squad</Button>
+      <Button slot="actions" href="/contact" variant="outline">Ask a question</Button>
+    </TwoColumn>
+  </Section>
 
   <ImpactBand
     image={aiming}

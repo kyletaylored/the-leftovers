@@ -140,10 +140,10 @@ footerNote: >-
   Free agents welcome. Show up, pay your entry, play the tournament —
   that's the whole tryout.
 
-# Internal design reference, linked in the footer for the team. Not
-# customer-facing nav, so it lives here rather than in `nav`. Leave blank to
-# hide the footer link entirely.
-designStorybookUrl: https://claude.ai/artifact/U7z7FKdBokERWqJD5XSHoa
+# Internal design reference (the /design storybook page), linked in the footer
+# for the team. Not customer-facing nav, so it lives here rather than in `nav`.
+# A full https:// URL opens in a new tab. Leave blank to hide the link.
+designStorybookUrl: /design
 
 # pblidb.org team stats (unofficial, third-party — derived from public
 # PBLeague pages, not affiliated with PBLI). `query` is sent to their team
