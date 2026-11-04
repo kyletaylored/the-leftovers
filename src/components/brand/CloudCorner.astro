@@ -1,0 +1,82 @@
+---
+/**
+ * CloudCorner — a gilded ruyi-cloud bank with paper lanterns hanging from it,
+ * for the top corners of the ornate hero (Nov 2026 design pass, after
+ * `docs/design/homepage-mockup-b.webp`).
+ *
+ * Three licensed RuyiCloud banks are stacked at different depths (a dark
+ * crimson back layer, a gold-outlined front bank, and a small gilded puff)
+ * so the corner reads as a cluster, not one stamped shape. Lanterns hang
+ * BEHIND the clouds, so each cord appears to come from under the bank.
+ *
+ * Lanterns drop out on small screens so they never crowd the logo: the
+ * first always shows, the second from `sm`, the third from `lg`.
+ *
+ * Position and size it from the caller (`absolute -left-8 -top-6 w-44
+ * sm:w-72 lg:w-[26rem]`). `side="right"` mirrors the whole cluster. Pure
+ * decoration: aria-hidden, no JS, and the sway stops under reduced motion.
+ */
+import RuyiCloud from './RuyiCloud.astro';
+import Lantern from './Lantern.astro';
+import type { CloudVariant } from '@/lib/clouds';
+
+interface Props {
+  side?: 'left' | 'right';
+  /** 0–3 lanterns. */
+  lanterns?: number;
+  /** Swap which cloud art is used, so the two corners differ. */
+  variants?: [CloudVariant, CloudVariant, CloudVariant];
+  class?: string;
+}
+
+const {
+  side = 'left',
+  lanterns = 3,
+  variants = side === 'left' ? [2, 1, 5] : [4, 3, 6],
+  class: className = '',
+} = Astro.props;
+
+// Hanging points as % of the cluster box, with cord lengths and tones varied.
+const hangs = [
+  { left: '16%', top: '38%', w: '15%', cord: 70, tone: 'forest', delay: 0, show: '' },
+  { left: '44%', top: '30%', w: '12%', cord: 110, tone: 'crimson', delay: 1.7, show: 'hidden sm:block' },
+  { left: '68%', top: '22%', w: '10%', cord: 50, tone: 'forest', delay: 3.1, show: 'hidden lg:block' },
+] as const;
+---
+
+<div
+  class:list={['pointer-events-none aspect-[5/4]', side === 'right' && '-scale-x-100', className]}
+  aria-hidden="true"
+>
+  <div class="relative size-full">
+    {
+      hangs.slice(0, lanterns).map((h) => (
+        <Lantern
+          variant="paper"
+          tone={h.tone}
+          cord={h.cord}
+          sway
+          swayDelay={h.delay}
+          class={`absolute h-auto ${h.show}`}
+          style={`left:${h.left};top:${h.top};width:${h.w}`}
+        />
+      ))
+    }
+    <RuyiCloud
+      variant={variants[0]}
+      class="absolute -left-[14%] -top-[20%] w-[92%] text-crimson opacity-80"
+    />
+    <RuyiCloud
+      variant={variants[1]}
+      outline
+      outlineWidth={1.6}
+      class="absolute -left-[6%] -top-[10%] w-[74%] text-crimson-600"
+    />
+    <RuyiCloud
+      variant={variants[2]}
+      outline
+      outlineWidth={1.2}
+      class="absolute left-[46%] -top-[6%] w-[44%] text-crimson"
+    />
+  </div>
+</div>

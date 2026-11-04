@@ -25,7 +25,7 @@ interface Props {
   galleries: CollectionEntry<'galleries'>[];
   /** Advance automatically. Off by default; ignored under reduced-motion. */
   autoplayMs?: number;
-  /** See Slideshow.tsx — `peek` (default), `single`, or full-bleed `hero`. */
+  /** See Slideshow.tsx — `peek` (default), `single`, full-bleed `hero` or `showcase`. */
   layout?: SlideshowLayout;
   indicators?: SlideshowIndicators;
   captionStyle?: SlideshowCaptionStyle;
@@ -58,7 +58,8 @@ const resolved = await Promise.all(
 
       const optimized = await getImage({
         src: asset,
-        widths: [480, 768, 1200],
+        // Full-bleed layouts need a desktop-width source; boxed ones don't.
+        widths: layout === 'showcase' || layout === 'hero' ? [640, 960, 1440, 1920] : [480, 768, 1200],
         format: 'webp',
       });
 
@@ -68,7 +69,10 @@ const resolved = await Promise.all(
         width: Number(optimized.attributes.width ?? asset.width),
         height: Number(optimized.attributes.height ?? asset.height),
         alt: photo.alt,
-        caption: photo.caption ?? photo.galleryTitle,
+        // The photo's own line, with the gallery title as its kicker. A photo
+        // with no caption shows the gallery title alone (the old behaviour).
+        caption: photo.caption,
+        kicker: photo.kicker ?? photo.galleryTitle,
       };
       return slide;
     })

@@ -470,7 +470,19 @@ content:
             description: >-
               Describe what's happening in the shot. Read aloud to blind
               visitors and indexed by image search.
-          - { name: caption, label: Caption (optional), type: string }
+          - name: caption
+            label: Headline (optional)
+            type: string
+            description: >-
+              The big line shown on this photo in the homepage slider, e.g.
+              "Off the break". Keep it to a few words. Left empty, the slide
+              shows only the kicker below.
+          - name: kicker
+            label: Kicker (optional)
+            type: string
+            description: >-
+              The small gold line above the headline, e.g. the event and year.
+              Left empty, it uses the gallery title.
 
   # -- FAQs -----------------------------------------------------------------
   - name: faqs

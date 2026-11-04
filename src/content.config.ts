@@ -282,7 +282,10 @@ const galleries = defineCollection({
           image: imagePath,
           /** Required, as everywhere else an image appears (§6). */
           alt: z.string(),
+          /** The slide's own line: the headline in the showcase slider, the flag text elsewhere. */
           caption: z.string().optional(),
+          /** Small context line above the caption. Defaults to the gallery title. */
+          kicker: z.string().optional(),
         })
       )
       .default([]),

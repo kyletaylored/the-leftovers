@@ -34,6 +34,8 @@ import TerracedDivider from '@/components/brand/TerracedDivider.astro';
 import MascotMark from '@/components/brand/MascotMark.astro';
 import Wordmark from '@/components/brand/Wordmark.astro';
 import Lantern from '@/components/brand/Lantern.astro';
+import RiceTerraces from '@/components/brand/RiceTerraces.astro';
+import CloudCorner from '@/components/brand/CloudCorner.astro';
 import Badge from '@/components/brand/Badge.astro';
 
 // Components
@@ -56,6 +58,7 @@ import Gallery from '@/components/Gallery.astro';
 import LogoStrip from '@/components/LogoStrip.astro';
 import Slideshow, { type Slide } from '@/components/Slideshow.tsx';
 import FeatureRow from '@/components/marketing/FeatureRow.astro';
+import ImpactBand from '@/components/marketing/ImpactBand.astro';
 import PricingCard from '@/components/marketing/PricingCard.astro';
 import ProductGrid from '@/components/marketing/ProductGrid.astro';
 import FormField from '@/components/form/FormField.astro';
@@ -70,6 +73,9 @@ import type { TerracedStyle } from '@/components/brand/TerracedDivider.astro';
 import jerseyImg from '@/assets/img/leftovers-v1-v2.png';
 import bcaImg from '@/assets/img/bca-leftover.jpg';
 import logoImg from '@/assets/img/brand/logo.png';
+import shooterImg from '@/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp';
+import aimingImg from '@/assets/img/events/nxl-lso26/lo2nxllso26-219-x5.webp';
+import sprintImg from '@/assets/img/events/nxl-lso26/lo3nxllso26-51-x5.webp';
 import nxlUsLogo from '@/assets/img/leagues/nxl-us.png';
 import nxlEuLogo from '@/assets/img/leagues/nxl-eu.png';
 import icplLogo from '@/assets/img/leagues/icpl.png';
@@ -95,12 +101,32 @@ const sampleFaqs = faqs.sort((a, b) => a.data.order - b.data.order).slice(0, 3);
 // Slides for the carousel variants — local assets only (the CSP is
 // img-src 'self'), resolved through the image service like GallerySlideshow.
 const slideSources = [
-  { src: bcaImg, alt: 'Pink breast-cancer-awareness Leftovers jersey', caption: 'Series Finals — Day 1' },
-  { src: jerseyImg, alt: 'V1 and V2 Leftovers jerseys side by side', caption: 'Series Finals — Nov 14–15' },
-  { src: logoImg, alt: 'The Leftovers logo lockup', caption: 'Pre-order drop' },
+  { src: bcaImg, alt: 'Pink breast-cancer-awareness Leftovers jersey', caption: 'Series Finals — Day 1', kicker: 'Specimen kicker' },
+  { src: jerseyImg, alt: 'V1 and V2 Leftovers jerseys side by side', caption: 'Series Finals — Nov 14–15', kicker: 'Specimen kicker' },
+  { src: logoImg, alt: 'The Leftovers logo lockup', caption: 'Pre-order drop', kicker: undefined },
 ];
+// Real event photography for the full-bleed showcase specimen.
+const showcaseSources = [
+  { src: shooterImg, alt: 'A Leftovers player aims a paintball marker across a field.', caption: 'Eyes up', kicker: 'NXL · 2025' },
+  { src: sprintImg, alt: 'Three Leftovers players sprint out from behind a red inflatable bunker.', caption: 'Full send', kicker: 'NXL · 2026' },
+  { src: aimingImg, alt: 'A Leftovers player behind an inflatable bunker sights down a marker.', caption: 'Hold the lane', kicker: 'NXL · 2026' },
+];
+const showcaseSlides: Slide[] = await Promise.all(
+  showcaseSources.map(async ({ src, alt, caption, kicker }) => {
+    const optimized = await getImage({ src, widths: [640, 960, 1440, 1920], format: 'webp' });
+    return {
+      src: optimized.src,
+      srcSet: optimized.srcSet.attribute || undefined,
+      width: Number(optimized.attributes.width ?? src.width),
+      height: Number(optimized.attributes.height ?? src.height),
+      alt,
+      caption,
+      kicker,
+    };
+  })
+);
 const slides: Slide[] = await Promise.all(
-  slideSources.map(async ({ src, alt, caption }) => {
+  slideSources.map(async ({ src, alt, caption, kicker }) => {
     const optimized = await getImage({ src, widths: [480, 768, 1200], format: 'webp' });
     return {
       src: optimized.src,
@@ -109,6 +135,7 @@ const slides: Slide[] = await Promise.all(
       height: Number(optimized.attributes.height ?? src.height),
       alt,
       caption,
+      kicker,
     };
   })
 );
@@ -130,7 +157,9 @@ const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Ast
   { name: 'Icon', file: 'brand/Icon.astro', kind: 'Astro', section: 'icons', use: 'Every glyph. Paths live in src/lib/icons.ts.' },
   { name: 'RuyiCloud', file: 'brand/RuyiCloud.astro', kind: 'Astro', section: 'motifs', use: 'Corner/background cloud accent, coloured via text-*.' },
   { name: 'TerracedDivider', file: 'brand/TerracedDivider.astro', kind: 'Astro', section: 'motifs', use: 'Section break / card footer. Pick a style.' },
-  { name: 'Wordmark · MascotMark · Lantern · Badge', file: 'brand/*.astro', kind: 'Astro', section: 'motifs', use: 'Logo art, mascot, lantern ornament, crest.' },
+  { name: 'RiceTerraces', file: 'brand/RiceTerraces.astro', kind: 'Astro', section: 'motifs', use: 'Layered gold-lined terraced landscape. The showpiece foot of the ornate hero.' },
+  { name: 'CloudCorner', file: 'brand/CloudCorner.astro', kind: 'Astro', section: 'motifs', use: 'Gilded ruyi-cloud cluster with swaying paper lanterns, for hero corners.' },
+  { name: 'Wordmark · MascotMark · Lantern · Badge', file: 'brand/*.astro', kind: 'Astro', section: 'motifs', use: 'Logo art, mascot, lantern (outline | paper), crest.' },
   { name: 'Button', file: 'Button.astro', kind: 'Astro', section: 'components', use: 'Every button and CTA link. Never hand-roll one.' },
   { name: 'Pill', file: 'ui/Pill.astro', kind: 'Astro', section: 'components', use: 'Status badges: Open Slot, Pre-Order, Sold Out, Active, Next Up.' },
   { name: 'Toast', file: 'Toast.astro', kind: 'Astro', section: 'components', use: 'On-page confirmation after a form or join action.' },
@@ -140,12 +169,13 @@ const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Ast
   { name: 'StatNumber', file: 'StatNumber.astro', kind: 'Astro', section: 'components', use: 'Big ribbed-gold figure + label.' },
   { name: 'Callout · MascotCallout · CtaStrip', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Pull quote, empty state, full-width CTA band.' },
   { name: 'ThreeColumn · FaqAccordion', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Icon benefits row; native <details> FAQ.' },
-  { name: 'Section · PageHeader · Hero', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Page scaffolding. Every page is built from these.' },
+  { name: 'Section · PageHeader · Hero', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Page scaffolding. Hero: brand | ornate | image | video | text.' },
   { name: 'FeatureRow', file: 'marketing/FeatureRow.astro', kind: 'Astro', section: 'marketing', use: 'Alternating media + copy. Flip with reverse.' },
+  { name: 'ImpactBand', file: 'marketing/ImpactBand.astro', kind: 'Astro', section: 'marketing', use: 'Full-bleed action photo fading into big copy. align left | right, tone ink | crimson.' },
   { name: 'PricingCard', file: 'marketing/PricingCard.astro', kind: 'Astro', section: 'marketing', use: 'Tier card; featured gets gold border + ribbon.' },
   { name: 'LogoStrip', file: 'LogoStrip.astro', kind: 'Astro', section: 'marketing', use: 'Static centred logo row: leagues on the homepage, partners on Contact. sm | md.' },
   { name: 'Gallery', file: 'Gallery.astro', kind: 'Astro', section: 'marketing', use: 'Masonry photo grid, zero JS.' },
-  { name: 'Slideshow / GallerySlideshow', file: 'Slideshow.tsx', kind: 'Astro + island', section: 'marketing', story: true, use: 'Carousel: peek | single | hero; dashes | thumbnails.' },
+  { name: 'Slideshow / GallerySlideshow', file: 'Slideshow.tsx', kind: 'Astro + island', section: 'marketing', story: true, use: 'Carousel: peek | single | hero | showcase; dashes | thumbnails. Per-slide caption + kicker.' },
   { name: 'ProductCard · ProductGrid', file: 'marketing/ProductGrid.astro', kind: 'Astro', section: 'marketing', use: 'Shop grid with optional filter chips.' },
   { name: 'FormField', file: 'form/FormField.astro', kind: 'Astro', section: 'forms', use: 'Label + input | select | textarea + hint/error.' },
   { name: 'RadioGroup · CheckboxGroup', file: 'form/*.astro', kind: 'Astro', section: 'forms', use: 'Styled real inputs in a fieldset.' },
@@ -352,12 +382,46 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
           </div>
         </Specimen>
 
+        <Specimen
+          title="RiceTerraces: layered landscape"
+          tag="NEW"
+          file="src/components/brand/RiceTerraces.astro"
+          note={'Three depths (rounded far mountains with sparkles, quantised paddy steps, a mixed front run of swells, plateaus and pagoda eaves), nested gold contours clipped inside each layer, and 田 glyphs on the plateaus. Change seed for a different skyline; simple drops the far layer. Give it a height and full width: it crops at phone width instead of squashing. Use once per page, at the foot of a hero.'}
+        >
+          <div class="grid gap-4">
+            <RiceTerraces seed={7} class="h-48 bg-topo" />
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div><RiceTerraces seed={2} class="h-28 bg-ink-900" /><code class="mt-1.5 block font-mono text-[0.625rem] text-bone-muted">seed=2</code></div>
+              <div><RiceTerraces seed={5} simple class="h-28 bg-ink-900" /><code class="mt-1.5 block font-mono text-[0.625rem] text-bone-muted">seed=5 simple</code></div>
+            </div>
+          </div>
+        </Specimen>
+
+        <Specimen
+          title="CloudCorner + gilded RuyiCloud"
+          tag="NEW"
+          file={['src/components/brand/CloudCorner.astro', 'src/components/brand/RuyiCloud.astro', 'src/components/brand/Lantern.astro']}
+          note={'Three cloud banks at different depths with paper lanterns hung behind them. side="right" mirrors it. Lanterns drop to one on phones and two on tablets so they never crowd the logo. RuyiCloud outline traces any cloud in gold (non-scaling px stroke).'}
+        >
+          <div class="relative h-72 overflow-hidden bg-topo">
+            <CloudCorner side="left" class="absolute -left-6 -top-4 w-72" />
+            <CloudCorner side="right" class="absolute -right-6 -top-4 w-72" />
+          </div>
+          <div class="mt-4 flex flex-wrap items-center gap-6">
+            <RuyiCloud variant={3} outline class="h-14 w-auto text-crimson-600" />
+            <RuyiCloud variant={6} outline outlineWidth={2.5} class="h-14 w-auto text-crimson" />
+            <code class="font-mono text-[0.625rem] text-bone-muted">RuyiCloud outline · outlineWidth</code>
+          </div>
+        </Specimen>
+
         <Specimen title="Brand marks" file={['brand/Wordmark.astro', 'brand/MascotMark.astro', 'brand/Lantern.astro', 'brand/Badge.astro']} note="Wordmark is the official logo art. Pass label only where the mark IS the link's accessible name (the nav). MascotMark dim is for watermarks and empty states.">
           <div class="flex flex-wrap items-end gap-8">
             <div class="flex flex-col items-center gap-1.5"><Wordmark class="h-12 w-auto" label={false} /><code class="text-[0.625rem] text-bone-muted">Wordmark</code></div>
             <div class="flex flex-col items-center gap-1.5"><MascotMark class="w-16" width={64} /><code class="text-[0.625rem] text-bone-muted">MascotMark</code></div>
             <div class="flex flex-col items-center gap-1.5"><MascotMark class="w-16" width={64} dim /><code class="text-[0.625rem] text-bone-muted">MascotMark dim</code></div>
             <div class="flex flex-col items-center gap-1.5"><Lantern class="h-24 w-auto" cord={30} /><code class="text-[0.625rem] text-bone-muted">Lantern</code></div>
+            <div class="flex flex-col items-center gap-1.5"><Lantern variant="paper" class="h-28 w-auto" cord={20} /><code class="text-[0.625rem] text-bone-muted">paper</code></div>
+            <div class="flex flex-col items-center gap-1.5"><Lantern variant="paper" tone="crimson" sway class="h-28 w-auto" cord={20} /><code class="text-[0.625rem] text-bone-muted">paper crimson sway</code></div>
             <div class="flex flex-col items-center gap-1.5"><Badge class="size-16" /><code class="text-[0.625rem] text-bone-muted">Badge</code></div>
           </div>
         </Specimen>
@@ -497,6 +561,23 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
 
     {/* =========================================================== BLOCKS */}
     <DocSection id="blocks" number="04.4" title="Page blocks" kicker="Scaffolding most pages are built from" intro="Section (tone base | alt | topo | sand | seigaiha, optional terraced divider), PageHeader and Hero wrap every page. They're full-bleed, so they're not boxed here. Open any page in src/pages to see them composed. The blocks below sit inside a Section.">
+      <Specimen
+        title={'Hero variant="ornate"'}
+        tag="NEW"
+        class="mb-5"
+        flush
+        file={['src/components/Hero.astro', 'src/pages/preview/home-b.astro']}
+        note={'The logo hero dressed for a showpiece: CloudCorner in both top corners, a gold glow behind the logo, RiceTerraces along the bottom, and the tagline split on "/" with gold slashes. The real Hero owns the page h1, so it is mocked here from its parts; see it live at /preview/home-b.'}
+      >
+        <div class="relative h-[26rem] overflow-hidden bg-topo sm:h-[30rem]">
+          <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_50%_45%,color-mix(in_srgb,var(--color-gold)_16%,transparent),transparent_70%)]" />
+          <CloudCorner side="left" class="absolute -left-10 -top-6 w-44 sm:w-72 lg:w-[22rem]" />
+          <CloudCorner side="right" class="absolute -right-10 -top-6 w-44 sm:w-72 lg:w-[22rem]" />
+          <Image src={logoImg} alt="" widths={[224, 448]} sizes="224px" class="absolute left-1/2 top-14 h-auto w-44 -translate-x-1/2 sm:w-56" />
+          <RiceTerraces seed={7} class="absolute bottom-0 left-0 h-24 sm:h-36" />
+        </div>
+        <p class="px-5 pt-3 sm:px-[22px]"><a class="tap inline-flex items-center text-xs font-bold uppercase tracking-[0.14em] text-gold-300 underline" href="/preview/home-b">Open /preview/home-b</a></p>
+      </Specimen>
       <div class="grid gap-5 lg:grid-cols-2">
         <Specimen title="Callout" file="src/components/Callout.astro" note="A pull quote with optional cite.">
           <Callout cite="Every player on the roster">Paintball builds better people.</Callout>
@@ -551,6 +632,39 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
               reverse
             />
           </div>
+        </Specimen>
+
+        <Specimen
+          title="ImpactBand: full-bleed photo fade"
+          tag="NEW"
+          flush
+          file="src/components/marketing/ImpactBand.astro"
+          note={'The bold one: the photo owns the full width and fades to ink (or crimson) under the copy, and melts into the sections above and below. On phones the photo stacks on top and fades down into the copy. Pick a shot whose subject is on the side away from the copy; nudge it with focus. Use one or two per page, never back to back on the same side. Place it outside any Section container.'}
+        >
+          <ImpactBand
+            as="h3"
+            image={shooterImg}
+            imageAlt="A Leftovers player aims a paintball marker across a field."
+            eyebrow="Play hard"
+            title={'Paintball builds\nbetter people.'}
+            body="A community-run team built from rotating free agents."
+            stats={[{ value: '0', label: 'Tryouts' }, { value: '0', label: 'Bench spots' }, { value: '100%', label: 'Playing time' }]}
+            ghost="Play"
+          >
+            <Button slot="actions" href="/join" size="lg">Join a squad</Button>
+          </ImpactBand>
+          <ImpactBand
+            as="h3"
+            image={aimingImg}
+            imageAlt="A Leftovers player behind an inflatable bunker sights down a marker."
+            align="right"
+            tone="crimson"
+            eyebrow="Free agents welcome"
+            title={'No team?\nNo problem.'}
+            body={'align="right" tone="crimson": copy on the right, the photo fading through brand crimson.'}
+          >
+            <Button slot="actions" href="/join" variant="gold">Request to join</Button>
+          </ImpactBand>
         </Specimen>
 
         <Specimen title="PricingCard" file="src/components/marketing/PricingCard.astro" note="Lay out in a grid at the call site (sm:grid-cols-3). One featured card per row at most.">
@@ -609,6 +723,16 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
             <Slideshow client:visible slides={slides} />
           </Specimen>
         </div>
+
+        <Specimen
+          title="Slider: full-width showcase"
+          tag="NEW · React island"
+          flush
+          file={['src/components/Slideshow.tsx', 'src/components/GallerySlideshow.astro']}
+          note={'layout="showcase": the action-sports poster slider. Tall full-bleed photo with a slow zoom, a gold kicker and a huge headline per slide, a 01 / 10 counter, progress segments and square controls. With autoplayMs it gets a pause button and the active bar fills over the interval. Per-slide text comes from each photo\'s caption (headline) and kicker (defaults to the gallery title) in the galleries collection. Place it outside any container.'}
+        >
+          <Slideshow client:visible slides={showcaseSlides} layout="showcase" autoplayMs={6000} />
+        </Specimen>
 
         <Specimen title="Slider: full-width hero / section" tag="React island" file="src/components/Slideshow.tsx" note={'layout="hero": 16:7, arrows on the image, flag + dashes bottom-left. Place it full-bleed (outside the Section container) as a page hero or an event-recap / sponsor reel.'}>
           <Slideshow client:visible slides={slides} layout="hero" />

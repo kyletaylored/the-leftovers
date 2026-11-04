@@ -1,0 +1,280 @@
+---
+/**
+ * RiceTerraces — a layered, gold-lined terraced landscape for the foot of a
+ * hero (Nov 2026 design pass, after `docs/design/homepage-mockup-b.webp`).
+ *
+ * TerracedDivider draws ONE ridge in one style. This is the showpiece
+ * version: three depths of hills, each built differently so the skyline
+ * never repeats itself:
+ *  - far    — soft rounded mountains, dimmed, with sparkles over the peaks;
+ *  - mid    — hills quantised into rounded rice-paddy steps;
+ *  - front  — a run of mixed segments (swells, stepped plateaus, pagoda-eave
+ *             flicks with finials, flat paddies), so no two spans match.
+ * Every layer carries nested gold contour lines clipped inside its own
+ * silhouette (the paddy walls), and 田 ("rice field") glyphs sit on the
+ * plateaus, singly or in pairs.
+ *
+ * Everything is generated at build time from `seed` (deterministic, so the
+ * markup is stable between builds). Pure decoration: aria-hidden, no JS.
+ *
+ * Sizing: the viewBox is wide and uses `xMidYMax slice`, so give it a
+ * height (`h-28 sm:h-36 lg:h-48`) and full width. On a phone it crops the
+ * sides instead of squashing the glyphs, which `preserveAspectRatio="none"`
+ * would do.
+ */
+import { uid } from '@/lib/uid';
+
+interface Props {
+  seed?: number;
+  /** Point the landscape downward, for the top edge of a section. */
+  flip?: boolean;
+  /** Drop the far mountain layer for a shorter, simpler band. */
+  simple?: boolean;
+  class?: string;
+}
+
+const { seed = 1, flip = false, simple = false, class: className = '' } = Astro.props;
+
+const W = 1600;
+const H = 260;
+const STEP = 5;
+
+const rand = (i: number) => {
+  const x = Math.sin(i * 12.9898 + seed * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+};
+const between = (i: number, lo: number, hi: number) => lo + rand(i) * (hi - lo);
+
+const xs: number[] = [];
+for (let x = 0; x <= W; x += STEP) xs.push(x);
+
+/** Moving average, to round off quantised steps without losing them. */
+function smooth(ys: number[], radius: number): number[] {
+  return ys.map((_, i) => {
+    let sum = 0;
+    let n = 0;
+    for (let k = -radius; k <= radius; k++) {
+      const v = ys[i + k];
+      if (v !== undefined) {
+        sum += v;
+        n++;
+      }
+    }
+    return sum / n;
+  });
+}
+
+function gaussians(count: number, salt: number, ampLo: number, ampHi: number, wLo: number, wHi: number) {
+  return Array.from({ length: count }, (_, i) => ({
+    c: ((i + 0.15 + rand(salt + i) * 0.7) / count) * W,
+    a: between(salt + i + 50, ampLo, ampHi),
+    w: between(salt + i + 90, wLo, wHi),
+  }));
+}
+const sumOf = (bumps: { c: number; a: number; w: number }[], x: number) =>
+  bumps.reduce((acc, { c, a, w }) => acc + a * Math.exp(-(((x - c) / w) ** 2)), 0);
+
+// --- far: rounded mountains ------------------------------------------------
+const farBumps = gaussians(7, 100, 45, 115, 70, 150);
+const farY = xs.map((x) => 168 - sumOf(farBumps, x));
+
+// --- mid: quantised paddy steps --------------------------------------------
+const midBumps = gaussians(9, 200, 22, 62, 55, 120);
+const midY = smooth(
+  xs.map((x) => 206 - Math.round(sumOf(midBumps, x) / 15) * 15),
+  3
+);
+
+// --- front: a run of mixed segments ----------------------------------------
+type Kind = 'swell' | 'terrace' | 'eave' | 'flat';
+const kinds: Kind[] = ['swell', 'terrace', 'eave', 'flat'];
+const segments: { x0: number; x1: number; kind: Kind; a: number; steps: number }[] = [];
+{
+  let x = -40;
+  let i = 0;
+  let last: Kind | undefined;
+  while (x < W + 40) {
+    const width = between(300 + i, 130, 250);
+    let kind = kinds[Math.floor(rand(330 + i) * kinds.length)];
+    if (kind === last) kind = kinds[(kinds.indexOf(kind) + 1) % kinds.length];
+    segments.push({
+      x0: x,
+      x1: x + width,
+      kind,
+      a: between(360 + i, kind === 'flat' ? 2 : 16, kind === 'eave' ? 46 : 34),
+      steps: 2 + Math.floor(rand(390 + i) * 2),
+    });
+    last = kind;
+    x += width;
+    i++;
+  }
+}
+const frontRaw = xs.map((x) => {
+  const seg = segments.find((s) => x >= s.x0 && x < s.x1) ?? segments[segments.length - 1];
+  const t = (x - seg.x0) / (seg.x1 - seg.x0);
+  const tent = 1 - Math.abs(2 * t - 1);
+  let h = 0;
+  if (seg.kind === 'swell') h = seg.a * Math.sin(Math.PI * t) ** 1.6;
+  if (seg.kind === 'terrace') h = (seg.a * Math.round(tent * seg.steps * 1.2)) / (seg.steps * 1.2);
+  if (seg.kind === 'eave') h = seg.a * tent ** 3.2;
+  if (seg.kind === 'flat') h = seg.a;
+  return 238 - h;
+});
+const frontY = smooth(frontRaw, 2);
+
+// --- geometry helpers -------------------------------------------------------
+const f = (n: number) => n.toFixed(1);
+const ridgeD = (ys: number[]) => ys.map((y, i) => `${i ? 'L' : 'M'}${f(xs[i])},${f(y)}`).join('');
+const fillD = (ys: number[]) => `${ridgeD(ys)}L${W},${H}L0,${H}Z`;
+
+/** Local high points (smallest y), at least `gap` apart, away from the edges. */
+function peaks(ys: number[], gap: number): [number, number][] {
+  const found: [number, number][] = [];
+  for (let i = 2; i < ys.length - 2; i++) {
+    if (ys[i] <= ys[i - 1] && ys[i] <= ys[i + 1] && ys[i] < ys[i - 2] + 0.01) {
+      const x = xs[i];
+      if (x < 40 || x > W - 40) continue;
+      if (found.length && x - found[found.length - 1][0] < gap) {
+        if (ys[i] < found[found.length - 1][1]) found[found.length - 1] = [x, ys[i]];
+        continue;
+      }
+      found.push([x, ys[i]]);
+    }
+  }
+  return found;
+}
+const yAt = (ys: number[], x: number) => ys[Math.min(ys.length - 1, Math.max(0, Math.round(x / STEP)))];
+
+// 田 glyphs on the front plateaus (terrace tops + flat paddies) and mid peaks.
+type Glyph = { x: number; y: number; s: number; o: number };
+const glyphs: Glyph[] = [];
+segments.forEach((seg, i) => {
+  const cx = (seg.x0 + seg.x1) / 2;
+  if (cx < 30 || cx > W - 30) return;
+  if (seg.kind === 'terrace' || seg.kind === 'flat') {
+    const s = between(500 + i, 11, 16);
+    const y = yAt(frontY, cx) - s / 2 - 2;
+    glyphs.push({ x: cx, y, s, o: 0.95 });
+    if (rand(520 + i) > 0.45) {
+      const dx = (s + 4) * (rand(540 + i) > 0.5 ? 1 : -1);
+      glyphs.push({ x: cx + dx, y: yAt(frontY, cx + dx) - s / 2 - 2, s: s * 0.8, o: 0.8 });
+    }
+  }
+});
+peaks(midY, 150).forEach(([x, y], i) => {
+  if (rand(600 + i) < 0.35) return;
+  const s = between(620 + i, 8, 11);
+  glyphs.push({ x, y: y - s / 2 - 1.5, s, o: 0.6 });
+});
+
+// Finials on the pagoda eaves.
+const finials = segments
+  .filter((s) => s.kind === 'eave')
+  .map((s) => {
+    const cx = (s.x0 + s.x1) / 2;
+    return [cx, yAt(frontY, cx)] as [number, number];
+  })
+  .filter(([x]) => x > 10 && x < W - 10);
+
+// Sparkles over the far peaks.
+const sparkles = simple
+  ? []
+  : peaks(farY, 180).map(([x, y], i) => ({
+      x: x + between(700 + i, -30, 30),
+      y: y - between(720 + i, 14, 34),
+      r: between(740 + i, 3, 6),
+    }));
+
+const ids = { far: uid('rt-far'), mid: uid('rt-mid'), front: uid('rt-front'), shade: uid('rt-shade') };
+const contours = (count: number, gap: number) => Array.from({ length: count }, (_, k) => (k + 1) * gap);
+---
+
+<div class:list={['pointer-events-none relative w-full', className]} aria-hidden="true">
+  <svg
+    viewBox={`0 0 ${W} ${H}`}
+    width="100%"
+    height="100%"
+    preserveAspectRatio="xMidYMax slice"
+    style={`display:block;${flip ? 'transform:scaleY(-1);' : ''}`}
+    role="presentation"
+    focusable="false"
+  >
+    <defs>
+      <clipPath id={ids.far}><path d={fillD(farY)} /></clipPath>
+      <clipPath id={ids.mid}><path d={fillD(midY)} /></clipPath>
+      <clipPath id={ids.front}><path d={fillD(frontY)} /></clipPath>
+      {/* Darkens each layer toward its base so the depths separate. */}
+      <linearGradient id={ids.shade} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0.35" stop-color="var(--color-ink)" stop-opacity="0" />
+        <stop offset="1" stop-color="var(--color-ink)" stop-opacity="0.55" />
+      </linearGradient>
+    </defs>
+
+    {
+      !simple && (
+        <g>
+          <path d={fillD(farY)} style="fill: color-mix(in srgb, var(--color-forest) 38%, var(--color-ink))" />
+          <g clip-path={`url(#${ids.far})`} stroke="var(--color-gold)" fill="none" stroke-width="1">
+            {contours(5, 13).map((dy, k) => (
+              <path d={ridgeD(farY)} transform={`translate(0 ${dy})`} stroke-opacity={0.22 - k * 0.035} />
+            ))}
+          </g>
+          <path d={ridgeD(farY)} fill="none" stroke="var(--color-gold)" stroke-width="1.3" stroke-opacity="0.45" />
+          <g fill="var(--color-gold)" fill-opacity="0.7">
+            {sparkles.map(({ x, y, r }) => (
+              <path
+                d={`M${f(x)},${f(y - r)}Q${f(x + r * 0.18)},${f(y - r * 0.18)} ${f(x + r)},${f(y)}Q${f(x + r * 0.18)},${f(y + r * 0.18)} ${f(x)},${f(y + r)}Q${f(x - r * 0.18)},${f(y + r * 0.18)} ${f(x - r)},${f(y)}Q${f(x - r * 0.18)},${f(y - r * 0.18)} ${f(x)},${f(y - r)}Z`}
+              />
+            ))}
+          </g>
+        </g>
+      )
+    }
+
+    <g>
+      <path d={fillD(midY)} fill="var(--color-forest-600)" />
+      <path d={fillD(midY)} fill={`url(#${ids.shade})`} />
+      <g clip-path={`url(#${ids.mid})`} stroke="var(--color-gold)" fill="none" stroke-width="1.1">
+        {contours(4, 11).map((dy, k) => (
+          <path
+            d={ridgeD(midY)}
+            transform={`translate(0 ${dy})`}
+            stroke-opacity={0.42 - k * 0.08}
+            stroke-dasharray={k === 2 ? '14 6' : undefined}
+          />
+        ))}
+      </g>
+      <path d={ridgeD(midY)} fill="none" stroke="var(--color-gold)" stroke-width="1.6" stroke-opacity="0.8" stroke-linejoin="round" />
+    </g>
+
+    <g>
+      <path d={fillD(frontY)} fill="var(--color-forest)" />
+      <path d={fillD(frontY)} fill={`url(#${ids.shade})`} />
+      <g clip-path={`url(#${ids.front})`} stroke="var(--color-gold)" fill="none" stroke-width="1.2">
+        {contours(3, 9).map((dy, k) => (
+          <path d={ridgeD(frontY)} transform={`translate(0 ${dy})`} stroke-opacity={0.5 - k * 0.13} />
+        ))}
+      </g>
+      <path d={ridgeD(frontY)} fill="none" stroke="var(--color-gold)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" />
+    </g>
+
+    <g stroke="var(--color-gold)" fill="var(--color-ink)" fill-opacity="0.6">
+      {glyphs.map(({ x, y, s, o }) => (
+        <g transform={`translate(${f(x)} ${f(y)})`} stroke-opacity={o} stroke-width={s > 11 ? 1.5 : 1.1}>
+          <rect x={f(-s / 2)} y={f(-s / 2)} width={f(s)} height={f(s)} />
+          <line x1={f(-s / 2)} y1="0" x2={f(s / 2)} y2="0" />
+          <line x1="0" y1={f(-s / 2)} x2="0" y2={f(s / 2)} />
+        </g>
+      ))}
+    </g>
+
+    <g fill="var(--color-gold)">
+      {finials.map(([x, y]) => (
+        <>
+          <line x1={f(x)} y1={f(y)} x2={f(x)} y2={f(y - 9)} stroke="var(--color-gold)" stroke-width="1.6" />
+          <circle cx={f(x)} cy={f(y - 11)} r="3.4" />
+        </>
+      ))}
+    </g>
+  </svg>
+</div>

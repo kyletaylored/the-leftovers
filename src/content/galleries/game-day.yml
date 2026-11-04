@@ -1,26 +1,47 @@
 # Homepage photo slider (the "Don't miss the action" block). Photos live in
 # src/assets/img/events/<event-code>/. Folder codes come from the photographers'
-# filenames. Alt text describes what is visible and names nobody.
+# filenames. Alt text describes what is visible and names nobody. `caption` is
+# the big per-slide headline; `kicker` is the small gold line above it.
 title: Game day
 order: 0
 photos:
   - image: /src/assets/img/events/nxl-lso26/lo3nxllso26-79-x5.webp
     alt: A crowd of Leftovers players in team jerseys, some crouching in front, pose together under a tent and flash shaka signs.
+    caption: The whole crew
+    kicker: NXL · 2026
   - image: /src/assets/img/events/nxl-lso26/lo3nxllso26-24-x5.webp
     alt: Leftovers players dash between inflatable bunkers on a tournament field, markers raised, with a netting wall behind them.
+    caption: Off the break
+    kicker: NXL · 2026
   - image: /src/assets/img/events/nxl-lsm25/satnxllsm25ls-1901-x5.webp
     alt: A group of Leftovers teammates in mud-spotted black and red jerseys pose in two rows in front of a tent.
+    caption: Mud earned
+    kicker: NXL · 2025
   - image: /src/assets/img/events/nxl-mwo25/lo3nxlmwo25-4-x5.webp
     alt: Two smiling players pose in front of a tournament tent, one in a Leftovers jersey with the takeout-box logo.
+    caption: Day ones
+    kicker: NXL · 2025
   - image: /src/assets/img/events/nxl-lsm25/frinxllsm25ls-1427-x5.webp
     alt: Leftovers players in a tight huddle with their arms together and paint pods on their hips.
+    caption: Lock in
+    kicker: NXL · 2025
   - image: /src/assets/img/events/nxl-lso26/lo3nxllso26-51-x5.webp
     alt: Three Leftovers players sprint out from behind a red inflatable bunker with their markers up.
+    caption: Full send
+    kicker: NXL · 2026
   - image: /src/assets/img/events/nxl-mao26/lo4nxlmao26-191.webp
     alt: A group of Leftovers players in red and black jerseys pose on a gravel lot with event tents behind them.
+    caption: Squad up
+    kicker: NXL · 2026
   - image: /src/assets/img/events/nxl-lsm25/sunnxllsm25bb2-1331-x5.webp
     alt: Four players hold up a Leftovers jersey between them and smile in front of a chain-link fence.
+    caption: Rep the box
+    kicker: NXL · 2025
   - image: /src/assets/img/events/nxl-mwo25/lo4nxlmwo25-176-x5.webp
     alt: A smiling player wearing a cardboard box as a hat gives a shaka sign inside a tent.
+    caption: Box head energy
+    kicker: NXL · 2025
   - image: /src/assets/img/events/nxl-mwo25/lo3nxlmwo25-233-x5.webp
     alt: A row of Leftovers players stand shoulder to shoulder in front of a black tournament backdrop.
+    caption: Shoulder to shoulder
+    kicker: NXL · 2025

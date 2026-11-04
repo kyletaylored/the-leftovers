@@ -9,6 +9,11 @@
  *
  * Colour comes from the `class` (e.g. `text-crimson`), not a prop, so callers
  * use the same Tailwind tokens as everything else.
+ *
+ * `outline` (Nov 2026 hero pass) traces the cloud's edge in gold on top of
+ * the fill, the gilded look from `docs/design/homepage-mockup-b.webp`. The
+ * stroke is non-scaling, so `outlineWidth` is in screen pixels at any size.
+ * Without it the output is unchanged.
  */
 import { getCloud, type CloudVariant } from '@/lib/clouds';
 
@@ -17,20 +22,32 @@ interface Props {
   variant?: CloudVariant;
   /** Mirror horizontally, for the opposite corner. */
   flip?: boolean;
+  /** Trace the edge in gold. */
+  outline?: boolean;
+  outlineWidth?: number;
   class?: string;
 }
 
-const { variant = 1, flip = false, class: className = '' } = Astro.props;
+const { variant = 1, flip = false, outline = false, outlineWidth = 1.5, class: className = '' } = Astro.props;
 const { viewBox, body } = getCloud(variant);
 ---
 
 <svg
   set:html={body}
-  class:list={[className, flip && 'scale-x-[-1]']}
+  class:list={[className, flip && 'scale-x-[-1]', outline && 'ruyi-outline']}
   aria-hidden="true"
   role="presentation"
   focusable="false"
   fill="currentColor"
   preserveAspectRatio="xMidYMid meet"
   viewBox={viewBox}
+  style={outline ? `stroke:var(--color-gold);stroke-width:${outlineWidth}px` : undefined}
 />
+
+<style>
+  /* The art's path sets its own fill inline; the stroke is inherited from the
+     <svg>, so only vector-effect needs pushing down to the (unscoped) path. */
+  .ruyi-outline :global(path) {
+    vector-effect: non-scaling-stroke;
+  }
+</style>
