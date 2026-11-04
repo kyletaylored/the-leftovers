@@ -1,0 +1,66 @@
+---
+/**
+ * /credits — third-party art and type the site uses, and their licences.
+ *
+ * Exists so the footer doesn't have to carry attribution lines itself
+ * (Nov 2026: the team asked for a cleaner footer). The footer's small legal
+ * row links here, next to Privacy and Terms.
+ *
+ * The Vecteezy credit is a LICENCE CONDITION for the ruyi-cloud art, not a
+ * courtesy, which is why it must stay reachable from every page (that legal
+ * link) and why this page is built in code from CLOUD_ATTRIBUTION rather
+ * than being a CMS page someone could empty by accident. See ATTRIBUTIONS.md
+ * before changing it. Indexable on purpose: attribution should be findable.
+ */
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import Prose from '@/components/Prose.astro';
+import { CLOUD_ATTRIBUTION } from '@/lib/clouds';
+import { site } from '@/lib/settings';
+
+const fonts = [
+  { name: 'CC Monster Mash (Worn)', use: 'The “The Leftovers” wordmark', licence: 'Comic Book Fonts LLC, commercial web licence' },
+  { name: 'Gasoek One', use: 'Headlines', licence: 'SIL Open Font License 1.1, via Google Fonts' },
+  { name: 'Inter', use: 'Body and interface text', licence: 'SIL Open Font License 1.1, via Google Fonts' },
+];
+---
+
+<BaseLayout
+  title="Credits"
+  description={`The artwork and typefaces used on ${site.title}'s website, and the licences they're used under.`}
+>
+  <PageHeader
+    eyebrow="Credits"
+    title="Credits"
+    intro="The art and type this site is built with, and who made it."
+  />
+
+  <Section tone="base">
+    <Prose>
+      <h2>Cloud motifs</h2>
+      <p>
+        The ruyi cloud banks across the site are adapted from{' '}
+        <a href={CLOUD_ATTRIBUTION.href} rel="noopener">{CLOUD_ATTRIBUTION.label}</a>, used under
+        the Vecteezy Free License. We recolour and resize them to fit the brand.
+      </p>
+
+      <h2>Typefaces</h2>
+      <ul>
+        {
+          fonts.map((font) => (
+            <li>
+              <strong>{font.name}</strong>: {font.use}. {font.licence}.
+            </li>
+          ))
+        }
+      </ul>
+
+      <h2>Logo and photography</h2>
+      <p>
+        The Leftovers logo and mascot belong to the team. Please ask before reusing them, or any of
+        the photos on this site.
+      </p>
+    </Prose>
+  </Section>
+</BaseLayout>

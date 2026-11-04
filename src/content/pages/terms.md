@@ -51,7 +51,7 @@ apparel:
 ## Website content and external links
 
 All logos, mascot artwork, and custom motifs on this site belong to The
-Leftovers or their respective licensed creators (see our footer attributions).
+Leftovers or their respective licensed creators (see our [Credits](/credits) page).
 Event dates, league schedules, and third-party stats (such as public tournament
 records from `pblidb.org`) are provided as-is and may change without notice.
 

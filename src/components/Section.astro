@@ -17,7 +17,11 @@ interface Props {
   id?: string;
   /** Alternate background for visual rhythm between sections. */
   tone?: 'base' | 'alt' | 'topo' | 'sand' | 'seigaiha';
-  /** Close the section with the terraced-mountain divider. */
+  /**
+   * Close the section with the terraced-mountain divider. Never on a page's
+   * LAST section: the Footer ends on its own RiceTerraces band, and two
+   * terrace bands a screen apart read as a mistake.
+   */
   divider?: boolean;
   dividerSeed?: number;
   class?: string;

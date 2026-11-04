@@ -211,7 +211,7 @@ const ids = { far: uid('rt-far'), mid: uid('rt-mid'), front: uid('rt-front'), sh
 const contours = (count: number, gap: number) => Array.from({ length: count }, (_, k) => (k + 1) * gap);
 ---
 
-<div class:list={['pointer-events-none relative w-full', className]} aria-hidden="true">
+<div class:list={['pointer-events-none w-full', className]} aria-hidden="true">
   <svg
     viewBox={`0 0 ${W} ${H}`}
     width="100%"

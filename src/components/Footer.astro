@@ -1,10 +1,24 @@
 ---
+/**
+ * Footer — site-wide close: brand note, footer nav, socials and email,
+ * legal links (Privacy, Terms, Credits) and the cookie-settings re-opener.
+ *
+ * The Vecteezy cloud attribution the licence requires lives on /credits, and
+ * the Credits link in the legal row is what keeps it reachable from every
+ * page: don't remove that link without putting the credit back here. The
+ * design-storybook link was removed at the team's request; /design still
+ * works by URL.
+ *
+ * Nov 2026: on the raked-sand texture (bg-sand, text-safe) to match the
+ * ornate hero, and closed by one RiceTerraces band. Pages used to end on a
+ * `<Section divider>` as well, which stacked two identical terrace bands a
+ * screen apart; the last Section on a page no longer takes `divider`.
+ */
 import { site } from '@/lib/settings';
 import Wordmark from './brand/Wordmark.astro';
 import MascotMark from './brand/MascotMark.astro';
 import Icon, { type IconName } from './brand/Icon.astro';
-import TerracedDivider from './brand/TerracedDivider.astro';
-import { CLOUD_ATTRIBUTION } from '@/lib/clouds';
+import RiceTerraces from './brand/RiceTerraces.astro';
 
 const socials: Array<{ name: IconName; href?: string; label: string }> = [
   { name: 'instagram', href: site.social.instagram, label: 'Instagram' },
@@ -17,7 +31,7 @@ const socials: Array<{ name: IconName; href?: string; label: string }> = [
 const year = new Date().getFullYear();
 ---
 
-<footer class="mt-auto bg-ink-900">
+<footer class="relative mt-auto border-t border-ink-600 bg-sand">
   <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-14">
     <div class="grid gap-10 lg:grid-cols-[1.2fr_1fr_1fr]">
       <div>
@@ -92,6 +106,13 @@ const year = new Date().getFullYear();
           >
             Terms &amp; Conditions
           </a>
+          {/* Required: carries the Vecteezy licence credit (see /credits). */}
+          <a
+            href="/credits"
+            class="underline decoration-ink-600 underline-offset-2 transition-colors hover:text-gold-300"
+          >
+            Credits
+          </a>
           {
             site.gtmId && (
               <button
@@ -105,36 +126,11 @@ const year = new Date().getFullYear();
           }
         </nav>
       </div>
-      {
-        site.designStorybookUrl && (
-          <p>
-            <a
-              href={site.designStorybookUrl}
-              {...(/^https?:\/\//.test(site.designStorybookUrl)
-                ? { rel: 'noopener', target: '_blank' }
-                : {})}
-              class="underline decoration-ink-600 underline-offset-2 hover:text-gold-300"
-            >
-              Design storybook
-            </a>{' '}
-            — internal visual reference for the team.
-          </p>
-        )
-      }
-      {/* Attribution is a condition of the Vecteezy licence, not a courtesy.
-          See ATTRIBUTIONS.md before removing it. */}
-      <p>
-        Cloud motifs:{' '}
-        <a
-          href={CLOUD_ATTRIBUTION.href}
-          rel="noopener nofollow"
-          class="underline decoration-ink-600 underline-offset-2 hover:text-gold-300"
-        >
-          {CLOUD_ATTRIBUTION.label}
-        </a>
-      </p>
     </div>
   </div>
 
-  <TerracedDivider seed={7} class="h-14 sm:h-20" />
+  {/* The page's one closing terrace band (pages no longer end on a Section
+      divider, so it never stacks). Mirrors the hero's RiceTerraces: the
+      site opens and closes on the same motif. */}
+  <RiceTerraces seed={4} simple class="h-20 sm:h-28 lg:h-auto lg:aspect-[2400/260]" />
 </footer>

@@ -17,6 +17,8 @@ const linkSchema = z.object({ label: z.string(), href: z.string() });
 const settingsSchema = z.object({
   title: z.string(),
   tagline: z.string(),
+  /** Homepage search-result title; falls back to "Title — Tagline". */
+  homeTitle: z.string().optional(),
   description: z.string(),
   established: z.number(),
   homeBase: z.string().default(''),
@@ -72,7 +74,6 @@ const settingsSchema = z.object({
     .array(z.object({ name: z.string(), logo: z.string(), logoAlt: z.string() }))
     .default([]),
   footerNote: z.string(),
-  designStorybookUrl: z.string().default(''),
   pblidb: z
     .object({
       /** Fuzzy query sent to pblidb.org's team search (`GET /v1/teams?q=`).

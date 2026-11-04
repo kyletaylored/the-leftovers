@@ -170,7 +170,7 @@ npm install
 npm run dev        # http://localhost:4321
 npm run build      # astro check && astro build -> dist/
 npm run preview    # serve dist/ locally
-npm run og         # regenerate public/og-default.png after brand changes
+npm run og         # after npm run build: re-shoot public/og-default.png from /design/og-card
 npm run storybook  # http://localhost:6006 — foundations + React islands
 npx vitest run     # run every Storybook play test headlessly
 node scripts/make-pattern-tiles.mjs   # regenerate the sand/seigaiha tiles

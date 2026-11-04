@@ -5,6 +5,12 @@
  * Canonical URL, title/description, OG + Twitter card, and an optional
  * JSON-LD graph. Every page routes its metadata through here so there is
  * exactly one place a tag can be missing from.
+ *
+ * The default share card is public/og-default.png (1200×630), rendered from
+ * the real brand components by `npm run og` (see src/pages/design/og-card).
+ * Its size is declared with og:image:width/height so platforms can lay out
+ * the preview before fetching it. A page passing its own `ogImage` should
+ * pass its size too, or the size tags are left out rather than guessed.
  */
 import { site } from '@/lib/settings';
 
@@ -14,6 +20,9 @@ interface Props {
   /** Absolute or site-relative image URL for the social card. */
   ogImage?: string;
   ogImageAlt?: string;
+  /** Pixel size of `ogImage`. Known for the default card; pass it for others. */
+  ogImageWidth?: number;
+  ogImageHeight?: number;
   /** `article` for news/recap posts, `website` otherwise. */
   ogType?: 'website' | 'article';
   noindex?: boolean;
@@ -21,15 +30,21 @@ interface Props {
   schema?: Array<Record<string, unknown>>;
 }
 
+const DEFAULT_OG = { src: '/og-default.png', width: 1200, height: 630 };
+
 const {
   title,
   description = site.description,
-  ogImage = '/og-default.png',
-  ogImageAlt = `${site.title} — ${site.tagline}`,
+  ogImage = DEFAULT_OG.src,
+  ogImageAlt = `${site.title} logo with gilded clouds, paper lanterns and rice terraces: "Paintball builds better people."`,
   ogType = 'website',
   noindex = false,
   schema = [],
 } = Astro.props;
+const isDefaultOg = ogImage === DEFAULT_OG.src;
+const ogWidth = Astro.props.ogImageWidth ?? (isDefaultOg ? DEFAULT_OG.width : undefined);
+const ogHeight = Astro.props.ogImageHeight ?? (isDefaultOg ? DEFAULT_OG.height : undefined);
+const ogMime = /\.png$/i.test(ogImage) ? 'image/png' : /\.jpe?g$/i.test(ogImage) ? 'image/jpeg' : /\.webp$/i.test(ogImage) ? 'image/webp' : undefined;
 
 /**
  * Canonicalise the path before building the URL.
@@ -48,7 +63,8 @@ const canonicalPath =
     .replace(/(.+)\/$/, '$1') || '/';
 const canonical = new URL(canonicalPath, Astro.site).href;
 const ogImageUrl = new URL(ogImage, Astro.site).href;
-const fullTitle = title === site.title ? `${site.title} — ${site.tagline}` : `${title} | ${site.title}`;
+const fullTitle =
+  title === site.title ? (site.homeTitle ?? `${site.title} — ${site.tagline}`) : `${title} | ${site.title}`;
 
 const graph =
   schema.length > 0
@@ -67,6 +83,10 @@ const graph =
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:secure_url" content={ogImageUrl} />
+{ogMime && <meta property="og:image:type" content={ogMime} />}
+{ogWidth && <meta property="og:image:width" content={String(ogWidth)} />}
+{ogHeight && <meta property="og:image:height" content={String(ogHeight)} />}
 <meta property="og:image:alt" content={ogImageAlt} />
 <meta property="og:locale" content="en_US" />
 
