@@ -265,7 +265,7 @@ export default function CookieConsent({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
         <div className="space-y-1.5">
           <div className="flex items-center justify-between gap-2">
-            <p className="eyebrow">Cookies &amp; Analytics (EU / US)</p>
+            <p className="eyebrow">Cookies &amp; Analytics</p>
             {choice !== 'undecided' && (
               <span className="text-[0.6875rem] text-bone-muted">
                 Current:{' '}
@@ -276,8 +276,7 @@ export default function CookieConsent({
             )}
           </div>
           <p className="text-sm leading-relaxed text-bone">
-            We use Google Analytics (via Tag Manager) to see which pages and events people check out.
-            Analytics cookies only run if you opt in. Read our{' '}
+            We use cookies to collect analytics for site traffic and performance. See our{' '}
             <a
               href={privacyHref}
               className="text-gold-300 underline decoration-gold/50 underline-offset-2 hover:text-gold"
