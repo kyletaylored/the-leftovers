@@ -31,6 +31,8 @@ const settingsSchema = z.object({
     email: z.string(),
   }),
   discordServerId: z.string().default(''),
+  /** Google Tag Manager container ID (e.g. "GTM-KPXD7QD6"), gated by CookieConsent. */
+  gtmId: z.string().default(''),
   facebookPagePlugin: z
     .object({
       enabled: z.boolean().default(false),

@@ -67,6 +67,7 @@ team deciding to:
 | `/join` | "Request to play" form | `JoinRequestForm` island → Google Form ([JOIN.md](JOIN.md)) |
 | `/community` | Social links, optional Instagram/Facebook embeds, newsletter | **Hidden.** No Discord right now (see below) |
 | `/contact` | Contact, with the partner logos (Infamous, Kinetic) | |
+| `/privacy` · `/terms` | Privacy Policy & Terms and Conditions | Linked in the footer alongside Cookie settings |
 | `/design` | Design system reference | `noindex`, not in the sitemap. For builders, not visitors |
 | `404` | Mascot empty state | |
 
@@ -171,6 +172,7 @@ docs/design/             Committed, downsized reference plates (see §6)
 | `Calendar` | `/events` | `EventsCalendar.astro`. Day links are plain `#slug` anchors that work without JS |
 | `PreorderForm` · `ProductGallery` | `/preorder/[slug]` | The page passes the drop's data |
 | `JoinRequestForm` | `/join` | Events list comes from the collection |
+| `CookieConsent` | Every page (`BaseLayout`), `/design` | Gates Google Tag Manager (`site.gtmId`) behind EU/GDPR opt-in consent |
 
 Everything else is plain Astro or CSS. That includes the nav toggle (vanilla
 JS), the FAQ (`<details>`), the marquee and the hero cross-fade (CSS).
@@ -318,9 +320,9 @@ inline-styled HTML into the repo.
 
 - Don't add a server, database, login or checkout. That would break the core
   constraint. Use a third party instead.
-- Don't add a tracking or cookie-setting script without changing the footer's
-  "no trackers, no cookies" line. The Facebook Page plugin is off for this
-  reason.
+- Don't add a tracking or cookie-setting script without gating it behind
+  `CookieConsent` (EU / GDPR opt-in) and disclosing it on `/privacy`. The
+  Facebook Page plugin stays off unless gated the same way.
 - Don't subset, convert or commit the desktop versions of the licensed brush
   font.
 - Don't type derived numbers (win rates, records) into content.

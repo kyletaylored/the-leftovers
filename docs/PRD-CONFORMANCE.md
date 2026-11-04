@@ -56,9 +56,13 @@ tradeoff would start to bite if an island ever moves above the fold.
 shadcn ships no second palette: its tokens are redefined in terms of brand
 tokens in `global.css`, so registry components land on-brand.
 
-**Deviation — analytics.** Cloudflare Web Analytics is a Cloudflare-only
-feature, so nothing is wired up. No tracking script is committed, which keeps
-the footer's "no trackers, no cookies" claim true.
+**Deviation — analytics (updated Nov 2026).** Cloudflare Web Analytics is a
+Cloudflare-only feature. In Nov 2026 the team added **Google Tag Manager**
+(`GTM-KPXD7QD6`) / Google Analytics, gated behind `CookieConsent.tsx` with
+Google Consent Mode v2 (`analytics_storage` defaults to `'denied'` and `gtm.js`
+only loads once the visitor clicks **Accept analytics**) to comply with EU
+ePrivacy / GDPR requirements for European events, alongside `/privacy` and
+`/terms` pages. The earlier "no trackers, no cookies" footer claim was removed.
 
 ### The islands decision, as built
 
@@ -73,6 +77,7 @@ forms (updated Nov 2026):
 | Events month calendar | React island; day links are plain anchors | small + runtime |
 | Pre-order form + gallery | React islands on `/preorder/[slug]` | form + runtime |
 | Join request form | React island on `/join` | form + runtime |
+| Cookie / analytics consent | React island (`CookieConsent.tsx`) in `BaseLayout`, gating GTM behind opt-in | small + runtime |
 | Mobile nav toggle | ~30 lines of vanilla JS | negligible |
 | FAQ accordion | Native `<details>` | **0** |
 | Sponsor marquee | CSS animation | **0** |

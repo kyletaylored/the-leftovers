@@ -1,0 +1,46 @@
+---
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import Prose from '@/components/Prose.astro';
+import Button from '@/components/Button.astro';
+import { resolveHeroImages } from '@/lib/images';
+import { site } from '@/lib/settings';
+
+const page = await getEntry('pages', 'privacy');
+if (!page) throw new Error('Missing content file: src/content/pages/privacy.md');
+const heroImages = await resolveHeroImages(page.data.heroImages);
+const { Content } = await render(page);
+---
+
+<BaseLayout
+  title={page.data.seo.title ?? page.data.title}
+  description={page.data.seo.description}
+>
+  <PageHeader
+    eyebrow={page.data.eyebrow}
+    title={page.data.title}
+    intro={page.data.intro}
+    images={heroImages}
+  />
+
+  <Section tone="base" divider dividerSeed={41}>
+    <Prose>
+      <Content />
+    </Prose>
+
+    <div class="mt-10 flex flex-wrap gap-3">
+      {
+        site.gtmId && (
+          <Button variant="outline" size="sm" data-cookie-consent-open icon={false}>
+            Manage cookie preferences
+          </Button>
+        )
+      }
+      <Button href="/terms" variant="ghost" size="sm">
+        Read Terms &amp; Conditions
+      </Button>
+    </div>
+  </Section>
+</BaseLayout>

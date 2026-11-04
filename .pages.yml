@@ -584,3 +584,9 @@ content:
           - { name: logo, label: Logo, type: image, options: { media: images }, required: true }
           - { name: logoAlt, label: Logo alt text, type: string, required: true }
       - { name: footerNote, label: Footer note, type: text, required: true }
+      - {
+          name: gtmId,
+          label: Google Tag Manager ID,
+          type: string,
+          description: 'Container ID (e.g. GTM-KPXD7QD6). Loaded only after a visitor accepts analytics cookies.',
+        }

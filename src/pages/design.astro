@@ -40,6 +40,7 @@ import Badge from '@/components/brand/Badge.astro';
 import Button from '@/components/Button.astro';
 import Pill from '@/components/ui/Pill.astro';
 import Toast from '@/components/Toast.astro';
+import CookieConsent from '@/components/CookieConsent.tsx';
 import PlayerCard from '@/components/PlayerCard.astro';
 import EventCard from '@/components/EventCard.astro';
 import EventsCalendar from '@/components/EventsCalendar.astro';
@@ -133,6 +134,7 @@ const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Ast
   { name: 'Button', file: 'Button.astro', kind: 'Astro', section: 'components', use: 'Every button and CTA link. Never hand-roll one.' },
   { name: 'Pill', file: 'ui/Pill.astro', kind: 'Astro', section: 'components', use: 'Status badges: Open Slot, Pre-Order, Sold Out, Active, Next Up.' },
   { name: 'Toast', file: 'Toast.astro', kind: 'Astro', section: 'components', use: 'On-page confirmation after a form or join action.' },
+  { name: 'CookieConsent', file: 'CookieConsent.tsx', kind: 'React island', section: 'components', story: true, use: 'EU/GDPR cookie & Google Tag Manager consent banner + preference toggle.' },
   { name: 'PlayerCard', file: 'PlayerCard.astro', kind: 'Astro', section: 'components', use: 'Roster card (active + open-slot states).' },
   { name: 'EventCard', file: 'EventCard.astro', kind: 'Astro', section: 'components', use: 'Event with date chip, venue, CTA. card | feature.' },
   { name: 'StatNumber', file: 'StatNumber.astro', kind: 'Astro', section: 'components', use: 'Big ribbed-gold figure + label.' },
@@ -462,6 +464,32 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
             <StatNumber value="12" label="Events played" size="sm" />
             <StatNumber value="48" label="Points won" />
             <StatNumber value="3" label="Podiums" size="lg" />
+          </div>
+        </Specimen>
+        <Specimen
+          title="CookieConsent (EU / GDPR + Google Tag Manager)"
+          tag="NEW"
+          class="lg:col-span-2"
+          file="src/components/CookieConsent.tsx"
+          note={'Gates Google Tag Manager (site.gtmId) behind opt-in consent via Google Consent Mode v2. Equal-weight "Essential only" and "Accept analytics" buttons satisfy EU ePrivacy/GDPR rules. Re-opens from any [data-cookie-consent-open] button (such as "Cookie settings" in the footer).'}
+        >
+          <div class="flex flex-col gap-4">
+            <CookieConsent
+              client:visible
+              position="inline"
+              initialChoice="undecided"
+              storageKey="design_specimen_cookie_undecided"
+              showManageWhenDecided
+              disableScriptLoad
+            />
+            <CookieConsent
+              client:visible
+              position="inline"
+              initialChoice="accepted"
+              storageKey="design_specimen_cookie_accepted"
+              showManageWhenDecided
+              disableScriptLoad
+            />
           </div>
         </Specimen>
       </div>
