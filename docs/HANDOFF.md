@@ -91,11 +91,15 @@ team deciding to:
 The *code* is launch-ready. A lot of the *content* isn't. Don't mistake one for
 the other:
 
-- **No photography anywhere.** `src/assets/img/{players,events,galleries}/`
-  are empty. PlayerCards show the numeral panel, galleries show the mascot
-  empty state, and every hero uses the motif header. Most remaining design work
-  (homepage mockup B's photo manifesto band, `TwoColumn`/`FeatureRow`
-  placements, photo PlayerCards) is **blocked on photos, not code**.
+- **Event photos are imported but not placed.** 56 event photos (2400px WebP,
+  ~21 MB total) sit in `src/assets/img/events/<event-code>/` (`nxl-mwo25`,
+  `nxl-lso26`, `icpl-poc25`, `social` for Facebook pulls, `unsorted` for
+  untagged `DSC_*` shots, and so on). Nothing references them yet: they have no
+  alt text, galleries are still empty, player photos don't exist, and heroes
+  still use the motif header. League logos are in `src/assets/img/sponsors/`
+  (`icpl`, `infamous`, `kinetic`, `nxl-eu`, `nxl-us`) with no sponsor entries.
+  The folder codes come from the photographers' filenames, not confirmed event
+  names. Rename a folder if you know the real name, and fix any paths.
 - **The roster may be partly fictional.** Several players (J. Smith,
   M. Rodriguez and others) share names with the design mockups. Confirm the
   real roster with the team before treating `src/content/players/` as truth.
@@ -263,7 +267,8 @@ inline-styled HTML into the repo.
 
 ### Needs the team (decisions or content, not code)
 
-1. **Photography.** This is the biggest lever. It unblocks player photos,
+1. **Photography, placement and player photos.** Event photos are in; they need
+   curating, alt text and galleries. Player photos are still missing. It unblocks player photos,
    galleries, the mockup-B manifesto band, the `Hero` video variant, and real
    carousel slides on `/design`.
 2. **Confirm the real roster and the next real event.** Replace the
