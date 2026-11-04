@@ -1,0 +1,51 @@
+---
+/**
+ * Pill — the rounded status badge from the design storybook (§04
+ * "Badges"): Open Slot / Pre-Order / Sold Out / Active, plus the "Next Up"
+ * flag on agenda rows and the filter chips' resting look.
+ *
+ * One component so the tone → colour mapping can't drift between call
+ * sites. Tones follow the brand's fill/text split (global.css): crimson and
+ * forest are FILLS with bone text; gold-as-text uses gold-300.
+ *
+ *  - `outline` — gold hairline, gold-300 text (Open Slot, role tags)
+ *  - `gold`    — solid gold, ink text (Pre-Order, active chip)
+ *  - `crimson` — solid crimson, bone text (Sold Out, Next Up)
+ *  - `forest`  — solid forest, bone text (Active)
+ *  - `muted`   — ink-600 hairline, bone-muted text (inactive chip)
+ *
+ * Purely presentational — renders a <span>. For a pressable chip, put the
+ * same classes on a <button> (see ProductGrid) rather than nesting one here.
+ */
+interface Props {
+  tone?: 'outline' | 'gold' | 'crimson' | 'forest' | 'muted';
+  size?: 'sm' | 'md';
+  class?: string;
+}
+
+const { tone = 'outline', size = 'md', class: className = '' } = Astro.props;
+
+const tones = {
+  outline: 'border border-gold text-gold-300',
+  gold: 'bg-gold text-ink',
+  crimson: 'bg-crimson text-bone',
+  forest: 'bg-forest text-bone',
+  muted: 'border border-ink-600 text-bone-muted',
+} as const;
+
+const sizes = {
+  sm: 'px-2.5 py-0.5 text-[0.5625rem]',
+  md: 'px-3 py-1 text-[0.625rem]',
+} as const;
+---
+
+<span
+  class:list={[
+    'inline-flex items-center whitespace-nowrap rounded-full font-bold uppercase leading-normal tracking-[0.1em]',
+    tones[tone],
+    sizes[size],
+    className,
+  ]}
+>
+  <slot />
+</span>

@@ -1,0 +1,84 @@
+---
+/**
+ * Specimen — one framed example on the /design reference page: a small
+ * caps title, the live component(s) in the slot, the source file it comes
+ * from, and a one-line "when to use it" note. Doc chrome only.
+ *
+ * `surface="dark"` (default) renders on ink, the site's real background —
+ * use it for anything that ships on the site. `surface="paper"` is for
+ * doc-only content (token tables, notes) that reads better light.
+ */
+interface Props {
+  title: string;
+  /** Repo-relative source path(s), e.g. "src/components/Button.astro". */
+  file?: string | string[];
+  /** When/why to reach for this component. */
+  note?: string;
+  surface?: 'dark' | 'paper';
+  /** Small gold tag after the title, e.g. "NEW" or "React island". */
+  tag?: string;
+  /** Drop the inner padding (full-bleed demos like the hero slider). */
+  flush?: boolean;
+  class?: string;
+}
+
+const { title, file, note, surface = 'dark', tag, flush = false, class: className = '' } = Astro.props;
+const files = file ? (Array.isArray(file) ? file : [file]) : [];
+const dark = surface === 'dark';
+---
+
+<div
+  class:list={[
+    'min-w-0 border border-[#DAD4C4]',
+    dark ? 'bg-ink' : 'bg-[#FBF9F4]',
+    !flush && 'p-5 sm:p-[22px]',
+    className,
+  ]}
+>
+  <h3
+    class:list={[
+      'mb-4 flex flex-wrap items-center gap-2 font-sans text-[0.6875rem] font-bold tracking-[0.14em]',
+      dark ? 'text-bone-muted' : 'text-[#4a443a]',
+      flush && 'px-5 pt-5 sm:px-[22px] sm:pt-[22px]',
+    ]}
+  >
+    {title}
+    {
+      tag && (
+        <span class="rounded-[2px] bg-gold px-1.5 py-px text-[0.5625rem] tracking-[0.08em] text-ink">
+          {tag}
+        </span>
+      )
+    }
+  </h3>
+
+  <slot />
+
+  {
+    (note || files.length > 0) && (
+      <div
+        class:list={[
+          'mt-4 space-y-1.5 text-[0.6875rem] leading-relaxed',
+          dark ? 'text-bone-muted' : 'text-[#6b6356]',
+          flush && 'px-5 pb-5 sm:px-[22px] sm:pb-[22px]',
+        ]}
+      >
+        {note && <p>{note}</p>}
+        {files.length > 0 && (
+          <p class="flex flex-wrap gap-1.5">
+            {files.map((f) => (
+              <code
+                class:list={[
+                  'rounded-[2px] px-1.5 py-px font-mono',
+                  dark ? 'bg-ink-800 text-gold-300' : 'bg-[#e2ddce] text-[#3a342b]',
+                ]}
+              >
+                {f}
+              </code>
+            ))}
+          </p>
+        )}
+      </div>
+    )
+  }
+</div>

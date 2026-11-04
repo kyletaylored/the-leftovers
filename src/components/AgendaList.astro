@@ -1,0 +1,96 @@
+---
+/**
+ * AgendaList — the compact events list from the design storybook (§04.7
+ * "Agenda list — compact variant"). The lighter-weight alternative to the
+ * month-grid Calendar when there are only ever one or two events on the
+ * board: a date chip, title, date range + league, and a "Next Up" flag on
+ * the nearest upcoming event.
+ *
+ * With `showTbd` (on by default) a dimmed "Next Event TBD" row closes the
+ * list, so a one-event schedule never reads as the season being over — and
+ * an empty schedule still renders something honest instead of nothing.
+ *
+ * Rows link to the matching EventCard anchor (`#slug`) when `linkToCards`
+ * is set, the same zero-JS jump the Calendar uses.
+ */
+import Pill from './ui/Pill.astro';
+import { dateRange, dayNum, monthShort, isoDate } from '@/lib/format';
+import type { EventEntry } from '@/lib/events';
+
+interface Props {
+  events: EventEntry[];
+  /** The event to flag "Next Up" — usually `getEvents().next`. */
+  next?: EventEntry;
+  showTbd?: boolean;
+  linkToCards?: boolean;
+  as?: 'h3' | 'h4';
+  class?: string;
+}
+
+const {
+  events,
+  next,
+  showTbd = true,
+  linkToCards = false,
+  as: Heading = 'h3',
+  class: className = '',
+} = Astro.props;
+---
+
+<ol class:list={['flex flex-col', className]}>
+  {
+    events.map((event) => {
+      const { title, league, startDate, endDate } = event.data;
+      const isNext = next?.id === event.id;
+      const Row = linkToCards ? 'a' : 'div';
+      return (
+        <li class="border-b border-ink-600 last:border-b-0">
+          <Row
+            href={linkToCards ? `#${event.id}` : undefined}
+            class:list={[
+              'flex items-center gap-4 px-1 py-4',
+              linkToCards && 'transition-colors hover:bg-ink-800',
+            ]}
+          >
+            <div class="flex w-14 shrink-0 flex-col items-center rounded-sm border border-gold/50 bg-ink-800 px-3 py-2">
+              <span class="text-[0.5625rem] font-bold uppercase tracking-[0.1em] text-gold-300">
+                {monthShort(startDate)}
+              </span>
+              <span class="numeral text-[1.375rem] leading-none">{dayNum(startDate)}</span>
+            </div>
+            <div class="min-w-0 flex-1">
+              <Heading class="truncate text-base text-bone">{title}</Heading>
+              <p class="mt-1 text-xs text-bone-muted">
+                <time datetime={isoDate(startDate)}>{dateRange(startDate, endDate)}</time>
+                {league && <> · {league}</>}
+              </p>
+            </div>
+            {isNext && (
+              <Pill tone="crimson" size="sm" class="shrink-0">
+                Next Up
+              </Pill>
+            )}
+          </Row>
+        </li>
+      );
+    })
+  }
+  {
+    showTbd && (
+      <li class="flex items-center gap-4 px-1 py-4 opacity-50">
+        <div class="flex w-14 shrink-0 flex-col items-center rounded-sm border border-dashed border-ink-600 px-3 py-2">
+          <span class="text-[0.5625rem] font-bold uppercase tracking-[0.1em] text-bone-muted" aria-hidden="true">
+            —
+          </span>
+          <span class="font-display text-[1.375rem] leading-none text-bone-muted" aria-hidden="true">
+            ?
+          </span>
+        </div>
+        <div class="min-w-0 flex-1">
+          <Heading class="text-base text-bone-muted">Next Event TBD</Heading>
+          <p class="mt-1 text-xs text-bone-muted">Posted once confirmed</p>
+        </div>
+      </li>
+    )
+  }
+</ol>

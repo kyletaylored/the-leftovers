@@ -12,7 +12,12 @@
  */
 import { getImage } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import Slideshow, { type Slide } from './Slideshow.tsx';
+import Slideshow, {
+  type Slide,
+  type SlideshowCaptionStyle,
+  type SlideshowIndicators,
+  type SlideshowLayout,
+} from './Slideshow.tsx';
 import MascotCallout from './MascotCallout.astro';
 import { resolveImage } from '@/lib/images';
 
@@ -20,6 +25,10 @@ interface Props {
   galleries: CollectionEntry<'galleries'>[];
   /** Advance automatically. Off by default; ignored under reduced-motion. */
   autoplayMs?: number;
+  /** See Slideshow.tsx — `peek` (default), `single`, or full-bleed `hero`. */
+  layout?: SlideshowLayout;
+  indicators?: SlideshowIndicators;
+  captionStyle?: SlideshowCaptionStyle;
   emptyTitle?: string;
   emptyBody?: string;
   class?: string;
@@ -28,6 +37,9 @@ interface Props {
 const {
   galleries,
   autoplayMs,
+  layout,
+  indicators,
+  captionStyle,
   emptyTitle = 'No photos up yet',
   emptyBody = "Somebody always forgets to bring a camera. When shots from the last event land, they show up here.",
   class: className = '',
@@ -69,7 +81,15 @@ const slides: Slide[] = resolved.flatMap((slide) => (slide ? [slide] : []));
 
 {
   slides.length > 0 ? (
-    <Slideshow client:visible slides={slides} autoplayMs={autoplayMs} className={className} />
+    <Slideshow
+      client:visible
+      slides={slides}
+      autoplayMs={autoplayMs}
+      layout={layout}
+      indicators={indicators}
+      captionStyle={captionStyle}
+      className={className}
+    />
   ) : (
     <MascotCallout as="h3" title={emptyTitle} body={emptyBody} class={className} />
   )

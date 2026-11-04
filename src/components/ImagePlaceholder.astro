@@ -1,0 +1,54 @@
+---
+/**
+ * ImagePlaceholder — the on-brand stand-in for photography that hasn't been
+ * shot yet (design storybook §06 "Imagery placeholders"). Diagonal ink
+ * stripes, a hairline border and a monospace label naming the intended shot
+ * — never a broken-image icon or an empty grey box.
+ *
+ * It's a labelled `role="img"`, so screen readers hear what WILL be there
+ * ("Player photo") rather than nothing. Swap it for a real `<Image>` once the
+ * asset exists; the aspect ratios below match the slots the real components
+ * use (PlayerCard 4:5, EventCard 16:9, ProductCard 1:1, gallery 3:2,
+ * FeatureRow 16:10, hero slider 16:7).
+ */
+interface Props {
+  /** What the photo will be, e.g. "player photo". Shown and announced. */
+  label: string;
+  ratio?: '4/5' | '16/9' | '1/1' | '3/2' | '16/10' | '16/7' | '4/3';
+  /** Stripe angle in degrees — vary it so a grid of placeholders isn't stamped. */
+  angle?: number;
+  /** Print the ratio under the label (handy on reference pages). */
+  showRatio?: boolean;
+  class?: string;
+}
+
+const { label, ratio = '16/9', angle = 135, showRatio = false, class: className = '' } = Astro.props;
+
+const aspect = {
+  '4/5': 'aspect-[4/5]',
+  '16/9': 'aspect-video',
+  '1/1': 'aspect-square',
+  '3/2': 'aspect-[3/2]',
+  '16/10': 'aspect-[16/10]',
+  '16/7': 'aspect-[16/7]',
+  '4/3': 'aspect-[4/3]',
+} as const;
+
+const stripes = `background-image: repeating-linear-gradient(${angle}deg, var(--color-ink-800) 0 10px, var(--color-ink-900) 10px 20px);`;
+---
+
+<div
+  role="img"
+  aria-label={label}
+  class:list={[
+    'flex w-full items-center justify-center rounded-sm border border-ink-600 bg-ink-900',
+    aspect[ratio],
+    className,
+  ]}
+  style={stripes}
+>
+  <span class="px-3 text-center font-mono text-[0.6875rem] leading-relaxed text-gold-300" aria-hidden="true">
+    {label}
+    {showRatio && <><br />{ratio.replace('/', ':')}</>}
+  </span>
+</div>

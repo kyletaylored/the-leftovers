@@ -28,7 +28,9 @@ export default defineConfig({
       // /about, /roster, /stats are thin meta-refresh stubs now (folded into
       // /team — see src/pages/team.astro). They 200, so the sitemap
       // generator would otherwise list them as if they were real pages.
-      filter: (page) => !['/about', '/roster', '/stats'].some((p) => page.endsWith(p)),
+      // /design is the internal design-system storybook (noindex) — a tool
+      // for whoever's building the site, not a page for visitors.
+      filter: (page) => !['/about', '/roster', '/stats', '/design'].some((p) => page.endsWith(p)),
     }),
     react(),
   ],

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import {
   Carousel,
   CarouselContent,
@@ -23,6 +23,18 @@ import { cn } from '@/lib/utils';
  *  - The dots are real buttons, not decoration.
  *  - Autoplay is OFF by default and never runs under reduced-motion. A
  *    carousel that moves on its own is a hazard for anyone reading slowly.
+ *
+ * Variants (design storybook §04.5 "Galleries" / "Slider"). Defaults
+ * reproduce the original peek carousel exactly, so existing call sites are
+ * unchanged:
+ *  - `layout`: `peek` (default — neighbours peek in at the edges), `single`
+ *    (one 16:10 image at a time), `hero` (edge-to-edge 16:7, arrows on the
+ *    image, caption flag + dashes overlaid bottom-left — a page hero or a
+ *    mid-page recap/sponsor reel).
+ *  - `indicators`: `dashes` (default) when captions carry the context, or
+ *    `thumbnails` when the shots themselves are worth previewing.
+ *  - `captionStyle`: `below` (default, figcaption strip) or `flag` (the
+ *    clipped crimson ribbon on the image's bottom-left). `hero` always flags.
  */
 export interface Slide {
   /** Rendered src + srcset, produced by Astro's image service. */
@@ -34,14 +46,53 @@ export interface Slide {
   caption?: string;
 }
 
+export type SlideshowLayout = 'peek' | 'single' | 'hero';
+export type SlideshowIndicators = 'dashes' | 'thumbnails';
+export type SlideshowCaptionStyle = 'below' | 'flag';
+
 interface SlideshowProps {
   slides: Slide[];
   /** Advance every N ms. Ignored under prefers-reduced-motion. */
   autoplayMs?: number;
+  layout?: SlideshowLayout;
+  indicators?: SlideshowIndicators;
+  captionStyle?: SlideshowCaptionStyle;
   className?: string;
 }
 
-export default function Slideshow({ slides, autoplayMs, className }: SlideshowProps) {
+/** The clipped crimson ribbon that labels a slide (storybook "caption flag"). */
+function CaptionFlag({ children, large = false }: { children: ReactNode; large?: boolean }) {
+  return (
+    <span
+      className={cn(
+        'absolute left-0 bg-crimson font-bold uppercase tracking-[0.06em] text-bone',
+        '[clip-path:polygon(0_0,100%_0,88%_100%,0_100%)]',
+        large
+          ? 'bottom-7 py-3 pl-6 pr-8 text-sm sm:text-[0.9375rem]'
+          : 'bottom-0 py-2 pl-4 pr-5 text-xs'
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+const aspectFor: Record<SlideshowLayout, string> = {
+  peek: 'aspect-[3/2]',
+  single: 'aspect-[16/10]',
+  hero: 'aspect-[16/7]',
+};
+
+export default function Slideshow({
+  slides,
+  autoplayMs,
+  layout = 'peek',
+  indicators = 'dashes',
+  captionStyle = 'below',
+  className,
+}: SlideshowProps) {
+  const isHero = layout === 'hero';
+  const flag = isHero || captionStyle === 'flag';
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
@@ -96,25 +147,37 @@ export default function Slideshow({ slides, autoplayMs, className }: SlideshowPr
             <CarouselItem
               key={slide.src}
               aria-label={`${index + 1} of ${slides.length}`}
-              className="basis-full sm:basis-4/5 lg:basis-2/3"
+              className={cn(
+                'basis-full',
+                layout === 'peek' && 'sm:basis-4/5 lg:basis-2/3'
+              )}
             >
-              <figure className="overflow-hidden rounded-sm border border-border bg-card">
+              <figure className="relative overflow-hidden rounded-sm border border-border bg-card">
                 <img
                   src={slide.src}
                   srcSet={slide.srcSet}
-                  sizes="(min-width: 1024px) 60vw, (min-width: 640px) 78vw, 92vw"
+                  sizes={
+                    layout === 'peek'
+                      ? '(min-width: 1024px) 60vw, (min-width: 640px) 78vw, 92vw'
+                      : '(min-width: 1320px) 1320px, 100vw'
+                  }
                   width={slide.width}
                   height={slide.height}
                   alt={slide.alt}
                   loading={index === 0 ? 'eager' : 'lazy'}
                   decoding="async"
-                  className="aspect-[3/2] w-full object-cover"
+                  className={cn(aspectFor[layout], 'w-full object-cover')}
                 />
-                {slide.caption && (
-                  <figcaption className="px-4 py-2.5 text-xs text-bone-muted">
-                    {slide.caption}
-                  </figcaption>
-                )}
+                {slide.caption &&
+                  (flag ? (
+                    <figcaption>
+                      <CaptionFlag large={isHero}>{slide.caption}</CaptionFlag>
+                    </figcaption>
+                  ) : (
+                    <figcaption className="px-4 py-2.5 text-xs text-bone-muted">
+                      {slide.caption}
+                    </figcaption>
+                  ))}
               </figure>
             </CarouselItem>
           ))}
@@ -122,13 +185,73 @@ export default function Slideshow({ slides, autoplayMs, className }: SlideshowPr
 
         {slides.length > 1 && (
           <>
-            <CarouselPrevious />
-            <CarouselNext />
+            <CarouselPrevious
+              className={cn(
+                // `peek` hangs the arrows outside the track (original look);
+                // `single`/`hero` keep them on the image so they never
+                // overflow a narrow container.
+                layout === 'single' && 'left-3 sm:left-3',
+                isHero &&
+                  'left-4 rounded-none border-bone/40 bg-ink/50 text-bone sm:left-4 hover:border-gold'
+              )}
+            />
+            <CarouselNext
+              className={cn(
+                layout === 'single' && 'right-3 sm:right-3',
+                isHero &&
+                  'right-4 rounded-none border-bone/40 bg-ink/50 text-bone sm:right-4 hover:border-gold'
+              )}
+            />
           </>
         )}
       </Carousel>
 
-      {slides.length > 1 && (
+      {slides.length > 1 && isHero && (
+        // Dashes sit ON the image under the caption flag at hero scale.
+        <div className="absolute bottom-1 left-6 flex gap-1.5">
+          {slides.map((slide, index) => (
+            <button
+              key={slide.src}
+              type="button"
+              onClick={() => scrollTo(index)}
+              aria-label={`Go to slide ${index + 1}`}
+              aria-current={index === current ? 'true' : undefined}
+              className="group flex h-6 items-center"
+            >
+              <span
+                className={cn(
+                  'block h-[3px] w-6 transition-colors',
+                  index === current ? 'bg-gold' : 'bg-bone/35 group-hover:bg-gold/60'
+                )}
+              />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {slides.length > 1 && !isHero && indicators === 'thumbnails' && (
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+          {slides.map((slide, index) => (
+            <button
+              key={slide.src}
+              type="button"
+              onClick={() => scrollTo(index)}
+              aria-label={`Go to slide ${index + 1}`}
+              aria-current={index === current ? 'true' : undefined}
+              className={cn(
+                'aspect-[4/3] w-16 shrink-0 overflow-hidden rounded-sm transition-colors',
+                index === current
+                  ? 'border-2 border-gold'
+                  : 'border border-ink-600 opacity-70 hover:opacity-100'
+              )}
+            >
+              <img src={slide.src} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {slides.length > 1 && !isHero && indicators === 'dashes' && (
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
           {slides.map((slide, index) => (
             <button

@@ -1,0 +1,97 @@
+---
+/**
+ * Toast — the feedback/confirmation notification from the design storybook
+ * (§04 "Toast / feedback notification", delta #7). Its reason to exist: the
+ * roster "Join" flow and the pre-order form both stay on-page, and this is
+ * what confirms the action happened.
+ *
+ * Static markup — no framework island. It renders wherever it's placed
+ * (inline under a form, or pinned with `position="fixed"`), announces itself
+ * through `role="status"` (polite; never steals focus), and the optional
+ * dismiss button is a ~6-line progressive-enhancement script. With JS off the
+ * message simply stays visible, which is the correct failure mode for a
+ * confirmation.
+ *
+ * Show/hide it by toggling the `hidden` attribute from whatever owns the
+ * flow; the component doesn't decide when an action succeeded.
+ */
+import MascotMark from './brand/MascotMark.astro';
+import Icon from './brand/Icon.astro';
+
+interface Props {
+  message: string;
+  /** `success` = gold check (default). `error` = crimson border + alert glyph. */
+  tone?: 'success' | 'error';
+  /** Show the mascot avatar at the leading edge. */
+  mascot?: boolean;
+  dismissible?: boolean;
+  /** `inline` sits in flow; `fixed` pins bottom-centre above page content. */
+  position?: 'inline' | 'fixed';
+  hidden?: boolean;
+  id?: string;
+  class?: string;
+}
+
+const {
+  message,
+  tone = 'success',
+  mascot = true,
+  dismissible = true,
+  position = 'inline',
+  hidden = false,
+  id,
+  class: className = '',
+} = Astro.props;
+---
+
+<div
+  id={id}
+  role={tone === 'error' ? 'alert' : 'status'}
+  hidden={hidden}
+  data-toast
+  class:list={[
+    'flex items-center gap-3 rounded-sm border bg-ink-800 px-4 py-3',
+    tone === 'error' ? 'border-crimson' : 'border-gold',
+    position === 'fixed' &&
+      'fixed inset-x-4 bottom-4 z-50 mx-auto max-w-md shadow-2xl shadow-ink/60',
+    className,
+  ]}
+>
+  {mascot && <MascotMark class="w-7 shrink-0" width={28} />}
+  {
+    tone === 'error' ? (
+      <span class="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-crimson text-bone">
+        <Icon name="close" class="size-3" strokeWidth={3} />
+      </span>
+    ) : (
+      <span class="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-gold text-ink">
+        <Icon name="check" class="size-3" strokeWidth={3} />
+      </span>
+    )
+  }
+  <p class="flex-1 text-sm text-bone">{message}</p>
+  {
+    dismissible && (
+      <button
+        type="button"
+        data-toast-dismiss
+        aria-label="Dismiss notification"
+        class="tap -my-2 -mr-2 flex shrink-0 items-center justify-center text-bone-muted transition-colors hover:text-bone"
+      >
+        <Icon name="close" class="size-3.5" strokeWidth={2} />
+      </button>
+    )
+  }
+</div>
+
+{
+  dismissible && (
+    <script>
+      document.querySelectorAll<HTMLButtonElement>('[data-toast-dismiss]').forEach((button) => {
+        button.addEventListener('click', () => {
+          button.closest<HTMLElement>('[data-toast]')?.setAttribute('hidden', '');
+        });
+      });
+    </script>
+  )
+}

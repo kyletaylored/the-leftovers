@@ -1,0 +1,20 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction" />
+
+# The Leftovers — component stories
+
+This Storybook covers the **React islands** only: `Calendar`, `Slideshow`,
+`PreorderForm`, `JoinRequestForm`, `StatLeaderboardTable`. They are the
+components with interactive state, and every story carries a `play` test that
+`npx vitest run` executes.
+
+Most of the design system is **Astro components**, which Storybook can't
+render. Those are documented live on the site at **`/design`**
+(`src/pages/design.astro`): tokens, motifs, icons, every component specimen,
+and a component index. Run `npm run dev` and open
+[localhost:4321/design](http://localhost:4321/design).
+
+**Adding a component?** Document it on `/design` (a specimen plus an index row).
+If it's a React island, also add `ComponentName.stories.tsx` next to it with a
+`play` test. See `AGENTS.md` → "Design system".

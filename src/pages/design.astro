@@ -1,0 +1,640 @@
+---
+/**
+ * /design — the living design-system storybook.
+ *
+ * Implements the "Leftovers Design Storybook" reference
+ * (`_reference/Leftovers_Design_Storybook/index.html`, gitignored) with the
+ * REAL components rather than the reference's inline-styled mockups: every
+ * specimen below is the production component rendered with real content
+ * collections, so this page can't drift from what ships.
+ *
+ * It is the reference to check before building a page (reuse what's here)
+ * and the place to document a new component (add a specimen + an index row).
+ * See AGENTS.md → "Design system". React islands are ALSO documented in
+ * Storybook (`npm run storybook`), which is where their interactive states
+ * and play tests live; Astro components can only be shown here.
+ *
+ * noindex + excluded from the sitemap (astro.config.mjs): it's a tool for
+ * the people building the site, not a page for visitors.
+ */
+import { getImage } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import DocSection from '@/components/design/DocSection.astro';
+import Specimen from '@/components/design/Specimen.astro';
+
+// Brand primitives
+import Icon from '@/components/brand/Icon.astro';
+import RuyiCloud from '@/components/brand/RuyiCloud.astro';
+import TerracedDivider from '@/components/brand/TerracedDivider.astro';
+import MascotMark from '@/components/brand/MascotMark.astro';
+import Wordmark from '@/components/brand/Wordmark.astro';
+import Lantern from '@/components/brand/Lantern.astro';
+import Badge from '@/components/brand/Badge.astro';
+
+// Components
+import Button from '@/components/Button.astro';
+import Pill from '@/components/ui/Pill.astro';
+import Toast from '@/components/Toast.astro';
+import PlayerCard from '@/components/PlayerCard.astro';
+import EventCard from '@/components/EventCard.astro';
+import EventsCalendar from '@/components/EventsCalendar.astro';
+import AgendaList from '@/components/AgendaList.astro';
+import ImagePlaceholder from '@/components/ImagePlaceholder.astro';
+import StatNumber from '@/components/StatNumber.astro';
+import Callout from '@/components/Callout.astro';
+import MascotCallout from '@/components/MascotCallout.astro';
+import CtaStrip from '@/components/CtaStrip.astro';
+import ThreeColumn from '@/components/ThreeColumn.astro';
+import FaqAccordion from '@/components/FaqAccordion.astro';
+import Gallery from '@/components/Gallery.astro';
+import Slideshow, { type Slide } from '@/components/Slideshow.tsx';
+import FeatureRow from '@/components/marketing/FeatureRow.astro';
+import PricingCard from '@/components/marketing/PricingCard.astro';
+import ProductGrid from '@/components/marketing/ProductGrid.astro';
+import FormField from '@/components/form/FormField.astro';
+import RadioGroup from '@/components/form/RadioGroup.astro';
+import CheckboxGroup from '@/components/form/CheckboxGroup.astro';
+
+import { getEvents } from '@/lib/events';
+import { strokedIconNames, filledIconNames } from '@/lib/icons';
+import type { CloudVariant } from '@/lib/clouds';
+import type { TerracedStyle } from '@/components/brand/TerracedDivider.astro';
+
+import jerseyImg from '@/assets/img/leftovers-v1-v2.png';
+import bcaImg from '@/assets/img/bca-leftover.jpg';
+import logoImg from '@/assets/img/brand/logo.png';
+
+// ---------------------------------------------------------------- data --
+const [players, faqs, products, { upcoming, past, next }] = await Promise.all([
+  getCollection('players'),
+  getCollection('faqs'),
+  getCollection('products'),
+  getEvents(),
+]);
+
+const activePlayer =
+  players.find((p) => p.data.status === 'active' && p.data.number !== undefined) ??
+  players.find((p) => p.data.status === 'active');
+const openSlot = players.find((p) => p.data.status === 'open-slot');
+const sampleEvent = next ?? upcoming[0] ?? past[0];
+const allEvents = [...upcoming, ...past];
+const sampleFaqs = faqs.sort((a, b) => a.data.order - b.data.order).slice(0, 3);
+
+// Slides for the carousel variants — local assets only (the CSP is
+// img-src 'self'), resolved through the image service like GallerySlideshow.
+const slideSources = [
+  { src: bcaImg, alt: 'Pink breast-cancer-awareness Leftovers jersey', caption: 'Series Finals — Day 1' },
+  { src: jerseyImg, alt: 'V1 and V2 Leftovers jerseys side by side', caption: 'Series Finals — Nov 14–15' },
+  { src: logoImg, alt: 'The Leftovers logo lockup', caption: 'Pre-order drop' },
+];
+const slides: Slide[] = await Promise.all(
+  slideSources.map(async ({ src, alt, caption }) => {
+    const optimized = await getImage({ src, widths: [480, 768, 1200], format: 'webp' });
+    return {
+      src: optimized.src,
+      srcSet: optimized.srcSet.attribute || undefined,
+      width: Number(optimized.attributes.width ?? src.width),
+      height: Number(optimized.attributes.height ?? src.height),
+      alt,
+      caption,
+    };
+  })
+);
+
+// ------------------------------------------------------------- catalog --
+const palette = [
+  { name: 'ink', hex: '#0B0A08', swatch: 'bg-ink', role: 'page base' },
+  { name: 'ink-900', hex: '#100E0C', swatch: 'bg-ink-900', role: 'section alt' },
+  { name: 'ink-800', hex: '#16130F', swatch: 'bg-ink-800', role: 'card surface' },
+  { name: 'ink-700', hex: '#221E18', swatch: 'bg-ink-700', role: 'raised / hover' },
+  { name: 'ink-600', hex: '#322C24', swatch: 'bg-ink-600', role: 'hairlines' },
+  { name: 'crimson', hex: '#8B1E2B', swatch: 'bg-crimson', role: 'fill only' },
+  { name: 'crimson-600', hex: '#A32534', swatch: 'bg-crimson-600', role: 'hover fill' },
+  { name: 'crimson-400', hex: '#E06070', swatch: 'bg-crimson-400', role: 'crimson as text' },
+  { name: 'brand-red', hex: '#D12026', swatch: 'bg-brand-red', role: 'wordmark only' },
+  { name: 'gold', hex: '#C9A227', swatch: 'bg-gold', role: 'accent / stroke' },
+  { name: 'gold-300', hex: '#E0C164', swatch: 'bg-gold-300', role: 'gold as text' },
+  { name: 'gold-700', hex: '#8F721A', swatch: 'bg-gold-700', role: 'gradient shade' },
+  { name: 'forest', hex: '#2E4A34', swatch: 'bg-forest', role: 'mountain fill' },
+  { name: 'forest-600', hex: '#3A5C41', swatch: 'bg-forest-600', role: 'fill edge' },
+  { name: 'tan', hex: '#5C4A34', swatch: 'bg-tan', role: 'earth accent' },
+  { name: 'bone', hex: '#F4F1EA', swatch: 'bg-bone', role: 'text on dark' },
+  { name: 'bone-muted', hex: '#B9B2A4', swatch: 'bg-bone-muted', role: 'secondary text' },
+];
+
+const cloudVariants: CloudVariant[] = [1, 2, 3, 4, 5, 6];
+const terracedStyles: { style: TerracedStyle; label: string; note: string }[] = [
+  { style: 'rice-terrace', label: 'rice-terrace (default)', note: 'Flat stepped plateaus. Card footers and full-width section breaks.' },
+  { style: 'pagoda', label: 'pagoda', note: 'Curved eaves with finial dots. The one-per-page flourish (homepage hero).' },
+  { style: 'refined-peaks', label: 'refined-peaks', note: "Closest to the old skyline's footprint, with round joins and hex glyphs." },
+];
+
+/**
+ * The component index. ADD A ROW when you add a component, and keep `story`
+ * true only if a `*.stories.tsx` exists. `section` is the anchor on this page.
+ */
+const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Astro + island'; section: string; story?: boolean; use: string }[] = [
+  { name: 'Icon', file: 'brand/Icon.astro', kind: 'Astro', section: 'icons', use: 'Every glyph. Paths live in src/lib/icons.ts.' },
+  { name: 'RuyiCloud', file: 'brand/RuyiCloud.astro', kind: 'Astro', section: 'motifs', use: 'Corner/background cloud accent, coloured via text-*.' },
+  { name: 'TerracedDivider', file: 'brand/TerracedDivider.astro', kind: 'Astro', section: 'motifs', use: 'Section break / card footer. Pick a style.' },
+  { name: 'Wordmark · MascotMark · Lantern · Badge', file: 'brand/*.astro', kind: 'Astro', section: 'motifs', use: 'Logo art, mascot, lantern ornament, crest.' },
+  { name: 'Button', file: 'Button.astro', kind: 'Astro', section: 'components', use: 'Every button and CTA link. Never hand-roll one.' },
+  { name: 'Pill', file: 'ui/Pill.astro', kind: 'Astro', section: 'components', use: 'Status badges: Open Slot, Pre-Order, Sold Out, Active, Next Up.' },
+  { name: 'Toast', file: 'Toast.astro', kind: 'Astro', section: 'components', use: 'On-page confirmation after a form or join action.' },
+  { name: 'PlayerCard', file: 'PlayerCard.astro', kind: 'Astro', section: 'components', use: 'Roster card (active + open-slot states).' },
+  { name: 'EventCard', file: 'EventCard.astro', kind: 'Astro', section: 'components', use: 'Event with date chip, venue, CTA. card | feature.' },
+  { name: 'StatNumber', file: 'StatNumber.astro', kind: 'Astro', section: 'components', use: 'Big ribbed-gold figure + label.' },
+  { name: 'Callout · MascotCallout · CtaStrip', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Pull quote, empty state, full-width CTA band.' },
+  { name: 'ThreeColumn · FaqAccordion', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Icon benefits row; native <details> FAQ.' },
+  { name: 'Section · PageHeader · Hero', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Page scaffolding. Every page is built from these.' },
+  { name: 'FeatureRow', file: 'marketing/FeatureRow.astro', kind: 'Astro', section: 'marketing', use: 'Alternating media + copy. Flip with reverse.' },
+  { name: 'PricingCard', file: 'marketing/PricingCard.astro', kind: 'Astro', section: 'marketing', use: 'Tier card; featured gets gold border + ribbon.' },
+  { name: 'Gallery', file: 'Gallery.astro', kind: 'Astro', section: 'marketing', use: 'Masonry photo grid, zero JS.' },
+  { name: 'Slideshow / GallerySlideshow', file: 'Slideshow.tsx', kind: 'Astro + island', section: 'marketing', story: true, use: 'Carousel: peek | single | hero; dashes | thumbnails.' },
+  { name: 'ProductCard · ProductGrid', file: 'marketing/ProductGrid.astro', kind: 'Astro', section: 'marketing', use: 'Shop grid with optional filter chips.' },
+  { name: 'FormField', file: 'form/FormField.astro', kind: 'Astro', section: 'forms', use: 'Label + input | select | textarea + hint/error.' },
+  { name: 'RadioGroup · CheckboxGroup', file: 'form/*.astro', kind: 'Astro', section: 'forms', use: 'Styled real inputs in a fieldset.' },
+  { name: 'PreorderForm · JoinRequestForm', file: '*.tsx', kind: 'React island', section: 'forms', story: true, use: 'Interactive order / join forms.' },
+  { name: 'Calendar / EventsCalendar', file: 'Calendar.tsx', kind: 'Astro + island', section: 'calendar', story: true, use: 'Month grid; days anchor to EventCards.' },
+  { name: 'AgendaList', file: 'AgendaList.astro', kind: 'Astro', section: 'calendar', use: 'Compact event list with Next Up + TBD row.' },
+  { name: 'StatLeaderboardTable', file: 'StatLeaderboardTable.tsx', kind: 'React island', section: 'index', story: true, use: 'Sortable player stats table.' },
+  { name: 'ImagePlaceholder', file: 'ImagePlaceholder.astro', kind: 'Astro', section: 'imagery', use: 'Striped stand-in until real photography lands.' },
+];
+
+const sections = [
+  ['foundations', 'Foundations'],
+  ['motifs', 'Motifs'],
+  ['icons', 'Icons'],
+  ['components', 'Components'],
+  ['blocks', 'Blocks'],
+  ['marketing', 'Marketing'],
+  ['forms', 'Forms'],
+  ['calendar', 'Calendar'],
+  ['imagery', 'Imagery'],
+  ['index', 'Index'],
+] as const;
+
+const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Insert'];
+---
+
+<BaseLayout
+  title="Design System"
+  description="The Leftovers design system: tokens, motifs, icons and every production component, rendered live."
+  noindex
+>
+  <div class="bg-[#EFEBE0] text-[#1a1712]">
+    {/* ---------------------------------------------------------- top bar */}
+    <div class="border-b-2 border-gold bg-ink">
+      <div class="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3.5 sm:px-6">
+        <p class="flex items-center gap-2.5">
+          <span class="font-marker text-[1.375rem] tracking-[0.02em] text-brand-red">The Leftovers</span>
+          <span class="text-[0.6875rem] text-tan" aria-hidden="true">/</span>
+          <span class="font-display text-sm uppercase tracking-[0.06em] text-bone">Design Storybook</span>
+        </p>
+        <nav aria-label="Design system sections">
+          <ul class="flex flex-wrap gap-x-4 gap-y-1 text-[0.6875rem] font-bold uppercase tracking-[0.12em]">
+            {sections.map(([id, label]) => (
+              <li><a href={`#${id}`} class="text-gold-300 no-underline hover:text-gold">{label}</a></li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    {/* ------------------------------------------------------------ intro */}
+    <div class="mx-auto max-w-[1320px] px-4 pb-8 pt-12 sm:px-6">
+      <p class="mb-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-crimson">
+        Design system &amp; component reference
+      </p>
+      <h1 class="mb-4 text-[clamp(2rem,5vw,3.5rem)] text-ink">Design System Storybook</h1>
+      <p class="max-w-[720px] text-base leading-relaxed text-[#4a443a]">
+        Every specimen on this page is the production component, rendered with real content from
+        <code class="rounded-[3px] bg-[#e2ddce] px-1.5 py-0.5 text-sm">src/content</code>. Tokens come from
+        <code class="rounded-[3px] bg-[#e2ddce] px-1.5 py-0.5 text-sm">src/styles/global.css</code>. Build new
+        pages from what's here; when you add a component, add its specimen and an index row. Interactive React
+        islands also have stories in Storybook (<code class="rounded-[3px] bg-[#e2ddce] px-1.5 py-0.5 text-sm">npm run storybook</code>).
+      </p>
+    </div>
+
+    {/* ====================================================== FOUNDATIONS */}
+    <DocSection id="foundations" number="01" title="Foundations" kicker="Locked: tokens live in global.css @theme">
+      <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <Specimen
+          title="Color palette"
+          surface="paper"
+          class="md:col-span-2"
+          file="src/styles/global.css"
+          note="Crimson on ink is 2.2:1, which fails AA, so every accent is split into a FILL hex and a lighter TEXT hex (crimson → crimson-400, gold → gold-300). Carry the same split into any new component. Never type a raw hex in a component; use the Tailwind token (bg-ink-800, text-gold-300)."
+        >
+          <ul class="grid grid-cols-3 gap-2.5 sm:grid-cols-6">
+            {palette.map((c) => (
+              <li>
+                <div class:list={['h-14 border border-[#DAD4C4]', c.swatch]} />
+                <p class="mt-1.5 font-mono text-[0.625rem]">{c.hex}</p>
+                <p class="text-[0.625rem] font-bold text-[#3a342b]">{c.name}</p>
+                <p class="text-[0.625rem] text-[#6b6356]">{c.role}</p>
+              </li>
+            ))}
+          </ul>
+        </Specimen>
+
+        <Specimen title="Gold ribbed numeral" note="Not a font: a gradient + repeating ribs clipped to text. Use the .numeral class on Anton digits only.">
+          <div class="flex flex-col items-center justify-center py-4">
+            <span class="numeral text-[5.625rem] leading-[0.9]">22</span>
+            <code class="mt-3 font-mono text-[0.6875rem] text-gold-300">class="numeral"</code>
+          </div>
+        </Specimen>
+
+        <Specimen
+          title="Typography: 3 roles"
+          surface="paper"
+          class="md:col-span-2 xl:col-span-3"
+          note="Headings h1–h4 get Anton uppercase automatically from the base layer. Use .eyebrow for kicker labels above headlines."
+        >
+          <div class="grid gap-6 sm:grid-cols-3">
+            <div>
+              <p class="font-marker text-[2.375rem] leading-none text-brand-red">The Leftovers</p>
+              <p class="mt-1.5 text-[0.6875rem] text-[#6b6356]">CC Monster Mash Worn · <code>font-marker</code>. Wordmark only, licensed, never body text.</p>
+            </div>
+            <div>
+              <p class="font-display text-[1.875rem] uppercase leading-none text-ink">Meet the Crew</p>
+              <p class="mt-1.5 text-[0.6875rem] text-[#6b6356]">Anton · <code>font-display</code>. All headings, uppercase, tight leading.</p>
+            </div>
+            <div>
+              <p class="font-sans text-base text-[#1a1712]">Paintball builds better people. Aa Bb Cc 123</p>
+              <p class="mt-1.5 text-[0.6875rem] text-[#6b6356]">Inter · <code>font-sans</code>. Body &amp; UI text, 400–700.</p>
+            </div>
+          </div>
+        </Specimen>
+      </div>
+    </DocSection>
+
+    {/* =========================================================== MOTIFS */}
+    <DocSection id="motifs" number="02" title="Motifs" kicker="Ruyi cloud · terraced trim · brand marks">
+      <div class="grid gap-5">
+        <Specimen
+          title="Ruyi cloud: 6 licensed variants"
+          file={['src/components/brand/RuyiCloud.astro', 'src/lib/clouds.ts']}
+          note="Coloured by currentColor, so set it with a text-* class. Use 10–20% opacity as a background/corner accent, ~90% as a hero accent. Vary variant/flip so repeated sections don't look stamped. Attribution in the footer is required; never remove it."
+        >
+          <div class="flex flex-wrap items-center gap-6">
+            {cloudVariants.map((v, i) => (
+              <div class="flex flex-col items-center gap-1.5">
+                <RuyiCloud
+                  variant={v}
+                  class:list={['h-14 w-auto', ['text-crimson', 'text-gold', 'text-bone/50'][i % 3]]}
+                />
+                <code class="font-mono text-[0.625rem] text-bone-muted">variant={v}</code>
+              </div>
+            ))}
+          </div>
+        </Specimen>
+
+        <Specimen
+          title="Terraced mountain trim: 3 styles × 2 variants"
+          file="src/components/brand/TerracedDivider.astro"
+          note={'variant="full" draws the forest silhouette + gold ridge; variant="line" is stroke only, for use over an already-coloured surface (EventCard footer). seed varies the ridge so two dividers on a page differ; flip points it downward.'}
+        >
+          <div class="grid gap-6 lg:grid-cols-3">
+            {terracedStyles.map(({ style, label, note }) => (
+              <div>
+                <p class="mb-1.5 text-[0.625rem] font-bold uppercase tracking-[0.12em] text-gold-300">{label}</p>
+                <TerracedDivider style={style} class="h-[90px] bg-ink-900" />
+                <TerracedDivider style={style} variant="line" seed={3} class="mt-2 h-8 bg-ink-800" />
+                <p class="mt-1.5 text-[0.6875rem] text-bone-muted">{note}</p>
+              </div>
+            ))}
+          </div>
+        </Specimen>
+
+        <Specimen title="Brand marks" file={['brand/Wordmark.astro', 'brand/MascotMark.astro', 'brand/Lantern.astro', 'brand/Badge.astro']} note="Wordmark is the official logo art. Pass label only where the mark IS the link's accessible name (the nav). MascotMark dim is for watermarks and empty states.">
+          <div class="flex flex-wrap items-end gap-8">
+            <div class="flex flex-col items-center gap-1.5"><Wordmark class="h-12 w-auto" label={false} /><code class="text-[0.625rem] text-bone-muted">Wordmark</code></div>
+            <div class="flex flex-col items-center gap-1.5"><MascotMark class="w-16" width={64} /><code class="text-[0.625rem] text-bone-muted">MascotMark</code></div>
+            <div class="flex flex-col items-center gap-1.5"><MascotMark class="w-16" width={64} dim /><code class="text-[0.625rem] text-bone-muted">MascotMark dim</code></div>
+            <div class="flex flex-col items-center gap-1.5"><Lantern class="h-24 w-auto" cord={30} /><code class="text-[0.625rem] text-bone-muted">Lantern</code></div>
+            <div class="flex flex-col items-center gap-1.5"><Badge class="size-16" /><code class="text-[0.625rem] text-bone-muted">Badge</code></div>
+          </div>
+        </Specimen>
+      </div>
+    </DocSection>
+
+    {/* ============================================================ ICONS */}
+    <DocSection id="icons" number="03" title="Icon set" kicker={`${strokedIconNames.length} stroked + ${filledIconNames.length} social, one source`}>
+      <Specimen
+        title="Stroked: 24×24 grid, 1.8 stroke, currentColor"
+        file={['src/components/brand/Icon.astro', 'src/lib/icons.ts']}
+        note={'<Icon name="cart" class="size-5 text-gold" />. Decorative by default (aria-hidden). Pass label="…" when the icon is the only content of a control. To add a glyph, add its path to src/lib/icons.ts; it appears here automatically.'}
+      >
+        <ul class="grid grid-cols-[repeat(auto-fill,minmax(84px,1fr))] gap-2.5">
+          {strokedIconNames.map((name) => (
+            <li class="flex flex-col items-center gap-1.5 border border-ink-600 bg-ink-800 px-1 py-3">
+              <Icon name={name} class="size-[26px] text-gold" />
+              <span class="text-[0.5625rem] text-bone-muted">{name}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="mb-3 mt-6 text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-gold-300">Filled: social marks</p>
+        <ul class="grid grid-cols-[repeat(auto-fill,minmax(84px,1fr))] gap-2.5">
+          {filledIconNames.map((name) => (
+            <li class="flex flex-col items-center gap-1.5 border border-ink-600 bg-ink-800 px-1 py-3">
+              <Icon name={name} class="size-[26px] text-gold" />
+              <span class="text-[0.5625rem] text-bone-muted">{name}</span>
+            </li>
+          ))}
+        </ul>
+      </Specimen>
+    </DocSection>
+
+    {/* ======================================================= COMPONENTS */}
+    <DocSection id="components" number="04" title="Components" kicker="Atoms and cards">
+      <div class="mb-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <Specimen title="Buttons" file="src/components/Button.astro" note="Renders <a> with href, <button> without. All sizes clear the 44px touch target. external adds rel + the external glyph. disabled is one flat grey for every variant.">
+          <div class="flex flex-col items-start gap-2.5">
+            <Button>Join Team</Button>
+            <Button variant="outline" icon={false}>View Roster</Button>
+            <Button variant="gold" icon={false}>Pre-Order</Button>
+            <Button variant="ghost" icon={false}>Event Details</Button>
+            <Button variant="tertiary">Learn More</Button>
+            <Button disabled>Join Team</Button>
+          </div>
+        </Specimen>
+
+        <Specimen title="Button sizes" file="src/components/Button.astro" note={'size="sm" for cards and dense rows, md (default) inline, lg for heroes.'}>
+          <div class="flex flex-col items-start gap-2.5">
+            <Button size="sm">Small</Button>
+            <Button size="md">Medium</Button>
+            <Button size="lg">Large</Button>
+            <Button size="sm" variant="outline" href="https://example.com" external>Opens off-site</Button>
+          </div>
+        </Specimen>
+
+        <Specimen title="Pills / status badges" tag="NEW" file="src/components/ui/Pill.astro" note="Use for status, never as a button. tone maps to the fill/text split so colours can't drift.">
+          <div class="flex flex-wrap gap-2">
+            <Pill tone="outline">Open Slot</Pill>
+            <Pill tone="gold">Pre-Order</Pill>
+            <Pill tone="crimson">Sold Out</Pill>
+            <Pill tone="forest">Active</Pill>
+            <Pill tone="muted">Archived</Pill>
+          </div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <Pill tone="crimson" size="sm">Next Up</Pill>
+            <Pill tone="outline" size="sm">Sniper</Pill>
+          </div>
+        </Specimen>
+
+      </div>
+
+      <div class="mb-5 grid gap-5 lg:grid-cols-3">
+        <Specimen title="PlayerCard" file="src/components/PlayerCard.astro" note="Numeral beside the photo in a gold frame, crimson name-plate, role pill, corner cloud picked from the jersey number. Open slots get the dashed mascot card. Pass a players collection entry.">
+          <div class="grid grid-cols-2 gap-4">
+            {activePlayer && <PlayerCard player={activePlayer} as="h4" />}
+            {openSlot && <PlayerCard player={openSlot} as="h4" />}
+          </div>
+        </Specimen>
+
+        <Specimen title="EventCard" class="lg:col-span-2" file="src/components/EventCard.astro" note={'Date chip (day · month · ribbed day number), venue, CTA that switches on upcoming/past, terraced footer. layout="feature" is the bigger homepage NEXT UP treatment. The article id is the event slug, so #slug links jump to it.'}>
+          {
+            sampleEvent ? (
+              <div class="grid gap-4 md:grid-cols-2">
+                <EventCard event={sampleEvent} as="h4" />
+                <EventCard event={sampleEvent} as="h4" layout="feature" />
+              </div>
+            ) : (
+              <p class="text-sm text-bone-muted">No events in src/content/events.</p>
+            )
+          }
+        </Specimen>
+      </div>
+
+      <div class="grid gap-5 lg:grid-cols-2">
+        <Specimen title="Toast / feedback" tag="NEW" file="src/components/Toast.astro" note={'Confirms an on-page action (join request, pre-order). role="status" (error: role="alert"). Toggle the hidden attribute from the flow that owns it; position="fixed" pins it bottom-centre.'}>
+          <div class="flex flex-col gap-3">
+            <Toast message="Thanks for joining the crew!" />
+            <Toast message="That didn't send. Try again." tone="error" mascot={false} />
+          </div>
+        </Specimen>
+        <Specimen title="StatNumber" file="src/components/StatNumber.astro" note="A headline figure with its label. Composes into StatStrip on the homepage/team page.">
+          <div class="flex flex-wrap gap-10">
+            <StatNumber value="12" label="Events played" size="sm" />
+            <StatNumber value="48" label="Points won" />
+            <StatNumber value="3" label="Podiums" size="lg" />
+          </div>
+        </Specimen>
+      </div>
+    </DocSection>
+
+    {/* =========================================================== BLOCKS */}
+    <DocSection id="blocks" number="04.4" title="Page blocks" kicker="Scaffolding most pages are built from" intro="Section (tone base | alt | topo, optional terraced divider), PageHeader and Hero wrap every page. They're full-bleed, so they're not boxed here. Open any page in src/pages to see them composed. The blocks below sit inside a Section.">
+      <div class="grid gap-5 lg:grid-cols-2">
+        <Specimen title="Callout" file="src/components/Callout.astro" note="A pull quote with optional cite.">
+          <Callout cite="Every player on the roster">Paintball builds better people.</Callout>
+        </Specimen>
+        <Specimen title="MascotCallout: empty state" file="src/components/MascotCallout.astro" note="The honest empty state. Use it instead of an empty grid. Slot takes action Buttons.">
+          <MascotCallout as="h4" title="No photos up yet" body="Somebody always forgets to bring a camera.">
+            <Button href="/community" variant="outline" size="sm">Visit the community</Button>
+          </MascotCallout>
+        </Specimen>
+        <Specimen title="ThreeColumn" class="lg:col-span-2" file="src/components/ThreeColumn.astro" note="Icon + title + body benefits row.">
+          <ThreeColumn
+            as="h4"
+            items={[
+              { icon: 'jersey', title: 'Bring your own gear', body: 'Your marker, mask and pods. No loaners.' },
+              { icon: 'calendar', title: 'Pick your events', body: 'Confirm the dates you can make. No season commitment.' },
+              { icon: 'trophy', title: 'Play real points', body: 'No bench. Everyone on the roster plays.' },
+            ]}
+          />
+        </Specimen>
+        <Specimen title="CtaStrip" class="overflow-hidden lg:col-span-2" flush file="src/components/CtaStrip.astro" note={'Full-width call-to-action band. tone="crimson" | "forest". Buttons go in slot="actions".'}>
+          <CtaStrip as="h3" eyebrow="Open slots" title="Every name started as a slot" body="Confirm you're coming, cover your entry, and you're playing points." tone="crimson">
+            <Button slot="actions" href="/join" variant="gold">Request a slot</Button>
+          </CtaStrip>
+        </Specimen>
+        <Specimen title="FaqAccordion" class="lg:col-span-2" file="src/components/FaqAccordion.astro" note="Native <details>, zero JS. Feed it the faqs collection.">
+          <FaqAccordion items={sampleFaqs.map((f) => ({ question: f.data.question, answer: f.data.answer }))} />
+        </Specimen>
+      </div>
+    </DocSection>
+
+    {/* ======================================================== MARKETING */}
+    <DocSection id="marketing" number="04.5" title="Marketing organisms" kicker="Feature rows, pricing, galleries, sliders, product grid">
+      <div class="grid gap-5">
+        <Specimen title="FeatureRow: alternating media/copy" file="src/components/marketing/FeatureRow.astro" note="Alternate reverse on every row so a stacked page never reads as a repeated template. Without an image it falls back to the topo texture; use ImagePlaceholder-labelled slots in mockups.">
+          <div class="space-y-10">
+            <FeatureRow
+              eyebrow="Bring your own gear"
+              title="No Rentals, No Handouts"
+              body="Your marker, mask and pods. We don't stock loaner gear and we don't take a cut of your entry. Cover it yourself and show up ready to play."
+              ctaLabel="What to Bring"
+              ctaHref="/join"
+              imageAlt="Gear photo placeholder"
+            />
+            <FeatureRow
+              eyebrow="Rotating roster"
+              title="Every Name Started as a Slot"
+              body="There's no tryout and no bench. Confirm you're coming, cover your entry, and you're playing points."
+              ctaLabel="See Open Slots"
+              ctaHref="/team"
+              image={jerseyImg}
+              imageAlt="V1 and V2 Leftovers jerseys"
+              reverse
+            />
+          </div>
+        </Specimen>
+
+        <Specimen title="PricingCard" file="src/components/marketing/PricingCard.astro" note="Lay out in a grid at the call site (sm:grid-cols-3). One featured card per row at most.">
+          <div class="grid items-start gap-5 md:grid-cols-3">
+            <PricingCard tierName="Standard" price="$45" unit="/jersey" bullets={['Full sublimation print', 'Name on back', 'Ships in 4–6 weeks']} ctaLabel="Pre-Order" ctaHref="/shop" />
+            <PricingCard featured tierName="Player Kit" price="$85" unit="/kit" bullets={['Jersey + matching pants', 'Name + number on back', 'Ships in 4–6 weeks', '$10 goes to the season fund']} ctaLabel="Pre-Order" ctaHref="/shop" />
+            <PricingCard tierName="Sponsor a Slot" price="$125" unit="/event" bullets={["Covers one free agent's entry", 'Name listed on the roster page', 'Thank-you shoutout on socials']} ctaLabel="Sponsor" ctaHref="/contact" />
+          </div>
+        </Specimen>
+
+        <div class="grid gap-5 lg:grid-cols-2">
+          <Specimen title="Gallery: masonry" file="src/components/Gallery.astro" note="CSS columns, no JS; width/height on every image so nothing shifts as photos load.">
+            <Gallery
+                images={[
+                { src: bcaImg, alt: 'Pink jersey', caption: 'Pink drop' },
+                { src: jerseyImg, alt: 'V1 and V2 jerseys' },
+                { src: logoImg, alt: 'Logo lockup' },
+              ]}
+            />
+          </Specimen>
+
+          <Specimen title="Carousel: dash indicators + caption flag" tag="React island" file={['src/components/Slideshow.tsx', 'src/components/GallerySlideshow.astro']} note={'layout="single" captionStyle="flag". Use when captions carry the context. On real pages use GallerySlideshow, which resolves the galleries collection.'}>
+            <Slideshow client:visible slides={slides} layout="single" captionStyle="flag" />
+          </Specimen>
+
+          <Specimen title="Carousel: thumbnail strip" tag="React island" file="src/components/Slideshow.tsx" note={'indicators="thumbnails". Use when the shots themselves are worth previewing.'}>
+            <Slideshow client:visible slides={slides} layout="single" captionStyle="flag" indicators="thumbnails" />
+          </Specimen>
+
+          <Specimen title="Carousel: peek (default)" tag="React island" file="src/components/Slideshow.tsx" note="Neighbouring slides peek in at the edges; caption below. The Community page's original carousel.">
+            <Slideshow client:visible slides={slides} />
+          </Specimen>
+        </div>
+
+        <Specimen title="Slider: full-width hero / section" tag="React island" file="src/components/Slideshow.tsx" note={'layout="hero": 16:7, arrows on the image, flag + dashes bottom-left. Place it full-bleed (outside the Section container) as a page hero or an event-recap / sponsor reel.'}>
+          <Slideshow client:visible slides={slides} layout="hero" />
+        </Specimen>
+
+        <Specimen title="ProductGrid: with filter chips" file={['src/components/marketing/ProductGrid.astro', 'src/components/ProductCard.astro']} note="Pass categories (same order as products) to get the chip row; omit for a plain grid. Cards link out to the store.">
+          {
+            products.length > 0 ? (
+              <ProductGrid products={products} />
+            ) : (
+              <MascotCallout as="h4" title="No products in the collection yet" body="ProductGrid renders here as soon as src/content/products has an entry. Until then the shop page uses its own empty state." />
+            )
+          }
+        </Specimen>
+      </div>
+    </DocSection>
+
+    {/* ============================================================ FORMS */}
+    <DocSection id="forms" number="04.6" title="Form fields" kicker="Inputs, select, textarea, radio, checkbox, field groups" intro="Visible labels always (placeholder is a hint, never the label). Gold focus ring, crimson for validation. The .field-label / .field-input classes in global.css are the single source of truth, shared with the React form islands.">
+      <Specimen title="Field states" file={['src/components/form/FormField.astro', 'src/styles/global.css (.field-*)']}>
+        <div class="grid gap-x-10 gap-y-8 md:grid-cols-2 xl:grid-cols-4">
+          <FormField label="Text input" name="demo-text" placeholder="Kyle Taylor" hint="Default state" />
+          <FormField label="Email" name="demo-email" type="email" value="team@theleftoverspb.com" hint="Gold border + ring on focus" />
+          <FormField label="Text input: error" name="demo-error" value="not-an-email" error="Enter a valid email address" />
+          <FormField label="Text input: disabled" name="demo-disabled" value="Locked until roster confirms" disabled />
+          <FormField label="Select: position" name="demo-position" as="select">
+            {positions.map((p) => <option>{p}</option>)}
+          </FormField>
+          <FormField label="Textarea" name="demo-message" as="textarea" class="md:col-span-2 xl:col-span-3" placeholder="Tell us which event you're interested in, what position you play, and whether you've got your own marker, mask and pods." />
+          <RadioGroup
+            legend="Radio group: gear"
+            name="demo-gear"
+            defaultValue="own"
+            options={[
+              { value: 'own', label: 'I have my own marker, mask & pods' },
+              { value: 'borrow', label: 'I need to borrow some gear' },
+              { value: 'unsure', label: 'Not sure yet' },
+            ]}
+          />
+          <CheckboxGroup
+            legend="Checkbox group: notify me"
+            name="demo-notify"
+            defaultValues={['roster', 'jerseys']}
+            options={[
+              { value: 'roster', label: 'Roster openings' },
+              { value: 'jerseys', label: 'Jersey drops' },
+              { value: 'results', label: 'Event results' },
+            ]}
+          />
+        </div>
+
+        <div class="my-8 h-px bg-ink-600" />
+
+        <p class="field-label mb-4">Field group: roster enquiry</p>
+        <div class="mb-6 grid gap-5 md:grid-cols-3">
+          <FormField label="Name" name="demo-g-name" placeholder="Your name" />
+          <FormField label="Email" name="demo-g-email" type="email" placeholder="you@example.com" />
+          <FormField label="Which event?" name="demo-g-event" as="select">
+            {allEvents.length > 0 ? allEvents.map((e) => <option>{e.data.title}</option>) : <option>Next event TBD</option>}
+          </FormField>
+        </div>
+        <p class="field-label mb-4">Action buttons</p>
+        <div class="flex flex-wrap items-center gap-3.5">
+          <Button type="submit" icon={false}>Submit Enquiry</Button>
+          <Button variant="outline" icon={false}>Cancel</Button>
+          <Button disabled icon={false}>Submitting…</Button>
+          <Button variant="tertiary" icon={false}>Reset Form</Button>
+        </div>
+      </Specimen>
+    </DocSection>
+
+    {/* ========================================================= CALENDAR */}
+    <DocSection id="calendar" number="04.7" title="Calendar" kicker="Month grid + compact agenda">
+      <div class="grid items-start gap-5 lg:grid-cols-2">
+        <Specimen title="Month grid" tag="React island" file={['src/components/EventsCalendar.astro', 'src/components/Calendar.tsx']} note="Marked days are real #slug links to the matching EventCard, so it works with zero JS; only month navigation is the island. Opens on the next event's month, never a blank January.">
+          <EventsCalendar events={allEvents} next={next} class="mx-auto max-w-md" />
+        </Specimen>
+        <Specimen title="Agenda list: compact" tag="NEW" file="src/components/AgendaList.astro" note="The lighter alternative when there are only 1–2 events. Flags next as Next Up; the TBD row keeps a short schedule from reading as 'season over'. linkToCards turns rows into #slug jumps.">
+          <AgendaList events={upcoming} next={next} as="h4" />
+        </Specimen>
+      </div>
+    </DocSection>
+
+    {/* ========================================================== IMAGERY */}
+    <DocSection id="imagery" number="06" title="Imagery placeholders" kicker="Real photography lands later; these hold slots on-brand meanwhile">
+      <Specimen title="ImagePlaceholder" tag="NEW" file="src/components/ImagePlaceholder.astro" note="Striped, labelled, brand borders. Never a broken-image icon or an empty grey box. The label is announced (role=img), so name the shot. Ratios match the real component slots.">
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div><ImagePlaceholder label="player photo" ratio="4/5" showRatio /><p class="mt-1.5 text-[0.6875rem] text-bone-muted">PlayerCard</p></div>
+          <div><ImagePlaceholder label="event cover" ratio="16/9" angle={115} showRatio /><p class="mt-1.5 text-[0.6875rem] text-bone-muted">EventCard</p></div>
+          <div><ImagePlaceholder label="product shot" ratio="1/1" angle={65} showRatio /><p class="mt-1.5 text-[0.6875rem] text-bone-muted">ProductCard</p></div>
+          <div><ImagePlaceholder label="action photo" ratio="3/2" angle={95} showRatio /><p class="mt-1.5 text-[0.6875rem] text-bone-muted">Gallery / hero</p></div>
+        </div>
+      </Specimen>
+    </DocSection>
+
+    {/* ============================================================ INDEX */}
+    <DocSection id="index" number="07" title="Component index" kicker="Check here before writing a new component" intro="Every reusable component, where it lives and when to reach for it. Paths are relative to src/components/. Rows marked Storybook also have a *.stories.tsx with interactive states and play tests.">
+      <div class="overflow-x-auto border border-[#DAD4C4] bg-[#FBF9F4]">
+        <table class="w-full min-w-[720px] border-collapse text-[0.8125rem]">
+          <thead>
+            <tr class="bg-ink text-left text-[0.625rem] font-bold uppercase tracking-[0.1em] text-gold-300">
+              <th scope="col" class="px-4 py-2.5">Component</th>
+              <th scope="col" class="px-4 py-2.5">File</th>
+              <th scope="col" class="px-4 py-2.5">Kind</th>
+              <th scope="col" class="px-4 py-2.5">Storybook</th>
+              <th scope="col" class="px-4 py-2.5">Use it for</th>
+            </tr>
+          </thead>
+          <tbody>
+            {index.map((row, i) => (
+              <tr class:list={['border-b border-[#DAD4C4]', i % 2 === 1 && 'bg-[#F3F0E7]']}>
+                <td class="px-4 py-2.5 font-semibold"><a href={`#${row.section}`} class="text-crimson hover:text-crimson-600">{row.name}</a></td>
+                <td class="px-4 py-2.5"><code class="font-mono text-xs text-[#3a342b]">{row.file}</code></td>
+                <td class="px-4 py-2.5 text-[#4a443a]">{row.kind}</td>
+                <td class="px-4 py-2.5 text-[#4a443a]">{row.story ? 'Yes' : '—'}</td>
+                <td class="px-4 py-2.5 text-[#4a443a]">{row.use}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </DocSection>
+  </div>
+</BaseLayout>

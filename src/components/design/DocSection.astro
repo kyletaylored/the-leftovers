@@ -1,0 +1,29 @@
+---
+/**
+ * DocSection — a numbered section of the /design reference page
+ * ("01 · Foundations"). Doc chrome only: never use on a public page.
+ *
+ * The /design page deliberately sits on the storybook's light "paper"
+ * background rather than the site's ink, so specimens read as specimens.
+ * Those paper hexes are documentation chrome, not brand tokens, which is why
+ * they live here as arbitrary values instead of in global.css @theme.
+ */
+interface Props {
+  id: string;
+  number: string;
+  title: string;
+  kicker?: string;
+  intro?: string;
+}
+
+const { id, number, title, kicker, intro } = Astro.props;
+---
+
+<section id={id} class="mx-auto max-w-[1320px] scroll-mt-24 px-4 pb-14 pt-2 sm:px-6">
+  <div class="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+    <h2 class="text-[1.75rem] text-ink">{number} · {title}</h2>
+    {kicker && <span class="text-xs text-[#6b6356]">{kicker}</span>}
+  </div>
+  {intro && <p class="mb-6 max-w-[820px] text-[0.8125rem] leading-relaxed text-[#4a443a]">{intro}</p>}
+  <slot />
+</section>
