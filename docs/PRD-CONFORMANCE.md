@@ -1,8 +1,14 @@
 # PRD conformance audit
 
-Checked section by section against `_reference/the-leftovers-website-PRD.md`
-(358 lines, md5 `b0bbf4e3deede168bdb3f9d4c7a27435`). Records what shipped,
-what deviates and why, and what is deliberately not built.
+Checked section by section against the PRD, which is committed verbatim at
+[`docs/PRD.md`](PRD.md). The original is `_reference/the-leftovers-website-PRD.md`
+(358 lines, md5 `b0bbf4e3deede168bdb3f9d4c7a27435`). This file records what
+shipped, what deviates and why, and what is deliberately not built.
+
+Sections are dated where they were written, and later passes are appended
+rather than rewritten. For **current state and open work in one place**, read
+[HANDOFF.md](HANDOFF.md). The most recent pass is
+[Nov 2026: design system codified](#nov-2026-design-system-codified).
 
 Legend: **Done** · **Deviation** (built differently, with reason) ·
 **Not built** (out of Phase 1 scope, or blocked on a decision)
@@ -26,9 +32,10 @@ inventory. Nothing in the repo does any of these.
 
 ## §4 Tech stack
 
-Astro · Tailwind + CSS custom properties · framework-light islands with Svelte
-only where state is real · Pages CMS · GitHub · CI on push · native form to
-the email provider — **all as specified**.
+Astro · Tailwind + CSS custom properties · islands only where state is real ·
+Pages CMS · GitHub · CI on push · native form to the email provider — **as
+specified**, except the island *framework* (React, not Svelte) and the host,
+both below.
 
 **Deviation — hosting.** The PRD recommends Cloudflare Pages (§4.1) and this
 ships on **GitHub Pages**, its documented fallback, at the team's request.
@@ -55,20 +62,25 @@ the footer's "no trackers, no cookies" claim true.
 
 ### The islands decision, as built
 
-Svelte is in the stack for exactly two components, which is what §4 asks for:
+Originally two Svelte islands. Now React, and the list has grown with the
+forms (updated Nov 2026):
 
 | Interactive thing | How it's built | JS cost |
 |---|---|---|
 | Sortable/filterable stat table | React island, SSR'd as a full `<table>` first | ~5 KB + runtime |
 | Event countdown | React island, SSR'd via an Astro wrapper that pins the first value | ~1.3 KB + runtime |
 | Photo slideshow | React island on shadcn/ui Carousel (Embla) | ~24 KB + runtime |
+| Events month calendar | React island; day links are plain anchors | small + runtime |
+| Pre-order form + gallery | React islands on `/preorder/[slug]` | form + runtime |
+| Join request form | React island on `/join` | form + runtime |
 | Mobile nav toggle | ~30 lines of vanilla JS | negligible |
 | FAQ accordion | Native `<details>` | **0** |
 | Sponsor marquee | CSS animation | **0** |
 | Hero video variant | Declarative `<video autoplay muted>` | **0** |
 
-Total: ~280 KB raw / ~90 KB gzipped, nearly all the React runtime. All three
-are `client:visible`.
+Total at the time of the React move: ~280 KB raw / ~90 KB gzipped, nearly
+all of it the React runtime, which the later islands share. Every island is
+`client:visible`.
 
 ## §5 Site map
 
@@ -121,7 +133,9 @@ All 12 traditional and all 6 custom components exist.
 | StatLeaderboardTable (sortable, gold top row) | Done |
 | TerracedDivider, MascotCallout, SponsorMarquee | Done |
 
-**Gap worth naming: three of these aren't placed on a page yet** —
+**Gap worth naming: some of these aren't placed on a page yet.** As of
+Nov 2026 `Gallery` is on the homepage, and the unplaced list is in
+[HANDOFF.md §7](HANDOFF.md#7-open-work-in-priority-order). The original note:
 `TwoColumn`, `ProfileCard` and `Gallery`. They're complete and typed, but
 they're library stock until something uses them, and each is waiting on
 content that doesn't exist: `Gallery` needs event photos, `ProfileCard` needs
@@ -150,16 +164,22 @@ batch mechanic is first-class: `preorderCloses` drives a countdown, and
 |---|---|
 | Facebook group | Link-out only. Groups cannot be embedded by anyone — the component says so in a comment so nobody re-litigates it |
 | Instagram | Third-party widget slot, configured from site settings. Unconfigured, it renders a link-out card, not an empty hole |
-| Discord | Official free widget, needs only a server ID; falls back to a link-out card |
+| Discord | Official free widget, needs only a server ID; falls back to a link-out card. **Oct 2026: the team doesn't run a Discord**, so `social.discord` is empty and all Discord UI hides itself. `/join` replaced "ask in the Discord" |
 | Mailing list | Native `<form>` posting straight to the provider. No PII touches our infra |
 
 ## §9 Design system
 
 Colour tokens (near-black, crimson, gold, forest, tan) as CSS custom
-properties exposed to Tailwind via `@theme`. All four type roles: wordmark
-(Permanent Marker, subset to the glyphs in "THE LEFTOVERS"), headline sans
-(Anton), gold ribbed numerals **as a CSS treatment rather than a typeface**,
-body (Inter). `font-display: swap` throughout.
+properties exposed to Tailwind via `@theme`. All four type roles: wordmark,
+headline sans (Anton), gold ribbed numerals **as a CSS treatment rather than a
+typeface**, and body (Inter). `font-display: swap` throughout.
+
+**Wordmark face, updated:** it started as Permanent Marker, subset to the
+glyphs in "THE LEFTOVERS". It's now the **licensed CC Monster Mash Worn**, the
+face from the official logo art. It is **deliberately not subset**, because the
+licence forbids derivative works. The licence is per-domain with a pageview
+allowance (see `ATTRIBUTIONS.md`). The homepage hero uses the official logo
+*image*, and the `Wordmark` component is the small nav/footer lockup.
 
 Motifs — `TerracedDivider`, ruyi clouds, lanterns, takeout-box mascot — are
 reusable SVG components, so the OPEN SLOT card, the 404 and the newsletter
@@ -237,10 +257,11 @@ evaluation, PBLI data partnership.
 ### Open items added by implementation
 
 1. Security headers inactive until the Cloudflare move (§4 deviation above).
-2. `discordServerId` empty → Community shows a link-out card.
+2. No Discord (Oct 2026). `social.discord` is empty, so Discord UI hides itself.
 3. Instagram widget unconfigured → link-out card. Allowlist its script origin
    in `public/_headers` when adding it.
-4. `mailingList.formAction` is a placeholder Buttondown endpoint.
+4. `mailingList.formAction` is empty (it was a placeholder Buttondown
+   endpoint), so the newsletter block points to the community links.
 5. `.pages.yml` uses `pattern: {regex: …}` for URL field validation, which I
    could not confirm against the Pages CMS docs (their fields page 404s).
    If the CMS rejects the config, that's the first thing to remove — Zod
@@ -265,7 +286,7 @@ broken; all of it is a fidelity choice someone should make on purpose.
 | 4 | **Disabled button state** (grey) | **Built** — `Button` `disabled` prop | Real `disabled` attribute on `<button>`; `aria-disabled` + `tabindex="-1"` on `<a>`, since anchors have no native disabled state |
 | 5 | **Event date badge includes day-of-week** ("SAT" above "SEP 20") | **Built** — `EventCard` | `dayOfWeek()` already existed in `lib/format.ts`, just unused until now |
 | 6 | **Ruyi clouds in event/player card corners** | **Built on `PlayerCard`** | Deterministic variant/flip derived from the player's own data (number/name), so no call site needs a new prop. `EventCard` still has none — the handoff's before/after didn't show one there |
-| 7 | **Toast / feedback notification** ("Thanks for joining the crew!") | Not built | Still no consumer with a reason to trigger one — the newsletter form posts to the provider and leaves the page. Held for the same reason as before, not overlooked |
+| 7 | **Toast / feedback notification** ("Thanks for joining the crew!") | **Built Nov 2026** (`Toast.astro`), no trigger yet | Still no consumer with a reason to trigger one — the newsletter form posts to the provider and leaves the page. The component exists, and placing it is the open part |
 | 8 | **Visible labels above form fields** | **Now matches everywhere** | `PreorderForm` already used real labels. The one remaining `sr-only` instance (`NewsletterBlock`'s email field) is fixed in the design-handoff pass |
 
 ### Where the sheet and the PRD actively conflict — now resolved
@@ -346,6 +367,17 @@ drifts from the thing it describes:
   is what got built.
 
 ### New material not yet built — needs a decision, not a guess
+
+> **Status update (Nov 2026):** almost all of this has since shipped:
+> - Built: `FeatureRow`, `PricingCard`, `ProductGrid` (on `/shop`), `Gallery`,
+>   all the `Slideshow` carousel variants, `FormField`/`RadioGroup`/`CheckboxGroup`,
+>   and `Toast`.
+> - The **brush-stroke Button was built and then reverted** (Oct 2026), because
+>   it wasn't working out. Don't rebuild it without asking.
+> - Still waiting on photography: the 7-page photo reassembly.
+> - Still waiting on a business decision: "Sponsor a Slot".
+>
+> The text below is the original Sept 2026 note.
 
 None of this shipped in this pass. Each needs either a real photography
 answer or a call the team should make, not one I should make for them:
@@ -457,3 +489,38 @@ label letter-spacing (`0.18em` instead of `0.12em`), and a suppressed focus
 ring where the spec wants a visible 2px gold outline. Consolidated into
 `.field-label` / `.field-input` in `global.css`, one source of truth all
 three now reference instead of retyping.
+
+---
+
+## Nov 2026: design system codified
+
+The `_reference/Leftovers_Design_Storybook` reference was ported into the repo
+as working documentation, built from production components rather than
+mockup HTML.
+
+- **`/design` page** (`src/pages/design.astro`). It shows every component
+  with real collection data, plus tokens, motifs, icons, textures and a
+  **component index** table. It's `noindex` and kept out of the sitemap. The
+  audit and code-appendix sections of the reference were dropped, because
+  everything in them had already shipped.
+- **New components the reference showed and the repo lacked:** `Pill`,
+  `Toast`, `AgendaList`, `ImagePlaceholder`. `Slideshow` also gained
+  `single`/`hero` layouts, thumbnail indicators and a crimson caption flag.
+  Its default output is unchanged.
+- **Shared design data in `src/lib/`.** `icons.ts` (moved out of `Icon.astro`),
+  `palette.ts` and `textures.ts` are read by both `/design` and Storybook, so
+  the two can't drift apart.
+- **Storybook Foundations.** Colors, Typography, Icons and Textures stories,
+  with play tests that check the tokens resolve to their documented hex values
+  and that every texture tile is served. `.storybook/fonts.css` loads the real
+  brand fonts, since Storybook doesn't run Astro's font API.
+- **Textures.** `.bg-sand(-bold)` comes from the jersey's contour lines, and
+  `.bg-seigaiha(-bold)` is the traditional wave-scale pattern. Both are
+  generated seamless SVG tiles (`scripts/make-pattern-tiles.mjs`), with their
+  source art in `src/assets/img/brand/`. `<Section tone="sand|seigaiha">` is
+  supported, but **no public page uses them yet**.
+- **Fixes:** the `FormField` textarea placeholder never showed (there was
+  whitespace inside the element). `MascotCallout` now accepts an `h4` heading.
+- **Process.** `AGENTS.md` is now tracked and carries the rules: check
+  `/design` first, and ship each component change together with its example,
+  index row and story.

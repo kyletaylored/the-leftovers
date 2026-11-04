@@ -5,12 +5,15 @@ team with a rotating free-agent roster.
 
 Live at **[theleftoverspb.com](https://theleftoverspb.com)**.
 
-Built against `_reference/the-leftovers-website-PRD.md` and the brand style
-guide alongside it. Note that `_reference/` is gitignored, so those files are
-local-only — section references below (§4, §8.1, §10.2 and so on) point into
-that PRD. If you've cloned this and don't have it, ask the captain for a copy;
-the decisions it drives are summarised inline throughout this README and in
-the comments at the top of each component.
+> **Picking this up? Read [docs/HANDOFF.md](docs/HANDOFF.md) first.** It covers
+> current state, open work, the reference material, and the rules for
+> changing things. Agents should also read [AGENTS.md](AGENTS.md).
+
+Built against the PRD, which is committed verbatim at
+[docs/PRD.md](docs/PRD.md), and the brand style guide that came with it.
+Section references throughout the repo (§4, §8.1, §10.2 and so on) point into
+that PRD. Where the build deliberately differs from it, the reason is in
+[docs/PRD-CONFORMANCE.md](docs/PRD-CONFORMANCE.md).
 
 The short version of the architecture: **there is no backend.** Content is flat
 files in this repo edited through a hosted CMS UI, payments happen on Bonfire,
@@ -22,11 +25,18 @@ monthly bill or a database to keep alive.
 
 ## Design reference
 
-The brand and layout came from four reference plates. These are committed at
-reduced size in [`docs/design/`](docs/design/) so the intent is in the repo
-rather than in someone's downloads folder — the full-resolution originals live
-in the gitignored `_reference/`. They sit in `docs/`, which is outside the
+The brand and layout came from the reference plates below. They're committed
+at reduced size in [`docs/design/`](docs/design/), so the intent lives in the
+repo and not in someone's downloads folder. The full-resolution originals are
+in the gitignored `_reference/`, and [docs/HANDOFF.md](docs/HANDOFF.md#6-reference-material)
+maps each file to its original and its build status. `docs/` is outside the
 Astro build, so none of this ships to visitors.
+
+**The live design system is the `/design` page** (`npm run dev` → `/design`).
+It shows every real component, token, motif, icon and texture, plus a
+component index. **Storybook** (`npm run storybook`) covers the foundations and
+the React islands, with play tests. Both read the same data in `src/lib/`. The
+plates below are where it all came from. `/design` is what it is now.
 
 ### Brand guide — the locked palette, motifs and type roles
 
@@ -65,16 +75,35 @@ than code:
   that currently ships unused
 - the crimson full-width next-up band, an alternative to A's panel
 
+### Later plates: component library v2, mobile, photo cards
+
+| Component library + mobile reference | Photo PlayerCards, shop row, footer |
+|---|---|
+| [![Component library v2 (buttons, fields, badges, cards, banners, toast) beside three phone mockups: homepage, roster and navigation](docs/design/component-library-mobile.webp)](docs/design/component-library-mobile.webp) | [![Homepage variant with a photo hero, crimson next-up band and photo PlayerCards, plus a shop row and footer](docs/design/homepage-mockup-c.webp)](docs/design/homepage-mockup-c.webp) |
+
+The mobile column is the reference for phone layouts. The photo variant of
+PlayerCard is waiting on player photography.
+
+### The jersey: where the textures come from
+
+[![The Leftovers jersey art, front and back: black body with gold contour-wave lines, crimson ruyi clouds, green terraced mountains, lanterns and the gold ribbed number 22](docs/design/jersey-sample.webp)](docs/design/jersey-sample.webp)
+
+The contour lines on the jersey body are the source of the `.bg-sand` texture.
+`.bg-seigaiha` is the traditional wave-scale pattern. Both are generated tiles
+(`scripts/make-pattern-tiles.mjs`), and their one-off source art is in
+`src/assets/img/brand/`.
+
 ## Stack
 
 | Layer | Choice |
 |---|---|
 | Framework | [Astro](https://astro.build) 7 — static output, zero JS by default |
 | Styling | Tailwind CSS 4 (`@theme` tokens in `src/styles/global.css`) |
-| Islands | **React 19 + shadcn/ui**, used for three components (see below) |
+| Islands | **React 19 + shadcn/ui**, only where there's real state (see below) |
 | Content | Astro content collections — Markdown/YAML in `src/content` |
 | CMS | [Pages CMS](https://pagescms.org) — config in `.pages.yml` |
-| Fonts | Astro's font API, self-hosted and subset (Anton, Inter, Permanent Marker) |
+| Fonts | Astro's font API, self-hosted: Anton and Inter (subset), plus the licensed CC Monster Mash Worn wordmark face (not subset, per its licence) |
+| Design system | `/design` page (every component) + Storybook 10 (foundations + islands, play tests via Vitest) |
 | Hosting | **GitHub Pages** today (`.github/workflows/deploy.yml`); Cloudflare Pages config is committed and ready |
 
 ### Islands, and what they cost
@@ -89,9 +118,16 @@ choice only matters for the few things that genuinely need state:
 - **`StatLeaderboardTable.tsx`** — sortable/filterable career stats,
   server-rendered as a complete `<table>`. With JS blocked it is still a
   perfectly usable stats table; sorting is the enhancement.
-- **`Slideshow.tsx`** — photo carousel on shadcn/ui's Carousel (Embla).
+- **`Slideshow.tsx`** — photo carousel on shadcn/ui's Carousel (Embla), with
+  `peek` / `single` / `hero` layouts and dash or thumbnail indicators.
   `GallerySlideshow.astro` optimizes every image at build time and passes
   finished `src`/`srcSet` strings, so no image pipeline reaches the client.
+- **`Calendar.tsx`** — the `/events` month grid. Day links are plain anchors,
+  so only month-to-month navigation needs JS.
+- **`PreorderForm.tsx`** + **`ProductGallery.tsx`** — the on-site jersey order
+  form and its image gallery ([docs/PREORDERS.md](docs/PREORDERS.md)).
+- **`JoinRequestForm.tsx`** — the `/join` request-to-play form
+  ([docs/JOIN.md](docs/JOIN.md)).
 
 Everything else is plain Astro or CSS: the mobile nav is ~30 lines of vanilla
 JS, the FAQ accordion is native `<details>`, the sponsor marquee is a CSS
@@ -135,6 +171,9 @@ npm run dev        # http://localhost:4321
 npm run build      # astro check && astro build -> dist/
 npm run preview    # serve dist/ locally
 npm run og         # regenerate public/og-default.png after brand changes
+npm run storybook  # http://localhost:6006 — foundations + React islands
+npx vitest run     # run every Storybook play test headlessly
+node scripts/make-pattern-tiles.mjs   # regenerate the sand/seigaiha tiles
 ```
 
 Node 20+ (developed on 26).
@@ -154,15 +193,22 @@ src/
     events.ts              Derives upcoming/past from dates
     format.ts              Dates, money, rates — all UTC (see below)
     images.ts              Maps a CMS image path to an optimizable asset
+    pblidb.ts              Build-time team stats from pblidb.org (fails soft)
+    palette.ts icons.ts    Design data shared by /design and Storybook
+    textures.ts clouds.ts
   components/
     brand/                 Wordmark, Mascot, TerracedDivider, RuyiCloud,
                            Lantern, Badge, Icon — the reusable brand assets
+    ui/ form/ marketing/   Pill + shadcn carousel · form fields · marketing organisms
+    design/                Chrome for the /design page only
     *.astro                The component library (PRD §7)
-    *.svelte               The two islands
+    *.tsx                  React islands, each with a *.stories.tsx beside it
+  stories/foundations/     Storybook: Colors, Typography, Icons, Textures
   layouts/BaseLayout.astro The single HTML shell
-  pages/                   One file per route
-  styles/global.css        Brand tokens + the ribbed-numeral treatment
-scripts/make-og-default.mjs  Generates the social card
+  pages/                   One file per route (design.astro is the system docs)
+  styles/global.css        Brand tokens, .numeral, .field-*, .bg-* textures
+scripts/                   make-og-default, prep-brand-assets, make-pattern-tiles
+.storybook/                Storybook config; fonts.css stands in for Astro's font API
 ```
 
 ### Decisions worth knowing before you change something
@@ -194,8 +240,11 @@ scripts/make-og-default.mjs  Generates the social card
 
 ## Content & deployment
 
+- Handoff — current state, open work, reference map: **[docs/HANDOFF.md](docs/HANDOFF.md)**
+- The original spec: **[docs/PRD.md](docs/PRD.md)**
 - Editing content (for the team, no code required): **[docs/EDITING.md](docs/EDITING.md)**
 - First-time CMS + hosting setup: **[docs/DEPLOY.md](docs/DEPLOY.md)**
+- Pre-order drops and the join form: **[docs/PREORDERS.md](docs/PREORDERS.md)** · **[docs/JOIN.md](docs/JOIN.md)**
 - Section-by-section PRD audit — what shipped, what deviates and why:
   **[docs/PRD-CONFORMANCE.md](docs/PRD-CONFORMANCE.md)**
 
@@ -266,16 +315,22 @@ These are decisions for the team, not code gaps:
    feature — GitHub Pages ignores the file entirely. They start working the
    day the site moves to Cloudflare Pages (see
    [docs/DEPLOY.md](docs/DEPLOY.md)); there's nothing to change in the repo.
-2. **Discord server ID** — set `discordServerId` in `src/data/site.yml` to swap
-   the Community page's link-out card for Discord's live widget.
+2. **Discord** — the team doesn't run one right now, so `social.discord` is
+   empty and every Discord element hides itself. If one starts, set
+   `social.discord` (and optionally `discordServerId` for the live widget) in
+   `src/data/site.yml`.
 3. **Instagram widget** — pick a provider free tier and fill in
    `instagramWidget`. Until then the page shows a link-out card rather than a
    hole. Allowlist the script's origin in `public/_headers` at the same time,
    so it doesn't break the moment the site moves to Cloudflare Pages.
-4. **Mailing list** — `mailingList.formAction` points at a placeholder
-   Buttondown endpoint. Swap in the real one.
+4. **Mailing list** — `mailingList.formAction` is empty, so the newsletter
+   block points people at the community links instead. Paste in the real
+   Buttondown or Mailchimp form action.
 5. **Who owns content edits** day to day. The tooling is done; the owner isn't
    named.
+6. **Content is still mostly placeholder.** There are no photos yet, and the
+   roster, the only event and the jersey drop dates all need confirming. See
+   [docs/HANDOFF.md](docs/HANDOFF.md#content-is-mostly-placeholder).
 
 ### Not built (phase 2/3 per PRD §12)
 

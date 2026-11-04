@@ -9,6 +9,69 @@ In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the re
 If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is the user's decision.
 <!-- CODEGRAPH_END -->
 
+# The Leftovers website: agent instructions
+
+The site for a community-run paintball team. It's a static Astro 7 site with
+Tailwind v4, a few React 19 islands, content collections edited through Pages
+CMS, and deploys to GitHub Pages on every push to `main`. Live at
+https://theleftoverspb.com. The repo is **public**.
+
+## Read first
+
+1. **[`docs/HANDOFF.md`](docs/HANDOFF.md)**: current state, what's
+   placeholder, open work in priority order, and a map of the reference
+   material.
+2. **[`docs/PRD.md`](docs/PRD.md)**: the v1 spec. "§n" references in the
+   comments and docs point here.
+3. **[`docs/PRD-CONFORMANCE.md`](docs/PRD-CONFORMANCE.md)**: every deliberate
+   deviation from the PRD and its reason. If the code and the PRD disagree,
+   check this file before "fixing" anything. React instead of Svelte, GitHub
+   Pages instead of Cloudflare, the `/team` merge and no Discord are all
+   intentional.
+4. The doc comment at the top of any file you're about to change. They record
+   the *why* (hydration pinning, UTC dates, licence limits) and are
+   load-bearing.
+
+## Hard constraints
+
+Don't break these without the owner explicitly deciding to:
+
+- **No backend, database, accounts or self-hosted checkout.** Dynamic needs go
+  to a free third party: forms go to Google Forms, the mailing list goes to its
+  provider, and the store is an external link.
+- **No trackers or cookie-setting scripts.** The footer promises it. The
+  Facebook Page plugin stays off for this reason.
+- **Strict CSP** (`public/_headers`): `img-src 'self' data:` and
+  `font-src 'self'`. Images and fonts must be local, and any third-party
+  embed needs its origin allowlisted there.
+- **Images live in `src/assets/img/`** and go through `<Image>`/`getImage`.
+  `public/` is for files that must keep a fixed URL (texture tiles, OG card,
+  CNAME).
+- **Every image field in a collection has a required `alt`** in both
+  `src/content.config.ts` and `.pages.yml`. Keep the two in sync whenever you
+  add or change a field.
+- **Never store derived values in content.** Rates, records, totals and
+  upcoming/past are computed in `src/lib/`. Content holds only what a human
+  observed.
+- **Dates are formatted in UTC** (`src/lib/format.ts`). Don't switch them to
+  local time.
+- **The licensed brush font** (`src/assets/fonts/CCMonsterMash-Worn.woff2`):
+  never subset or convert it, and never commit the OTF/TTF desktop files from
+  `_reference/`. The licence is per-domain (`ATTRIBUTIONS.md`).
+- **Mobile Lighthouse ≥ 90 on every category; in practice ~97–100.** Islands
+  are `client:visible` and never above the fold.
+- **WCAG AA.** One `h1` per page (owned by `PageHeader`/`Hero`), touch targets
+  of at least 44px, and visible focus rings.
+
+## Content vs code
+
+Content (players, events, results, preorders, pages, `src/data/site.yml`) is
+the team's, edited through Pages CMS. Those edits arrive as commits on `main`,
+so **pull before you push**. Much of the content is currently placeholder
+(see HANDOFF §2). Don't invent real-looking content: no fake sponsors,
+results or photos. Use `MascotCallout` empty states or `ImagePlaceholder`
+instead.
+
 ## Design system
 
 The site's design system is documented in two places. Together they are the
@@ -80,3 +143,26 @@ Every new or changed component must be documented in the same change:
 - `npm run build`: `astro check` (types) and the full static build.
 - `npx vitest run`: every Storybook story's `play` test, in headless Chromium.
 - Open `/design` and check your specimen at desktop and phone width.
+
+## Keep the handoff docs true
+
+Docs that drift are worse than no docs. In the same change:
+
+- **Finished an item from HANDOFF §7, or created a new one?** Update
+  `docs/HANDOFF.md`, including the "as of" date at the top.
+- **Deliberately deviated from the PRD?** Add a dated note to
+  `docs/PRD-CONFORMANCE.md` saying what changed and why. Never edit
+  `docs/PRD.md`: it's the frozen v1 contract.
+- **Changed how the team edits something?** Update `docs/EDITING.md` (written
+  for non-developers) and the matching `.pages.yml` field.
+- **New reference image?** Commit a downsized WebP to `docs/design/`
+  (`cwebp -q 72 -resize 1600 0 in.png -o docs/design/name.webp`) and add a row
+  to HANDOFF §6. The full-resolution original stays in gitignored
+  `_reference/`.
+
+## Git
+
+Commit straight to `main` (this repo's convention), and only when the owner
+asks. A push deploys to production. Commits are SSH-signed, so if signing
+fails the agent is locked: ask the owner to unlock it, and don't disable
+signing.

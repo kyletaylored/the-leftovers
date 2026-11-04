@@ -105,10 +105,13 @@ community page and the contact page at once.
 
 Two fields unlock features that are currently showing link-out cards instead:
 
-- **Discord server ID** — paste the numeric ID and the Community page renders
-  Discord's live widget (member count and an inline invite) instead of a
-  button. Your server has to be public, and the widget has to be enabled in
-  Discord's own Server Settings → Widget.
+- **Discord server ID** — *the team doesn't run a Discord right now, so leave
+  the Discord invite and this field blank, and all Discord buttons and
+  sections stay hidden.* If a server starts: add the invite link, then paste
+  the numeric ID here, and the Community page renders Discord's live widget
+  (member count and an inline invite) instead of a button. The server has to
+  be public, and the widget has to be enabled in Discord's own Server
+  Settings → Widget.
 - **Instagram feed widget** — Instagram has no usable live-feed API, so a photo
   grid needs a third-party service (Elfsight, Juicer, SnapWidget all have free
   tiers). Paste its script URL and element class here. **Tell whoever maintains

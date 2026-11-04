@@ -122,7 +122,7 @@ long-term tools, so nothing here assumes a commitment.
 | Service | What it would add | Without it (current state) |
 |---|---|---|
 | **Google Forms** | Pre-orders land in a Sheet automatically | The order form still works — it prices and formats the order and the buyer emails or pastes it. See [PREORDERS.md](PREORDERS.md) |
-| **Discord** | The free official server widget | Community page shows a link-out card |
+| **Discord** | The free official server widget | *Not used right now.* With `social.discord` empty, all Discord UI is hidden |
 | **A mailing-list provider** | An actual list to join | The newsletter block points at the community channels instead of showing a form that posts nowhere |
 | **An Instagram widget** | A live photo grid | Community page shows a link-out card; the on-site slideshow covers photos |
 | **A print store** (Bonfire etc.) | Evergreen merch | `products` is empty and the shop shows drops only. Batch jersey drops don't need it |
