@@ -8,8 +8,9 @@
 #      the security headers are not active on GitHub Pages. They ship in the
 #      repo ready for the move to Cloudflare Pages, which is the reason §4.1
 #      recommends it.
-#   2. There are no per-PR preview deployments. This workflow builds on PRs to
-#      catch breakage, but only `main` deploys.
+#   2. There are no per-PR preview deployments. Pull requests are checked by
+#      ci.yml (build only); this workflow never runs on a PR, so a PR shows
+#      no Deploy check at all.
 #
 # Every push to main — including a content save from Pages CMS, which commits
 # straight to main — rebuilds and deploys. That's the §11 editorial workflow:
@@ -19,8 +20,6 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
-  pull_request:
     branches: [main]
   # Lets you re-deploy the current main without pushing an empty commit.
   workflow_dispatch:
@@ -33,7 +32,9 @@ permissions:
 
 # Never let two deploys race. `cancel-in-progress: false` matters here: a
 # content editor can easily save twice in a minute, and cancelling the
-# in-flight deploy would leave the site mid-publish.
+# in-flight deploy would leave the site mid-publish. Don't cancel a running
+# Deploy by hand either: Pages marks that deployment `error` and the next one
+# can sit "in progress" on GitHub's side (Nov 2026). Let it time out instead.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -41,7 +42,10 @@ concurrency:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    # Pinned rather than `ubuntu-latest`, so a runner-image rollover can't
+    # change the build under us. Keep in sync with ci.yml.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
 
@@ -87,10 +91,14 @@ jobs:
 
   deploy:
     name: Deploy
-    # Pull requests build but don't publish.
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    # Belt-and-braces: a workflow_dispatch from another branch builds but
+    # never publishes.
+    if: github.ref == 'refs/heads/main'
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    # deploy-pages gives up after its own 10-minute timeout; this stops a
+    # wedged job from holding the `pages` queue any longer than that.
+    timeout-minutes: 15
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

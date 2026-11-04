@@ -1,0 +1,55 @@
+# Pull-request check: does the site build?
+#
+# This is the only check a PR gets. It runs the same `npm ci` + `npm run build`
+# as the deploy (`astro check` for types and content schemas, then the full
+# static build) and nothing else: no Pages artifact upload, no deploy job, and
+# read-only permissions. Publishing lives in deploy.yml, which only runs on
+# `main`.
+#
+# It has its own concurrency group per PR, separate from the deploy's `pages`
+# group. When both workflows shared one group, PR builds queued behind live
+# deploys, and a newer queued run cancelled an older one, so a PR check could
+# be cancelled by an unrelated merge (seen Nov 2026). A new push to the same
+# PR still cancels that PR's previous build, since only the latest matters.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    # Pinned rather than `ubuntu-latest`, so a runner-image rollover can't
+    # change the build under us. Keep in sync with deploy.yml.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          # Same alias as deploy.yml; see the note there.
+          node-version: lts/*
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # `astro check && astro build`: type errors or content that doesn't match
+      # its schema fail the PR here, before anything reaches main.
+      - name: Build
+        run: npm run build
+
+      # Same guard as the deploy: the custom domain must survive the build.
+      - name: Verify CNAME
+        run: |
+          test -f dist/CNAME || { echo "::error::dist/CNAME missing — public/CNAME should be copied by the build"; exit 1; }
