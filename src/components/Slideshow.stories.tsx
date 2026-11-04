@@ -100,3 +100,12 @@ export const ShowcaseAutoplay: Story = {
     await expect(canvas.getByRole('button', { name: /play slideshow/i })).toBeVisible();
   },
 };
+
+/** Overlay tone (showcase only): crimson, matching ImpactBand tone="crimson". */
+export const ShowcaseCrimson: Story = {
+  args: { slides: posterSlides, layout: 'showcase', tone: 'crimson' },
+  parameters: { layout: 'fullscreen' },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByText('Off the break')).toBeInTheDocument();
+  },
+};

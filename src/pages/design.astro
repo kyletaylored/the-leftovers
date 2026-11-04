@@ -59,6 +59,7 @@ import LogoStrip from '@/components/LogoStrip.astro';
 import Slideshow, { type Slide } from '@/components/Slideshow.tsx';
 import FeatureRow from '@/components/marketing/FeatureRow.astro';
 import ImpactBand from '@/components/marketing/ImpactBand.astro';
+import TwoColumn from '@/components/TwoColumn.astro';
 import PricingCard from '@/components/marketing/PricingCard.astro';
 import ProductGrid from '@/components/marketing/ProductGrid.astro';
 import FormField from '@/components/form/FormField.astro';
@@ -171,7 +172,8 @@ const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Ast
   { name: 'ThreeColumn · FaqAccordion', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Icon benefits row; native <details> FAQ.' },
   { name: 'Section · PageHeader · Hero', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Page scaffolding. Hero: brand | ornate | image | video | text.' },
   { name: 'FeatureRow', file: 'marketing/FeatureRow.astro', kind: 'Astro', section: 'marketing', use: 'Alternating media + copy. Flip with reverse.' },
-  { name: 'ImpactBand', file: 'marketing/ImpactBand.astro', kind: 'Astro', section: 'marketing', use: 'Full-bleed action photo fading into big copy. align left | right, tone ink | crimson.' },
+  { name: 'ImpactBand', file: 'marketing/ImpactBand.astro', kind: 'Astro', section: 'marketing', use: 'Full-bleed action photo fading into big copy. align left | right; tone ink | crimson | forest; treatment fade | duotone.' },
+  { name: 'TwoColumn', file: 'TwoColumn.astro', kind: 'Astro', section: 'blocks', use: 'Boxed image + copy CTA. A calm break between full-bleed blocks.' },
   { name: 'PricingCard', file: 'marketing/PricingCard.astro', kind: 'Astro', section: 'marketing', use: 'Tier card; featured gets gold border + ribbon.' },
   { name: 'LogoStrip', file: 'LogoStrip.astro', kind: 'Astro', section: 'marketing', use: 'Static centred logo row: leagues on the homepage, partners on Contact. sm | md.' },
   { name: 'Gallery', file: 'Gallery.astro', kind: 'Astro', section: 'marketing', use: 'Masonry photo grid, zero JS.' },
@@ -386,10 +388,10 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
           title="RiceTerraces: layered landscape"
           tag="NEW"
           file="src/components/brand/RiceTerraces.astro"
-          note={'Three depths (rounded far mountains with sparkles, quantised paddy steps, a mixed front run of swells, plateaus and pagoda eaves), nested gold contours clipped inside each layer, and 田 glyphs on the plateaus. Change seed for a different skyline; simple drops the far layer. Give it a height and full width: it crops at phone width instead of squashing. Use once per page, at the foot of a hero.'}
+          note={'Three depths (rounded far mountains with sparkles, quantised paddy steps, a mixed front run of swells, plateaus and pagoda eaves), nested gold contours clipped inside each layer, and 田 glyphs on the plateaus. Change seed for a different skyline; simple drops the far layer. Mobile first: a fixed height on small screens (crops the sides, never squashes), then lg:h-auto lg:aspect-[2400/260] so nothing is cropped top or bottom. Glyphs are single and evenly spaced. Use once per page, at the foot of a hero.'}
         >
           <div class="grid gap-4">
-            <RiceTerraces seed={7} class="h-48 bg-topo" />
+            <RiceTerraces seed={7} class="h-28 bg-sand sm:h-36 lg:h-auto lg:aspect-[2400/260]" />
             <div class="grid gap-4 sm:grid-cols-2">
               <div><RiceTerraces seed={2} class="h-28 bg-ink-900" /><code class="mt-1.5 block font-mono text-[0.625rem] text-bone-muted">seed=2</code></div>
               <div><RiceTerraces seed={5} simple class="h-28 bg-ink-900" /><code class="mt-1.5 block font-mono text-[0.625rem] text-bone-muted">seed=5 simple</code></div>
@@ -566,17 +568,17 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
         tag="NEW"
         class="mb-5"
         flush
-        file={['src/components/Hero.astro', 'src/pages/preview/home-b.astro']}
-        note={'The logo hero dressed for a showpiece: CloudCorner in both top corners, a gold glow behind the logo, RiceTerraces along the bottom, and the tagline split on "/" with gold slashes. The real Hero owns the page h1, so it is mocked here from its parts; see it live at /preview/home-b.'}
+        file={['src/components/Hero.astro', 'src/pages/index.astro']}
+        note={'The logo hero on bg-sand, dressed for a showpiece: CloudCorner in both top corners, a gold glow behind the logo, RiceTerraces along the bottom, and the tagline split on "/" with gold slashes. The real Hero owns the page h1, so it is mocked here from its parts; see it live on the homepage.'}
       >
-        <div class="relative h-[26rem] overflow-hidden bg-topo sm:h-[30rem]">
+        <div class="relative h-[26rem] overflow-hidden bg-sand sm:h-[30rem]">
           <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_55%_60%_at_50%_45%,color-mix(in_srgb,var(--color-gold)_16%,transparent),transparent_70%)]" />
           <CloudCorner side="left" class="absolute -left-10 -top-6 w-44 sm:w-72 lg:w-[22rem]" />
           <CloudCorner side="right" class="absolute -right-10 -top-6 w-44 sm:w-72 lg:w-[22rem]" />
           <Image src={logoImg} alt="" widths={[224, 448]} sizes="224px" class="absolute left-1/2 top-14 h-auto w-44 -translate-x-1/2 sm:w-56" />
-          <RiceTerraces seed={7} class="absolute bottom-0 left-0 h-24 sm:h-36" />
+          <RiceTerraces seed={7} class="absolute bottom-0 left-0 h-24 sm:h-36 lg:h-auto lg:aspect-[2400/260]" />
         </div>
-        <p class="px-5 pt-3 sm:px-[22px]"><a class="tap inline-flex items-center text-xs font-bold uppercase tracking-[0.14em] text-gold-300 underline" href="/preview/home-b">Open /preview/home-b</a></p>
+        <p class="px-5 pt-3 sm:px-[22px]"><a class="tap inline-flex items-center text-xs font-bold uppercase tracking-[0.14em] text-gold-300 underline" href="/">Open the homepage</a></p>
       </Specimen>
       <div class="grid gap-5 lg:grid-cols-2">
         <Specimen title="Callout" file="src/components/Callout.astro" note="A pull quote with optional cite.">
@@ -597,6 +599,19 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
             ]}
           />
         </Specimen>
+        <Specimen
+          title="TwoColumn: image + copy CTA"
+          class="lg:col-span-2"
+          file="src/components/TwoColumn.astro"
+          note={'The standard boxed two-column block: copy, actions and an image with a gold offset frame. Stacks image-under-copy on phones. Use it inside a textured Section (seigaiha / sand) to break up two full-bleed blocks, like the slider and an ImpactBand on the homepage. imageSide flips it.'}
+        >
+          <TwoColumn as="h3" eyebrow="How it works" title="Three steps to the field" image={sprintImg} imageAlt="Three Leftovers players sprint out from behind a red inflatable bunker.">
+            <p>No tryout, bring your own gear, and you actually play.</p>
+            <Button slot="actions" href="/join">Join a squad</Button>
+            <Button slot="actions" href="/contact" variant="outline">Ask a question</Button>
+          </TwoColumn>
+        </Specimen>
+
         <Specimen title="CtaStrip" class="overflow-hidden lg:col-span-2" flush file="src/components/CtaStrip.astro" note={'Full-width call-to-action band. tone="crimson" | "forest". Buttons go in slot="actions".'}>
           <CtaStrip as="h3" eyebrow="Open slots" title="Every name started as a slot" body="Confirm you're coming, cover your entry, and you're playing points." tone="crimson">
             <Button slot="actions" href="/join" variant="gold">Request a slot</Button>
@@ -639,7 +654,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
           tag="NEW"
           flush
           file="src/components/marketing/ImpactBand.astro"
-          note={'The bold one: the photo owns the full width and fades to ink (or crimson) under the copy, and melts into the sections above and below. On phones the photo stacks on top and fades down into the copy. Pick a shot whose subject is on the side away from the copy; nudge it with focus. Use one or two per page, never back to back on the same side. Place it outside any Section container.'}
+          note={'The bold one: the photo owns the full width and fades into a SOLID wash under the copy, so body text always sits on flat colour (AA). tone = ink (black, default) | crimson | forest; on crimson/forest the body copy is full bone. treatment="duotone" also tints the whole photo (ink = black and white; crimson tints at half strength). Mobile first: on phones the photo stacks on top and fades down into the copy. Keep titles to two short lines. Use one or two per page, never back to back: put a boxed block (TwoColumn) between them. Place it outside any Section container.'}
         >
           <ImpactBand
             as="h3"
@@ -661,10 +676,43 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
             tone="crimson"
             eyebrow="Free agents welcome"
             title={'No team?\nNo problem.'}
-            body={'align="right" tone="crimson": copy on the right, the photo fading through brand crimson.'}
+            body={'align="right" tone="crimson": copy on the right, on a solid crimson wash with full-bone body text.'}
           >
             <Button slot="actions" href="/join" variant="gold">Request to join</Button>
           </ImpactBand>
+          <ImpactBand
+            as="h3"
+            image={sprintImg}
+            imageAlt="Three Leftovers players sprint out from behind a red inflatable bunker."
+            tone="forest"
+            treatment="duotone"
+            eyebrow={'tone="forest" treatment="duotone"'}
+            title={'Off the\nbreak.'}
+            body="The whole photo tinted forest for a poster look; use it when a shot's own colours fight the brand."
+          >
+            <Button slot="actions" href="/join" variant="gold">Join a squad</Button>
+          </ImpactBand>
+          <ImpactBand
+            as="h3"
+            image={shooterImg}
+            imageAlt="A Leftovers player aims a paintball marker across a field."
+            align="right"
+            tone="crimson"
+            treatment="duotone"
+            eyebrow={'tone="crimson" treatment="duotone"'}
+            title={'Eyes\nup.'}
+            body="Crimson tints at half strength so the photo still reads; it is the most saturated brand colour."
+          />
+          <ImpactBand
+            as="h3"
+            image={aimingImg}
+            imageAlt="A Leftovers player behind an inflatable bunker sights down a marker."
+            tone="ink"
+            treatment="duotone"
+            eyebrow={'tone="ink" treatment="duotone" (black)'}
+            title={'Black &\nwhite.'}
+            body="The black option: ink is the default tone, and with duotone the photo goes black and white."
+          />
         </Specimen>
 
         <Specimen title="PricingCard" file="src/components/marketing/PricingCard.astro" note="Lay out in a grid at the call site (sm:grid-cols-3). One featured card per row at most.">
@@ -729,9 +777,19 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
           tag="NEW · React island"
           flush
           file={['src/components/Slideshow.tsx', 'src/components/GallerySlideshow.astro']}
-          note={'layout="showcase": the action-sports poster slider. Tall full-bleed photo with a slow zoom, a gold kicker and a huge headline per slide, a 01 / 10 counter, progress segments and square controls. With autoplayMs it gets a pause button and the active bar fills over the interval. Per-slide text comes from each photo\'s caption (headline) and kicker (defaults to the gallery title) in the galleries collection. Place it outside any container.'}
+          note={'layout="showcase": the action-sports poster slider. Tall full-bleed photo with a slow zoom, a gold kicker and a huge headline per slide, a 01 / 10 counter, progress segments (one continuous bar on phones) and square controls. tone colours the overlay. With autoplayMs it gets a pause button and the active bar fills over the interval. Per-slide text comes from each photo\'s caption (headline) and kicker (defaults to the gallery title) in the galleries collection. Place it outside any container.'}
         >
           <Slideshow client:visible slides={showcaseSlides} layout="showcase" autoplayMs={6000} />
+        </Specimen>
+
+        <Specimen
+          title={'Slider: showcase tone="crimson"'}
+          tag="React island"
+          flush
+          file="src/components/Slideshow.tsx"
+          note={'tone = ink (default) | crimson | forest colours the overlay, matching ImpactBand. Pass it through GallerySlideshow the same way.'}
+        >
+          <Slideshow client:visible slides={showcaseSlides} layout="showcase" tone="crimson" />
         </Specimen>
 
         <Specimen title="Slider: full-width hero / section" tag="React island" file="src/components/Slideshow.tsx" note={'layout="hero": 16:7, arrows on the image, flag + dashes bottom-left. Place it full-bleed (outside the Section container) as a page hero or an event-recap / sponsor reel.'}>

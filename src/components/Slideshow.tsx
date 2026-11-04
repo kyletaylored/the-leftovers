@@ -39,6 +39,8 @@ import { cn } from '@/lib/utils';
  *    energy-drink / action-sports sites). Tall edge-to-edge photo with a slow
  *    zoom, a gold KICKER and a huge display HEADLINE per slide that animate
  *    in, a "03 / 10" counter, segmented progress bars and square controls.
+ *    `tone` (showcase only) colours the overlay: `ink` (default), `crimson`
+ *    or `forest`, matching ImpactBand's tones so the two can sit together.
  *    Place it outside any container. With `autoplayMs` it shows a visible
  *    pause/play button (WCAG 2.2.2) and the active bar fills over the
  *    interval; the bar's animationend is what advances the slide, so hover
@@ -64,6 +66,14 @@ export interface Slide {
 export type SlideshowLayout = 'peek' | 'single' | 'hero' | 'showcase';
 export type SlideshowIndicators = 'dashes' | 'thumbnails';
 export type SlideshowCaptionStyle = 'below' | 'flag';
+export type SlideshowTone = 'ink' | 'crimson' | 'forest';
+
+/** Showcase overlay per tone: a bottom fade under the headline + a left fade. */
+const showcaseTone: Record<SlideshowTone, { bottom: string; side: string; bg: string }> = {
+  ink: { bottom: 'from-ink via-ink/35 to-ink/10', side: 'from-ink/70', bg: 'bg-ink' },
+  crimson: { bottom: 'from-crimson via-crimson/45 to-ink/10', side: 'from-crimson/75', bg: 'bg-crimson' },
+  forest: { bottom: 'from-forest via-forest/45 to-ink/10', side: 'from-forest/75', bg: 'bg-forest' },
+};
 
 interface SlideshowProps {
   slides: Slide[];
@@ -72,6 +82,8 @@ interface SlideshowProps {
   layout?: SlideshowLayout;
   indicators?: SlideshowIndicators;
   captionStyle?: SlideshowCaptionStyle;
+  /** `showcase` only: overlay colour. */
+  tone?: SlideshowTone;
   className?: string;
 }
 
@@ -164,6 +176,7 @@ export default function Slideshow({
   layout = 'peek',
   indicators = 'dashes',
   captionStyle = 'below',
+  tone = 'ink',
   className,
 }: SlideshowProps) {
   const isHero = layout === 'hero';
@@ -230,7 +243,7 @@ export default function Slideshow({
     const running = autoplay && playing;
     return (
       <div
-        className={cn('relative bg-ink', className)}
+        className={cn('relative', showcaseTone[tone].bg, className)}
         // Hovering or focusing anywhere in the slider holds the progress bar.
         onPointerEnter={() => setHeld(true)}
         onPointerLeave={() => setHeld(false)}
@@ -259,7 +272,8 @@ export default function Slideshow({
                       width={slide.width}
                       height={slide.height}
                       alt={slide.alt}
-                      loading={index === 0 ? 'eager' : 'lazy'}
+                      // Showcase sits below the fold: never compete with the hero (LCP).
+                      loading="lazy"
                       decoding="async"
                       className={cn(
                         'absolute inset-0 size-full object-cover transition-transform duration-[7000ms] ease-out',
@@ -267,11 +281,11 @@ export default function Slideshow({
                       )}
                     />
                     <div
-                      className="absolute inset-0 bg-gradient-to-t from-ink via-ink/35 to-ink/10"
+                      className={cn('absolute inset-0 bg-gradient-to-t', showcaseTone[tone].bottom)}
                       aria-hidden="true"
                     />
                     <div
-                      className="absolute inset-0 bg-gradient-to-r from-ink/70 via-transparent to-transparent"
+                      className={cn('absolute inset-0 bg-gradient-to-r via-transparent to-transparent', showcaseTone[tone].side)}
                       aria-hidden="true"
                     />
                     {headline && (
@@ -287,7 +301,7 @@ export default function Slideshow({
                             {kicker}
                           </span>
                         )}
-                        <span className="block max-w-5xl font-display text-5xl uppercase leading-[0.9] text-bone [text-shadow:0_4px_24px_rgba(0,0,0,0.45)] sm:text-7xl lg:text-8xl xl:text-9xl">
+                        <span className="block max-w-4xl font-display text-4xl uppercase leading-[0.92] text-bone [text-shadow:0_4px_24px_rgba(0,0,0,0.45)] sm:text-6xl lg:text-7xl xl:text-8xl">
                           {headline}
                         </span>
                       </figcaption>
@@ -413,7 +427,8 @@ export default function Slideshow({
                   width={slide.width}
                   height={slide.height}
                   alt={slide.alt}
-                  loading={index === 0 ? 'eager' : 'lazy'}
+                  // Only the hero layout can be above the fold.
+                  loading={index === 0 && isHero ? 'eager' : 'lazy'}
                   decoding="async"
                   className={cn(aspectFor[layout], 'w-full object-cover')}
                 />

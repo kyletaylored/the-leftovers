@@ -6,22 +6,34 @@
  *
  * FeatureRow boxes the photo next to the copy. This lets the photo own the
  * full width, the way sports-energy brands frame athletes: the image fades
- * to ink under the copy, and also at its top and bottom edges so it melts
- * into the sections around it instead of sitting on a hard line.
+ * into a solid colour under the copy, and also at its top and bottom edges
+ * so it melts into the sections around it instead of sitting on a hard line.
  *
- * Layout:
- *  - lg+: the photo fills the band; the copy sits over the faded side
+ * Mobile first:
+ *  - phones/tablets: the photo stacks on top and fades down into the copy,
+ *    which overlaps its bottom edge, so text never sits on a busy part of a
+ *    photo at phone width;
+ *  - lg+: the photo fills the band and the copy sits over the faded side
  *    (`align`), vertically centred.
- *  - below lg: the photo stacks on top and fades down into the copy, which
- *    overlaps its bottom edge, so text never sits on a busy part of a photo
- *    at phone width.
+ *
+ * Colour (both props, any combination):
+ *  - `tone` is the wash the photo fades into: `ink` (black, the default),
+ *    `crimson` or `forest`. The wash is SOLID under the copy, not a gradient, so body
+ *    text always sits on a flat brand colour and passes AA. On `crimson`
+ *    and `forest` the body copy is full bone, not bone-muted.
+ *  - `treatment="duotone"` also tints the whole photo in the tone (greyscale
+ *    + a 'color' blend that swaps in the tone's hue but keeps the photo's
+ *    brightness), for a poster look or when a photo's own colours
+ *    fight the brand. With `ink` that's a black-and-white photo. The tint
+ *    strength is set per tone (`tint` below): crimson is the most
+ *    saturated colour, so it tints at half strength or it floods the photo.
  *
  * Pick a photo whose subject is on the side AWAY from the copy, and nudge it
  * with `focus` (CSS object-position). `ghost` puts an outlined word huge
  * behind the copy; it is aria-hidden, so don't put meaning there.
  *
  * Headings render at the level the caller passes (default h2). The title
- * accepts "\n" for deliberate line breaks.
+ * accepts "\n" for deliberate line breaks; keep titles to two short lines.
  */
 import { Image } from 'astro:assets';
 
@@ -29,6 +41,8 @@ interface Stat {
   value: string | number;
   label: string;
 }
+
+export type ImpactTone = 'ink' | 'crimson' | 'forest';
 
 interface Props {
   image: ImageMetadata;
@@ -42,8 +56,8 @@ interface Props {
   body?: string;
   stats?: Stat[];
   ghost?: string;
-  /** `crimson` washes the faded side in brand red instead of plain ink. */
-  tone?: 'ink' | 'crimson';
+  tone?: ImpactTone;
+  treatment?: 'fade' | 'duotone';
   as?: 'h2' | 'h3';
   /** Set when the band is above the fold, so the photo isn't lazy-loaded. */
   priority?: boolean;
@@ -62,6 +76,7 @@ const {
   stats = [],
   ghost,
   tone = 'ink',
+  treatment = 'fade',
   as: Heading = 'h2',
   priority = false,
   id,
@@ -71,12 +86,23 @@ const {
 const right = align === 'right';
 const lines = title.split('\n');
 const position = focus ?? (right ? '30% 35%' : '70% 35%');
-const wash = tone === 'crimson' ? 'var(--color-crimson)' : 'var(--color-ink)';
-const sideFade = `linear-gradient(to ${right ? 'left' : 'right'}, ${wash} 0%, color-mix(in srgb, ${wash} 92%, transparent) 30%, color-mix(in srgb, ${wash} 62%, transparent) 48%, color-mix(in srgb, ${wash} 18%, transparent) 66%, transparent 82%)`;
+
+const tones = {
+  ink: { wash: 'var(--color-ink)', bg: 'bg-ink', body: 'text-bone-muted', bar: 'bg-crimson', label: 'text-bone-muted', tint: 1 },
+  crimson: { wash: 'var(--color-crimson)', bg: 'bg-crimson', body: 'text-bone', bar: 'bg-gold', label: 'text-bone', tint: 0.45 },
+  forest: { wash: 'var(--color-forest)', bg: 'bg-forest', body: 'text-bone', bar: 'bg-gold', label: 'text-bone', tint: 0.75 },
+} as const;
+const t = tones[tone];
+const mix = (pct: number) => `color-mix(in srgb, ${t.wash} ${pct}%, transparent)`;
+
+// Solid under the copy column (0–44%), then a quick fall-off to the photo.
+const sideFade = `linear-gradient(to ${right ? 'left' : 'right'}, ${t.wash} 0%, ${t.wash} 44%, ${mix(80)} 56%, ${mix(35)} 67%, transparent 80%)`;
+const downFade = `linear-gradient(to top, ${t.wash} 0%, ${mix(70)} 22%, transparent 60%)`;
+const edgeMelt = `linear-gradient(to bottom, ${t.wash}, transparent 14%, transparent 84%, ${t.wash})`;
 const hasActions = Astro.slots.has('actions');
 ---
 
-<section id={id} class:list={['relative isolate overflow-hidden bg-ink', className]}>
+<section id={id} class:list={['relative isolate overflow-hidden', t.bg, className]}>
   <div class="relative lg:absolute lg:inset-0">
     <Image
       src={image}
@@ -86,27 +112,31 @@ const hasActions = Astro.slots.has('actions');
       loading={priority ? 'eager' : 'lazy'}
       fetchpriority={priority ? 'high' : undefined}
       decoding="async"
-      class="aspect-[4/3] w-full object-cover sm:aspect-[16/9] lg:aspect-auto lg:h-full"
+      class:list={[
+        'aspect-[4/3] w-full object-cover sm:aspect-[16/9] lg:aspect-auto lg:h-full',
+        treatment === 'duotone' && 'grayscale contrast-125',
+      ]}
       style={`object-position:${position}`}
     />
-    {/* Phone/tablet: fade down into the copy below. */}
-    <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/30 to-transparent lg:hidden" aria-hidden="true" />
+    {
+      treatment === 'duotone' && (
+        <div class="absolute inset-0 mix-blend-color" style={`background:${t.wash};opacity:${t.tint}`} aria-hidden="true" />
+      )
+    }
+    {/* Phones/tablets: fade down into the copy below. */}
+    <div class="absolute inset-0 lg:hidden" style={`background:${downFade}`} aria-hidden="true" />
     {/* Desktop: fade sideways under the copy, plus top/bottom edge melts. */}
     <div class="absolute inset-0 hidden lg:block" style={`background:${sideFade}`} aria-hidden="true" />
-    <div
-      class="absolute inset-0 hidden lg:block"
-      style="background:linear-gradient(to bottom, var(--color-ink), transparent 16%, transparent 80%, var(--color-ink))"
-      aria-hidden="true"
-    />
+    <div class="absolute inset-0 hidden lg:block" style={`background:${edgeMelt}`} aria-hidden="true" />
   </div>
 
-  <div class="relative mx-auto -mt-20 max-w-7xl px-4 pb-16 sm:-mt-28 sm:px-6 lg:mt-0 lg:flex lg:min-h-[40rem] lg:items-center lg:py-24 xl:min-h-[46rem]">
-    <div class:list={['relative max-w-xl xl:max-w-2xl', right && 'lg:ml-auto lg:text-right']}>
+  <div class="relative mx-auto -mt-16 max-w-7xl px-4 pb-14 sm:-mt-24 sm:px-6 sm:pb-16 lg:mt-0 lg:flex lg:min-h-[36rem] lg:items-center lg:py-20 xl:min-h-[40rem]">
+    <div class:list={['relative max-w-2xl lg:max-w-[56%]', right && 'lg:ml-auto lg:text-right']}>
       {
         ghost && (
           <span
             class:list={[
-              'pointer-events-none absolute -top-12 select-none font-display text-[7rem] uppercase leading-none text-transparent opacity-60 sm:-top-16 sm:text-[10rem] lg:-top-24 lg:text-[13rem]',
+              'pointer-events-none absolute -top-10 select-none font-display text-[5.5rem] uppercase leading-none text-transparent opacity-60 sm:-top-14 sm:text-[8rem] lg:-top-20 lg:text-[11rem]',
               right ? 'right-0' : 'left-0',
             ]}
             style="-webkit-text-stroke:1px color-mix(in srgb, var(--color-gold) 35%, transparent)"
@@ -118,18 +148,18 @@ const hasActions = Astro.slots.has('actions');
       }
       {
         eyebrow && (
-          <p class:list={['eyebrow relative mb-4 flex items-center gap-3', right && 'lg:flex-row-reverse']}>
-            <span class="block h-[3px] w-10 bg-crimson" aria-hidden="true" />
+          <p class:list={['eyebrow relative mb-3 flex items-center gap-3 sm:mb-4', right && 'lg:flex-row-reverse']}>
+            <span class:list={['block h-[3px] w-8 sm:w-10', t.bar]} aria-hidden="true" />
             {eyebrow}
           </p>
         )
       }
-      <Heading class="relative text-5xl leading-[0.9] text-bone sm:text-6xl lg:text-7xl xl:text-8xl">
+      <Heading class="relative text-4xl leading-[0.92] text-bone sm:text-5xl xl:text-[4rem]">
         {lines.map((line) => <span class="block">{line}</span>)}
       </Heading>
       {
         body && (
-          <p class:list={['relative mt-6 max-w-md text-base leading-relaxed text-bone-muted sm:text-lg', right && 'lg:ml-auto']}>
+          <p class:list={['relative mt-5 max-w-md text-base leading-relaxed sm:mt-6 sm:text-lg', t.body, right && 'lg:ml-auto']}>
             {body}
           </p>
         )
@@ -138,7 +168,7 @@ const hasActions = Astro.slots.has('actions');
         stats.length > 0 && (
           <dl
             class:list={[
-              'relative mt-8 grid grid-cols-3 items-end gap-4 sm:flex sm:flex-wrap sm:gap-x-3 sm:gap-y-4',
+              'relative mt-7 grid grid-cols-3 items-end gap-4 sm:mt-8 sm:flex sm:flex-wrap sm:gap-x-3 sm:gap-y-4',
               right && 'lg:justify-end',
             ]}
           >
@@ -152,7 +182,7 @@ const hasActions = Astro.slots.has('actions');
                   i > 0 && "sm:pl-8 sm:before:absolute sm:before:bottom-6 sm:before:left-1 sm:before:text-xl sm:before:text-gold sm:before:content-['/']",
                 ]}
               >
-                <dt class="mt-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] text-bone-muted sm:text-xs sm:tracking-[0.2em]">
+                <dt class:list={['mt-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] sm:text-xs sm:tracking-[0.2em]', t.label]}>
                   {stat.label}
                 </dt>
                 <dd class="numeral text-3xl leading-[0.85] sm:text-5xl">{stat.value}</dd>
@@ -163,7 +193,7 @@ const hasActions = Astro.slots.has('actions');
       }
       {
         hasActions && (
-          <div class:list={['relative mt-9 flex flex-col gap-3 sm:flex-row', right && 'lg:justify-end']}>
+          <div class:list={['relative mt-8 flex flex-col gap-3 sm:flex-row', right && 'lg:justify-end']}>
             <slot name="actions" />
           </div>
         )

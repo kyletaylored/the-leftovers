@@ -307,6 +307,14 @@ side, crimson name-plate, pill role badge, low-opacity corner cloud.
 
 ### Homepage layout
 
+**Nov 2026 update:** `homepage-mockup-b` is now what's built and live on
+`/`, after a review round at `/preview/home-b`: the ornate sand hero, the
+full-bleed `ImpactBand` manifesto (with the "0 tryouts / 0 bench spots /
+100% playing time" stats, which are copy rather than derived data), the
+full-width showcase slider, a `TwoColumn` "How it works" CTA, and a crimson
+free-agents `ImpactBand` in place of the next-up band, since there is no
+confirmed next event yet. The original note follows.
+
 `homepage-mockup-a` is what's built. `homepage-mockup-b` adds a full-bleed
 action photo with the *"Paintball builds better people"* manifesto line and
 inline stats, plus a crimson full-width next-up band. Both are photography

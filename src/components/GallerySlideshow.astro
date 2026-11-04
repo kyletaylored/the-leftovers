@@ -17,6 +17,7 @@ import Slideshow, {
   type SlideshowCaptionStyle,
   type SlideshowIndicators,
   type SlideshowLayout,
+  type SlideshowTone,
 } from './Slideshow.tsx';
 import MascotCallout from './MascotCallout.astro';
 import { resolveImage } from '@/lib/images';
@@ -29,6 +30,8 @@ interface Props {
   layout?: SlideshowLayout;
   indicators?: SlideshowIndicators;
   captionStyle?: SlideshowCaptionStyle;
+  /** `showcase` only: overlay colour (ink | crimson | forest). */
+  tone?: SlideshowTone;
   emptyTitle?: string;
   emptyBody?: string;
   class?: string;
@@ -40,6 +43,7 @@ const {
   layout,
   indicators,
   captionStyle,
+  tone,
   emptyTitle = 'No photos up yet',
   emptyBody = "Somebody always forgets to bring a camera. When shots from the last event land, they show up here.",
   class: className = '',
@@ -92,6 +96,7 @@ const slides: Slide[] = resolved.flatMap((slide) => (slide ? [slide] : []));
       layout={layout}
       indicators={indicators}
       captionStyle={captionStyle}
+      tone={tone}
       className={className}
     />
   ) : (

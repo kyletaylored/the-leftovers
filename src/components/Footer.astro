@@ -110,8 +110,9 @@ const year = new Date().getFullYear();
           <p>
             <a
               href={site.designStorybookUrl}
-              rel="noopener"
-              target="_blank"
+              {...(/^https?:\/\//.test(site.designStorybookUrl)
+                ? { rel: 'noopener', target: '_blank' }
+                : {})}
               class="underline decoration-ink-600 underline-offset-2 hover:text-gold-300"
             >
               Design storybook

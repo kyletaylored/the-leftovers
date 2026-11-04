@@ -59,7 +59,7 @@ team deciding to:
 
 | Route | What it is | Notes |
 |---|---|---|
-| `/` | Home: sand hero, photo slider, "Anyone Can Play", "2027 Season Loading…" + league logos, newsletter | Reworked Nov 2026 from the team's feedback doc |
+| `/` | Home ("direction B"): ornate sand hero, `ImpactBand` manifesto, full-width showcase slider, "How it works" `TwoColumn` CTA, crimson free-agents `ImpactBand`, "2027 Season Loading…" + league logos, newsletter | Direction B promoted Nov 2026 |
 | `/team` | About + Roster + Stats + FAQ on one page, with a jump nav | **Hidden** (Nov 2026). `/about`, `/roster`, `/stats` redirect here |
 | `/events` | Countdown, month calendar, upcoming and past `EventCard`s | **Hidden** |
 | `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | **Hidden.** Products collection is empty on purpose |
@@ -255,7 +255,7 @@ in the gitignored `_reference/`, which only exists on the owner's machine.
 | `ui-components.webp` | `style-2.png` | Component states: buttons, fields, badges, cards, toast | Deltas tracked in PRD-CONFORMANCE |
 | `component-library-mobile.webp` | `style-3.jpeg` | Component library v2 + **mobile references** (home, roster, nav) | Mobile nav and cards built. Use it to check phone layouts |
 | `homepage-mockup-a.webp` | `homepage-1.png` | Homepage direction A | **Built** |
-| `homepage-mockup-b.webp` | `homepage-3.png` | Direction B: photo manifesto band, crimson next-up band | **Built as a preview** at `/preview/home-b` (Nov 2026): ornate `Hero`, `ImpactBand`, showcase slider. Not on `/` yet |
+| `homepage-mockup-b.webp` | `homepage-3.png` | Direction B: photo manifesto band, crimson next-up band | **Built and live on `/`** (Nov 2026): ornate `Hero`, `ImpactBand`, showcase slider, `TwoColumn` CTA |
 | `homepage-mockup-c.webp` | `homepage-2.jpeg` | Photo-variant PlayerCards, multi-product shop row, footer | Photo variant waiting on player photos |
 | `jersey-sample.webp` | `leftovers-jersey-sample.png` | The real jersey art: contour waves, clouds, terraces, lanterns | The source of the sand texture |
 | `src/assets/img/brand/golden-contour-waves.png` | `Golden Contour Waves on Black.png` | Sand/zen-garden source art | Shipped as asset + `.bg-sand*` |
@@ -277,13 +277,10 @@ inline-styled HTML into the repo.
 
 ### Needs the team (decisions or content, not code)
 
-0. **Pick a homepage direction.** `/preview/home-b` (noindex, unlinked) puts
-   the Nov 2026 bolder pieces together: the ornate hero (gilded cloud
-   corners, paper lanterns, `RiceTerraces`), full-bleed `ImpactBand`s, and the
-   full-width `showcase` slider. If the team picks it, move its blocks into
-   `src/pages/index.astro` and delete the preview page. Also review the
-   slider headlines in `src/content/galleries/game-day.yml`. They're
-   placeholder copy written from what each photo shows.
+0. **Review the homepage slider headlines** in
+   `src/content/galleries/game-day.yml` ("Off the break", "Full send"…). They
+   are placeholder copy written from what each photo shows; edit them in the
+   CMS under Photo galleries → Game day.
 
 1. **Photography, placement and player photos.** Event photos are in; they need
    curating, alt text and galleries. Player photos are still missing. It unblocks player photos,

@@ -9,7 +9,7 @@
  * feel magnified.
  *
  * `ornate` (Nov 2026 design pass, after `docs/design/homepage-mockup-b.webp`)
- * is the same logo lockup dressed for a showpiece: gilded ruyi-cloud banks
+ * is the same logo lockup on the raked-sand texture, dressed for a showpiece: gilded ruyi-cloud banks
  * with swaying paper lanterns in both top corners (CloudCorner), a warm gold
  * glow behind the logo, and the layered RiceTerraces landscape along the
  * bottom in place of the single-line TerracedDivider.
@@ -62,7 +62,7 @@ const ornate = variant === 'ornate';
 const taglineParts = tagline?.split('/').map((part) => part.trim()).filter(Boolean) ?? [];
 ---
 
-<section class:list={[ornate ? 'bg-topo' : 'bg-sand', 'relative overflow-hidden', className]}>
+<section class:list={['bg-sand relative overflow-hidden', className]}>
   {
     (variant === 'image' || variant === 'video') && backdrop && (
       <>
@@ -148,7 +148,7 @@ const taglineParts = tagline?.split('/').map((part) => part.trim()).filter(Boole
           />
           {tagline &&
             (ornate ? (
-              <p class="mx-auto mt-7 flex max-w-xl flex-wrap items-center justify-center gap-x-3 gap-y-1 text-[0.65rem] font-bold uppercase tracking-[0.3em] text-bone sm:text-xs sm:tracking-[0.36em]">
+              <p class="mx-auto mt-7 flex max-w-xl flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[0.6rem] font-bold uppercase tracking-[0.18em] text-bone sm:gap-x-3 sm:text-xs sm:tracking-[0.36em]">
                 {taglineParts.map((part, i) => (
                   <>
                     {i > 0 && <span class="text-gold" aria-hidden="true">/</span>}
@@ -179,7 +179,7 @@ const taglineParts = tagline?.split('/').map((part) => part.trim()).filter(Boole
 
   {
     ornate ? (
-      <RiceTerraces seed={7} class="absolute bottom-0 left-0 h-28 sm:h-36 lg:h-48" />
+      <RiceTerraces seed={7} class="absolute bottom-0 left-0 h-28 sm:h-36 lg:h-auto lg:aspect-[2400/260]" />
     ) : (
       <TerracedDivider seed={3} style="pagoda" class="absolute bottom-0 left-0 h-14 sm:h-20 lg:h-24" />
     )
