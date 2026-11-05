@@ -177,6 +177,7 @@ join:
     country: entry.645828190
     event: entry.1976036833
     division: entry.1734295414
+    position: entry.1776045942
     teamSize: entry.1974396290
     paymentMethod: entry.453493553
     notes: entry.1626376368
