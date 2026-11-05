@@ -28,7 +28,12 @@ https://theleftoverspb.com. The repo is **public**.
    check this file before "fixing" anything. React instead of Svelte, GitHub
    Pages instead of Cloudflare, the `/team` merge and no Discord are all
    intentional.
-4. The doc comment at the top of any file you're about to change. They record
+4. **[`docs/COMPONENTS.md`](docs/COMPONENTS.md)** before building or
+   changing a page: rules, page recipes, classes and every component's
+   options in ~4k tokens. Read it instead of `src/pages/design.astro` or the
+   component files. Generated from `src/lib/components.ts`. Claude Code
+   also has the `build-page` skill (`.claude/skills/build-page`).
+5. The doc comment at the top of any file you're about to change. They record
    the *why* (hydration pinning, UTC dates, licence limits) and are
    load-bearing.
 
@@ -99,11 +104,12 @@ The utility sets `--tex` (the tile) and `--tex-w` (its width) rather than
 
 ### Building a new page
 
-1. **Look at `/design` first.** Read the component index at the bottom of
-   `src/pages/design.astro` and build from what's there: `Section`,
-   `PageHeader`, `Button`, `Pill`, `EventCard`, `PlayerCard`, `FeatureRow`,
-   `FormField`, `MascotCallout` (empty states), `ImagePlaceholder` (missing
-   photos), and so on. Copy usage from the specimen markup. It's real,
+1. **Start from `docs/COMPONENTS.md`.** Pick a page recipe and its
+   components: `Section`, `PageHeader`, `Button`, `Pill`, `EventCard`,
+   `PlayerCard`, `FeatureRow`, `FormField`, `MascotCallout` (empty states),
+   `ImagePlaceholder` (missing photos), and so on. Copy usage from one
+   specimen on `/design` (grep `src/pages/design.astro` for its title and
+   read that block only) or from the recipe's example page. It's real,
    working code.
 2. **Don't hand-roll something that exists.** If a component almost fits,
    extend it with a prop and keep existing call sites' output unchanged.
@@ -135,11 +141,14 @@ Every new or changed component must be documented in the same change:
    it takes any. Keep specimen titles unique: each becomes an anchor listed in
    the page's side nav automatically. A new `<DocSection>` also needs a row
    in `navGroups` (its number comes from that order).
-2. **Add or update its row in the `index` array** in `src/pages/design.astro`
-   (name, file, kind, section anchor, `story`, use-it-for).
+2. **Add or update its entry in `src/lib/components.ts`** (use, options,
+   data, avoid, pairs, `section` anchor, `story`), then run
+   `npm run docs:components`. The `/design` index renders from it, and
+   `npm run build` fails if a component has no entry or `docs/COMPONENTS.md`
+   is stale. A page pattern worth reusing? Add it to `recipes` there too.
 3. **If it's a React island, add or update `ComponentName.stories.tsx`** next
    to it: one story per meaningful variant, plus a `play` test asserting the
-   key interaction or ARIA state. Set `story: true` on its index row.
+   key interaction or ARIA state. Set `story: true` on its catalog entry.
 4. **New icon?** Add the path to `src/lib/icons.ts`. `Icon.astro` and the
    `/design` icon grid both read from it, so nothing else needs editing.
 5. Put a doc comment at the top of the component: what it is, why it exists,

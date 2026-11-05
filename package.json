@@ -5,14 +5,15 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build",
+    "build": "node scripts/components-doc.ts --check && astro check && astro build",
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro",
     "og": "node scripts/make-og-default.mjs",
     "brand": "node scripts/prep-brand-assets.mjs",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "docs:components": "node scripts/components-doc.ts"
   },
   "type": "module",
   "dependencies": {
