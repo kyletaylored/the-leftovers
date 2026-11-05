@@ -98,6 +98,9 @@ linked from anywhere either, but its closed state still points at `/shop` and
   JSON-LD (`SportsTeam`, `Person`, `SportsEvent`, `Product`, `FAQPage`).
 - Design system: the `/design` page, Storybook with play tests, and shared
   token and texture data. See §4.
+- Wide screens: past 1600px the whole site sits in a centred page frame over
+  a dimmed seigaiha surround (`src/lib/layout.ts`, `.site-frame` in
+  `global.css`). Full-bleed images size to the frame (`FULL_BLEED_SIZES`).
 
 ### Content is mostly placeholder
 

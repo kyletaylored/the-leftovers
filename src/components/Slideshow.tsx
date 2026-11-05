@@ -8,6 +8,7 @@ import {
   type CarouselApi,
 } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
+import { FULL_BLEED_SIZES } from '@/lib/layout';
 
 /**
  * Slideshow — the photo carousel, built on shadcn/ui's Carousel (Embla).
@@ -268,7 +269,7 @@ export default function Slideshow({
                     <img
                       src={slide.src}
                       srcSet={slide.srcSet}
-                      sizes="100vw"
+                      sizes={FULL_BLEED_SIZES}
                       width={slide.width}
                       height={slide.height}
                       alt={slide.alt}

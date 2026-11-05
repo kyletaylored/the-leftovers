@@ -16,6 +16,7 @@ Read this before building or changing a page. It replaces reading `src/pages/des
 - Copy comes from collections or src/data/site.yml, not hardcoded in the page. Missing content → MascotCallout / ImagePlaceholder, never invented content.
 - Tokens only, never raw hex. Images from src/assets/img via <Image>/getImage (CSP: img-src self).
 - Islands hydrate client:visible and never above the fold.
+- Full-bleed means the page frame (max 1600px, src/lib/layout.ts), not the screen: use FULL_BLEED_SIZES for a full-width image, never sizes="100vw", and never 100vw/w-screen in CSS.
 - Full-bleed blocks (ImpactBand, CtaStrip, Ticker, GallerySlideshow hero/showcase) sit between Sections; never two full-bleed photo blocks in a row.
 - Motion stays ambient: drifting sand, swaying terraces and lanterns may share a hero, but never put a Ticker or an autoplaying slideshow in the same view as other motion.
 
@@ -41,6 +42,7 @@ Read this before building or changing a page. It replaces reading `src/pages/des
 | `font-display | font-sans | font-marker` | Headlines | body | brush (logo-like accents only) |
 | `eyebrow` | Small caps kicker above a headline |
 | `numeral | numeral-ghost` | Gold ribbed digits | ghost jersey number behind a photo |
+| `site-frame / site-surround` | BaseLayout only: the 1600px page frame over a dimmed seigaiha surround on wide screens |
 | `tap` | 44×44px minimum target on any custom control |
 | `field-label | field-input | field-hint` | Raw form controls, matching FormField |
 
