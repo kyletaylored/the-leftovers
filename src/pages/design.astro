@@ -26,6 +26,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import DocSection from '@/components/design/DocSection.astro';
 import Specimen from '@/components/design/Specimen.astro';
+import DesignNav from '@/components/design/DesignNav.astro';
 
 // Brand primitives
 import Icon from '@/components/brand/Icon.astro';
@@ -206,19 +207,42 @@ const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Ast
   { name: 'ImagePlaceholder', file: 'ImagePlaceholder.astro', kind: 'Astro', section: 'imagery', use: 'Striped stand-in until real photography lands.' },
 ];
 
-const sections = [
-  ['foundations', 'Foundations'],
-  ['motifs', 'Motifs'],
-  ['motion', 'Motion'],
-  ['icons', 'Icons'],
-  ['components', 'Components'],
-  ['blocks', 'Blocks'],
-  ['marketing', 'Marketing'],
-  ['forms', 'Forms'],
-  ['calendar', 'Calendar'],
-  ['imagery', 'Imagery'],
-  ['index', 'Index'],
-] as const;
+/**
+ * The page's sections, grouped for the side nav (DesignNav). ADD A ROW when
+ * you add a <DocSection>, in page order. Section numbers come from this
+ * order (num()), so they never skip or need renumbering. Specimens are
+ * listed under their section automatically.
+ */
+const navGroups = [
+  {
+    label: 'Brand',
+    sections: [
+      { id: 'foundations', label: 'Foundations' },
+      { id: 'motifs', label: 'Motifs' },
+      { id: 'motion', label: 'Motion' },
+      { id: 'icons', label: 'Icons' },
+    ],
+  },
+  {
+    label: 'Components',
+    sections: [
+      { id: 'components', label: 'Components' },
+      { id: 'blocks', label: 'Page blocks' },
+      { id: 'marketing', label: 'Marketing' },
+      { id: 'forms', label: 'Forms' },
+      { id: 'calendar', label: 'Calendar' },
+      { id: 'imagery', label: 'Imagery' },
+    ],
+  },
+  { label: 'Reference', sections: [{ id: 'index', label: 'Component index' }] },
+];
+const order = navGroups.flatMap((g) => g.sections.map((s) => s.id));
+const num = (id: string) => {
+  const i = order.indexOf(id);
+  if (i < 0) throw new Error(`design.astro: add section "${id}" to navGroups`);
+  return String(i + 1).padStart(2, '0');
+};
+const nav = navGroups.map((g) => ({ ...g, sections: g.sections.map((sec) => ({ ...sec, number: num(sec.id) })) }));
 
 const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Insert'];
 ---
@@ -237,16 +261,12 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
           <span class="text-[0.6875rem] text-tan" aria-hidden="true">/</span>
           <span class="font-display text-sm uppercase tracking-[0.06em] text-bone">Design Storybook</span>
         </p>
-        <nav aria-label="Design system sections">
-          <ul class="flex flex-wrap gap-x-4 gap-y-1 text-[0.6875rem] font-bold uppercase tracking-[0.12em]">
-            {sections.map(([id, label]) => (
-              <li><a href={`#${id}`} class="text-gold-300 no-underline hover:text-gold">{label}</a></li>
-            ))}
-          </ul>
-        </nav>
       </div>
     </div>
 
+    <div class="mx-auto max-w-[1600px] lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
+    <DesignNav groups={nav} />
+    <div class="min-w-0">
     {/* ------------------------------------------------------------ intro */}
     <div class="mx-auto max-w-[1320px] px-4 pb-8 pt-12 sm:px-6">
       <p class="mb-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-crimson">
@@ -263,7 +283,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </div>
 
     {/* ====================================================== FOUNDATIONS */}
-    <DocSection id="foundations" number="01" title="Foundations" kicker="Locked: tokens live in global.css @theme">
+    <DocSection id="foundations" number={num('foundations')} title="Foundations" kicker="Locked: tokens live in global.css @theme">
       <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         <Specimen
           title="Color palette"
@@ -316,7 +336,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* =========================================================== MOTIFS */}
-    <DocSection id="motifs" number="02" title="Motifs" kicker="Ruyi cloud · terraced trim · textures · brand marks">
+    <DocSection id="motifs" number={num('motifs')} title="Motifs" kicker="Ruyi cloud · terraced trim · textures · brand marks">
       <div class="grid gap-5">
         <Specimen
           title="Ruyi cloud: 6 licensed variants"
@@ -452,7 +472,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     {/* =========================================================== MOTION */}
     <DocSection
       id="motion"
-      number="02.5"
+      number={num('motion')}
       title="Motion"
       kicker="Drifting sand · swaying terraces · ticker"
       intro="Slow, ambient movement for showpiece moments. All CSS, composited (transform only), and switched off for visitors who ask for reduced motion, who get the still version. One moving element per screen: never pair a drifting background with a ticker in the same view, and keep motion out of anything a visitor has to read while it moves."
@@ -513,7 +533,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* ============================================================ ICONS */}
-    <DocSection id="icons" number="03" title="Icon set" kicker={`${strokedIconNames.length} stroked + ${filledIconNames.length} social, one source`}>
+    <DocSection id="icons" number={num('icons')} title="Icon set" kicker={`${strokedIconNames.length} stroked + ${filledIconNames.length} social, one source`}>
       <Specimen
         title="Stroked: 24×24 grid, 1.8 stroke, currentColor"
         file={['src/components/brand/Icon.astro', 'src/lib/icons.ts']}
@@ -540,7 +560,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* ======================================================= COMPONENTS */}
-    <DocSection id="components" number="04" title="Components" kicker="Atoms and cards">
+    <DocSection id="components" number={num('components')} title="Components" kicker="Atoms and cards">
       <div class="mb-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         <Specimen title="Buttons" file="src/components/Button.astro" note="Renders <a> with href, <button> without. All sizes clear the 44px touch target. external adds rel + the external glyph. disabled is one flat grey for every variant.">
           <div class="flex flex-col items-start gap-2.5">
@@ -644,7 +664,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* =========================================================== BLOCKS */}
-    <DocSection id="blocks" number="04.4" title="Page blocks" kicker="Scaffolding most pages are built from" intro="Section (tone base | alt | topo | sand | seigaiha, optional terraced divider), PageHeader and Hero wrap every page. They're full-bleed, so they're not boxed here. Open any page in src/pages to see them composed. The blocks below sit inside a Section.">
+    <DocSection id="blocks" number={num('blocks')} title="Page blocks" kicker="Scaffolding most pages are built from" intro="Section (tone base | alt | topo | sand | seigaiha, optional terraced divider), PageHeader and Hero wrap every page. They're full-bleed, so they're not boxed here. Open any page in src/pages to see them composed. The blocks below sit inside a Section.">
       <Specimen
         title={'Hero variant="ornate"'}
         tag="NEW"
@@ -706,7 +726,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* ======================================================== MARKETING */}
-    <DocSection id="marketing" number="04.5" title="Marketing organisms" kicker="Feature rows, pricing, galleries, sliders, product grid">
+    <DocSection id="marketing" number={num('marketing')} title="Marketing organisms" kicker="Feature rows, pricing, galleries, sliders, product grid">
       <div class="grid gap-5">
         <Specimen title="FeatureRow: alternating media/copy" file="src/components/marketing/FeatureRow.astro" note="Alternate reverse on every row so a stacked page never reads as a repeated template. Without an image it falls back to the topo texture; use ImagePlaceholder-labelled slots in mockups.">
           <div class="space-y-10">
@@ -891,7 +911,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* ============================================================ FORMS */}
-    <DocSection id="forms" number="04.6" title="Form fields" kicker="Inputs, select, textarea, radio, checkbox, field groups" intro="Visible labels always (placeholder is a hint, never the label). Gold focus ring, crimson for validation. The .field-label / .field-input classes in global.css are the single source of truth, shared with the React form islands.">
+    <DocSection id="forms" number={num('forms')} title="Form fields" kicker="Inputs, select, textarea, radio, checkbox, field groups" intro="Visible labels always (placeholder is a hint, never the label). Gold focus ring, crimson for validation. The .field-label / .field-input classes in global.css are the single source of truth, shared with the React form islands.">
       <Specimen title="Field states" file={['src/components/form/FormField.astro', 'src/styles/global.css (.field-*)']}>
         <div class="grid gap-x-10 gap-y-8 md:grid-cols-2 xl:grid-cols-4">
           <FormField label="Text input" name="demo-text" placeholder="Kyle Taylor" hint="Default state" />
@@ -966,7 +986,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* ========================================================= CALENDAR */}
-    <DocSection id="calendar" number="04.7" title="Calendar" kicker="Month grid + compact agenda">
+    <DocSection id="calendar" number={num('calendar')} title="Calendar" kicker="Month grid + compact agenda">
       <div class="grid items-start gap-5 lg:grid-cols-2">
         <Specimen title="Month grid" tag="React island" file={['src/components/EventsCalendar.astro', 'src/components/Calendar.tsx']} note="Marked days are real #slug links to the matching EventCard, so it works with zero JS; only month navigation is the island. Opens on the next event's month, never a blank January.">
           <EventsCalendar events={allEvents} next={next} class="mx-auto max-w-md" />
@@ -978,7 +998,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* ========================================================== IMAGERY */}
-    <DocSection id="imagery" number="06" title="Imagery placeholders" kicker="Real photography lands later; these hold slots on-brand meanwhile">
+    <DocSection id="imagery" number={num('imagery')} title="Imagery placeholders" kicker="Real photography lands later; these hold slots on-brand meanwhile">
       <Specimen title="ImagePlaceholder" tag="NEW" file="src/components/ImagePlaceholder.astro" note="Striped, labelled, brand borders. Never a broken-image icon or an empty grey box. The label is announced (role=img), so name the shot. Ratios match the real component slots.">
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div><ImagePlaceholder label="player photo" ratio="4/5" showRatio /><p class="mt-1.5 text-[0.6875rem] text-bone-muted">PlayerCard</p></div>
@@ -990,7 +1010,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* ============================================================ INDEX */}
-    <DocSection id="index" number="07" title="Component index" kicker="Check here before writing a new component" intro="Every reusable component, where it lives and when to reach for it. Paths are relative to src/components/. Rows marked Storybook also have a *.stories.tsx with interactive states and play tests.">
+    <DocSection id="index" number={num('index')} title="Component index" kicker="Check here before writing a new component" intro="Every reusable component, where it lives and when to reach for it. Paths are relative to src/components/. Rows marked Storybook also have a *.stories.tsx with interactive states and play tests.">
       <div class="overflow-x-auto border border-[#DAD4C4] bg-[#FBF9F4]">
         <table class="w-full min-w-[720px] border-collapse text-[0.8125rem]">
           <thead>
@@ -1016,5 +1036,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
         </table>
       </div>
     </DocSection>
+    </div>
+    </div>
   </div>
 </BaseLayout>

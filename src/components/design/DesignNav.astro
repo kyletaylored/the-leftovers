@@ -1,0 +1,189 @@
+---
+/**
+ * DesignNav — the /design page's "on this page" navigation. Doc chrome only.
+ *
+ * Grouped section links (Brand → Foundations, Motifs, …), each with its
+ * specimens nested under it. The page grew past what a one-line top bar can
+ * hold, so from lg up this is a sticky side rail, and below lg a sticky
+ * "Jump to" disclosure under the site header.
+ *
+ * - Sections are server-rendered from `groups`, so every link works with no
+ *   JS. The nested specimen links are added by the script below from the
+ *   Specimen anchors (`[data-specimen]`) it finds inside each section, so
+ *   they can never drift from the page: add a Specimen and it's listed.
+ * - Scroll-spy marks the section and specimen in view with
+ *   aria-current="true" (gold rail + text), and shows only the current
+ *   section's specimens so the rail stays short.
+ * - The disclosure is a native <details>. It starts open, so with no JS
+ *   the links are visible everywhere; the script closes it on phones,
+ *   keeps it open on desktop, and closes it again after a jump on phones.
+ */
+export interface NavSection {
+  id: string;
+  label: string;
+  number: string;
+}
+interface Props {
+  groups: { label: string; sections: NavSection[] }[];
+}
+const { groups } = Astro.props;
+---
+
+<aside
+  class="design-nav sticky top-[var(--site-header,65px)] z-40 border-b border-[#DAD4C4] bg-[#EFEBE0]/95 backdrop-blur-sm lg:z-auto lg:max-h-[calc(100vh-var(--site-header,65px))] lg:self-start lg:overflow-y-auto lg:border-b-0 lg:border-r lg:bg-transparent lg:backdrop-blur-none"
+>
+  <details open class="group/nav">
+    <summary
+      class="tap flex cursor-pointer list-none items-center justify-between px-4 text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-[#3a342b] sm:px-6 lg:hidden [&::-webkit-details-marker]:hidden"
+    >
+      <span>Jump to section <span class="design-nav-current font-normal normal-case tracking-normal text-[#6b6356]"></span></span>
+      <svg viewBox="0 0 24 24" class="size-4 transition-transform group-open/nav:rotate-180" aria-hidden="true">
+        <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </summary>
+    <nav aria-label="Design system sections" class="max-h-[65vh] overflow-y-auto px-4 pb-4 sm:px-6 lg:max-h-none lg:overflow-visible lg:px-5 lg:pb-10 lg:pt-12">
+      {groups.map((group) => (
+        <div class="mt-3 first:mt-0 lg:mt-6 lg:first:mt-0">
+          <p class="mb-1 text-[0.625rem] font-bold uppercase tracking-[0.2em] text-crimson">{group.label}</p>
+          <ul class="border-l border-[#DAD4C4]">
+            {group.sections.map((s) => (
+              <li data-nav-section={s.id}>
+                <a
+                  href={`#${s.id}`}
+                  class="design-nav-link -ml-px flex min-h-11 items-center gap-2 lg:min-h-9 border-l-2 border-transparent py-1.5 pl-3 pr-2 text-[0.8125rem] font-semibold text-[#3a342b] no-underline hover:border-[#b8ae98] hover:text-ink aria-[current=true]:border-gold aria-[current=true]:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold"
+                >
+                  <span class="font-mono text-[0.625rem] font-normal text-[#8a8170]">{s.number}</span>
+                  {s.label}
+                </a>
+                <ul class="design-nav-sub mb-1 ml-3 hidden" data-sub-for={s.id}></ul>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </nav>
+  </details>
+</aside>
+
+<style is:global>
+  /* Anchor jumps land below the sticky site header, plus the "Jump to" bar
+     on phones. One rule for sections and specimens alike. */
+  html:has(.design-nav) {
+    scroll-padding-top: calc(var(--site-header, 65px) + 60px);
+  }
+  @media (min-width: 1024px) {
+    html:has(.design-nav) {
+      scroll-padding-top: calc(var(--site-header, 65px) + 20px);
+    }
+  }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('.design-nav');
+  const details = nav?.querySelector('details');
+  if (nav && details) {
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const syncOpen = () => (details.open = desktop.matches);
+    syncOpen();
+    desktop.addEventListener('change', syncOpen);
+
+    // The site header's real height, so the rail sticks right under it.
+    const header = document.querySelector('header');
+    const setHeader = () =>
+      header && document.documentElement.style.setProperty('--site-header', `${header.getBoundingClientRect().height}px`);
+    setHeader();
+    window.addEventListener('resize', setHeader);
+
+    const current = nav.querySelector('.design-nav-current');
+    const sectionLinks = new Map<string, HTMLAnchorElement>();
+    const specimenLinks = new Map<string, HTMLAnchorElement>();
+    const sectionOf = new Map<Element, string>();
+    const targets: Element[] = [];
+
+    for (const li of nav.querySelectorAll<HTMLElement>('[data-nav-section]')) {
+      const id = li.dataset.navSection!;
+      const section = document.getElementById(id);
+      const link = li.querySelector<HTMLAnchorElement>('a')!;
+      const sub = li.querySelector<HTMLUListElement>('.design-nav-sub')!;
+      if (!section) continue;
+      sectionLinks.set(id, link);
+      sectionOf.set(section, id);
+      targets.push(section);
+      for (const spec of section.querySelectorAll<HTMLElement>('[data-specimen][id]')) {
+        const item = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `#${spec.id}`;
+        a.textContent = spec.dataset.specimen ?? spec.id;
+        a.className =
+          'design-nav-link -ml-px flex min-h-11 items-center border-l-2 border-transparent py-1 pl-3 lg:min-h-0 pr-2 text-xs leading-snug text-[#6b6356] no-underline hover:text-ink aria-[current=true]:border-gold aria-[current=true]:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold';
+        item.append(a);
+        sub.append(item);
+        specimenLinks.set(spec.id, a);
+        sectionOf.set(spec, id);
+        targets.push(spec);
+      }
+    }
+
+    // Scroll-spy: the last target whose top has passed a line just under the
+    // sticky header is "current". Cheap enough to run on scroll (rAF-batched).
+    let lastSection = '';
+    let lastSpecimen = '';
+    const mark = (link: HTMLAnchorElement | undefined, on: boolean) =>
+      link && (on ? link.setAttribute('aria-current', 'true') : link.removeAttribute('aria-current'));
+    function update() {
+      const line = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--site-header')) || 65) + 80;
+      let section = '';
+      let specimen = '';
+      for (const el of targets) {
+        if (el.getBoundingClientRect().top - line > 0) break;
+        if (el.hasAttribute('data-specimen')) specimen = el.id;
+        else {
+          section = el.id;
+          specimen = '';
+        }
+      }
+      if (section !== lastSection) {
+        mark(sectionLinks.get(lastSection), false);
+        mark(sectionLinks.get(section), true);
+        nav!.querySelectorAll('.design-nav-sub').forEach((ul) => {
+          ul.classList.toggle('hidden', (ul as HTMLElement).dataset.subFor !== section);
+        });
+        if (current) current.textContent = section ? `· ${sectionLinks.get(section)?.textContent?.trim().replace(/^\d+\s*/, '')}` : '';
+        lastSection = section;
+      }
+      if (specimen !== lastSpecimen) {
+        mark(specimenLinks.get(lastSpecimen), false);
+        mark(specimenLinks.get(specimen), true);
+        // Keep the active link visible in a long rail. Scroll the rail
+        // itself: scrollIntoView would also scroll the page.
+        const link = specimenLinks.get(specimen) ?? sectionLinks.get(section);
+        if (desktop.matches && link) {
+          const rail = nav!.getBoundingClientRect();
+          const r = link.getBoundingClientRect();
+          if (r.top < rail.top + 24) nav!.scrollTop -= rail.top + 24 - r.top;
+          else if (r.bottom > rail.bottom - 24) nav!.scrollTop += r.bottom - (rail.bottom - 24);
+        }
+        lastSpecimen = specimen;
+      }
+    }
+    let queued = false;
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (queued) return;
+        queued = true;
+        requestAnimationFrame(() => {
+          queued = false;
+          update();
+        });
+      },
+      { passive: true }
+    );
+    update();
+
+    // On phones, fold the menu away after a jump.
+    nav.addEventListener('click', (e) => {
+      if ((e.target as Element).closest('a') && !desktop.matches) details.open = false;
+    });
+  }
+</script>

@@ -25,9 +25,21 @@ interface Props {
 const { title, file, note, surface = 'dark', tag, flush = false, class: className = '' } = Astro.props;
 const files = file ? (Array.isArray(file) ? file : [file]) : [];
 const dark = surface === 'dark';
+/**
+ * Deep-link anchor from the title ("RiceTerraces animate: swaying depths" →
+ * #riceterraces-animate-swaying-depths). The /design side nav lists these
+ * under their section, so keep specimen titles unique.
+ */
+const id = title
+  .toLowerCase()
+  .replace(/&/g, ' and ')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-|-$/g, '');
 ---
 
 <div
+  id={id}
+  data-specimen={title}
   class:list={[
     'min-w-0 border border-[#DAD4C4]',
     dark ? 'bg-ink' : 'bg-[#FBF9F4]',
