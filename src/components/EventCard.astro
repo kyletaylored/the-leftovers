@@ -1,7 +1,8 @@
 ---
 /**
  * EventCard — date badge, location, league tag, CTAs and a BrandRule footer
- * (§7 custom components).
+ * (§7 custom components). The badge sits top right, so everything else lines
+ * up on the card's left edge, and it comes after the title in reading order.
  *
  * The CTAs switch on derived state (lib/events.ts). An upcoming event offers
  * "Request a spot", which goes to /join because the event captain registers
@@ -71,22 +72,7 @@ const squadCount = `${squads.length} ${squads.length === 1 ? 'squad' : 'squads'}
 
   <div class:list={['flex flex-1 flex-col p-5', layout === 'feature' && 'sm:p-7']}>
     <div class="flex items-start gap-4">
-      <!-- Date badge -->
-      <div
-        class="flex shrink-0 flex-col items-center rounded-sm border border-gold/50 bg-ink-900 px-3 py-2"
-      >
-        {/* Day-of-week added per the Sept 2026 design-handoff audit (delta
-            #5) — dayOfWeek() already existed in lib/format.ts, just unused. */}
-        <span class="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-gold-300">
-          {dayOfWeek(startDate)}
-        </span>
-        <span class="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-gold-300">
-          {monthShort(startDate)}
-        </span>
-        <span class="numeral text-3xl leading-none">{dayNum(startDate)}</span>
-      </div>
-
-      <div class="min-w-0">
+      <div class="min-w-0 flex-1">
         {
           league && !coverAsset && (
             <span class="mb-2 inline-block rounded-full bg-crimson px-2.5 py-0.5 text-[0.6rem] font-bold uppercase tracking-[0.14em] text-bone">
@@ -118,6 +104,21 @@ const squadCount = `${squads.length} ${squads.length === 1 ? 'squad' : 'squads'}
         <p class="mt-1 text-sm text-bone-muted">
           <time datetime={isoDate(startDate)}>{dateRange(startDate, endDate)}</time>
         </p>
+      </div>
+
+      <!-- Date badge -->
+      <div
+        class="flex shrink-0 flex-col items-center rounded-sm border border-gold/50 bg-ink-900 px-3 py-2"
+      >
+        {/* Day-of-week added per the Sept 2026 design-handoff audit (delta
+            #5) — dayOfWeek() already existed in lib/format.ts, just unused. */}
+        <span class="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-gold-300">
+          {dayOfWeek(startDate)}
+        </span>
+        <span class="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-gold-300">
+          {monthShort(startDate)}
+        </span>
+        <span class="numeral text-3xl leading-none">{dayNum(startDate)}</span>
       </div>
     </div>
 
