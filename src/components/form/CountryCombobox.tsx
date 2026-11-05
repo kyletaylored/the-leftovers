@@ -22,9 +22,10 @@ import { cn } from '@/lib/utils';
  *   text that isn't a country (or an alias like "UK" or "Holland") fails the
  *   browser's own validation, so the form won't submit with it.
  * - **Pre-filled from the browser's language** (`navigator.languages`, e.g.
- *   "en-GB" -> United Kingdom) after hydration, with a hint saying so. It's a
- *   guess from a language setting, not location, and changes nothing that
- *   isn't on screen. Server HTML renders the field empty, so nothing differs
+ *   "en-GB" -> United Kingdom) after hydration. It's a guess from a language
+ *   setting, not location, so it's only a starting value the visitor can
+ *   change. There's deliberately no "we guessed this" note (the team found it
+ *   unnecessary). Server HTML renders the field empty, so nothing differs
  *   between server and client markup.
  * - **Suggested first.** With an empty search the list opens with the US,
  *   Canada and the European countries the team draws from, then A–Z.
@@ -87,7 +88,6 @@ export default function CountryCombobox({
   const [query, setQuery] = useState(initial?.name ?? '');
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
-  const [guessed, setGuessed] = useState(false);
   const [touched, setTouched] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
@@ -106,7 +106,6 @@ export default function CountryCombobox({
     if (guess) {
       setSelected((current) => current ?? guess);
       setQuery((current) => current || guess.name);
-      setGuessed(true);
     }
     // Run once: a later change of `languages` shouldn't overwrite a choice.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -153,7 +152,6 @@ export default function CountryCombobox({
   function choose(country: Country) {
     setSelected(country);
     setQuery(country.name);
-    setGuessed(false);
     setOpen(false);
   }
 
@@ -239,7 +237,6 @@ export default function CountryCombobox({
           aria-describedby={hintId}
           onChange={(event) => {
             setQuery(event.target.value);
-            setGuessed(false);
             setActive(0);
             setOpen(true);
           }}
@@ -334,9 +331,7 @@ export default function CountryCombobox({
       <p id={hintId} className="field-hint" data-error={touched && invalid ? 'true' : undefined}>
         {touched && invalid
           ? INVALID
-          : guessed
-            ? 'Guessed from your browser’s language.'
-            : 'Type to search, or pick from the list.'}
+          : 'Type to search, or pick from the list.'}
       </p>
     </div>
   );

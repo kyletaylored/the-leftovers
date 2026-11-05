@@ -20,8 +20,8 @@ export interface Texture {
 }
 
 export const textures: Texture[] = [
-  { className: 'bg-topo', tile: '/img/topo.svg', textSafe: true, tone: 'topo', use: 'Topographic contours. The default quiet texture (hero, FeatureRow fallback).' },
-  { className: 'bg-sand', tile: '/img/sand.svg', textSafe: true, tone: 'sand', use: 'Raked sand. Calm sections: about, story, FAQ.' },
+  { className: 'bg-topo', tile: '/img/topo.svg', textSafe: true, tone: 'topo', use: 'Topographic contours. Quiet texture for sections and the FeatureRow fallback.' },
+  { className: 'bg-sand', tile: '/img/sand.svg', textSafe: true, tone: 'sand', use: 'Raked sand. The site standard for headers: homepage Hero, every PageHeader, the footer. Also calm sections.' },
   { className: 'bg-sand-bold', tile: '/img/sand-bold.svg', textSafe: false, use: 'Full-gold raked sand. Decorative panels only.' },
   { className: 'bg-seigaiha', tile: '/img/seigaiha.svg', textSafe: true, tone: 'seigaiha', use: 'Wave scales. Event / schedule sections, footer bands.' },
   { className: 'bg-seigaiha-bold', tile: '/img/seigaiha-bold.svg', textSafe: false, use: 'Full-gold wave scales. Thin dividers and accent strips.' },

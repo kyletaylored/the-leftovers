@@ -6,9 +6,13 @@
  * Exactly one per page (§10.3), which is why it owns the <h1> and `Section`
  * never does.
  *
- * Zero images: the original styled motif header (topo texture + ruyi
- * cloud) — unchanged, so a page never has to wait on photography to look
- * finished. One image: a static photo backdrop. More than one: a slow,
+ * Zero images: the styled motif header (texture + soft gold glow + ruyi
+ * cloud), so a page never has to wait on photography to look finished.
+ * Nov 2026: the texture is the raked sand (`bg-sand`) by default, so every
+ * interior page opens on the same pattern as the homepage hero and the
+ * footer. That's the standard: don't override `pattern` per page unless a
+ * page genuinely needs to read differently. `topo` is the old look, kept as
+ * an option; `seigaiha` suits schedule-heavy pages. One image: a static photo backdrop. More than one: a slow,
  * pure-CSS cross-fade loop between them — no JS, same staggered-opacity
  * technique as `SponsorMarquee`. "Swappable" is a CMS thing, not a runtime
  * control: an editor adds/reorders `heroImages` and the loop picks it up on
@@ -27,8 +31,11 @@ interface Props {
   eyebrow?: string;
   intro?: string;
   images?: HeroImage[];
+  /** Background texture when there are no images. Default `sand`, the site standard. */
+  pattern?: 'sand' | 'topo' | 'seigaiha';
 }
-const { title, eyebrow, intro, images = [] } = Astro.props;
+const { title, eyebrow, intro, images = [], pattern = 'sand' } = Astro.props;
+const patternClass = { sand: 'bg-sand', topo: 'bg-topo', seigaiha: 'bg-seigaiha' }[pattern];
 
 // Each layer holds the frame for SLIDE_SECONDS, so the total loop length
 // scales with the photo count automatically. `visiblePercent` is how much of
@@ -74,7 +81,12 @@ const crossfadeCss = `
         <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/40" />
       </div>
     ) : (
-      <div class="bg-topo absolute inset-0">
+      <div class:list={[patternClass, 'absolute inset-0']} aria-hidden="true">
+        {/* The same soft gold glow the homepage hero sits on, behind the title. */}
+        <div
+          class="absolute inset-0"
+          style="background:radial-gradient(ellipse 60% 90% at 18% 55%, color-mix(in srgb, var(--color-gold) 12%, transparent), transparent 70%)"
+        />
         <RuyiCloud
           variant={3}
           flip
