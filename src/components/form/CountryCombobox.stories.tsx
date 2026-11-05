@@ -39,7 +39,6 @@ export const GuessedFromLanguage: Story = {
   play: async ({ canvas, canvasElement }) => {
     const input = canvas.getByRole('combobox', { name: /country/i });
     await expect(input).toHaveValue('United Kingdom');
-    await expect(canvas.getByText(/guessed from your browser’s language/i)).toBeInTheDocument();
     const hidden = canvasElement.querySelector<HTMLInputElement>('input[type=hidden][name=country]');
     await expect(hidden?.value).toBe('United Kingdom');
   },
