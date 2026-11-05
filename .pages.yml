@@ -376,6 +376,251 @@ content:
             description: 'Ticked: Google is told not to list this page, and it is left out of the sitemap and llms.txt. The page still works for anyone with the link.'
       - { name: body, label: Body, type: rich-text }
 
+  # -- Landing pages --------------------------------------------------------
+  # The page builder. Mirrors `landing` in src/content.config.ts; block names
+  # must match the `type` literals there and the switch in BlockRenderer.astro.
+  - name: landing
+    label: Landing pages
+    description: >-
+      The page builder. Pick a hero, then add sections and drag them into
+      order. Keep Status on "Draft" while you work: a draft shows at
+      /preview/your-page-title about two minutes after you save, hidden from
+      search engines. Publish it and it moves to /your-page-title. Don't put
+      two full-width photo sections (Photo band, Photo gallery) back to back.
+      See docs/EDITING.md.
+    type: collection
+    path: src/content/landing
+    filename: '{fields.title}.yml'
+    format: yaml
+    view:
+      fields: [title, status]
+      primary: title
+      sort: [title]
+    fields:
+      - name: title
+        label: Page title
+        type: string
+        required: true
+        description: Also sets the page address when you first create it.
+      - name: status
+        label: Status
+        type: select
+        default: draft
+        required: true
+        options:
+          values:
+            - { value: draft, label: 'Draft (preview only)' }
+            - { value: published, label: Published }
+      - name: hero
+        label: Hero
+        type: object
+        required: true
+        description: The opening of the page. It always comes first and owns the main heading.
+        fields:
+          - name: variant
+            label: Style
+            type: select
+            default: brand
+            required: true
+            options:
+              values:
+                - { value: ornate, label: 'Ornate (homepage showpiece)' }
+                - { value: brand, label: Logo }
+                - { value: image, label: Photo background }
+                - { value: text, label: Text only }
+          - name: title
+            label: Heading
+            type: string
+            description: Used by the Photo and Text styles. The logo styles show the logo instead.
+          - { name: tagline, label: Tagline, type: string }
+          - name: image
+            label: Photo
+            type: image
+            options: { media: images }
+            description: Photo background style only.
+          - { name: imageAlt, label: Photo alt text, type: string, description: Required when a photo is set. }
+          - { name: animate, label: Gentle background motion, type: boolean, default: false }
+          - &ctas
+            name: ctas
+            label: Buttons
+            type: object
+            list: true
+            fields:
+              - { name: label, label: Button text, type: string, required: true }
+              - { name: href, label: Link, type: string, required: true, description: 'e.g. /join' }
+              - name: variant
+                label: Style
+                type: select
+                default: primary
+                options: { values: [primary, outline, gold, ghost] }
+      - name: sections
+        label: Sections
+        type: block
+        list: true
+        blockKey: type
+        blocks:
+          - name: impactBand
+            label: Photo band
+            fields:
+              - { name: image, label: Photo, type: image, options: { media: images }, required: true }
+              - { name: imageAlt, label: Photo alt text, type: string, required: true }
+              - { name: eyebrow, label: Kicker, type: string }
+              - name: title
+                label: Headline
+                type: text
+                required: true
+                description: Two short lines at most. Press Enter for a line break.
+              - { name: body, label: Text, type: text }
+              - name: stats
+                label: Stats
+                type: object
+                list: true
+                fields:
+                  - { name: value, label: Value, type: string, required: true }
+                  - { name: label, label: Label, type: string, required: true }
+              - name: ghost
+                label: Big background word
+                type: string
+                description: Decoration only. Screen readers skip it.
+              - { name: align, label: Text side, type: select, default: left, options: { values: [left, right] } }
+              - { name: tone, label: Colour, type: select, default: ink, options: { values: [ink, crimson, forest] } }
+              - { name: treatment, label: Photo treatment, type: select, default: fade, options: { values: [fade, duotone] } }
+              - name: wash
+                label: Photo fade
+                type: select
+                default: fade
+                description: >-
+                  "none" shows the photo edge to edge. With text or stats, also
+                  set the backdrop to "panel" so the words stay readable.
+                options: { values: [fade, none] }
+              - { name: backdrop, label: Backdrop behind text, type: select, default: auto, options: { values: [auto, none, scrim, panel] } }
+              - name: shift
+                label: Slide the photo sideways
+                type: number
+                description: -30 to 30. Negative moves it left. Desktop only.
+              - name: focus
+                label: Photo focus point
+                type: string
+                description: 'e.g. "70% 30%". Leave empty for the centre.'
+              - *ctas
+          - name: statement
+            label: Big statement
+            fields:
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: lines, label: Lines, type: string, list: true, required: true }
+          - name: gallery
+            label: Photo gallery
+            fields:
+              - name: gallery
+                label: Gallery
+                type: reference
+                required: true
+                options: { collection: galleries, value: '{name}', label: '{fields.title}' }
+              - name: layout
+                label: Layout
+                type: select
+                default: showcase
+                options: { values: [showcase, hero, peek, single] }
+          - name: twoColumn
+            label: Photo and text
+            fields:
+              - &tone { name: tone, label: Background, type: select, default: base, options: { values: [base, alt, topo, sand, seigaiha] } }
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string, required: true }
+              - { name: image, label: Photo, type: image, options: { media: images } }
+              - { name: imageAlt, label: Photo alt text, type: string, required: true }
+              - { name: imageSide, label: Photo side, type: select, default: right, options: { values: [left, right] } }
+              - { name: body, label: Text, type: text }
+              - name: steps
+                label: Numbered steps
+                type: object
+                list: true
+                fields:
+                  - { name: lead, label: Bold lead-in, type: string, required: true }
+                  - { name: text, label: Sentence, type: string, required: true }
+              - *ctas
+          - name: announcement
+            label: Announcement panel
+            fields:
+              - *tone
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Section heading, type: string }
+              - { name: heading, label: Panel heading, type: string, required: true }
+              - { name: body, label: Text, type: text }
+              - *ctas
+              - { name: showLeagues, label: Show league logos, type: boolean, default: false }
+              - { name: leaguesLabel, label: Logo row label, type: string }
+          - name: threeColumn
+            label: Three columns
+            fields:
+              - *tone
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string }
+              - { name: layout, label: Layout, type: select, default: card, options: { values: [card, centered] } }
+              - name: items
+                label: Columns
+                type: object
+                list: true
+                required: true
+                fields:
+                  - { name: title, label: Title, type: string, required: true }
+                  - { name: body, label: Text, type: text, required: true }
+          - name: featureRow
+            label: Feature row
+            fields:
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string, required: true }
+              - { name: body, label: Text, type: text, required: true }
+              - { name: image, label: Photo, type: image, options: { media: images } }
+              - { name: imageAlt, label: Photo alt text, type: string, required: true }
+              - { name: reverse, label: Photo on the other side, type: boolean, default: false }
+              - { name: ctaLabel, label: Button text, type: string }
+              - { name: ctaHref, label: Button link, type: string }
+          - name: prose
+            label: Text
+            fields:
+              - *tone
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string }
+              - name: body
+                label: Text
+                type: text
+                required: true
+                description: Leave a blank line between paragraphs.
+          - name: ctaStrip
+            label: Call to action strip
+            fields:
+              - { name: tone, label: Colour, type: select, default: crimson, options: { values: [crimson, forest] } }
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string, required: true }
+              - { name: body, label: Text, type: text }
+              - *ctas
+          - name: newsletter
+            label: Newsletter signup
+            fields:
+              - *tone
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string }
+              - { name: body, label: Text, type: text }
+          - name: faq
+            label: FAQs
+            fields:
+              - *tone
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string }
+      - name: seo
+        label: SEO
+        type: object
+        fields:
+          - name: title
+            label: Search-result title
+            type: string
+            description: Up to ~60 characters. Falls back to the page title.
+          - { name: description, label: Meta description, type: text, description: Up to ~155 characters. }
+          - { name: ogImage, label: Social share image, type: image, options: { media: images } }
+          - { name: ogImageAlt, label: Social share image alt text, type: string }
+          - { name: noindex, label: Hide from search engines, type: boolean, default: false }
+
   # -- Pre-order drops ------------------------------------------------------
   - name: preorders
     label: Pre-order drops

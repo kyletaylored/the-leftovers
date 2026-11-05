@@ -196,6 +196,50 @@ drops have the same box.
 
 ---
 
+## Building a landing page
+
+**Landing pages** is the page builder. You stack ready-made sections, and the
+site handles the design, so a page always looks like the rest of the site.
+
+1. Open **Landing pages** and click **Add an entry**. The **Page title** sets
+   the address (a page called "Summer Camp" lives at `/summer-camp`), so pick
+   it carefully. It can't reuse an existing address like `/join`: the site
+   won't update until you rename it.
+2. Leave **Status** on **Draft**.
+3. Choose a **Hero**. It always comes first and holds the page's main heading.
+   Leave **Ornate** to the homepage, and use **Logo**, **Photo background** or
+   **Text only** elsewhere.
+4. Under **Sections**, add sections and fill them in. Drag the handle on a
+   section to move it.
+5. Save, wait about two minutes, then open `/preview/your-page-title` to see it.
+   There's no live preview in the editor, so this is how you check your work.
+   Search engines can't see drafts, but anyone with the link can.
+6. When it looks right, set **Status** to **Published** and save. The page moves
+   to `/your-page-title`. Nothing links to it until you add it to the nav in
+   Site settings or link to it from another page.
+
+| Section | Use it for |
+|---|---|
+| **Photo band** | A big action photo with bold copy. The strongest section |
+| **Big statement** | A few large lines of text, centred |
+| **Photo gallery** | A slider of one of your Photo galleries |
+| **Photo and text** | A calm boxed section, with numbered steps if you need them |
+| **Announcement panel** | A boxed notice, with league logos if you want them |
+| **Three columns** | Three short points side by side |
+| **Feature row** | One photo beside a short pitch |
+| **Text** | Plain paragraphs. Leave a blank line between them |
+| **Call to action strip** | A full-width band asking people to do one thing |
+| **Newsletter signup** | The mailing-list form |
+| **FAQs** | The questions from the FAQs section |
+
+Two rules keep pages looking right:
+
+- **Don't put two full-width photo sections in a row** (Photo band, Photo
+  gallery). Put something calmer between them, like Photo and text.
+- **Every photo needs alt text** describing what's in it.
+
+---
+
 ## What to do if something looks wrong
 
 1. **Check you saved.** Then give it 60 seconds and hard-refresh.

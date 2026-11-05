@@ -73,6 +73,11 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Pairs with: Button
 - **ThreeColumn** (`ThreeColumn.astro`): Icon + title + body benefits row (3 items, stacks on phones).
   - Options: items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section) · iconStyle: tile|circle (gold ring, favicon badge) · as
+- **BlockRenderer** (`BlockRenderer.astro`): Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.
+  - Options: hero (omit only on /design) · sections[]. Blocks: impactBand, statement, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, faq
+  - Data: landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.
+  - Avoid: Pages that need logic or computed data; hand-write those.
+  - Pairs with: Hero, ImpactBand, TwoColumn
 
 ### Content blocks
 

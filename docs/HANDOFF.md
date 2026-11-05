@@ -62,6 +62,7 @@ team deciding to:
 
 | Route | What it is | Notes |
 |---|---|---|
+| `/[slug]`, `/preview/[slug]` | `landing` pages composed in Pages CMS: published, and drafts (noindex) | `BlockRenderer`. `/preview/home` is the homepage rebuilt as blocks; `index.astro` is still what's live |
 | `/` | Home ("direction B"): ornate sand hero, `ImpactBand` manifesto, full-width showcase slider, "How it works" `TwoColumn` CTA, crimson free-agents `ImpactBand`, "2027 Season Loading…" + league logos, newsletter | Direction B promoted Nov 2026 |
 | `/team` | About + Roster + Stats + FAQ on one page, with a jump nav | **Hidden** (Nov 2026). `/about`, `/roster`, `/stats` redirect here |
 | `/events` | Next event with countdown and squads, how it works and fees, then each season's `SeasonStrip` and results | Unhidden 5 Nov 2026, in the nav and sitemap |
@@ -85,7 +86,7 @@ linked from anywhere either, but its closed state still points at `/shop` and
 
 ### Built and working
 
-- All 7 PRD content collections plus `faqs`, `galleries` and `preorders`.
+- All 7 PRD content collections plus `faqs`, `galleries`, `preorders` and `landing` (the page builder: [EDITING.md](EDITING.md#building-a-landing-page)).
   Schemas are in `src/content.config.ts` and CMS forms in `.pages.yml`.
   **Every image field has a required `alt`.**
 - Stats are derived, never typed. `src/lib/stats.ts` computes every rate and
@@ -323,6 +324,7 @@ inline-styled HTML into the repo.
 
 ### Ready to build (code)
 
+0. **Decide whether the homepage moves to blocks.** `/preview/home` matches   `index.astro` from `src/content/landing/home.yml`. Moving would make the   homepage editable in Pages CMS and take its copy out of the template, but   `index.astro` also emits the `WebSite` schema, which would need a home.
 1. **Move hosting to Cloudflare Pages.** This turns on the CSP and security
    headers, real `_redirects` and preview deploys. Everything needed is
    committed; the steps are in [DEPLOY.md](DEPLOY.md#moving-to-cloudflare-pages).
