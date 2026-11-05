@@ -15,6 +15,7 @@ else in `docs/` goes deeper on one topic.
 | [`DEPLOY.md`](DEPLOY.md) | Hosting, domain, CMS setup, the Cloudflare move |
 | [`PREORDERS.md`](PREORDERS.md) · [`JOIN.md`](JOIN.md) | How the two on-site forms submit, and their Google Forms |
 | [`ANALYTICS.md`](ANALYTICS.md) | Google Tag Manager and Datadog RUM, both behind the cookie banner |
+| [`COMPONENTS.md`](COMPONENTS.md) | Generated component brief for AI agents: rules, page recipes, classes, every component's options |
 | [`SEO.md`](SEO.md) | Sitemap, robots.txt, llms.txt, hiding pages from search, Google Search Console setup |
 | [`/design`](../src/pages/design.astro) + Storybook | The live design system (see "Design system" below) |
 

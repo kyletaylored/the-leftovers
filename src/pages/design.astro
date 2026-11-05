@@ -22,6 +22,7 @@ import contourWaves from '@/assets/img/brand/golden-contour-waves.png';
 import seigaihaArt from '@/assets/img/brand/seigaiha.png';
 import { palette } from '@/lib/palette';
 import { textures } from '@/lib/textures';
+import { catalog } from '@/lib/components';
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import DocSection from '@/components/design/DocSection.astro';
@@ -167,45 +168,10 @@ const terracedStyles: { style: TerracedStyle; label: string; note: string }[] = 
 ];
 
 /**
- * The component index. ADD A ROW when you add a component, and keep `story`
- * true only if a `*.stories.tsx` exists. `section` is the anchor on this page.
+ * The component index renders from the catalog in src/lib/components.ts
+ * (also the source of docs/COMPONENTS.md). Add a component there, not here.
  */
-const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Astro + island' | 'CSS utility'; section: string; story?: boolean; use: string }[] = [
-  { name: 'Icon', file: 'brand/Icon.astro', kind: 'Astro', section: 'icons', use: 'Every glyph. Paths live in src/lib/icons.ts.' },
-  { name: 'RuyiCloud', file: 'brand/RuyiCloud.astro', kind: 'Astro', section: 'motifs', use: 'Corner/background cloud accent, coloured via text-*.' },
-  { name: 'TerracedDivider', file: 'brand/TerracedDivider.astro', kind: 'Astro', section: 'motifs', use: 'Section break / card footer. Pick a style.' },
-  { name: 'RiceTerraces', file: 'brand/RiceTerraces.astro', kind: 'Astro', section: 'motifs', use: 'Layered gold-lined terraced landscape. The showpiece foot of the ornate hero. animate sways the depths (see Motion).' },
-  { name: '.bg-drift', file: '../styles/global.css', kind: 'CSS utility', section: 'motion', use: 'Utility, not a component: add to any .bg-* texture to drift its tile sideways. .bg-drift-reverse, --drift-duration.' },
-  { name: 'Ticker', file: 'Ticker.astro', kind: 'Astro', section: 'motion', use: 'Scrolling news bar: next event, drops, open spots. gold | crimson | ink; pause button; one per page.' },
-  { name: 'CloudCorner', file: 'brand/CloudCorner.astro', kind: 'Astro', section: 'motifs', use: 'Gilded ruyi-cloud cluster with swaying paper lanterns, for hero corners.' },
-  { name: 'Wordmark · MascotMark · Lantern · Badge', file: 'brand/*.astro', kind: 'Astro', section: 'motifs', use: 'Logo art, mascot, lantern (outline | paper), crest.' },
-  { name: 'Button', file: 'Button.astro', kind: 'Astro', section: 'components', use: 'Every button and CTA link. Never hand-roll one.' },
-  { name: 'Pill', file: 'ui/Pill.astro', kind: 'Astro', section: 'components', use: 'Status badges: Open Slot, Pre-Order, Sold Out, Active, Next Up.' },
-  { name: 'Toast', file: 'Toast.astro', kind: 'Astro', section: 'components', use: 'On-page confirmation after a form or join action.' },
-  { name: 'CookieConsent', file: 'CookieConsent.tsx', kind: 'React island', section: 'components', story: true, use: 'EU/GDPR cookie & Google Tag Manager consent banner + preference toggle.' },
-  { name: 'PlayerCard', file: 'PlayerCard.astro', kind: 'Astro', section: 'components', use: 'Roster card (active + open-slot states).' },
-  { name: 'EventCard', file: 'EventCard.astro', kind: 'Astro', section: 'components', use: 'Event with date chip, venue, CTA. card | feature.' },
-  { name: 'StatNumber', file: 'StatNumber.astro', kind: 'Astro', section: 'components', use: 'Big ribbed-gold figure + label.' },
-  { name: 'Callout · MascotCallout · CtaStrip', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Pull quote, empty state, full-width CTA band.' },
-  { name: 'ThreeColumn · FaqAccordion', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Icon benefits row; native <details> FAQ.' },
-  { name: 'Section · PageHeader · Hero', file: '*.astro', kind: 'Astro', section: 'blocks', use: 'Page scaffolding. PageHeader opens every interior page on bg-sand (pattern prop: sand | topo | seigaiha). Hero: brand | ornate | image | video | text.' },
-  { name: 'FeatureRow', file: 'marketing/FeatureRow.astro', kind: 'Astro', section: 'marketing', use: 'Alternating media + copy. Flip with reverse.' },
-  { name: 'ImpactBand', file: 'marketing/ImpactBand.astro', kind: 'Astro', section: 'marketing', use: 'Full-bleed action photo fading into big copy. align left | right; tone ink | crimson | forest; treatment fade | duotone.' },
-  { name: 'TwoColumn', file: 'TwoColumn.astro', kind: 'Astro', section: 'blocks', use: 'Boxed image + copy CTA. A calm break between full-bleed blocks.' },
-  { name: 'PricingCard', file: 'marketing/PricingCard.astro', kind: 'Astro', section: 'marketing', use: 'Tier card; featured gets gold border + ribbon.' },
-  { name: 'LogoStrip', file: 'LogoStrip.astro', kind: 'Astro', section: 'marketing', use: 'Static centred logo row: leagues on the homepage, partners on Contact. sm | md.' },
-  { name: 'Gallery', file: 'Gallery.astro', kind: 'Astro', section: 'marketing', use: 'Masonry photo grid, zero JS.' },
-  { name: 'Slideshow / GallerySlideshow', file: 'Slideshow.tsx', kind: 'Astro + island', section: 'marketing', story: true, use: 'Carousel: peek | single | hero | showcase; dashes | thumbnails. Per-slide caption + kicker.' },
-  { name: 'ProductCard · ProductGrid', file: 'marketing/ProductGrid.astro', kind: 'Astro', section: 'marketing', use: 'Shop grid with optional filter chips.' },
-  { name: 'FormField', file: 'form/FormField.astro', kind: 'Astro', section: 'forms', use: 'Label + input | select | textarea + hint/error.' },
-  { name: 'RadioGroup · CheckboxGroup', file: 'form/*.astro', kind: 'Astro', section: 'forms', use: 'Styled real inputs in a fieldset.' },
-  { name: 'CountryCombobox', file: 'form/CountryCombobox.tsx', kind: 'React island', section: 'forms', story: true, use: 'Searchable country picker; pre-fills from browser language; posts one canonical name.' },
-  { name: 'PreorderForm · JoinRequestForm', file: '*.tsx', kind: 'React island', section: 'forms', story: true, use: 'Interactive order / join forms.' },
-  { name: 'Calendar / EventsCalendar', file: 'Calendar.tsx', kind: 'Astro + island', section: 'calendar', story: true, use: 'Month grid; days anchor to EventCards.' },
-  { name: 'AgendaList', file: 'AgendaList.astro', kind: 'Astro', section: 'calendar', use: 'Compact event list with Next Up + TBD row.' },
-  { name: 'StatLeaderboardTable', file: 'StatLeaderboardTable.tsx', kind: 'React island', section: 'index', story: true, use: 'Sortable player stats table.' },
-  { name: 'ImagePlaceholder', file: 'ImagePlaceholder.astro', kind: 'Astro', section: 'imagery', use: 'Striped stand-in until real photography lands.' },
-];
+const index = catalog;
 
 /**
  * The page's sections, grouped for the side nav (DesignNav). ADD A ROW when
@@ -1010,7 +976,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     </DocSection>
 
     {/* ============================================================ INDEX */}
-    <DocSection id="index" number={num('index')} title="Component index" kicker="Check here before writing a new component" intro="Every reusable component, where it lives and when to reach for it. Paths are relative to src/components/. Rows marked Storybook also have a *.stories.tsx with interactive states and play tests.">
+    <DocSection id="index" number={num('index')} title="Component index" kicker="Check here before writing a new component" intro="Every reusable component, where it lives and when to reach for it. Paths are relative to src/components/. Rows marked Storybook also have a *.stories.tsx with interactive states and play tests. Rendered from src/lib/components.ts, which also generates docs/COMPONENTS.md: the options, data, pairings and page recipes, written for AI agents.">
       <div class="overflow-x-auto border border-[#DAD4C4] bg-[#FBF9F4]">
         <table class="w-full min-w-[720px] border-collapse text-[0.8125rem]">
           <thead>
@@ -1029,7 +995,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
                 <td class="px-4 py-2.5"><code class="font-mono text-xs text-[#3a342b]">{row.file}</code></td>
                 <td class="px-4 py-2.5 text-[#4a443a]">{row.kind}</td>
                 <td class="px-4 py-2.5 text-[#4a443a]">{row.story ? 'Yes' : '—'}</td>
-                <td class="px-4 py-2.5 text-[#4a443a]">{row.use}</td>
+                <td class="px-4 py-2.5 text-[#4a443a]">{row.use}{row.internal && <span class="text-[#8a8170]"> (internal)</span>}</td>
               </tr>
             ))}
           </tbody>

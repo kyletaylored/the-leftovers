@@ -11,8 +11,10 @@ _reference/
 *storybook.log
 storybook-static
 
-# LLM agent tooling — local/editor-specific, not project config
-.claude/
+# LLM agent tooling — local/editor-specific, not project config.
+# Exception: .claude/skills/ holds shared project skills (build-page).
+.claude/*
+!.claude/skills/
 .codegraph/
 .codex/
 .cursor/
