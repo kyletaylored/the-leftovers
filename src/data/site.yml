@@ -20,9 +20,8 @@ homeBase: ""
 # Team, Events, Shop and Community are hidden for now (website feedback,
 # Nov 2026): the team wants to build them out properly first. The pages still
 # build, but they are noindex, out of the sitemap, and nothing links to them.
-# To bring one back: re-add it here, remove `noindex` from the page's
-# <BaseLayout> in src/pages/, and take it out of HIDDEN_PAGES in
-# astro.config.mjs.
+# To bring one back: re-add it here and untick "Hide from search engines"
+# (seo.noindex) on its Page copy entry.
 nav:
   - label: Home
     href: /
@@ -63,6 +62,16 @@ facebookPagePlugin:
 # analytics consent in CookieConsent (EU / GDPR opt-in). Leave blank to
 # disable analytics and hide the consent banner.
 gtmId: GTM-KPXD7QD6
+
+# Search engines and AI crawlers (docs/SEO.md).
+search:
+  # Only needed for a Search Console "URL prefix" property verified by HTML
+  # tag. A "Domain" property is verified by DNS and needs nothing here.
+  googleSiteVerification: ""
+  bingSiteVerification: ""
+  # allow | search-only | block. Controls robots.txt for AI bots only;
+  # Google and Bing search are always allowed.
+  aiCrawlers: allow
 
 # Discord's official, free server widget (§8.3). Put the numeric server ID
 # here to render the live member count block on /community.

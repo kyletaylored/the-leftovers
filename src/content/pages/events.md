@@ -6,6 +6,8 @@ intro: >-
   Registration links go straight to the league — we don't handle entries.
 heroImages: []
 seo:
+  # Hidden for now (Nov 2026 website feedback): out of search and the sitemap.
+  noindex: true
   title: Events & Calendar — The Leftovers
   description: >-
     Upcoming PBLeague tournaments for The Leftovers plus every event we've

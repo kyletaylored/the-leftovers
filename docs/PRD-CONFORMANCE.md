@@ -550,8 +550,8 @@ from earlier decisions here.
   comparison are gone. It is wide and heavy, so keep headlines short.
 - **Team, Events, Shop and Community are hidden.** The doc asks to hide them
   "entirely for now". They still build but are `noindex`, out of the sitemap,
-  out of the nav and footer, and unlinked from visible pages (`HIDDEN_PAGES` in
-  `astro.config.mjs`). This overrides PRD §5's page list for now. The
+  out of the nav and footer, and unlinked from visible pages (since 4 Nov 2026,
+  `seo.noindex: true` in their content files; the sitemap follows the tag). This overrides PRD §5's page list for now. The
   community-channels, open-slots and "From the Field" blocks left the homepage
   for the same reason, and so did the homepage's team-member and season
   counters (they counted placeholder players).
@@ -574,3 +574,10 @@ from earlier decisions here.
   required. Country is now a searchable picker (`CountryCombobox`) instead of
   free text, pre-filled from the browser's language. It posts one canonical
   English name, so the Google Form's question stays short text.
+- **Search indexing is content-driven, plus `llms.txt` (4 Nov 2026).** The
+  CMS "Hide from search engines" box (`seo.noindex`, on pages and pre-orders)
+  now drives the robots meta tag, and a small build integration
+  (`integrations/sitemap-noindex.mjs`) drops every `noindex` page from the
+  sitemap, replacing the hand-kept exclusion list. robots.txt gained an AI
+  crawler policy setting (`search.aiCrawlers`) and `/llms.txt` was added.
+  Neither is in §10.3; both are build-time files with no runtime cost.

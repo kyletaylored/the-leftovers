@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig, fontProviders } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import sitemapNoindex from './integrations/sitemap-noindex.mjs';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -16,15 +17,6 @@ import tailwindcss from '@tailwindcss/vite';
  */
 export const SITE = 'https://theleftoverspb.com';
 
-/**
- * Pages the team has hidden for now (website feedback, Nov 2026). They still
- * build, but they are `noindex`, out of the sitemap, out of the nav and
- * footer, and nothing visible links to them. To bring one back: remove it
- * here, remove its `noindex` from the page's <BaseLayout>, and add it to
- * `nav` in src/data/site.yml.
- */
-const HIDDEN_PAGES = ['/team', '/events', '/shop', '/community'];
-
 export default defineConfig({
   site: SITE,
   trailingSlash: 'never',
@@ -33,17 +25,15 @@ export default defineConfig({
   // then the same string, with no redirect hop for a crawler to follow.
   build: { format: 'file' },
   integrations: [
-    sitemap({
-      // /about, /roster, /stats are thin meta-refresh stubs now (folded into
-      // /team — see src/pages/team.astro). They 200, so the sitemap
-      // generator would otherwise list them as if they were real pages.
-      // /design is the internal design-system storybook (noindex) — a tool
-      // for whoever's building the site, not a page for visitors.
-      filter: (page) =>
-        !['/about', '/roster', '/stats', '/design', ...HIDDEN_PAGES].some((p) => page.endsWith(p)) &&
-        // /design/* holds internal tools such as the OG-card source page.
-        !page.includes('/design/'),
-    }),
+    // No `filter` list here on purpose. Which pages stay out of the sitemap
+    // is decided by each page's robots meta tag: sitemapNoindex() (next)
+    // removes every page that says noindex. That covers the redirect stubs
+    // (/about, /roster, /stats), /design, the 404 page, and any page the
+    // team hides with the CMS's "Hide from search engines" box (seo.noindex).
+    // Hidden pages (Team, Events, Shop, Community, Nov 2026) are hidden that
+    // way, in their content files.
+    sitemap(),
+    sitemapNoindex(),
     react(),
   ],
   vite: { plugins: [tailwindcss()] },

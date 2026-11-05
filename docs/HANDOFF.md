@@ -14,6 +14,7 @@ else in `docs/` goes deeper on one topic.
 | [`EDITING.md`](EDITING.md) | Content editing for the team, no code (Pages CMS) |
 | [`DEPLOY.md`](DEPLOY.md) | Hosting, domain, CMS setup, the Cloudflare move |
 | [`PREORDERS.md`](PREORDERS.md) · [`JOIN.md`](JOIN.md) | How the two on-site forms submit, and their Google Forms |
+| [`SEO.md`](SEO.md) | Sitemap, robots.txt, llms.txt, hiding pages from search, Google Search Console setup |
 | [`/design`](../src/pages/design.astro) + Storybook | The live design system (see "Design system" below) |
 
 ---
@@ -73,8 +74,10 @@ team deciding to:
 
 **Hidden pages** (Team, Events, Shop, Community) still build but are `noindex`,
 out of the sitemap, out of the nav and footer, and unlinked from visible pages.
-The list is `HIDDEN_PAGES` in `astro.config.mjs`; `astro.config.mjs` and
-`site.yml`'s `nav` say how to bring one back. `/preorder/[slug]` is not
+They're hidden by `seo.noindex: true` in their `src/content/pages/*.md` (the
+CMS's "Hide from search engines" box), and the sitemap follows that tag
+automatically ([SEO.md](SEO.md)). To bring one back: untick the box and re-add
+it to `nav` in `site.yml`. `/preorder/[slug]` is not
 linked from anywhere either, but its closed state still points at `/shop` and
 `/community`.
 
@@ -279,6 +282,12 @@ inline-styled HTML into the repo.
 ## 7. Open work, in priority order
 
 ### Needs the team (decisions or content, not code)
+
+- **Connect Google Search Console and submit the sitemap.** Verify the
+   `theleftoverspb.com` Domain property by DNS, then submit
+   `/sitemap-index.xml`; import into Bing Webmaster Tools from there. Steps
+   in [SEO.md](SEO.md#connecting-google-search-console-one-off-by-the-owner).
+   Also decide the AI-crawler policy (`search.aiCrawlers`, default `allow`).
 
 0. **Review the homepage slider headlines** in
    `src/content/galleries/game-day.yml` ("Off the break", "Full send"…). They

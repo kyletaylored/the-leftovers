@@ -6,6 +6,8 @@ intro: >-
   idea — the story, the crew, the stats, and the open slots all live here now.
 heroImages: []
 seo:
+  # Hidden for now (Nov 2026 website feedback): out of search and the sitemap.
+  noindex: true
   title: The Leftovers — Team, Roster & Stats
   description: >-
     How a group chat became a registered tournament team. Meet the roster,

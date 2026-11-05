@@ -6,6 +6,8 @@ intro: >-
   and everything prints once it closes. Checkout happens on Bonfire — we never
   touch your card details.
 seo:
+  # Hidden for now (Nov 2026 website feedback): out of search and the sitemap.
+  noindex: true
   title: The Leftovers Shop — Jersey Pre-Orders & Team Merch
   description: >-
     Pre-order the 2026 Leftovers team jersey, hats and stickers. Batched

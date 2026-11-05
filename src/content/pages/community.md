@@ -6,6 +6,8 @@ intro: >-
   and the mailing list if you'd rather just be told when something's
   happening. Want to play an event? Send a join request instead.
 seo:
+  # Hidden for now (Nov 2026 website feedback): out of search and the sitemap.
+  noindex: true
   title: The Leftovers Community — Instagram & Facebook Group
   description: >-
     Join The Leftovers paintball community. Instagram for game photos, a
