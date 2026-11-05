@@ -59,6 +59,7 @@
  * Headings render at the level the caller passes (default h2). The title
  * accepts "\n" for deliberate line breaks; keep titles to two short lines.
  */
+import { FULL_BLEED_SIZES } from '@/lib/layout';
 import { Image } from 'astro:assets';
 import { impactShiftVars, toStyle } from '@/lib/impact';
 
@@ -141,7 +142,7 @@ const vars = toStyle({ ...impactShiftVars(shift, align, wash), '--impact-focus':
       src={image}
       alt={imageAlt}
       widths={[640, 960, 1440, 1920, 2400]}
-      sizes="100vw"
+      sizes={FULL_BLEED_SIZES}
       loading={priority ? 'eager' : 'lazy'}
       fetchpriority={priority ? 'high' : undefined}
       decoding="async"

@@ -144,6 +144,32 @@
     overflow-x: hidden;
   }
 
+  /* Page frame (BaseLayout). Past 1600px (FRAME_MAX in src/lib/layout.ts:
+     keep the two in sync) the site sits in a centred ink box with a gold
+     hairline, over a dimmed seigaiha surround, so wide monitors don't stretch
+     photos and bands edge to edge. Below that the frame is invisible.
+     overflow-x: clip (not hidden) keeps full-bleed blocks inside the frame
+     without breaking the sticky nav. */
+  .site-frame {
+    overflow-x: clip;
+  }
+  @media (min-width: 1600px) {
+    .site-surround {
+      background-image:
+        linear-gradient(color-mix(in srgb, var(--color-ink) 55%, transparent), color-mix(in srgb, var(--color-ink) 55%, transparent)),
+        url('/img/seigaiha.svg');
+      background-size: auto, 160px auto;
+    }
+    .site-frame {
+      max-width: 1600px;
+      margin-inline: auto;
+      background-color: var(--color-ink);
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--color-gold) 22%, transparent),
+        0 0 80px rgb(0 0 0 / 0.7);
+    }
+  }
+
   /* Headline role: condensed, heavy, wide-tracked sports impact type. */
   h1,
   h2,

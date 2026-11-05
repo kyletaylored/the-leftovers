@@ -445,6 +445,7 @@ export const utilities: { cls: string; use: string }[] = [
   { cls: 'font-display | font-sans | font-marker', use: 'Headlines | body | brush (logo-like accents only)' },
   { cls: 'eyebrow', use: 'Small caps kicker above a headline' },
   { cls: 'numeral | numeral-ghost', use: 'Gold ribbed digits | ghost jersey number behind a photo' },
+  { cls: 'site-frame / site-surround', use: 'BaseLayout only: the 1600px page frame over a dimmed seigaiha surround on wide screens' },
   { cls: 'tap', use: '44×44px minimum target on any custom control' },
   { cls: 'field-label | field-input | field-hint', use: 'Raw form controls, matching FormField' },
 ];
@@ -455,6 +456,7 @@ export const rules: string[] = [
   'Copy comes from collections or src/data/site.yml, not hardcoded in the page. Missing content → MascotCallout / ImagePlaceholder, never invented content.',
   'Tokens only, never raw hex. Images from src/assets/img via <Image>/getImage (CSP: img-src self).',
   'Islands hydrate client:visible and never above the fold.',
+  'Full-bleed means the page frame (max 1600px, src/lib/layout.ts), not the screen: use FULL_BLEED_SIZES for a full-width image, never sizes="100vw", and never 100vw/w-screen in CSS.',
   'Full-bleed blocks (ImpactBand, CtaStrip, Ticker, GallerySlideshow hero/showcase) sit between Sections; never two full-bleed photo blocks in a row.',
   'Motion stays ambient: drifting sand, swaying terraces and lanterns may share a hero, but never put a Ticker or an autoplaying slideshow in the same view as other motion.',
 ];

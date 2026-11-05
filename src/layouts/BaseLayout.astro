@@ -132,12 +132,16 @@ const organizationSchema = {
     }
   </head>
 
-  <body class:list={['flex min-h-dvh flex-col', bodyClass]}>
-    <Nav />
-    <main id="main" class="flex-1">
-      <slot />
-    </main>
-    <Footer />
+  {/* Above FRAME_MAX (src/lib/layout.ts) the site sits in a centred frame
+      over the textured surround; below it the frame is just the page. */}
+  <body class:list={['site-surround', bodyClass]}>
+    <div class="site-frame flex min-h-dvh flex-col">
+      <Nav />
+      <main id="main" class="flex-1">
+        <slot />
+      </main>
+      <Footer />
+    </div>
     {needsConsent && <CookieConsent gtmId={site.gtmId} client:visible />}
   </body>
 </html>
