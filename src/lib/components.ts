@@ -91,7 +91,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'ThreeColumn', file: 'ThreeColumn.astro', kind: 'Astro', group: 'layout', section: 'blocks',
     use: 'Icon + title + body benefits row (3 items, stacks on phones).',
-    options: 'items[{icon?, title, body}] · as',
+    options: 'items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section) · iconStyle: tile|circle (gold ring, favicon badge) · as',
   },
 
   // --------------------------------------------------------------- content
@@ -142,8 +142,8 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'ImpactBand', file: 'marketing/ImpactBand.astro', kind: 'Astro', group: 'marketing', section: 'marketing',
     use: 'Full-bleed action photo fading into big copy (manifesto, recruiting push). Buttons in slot="actions".',
-    options: 'image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus · priority (LCP image) · as',
-    avoid: 'Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between.',
+    options: 'image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus (object-position) · priority (LCP image) · as. Desktop only: shift -30..30 (% of band, negative = left; slide a centred player out from under the copy) · wash: fade|none (none = photo edge to edge, full colour or tinted) · backdrop: none|scrim|panel (default scrim when wash=none)',
+    avoid: 'Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between. wash="none" with body text or stats but no backdrop="panel" (scrim alone can fail AA on a bright photo).',
     pairs: ['Hero', 'TwoColumn'],
   },
   {
