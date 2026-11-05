@@ -25,7 +25,7 @@ Read this before building or changing a page. It replaces reading `src/pages/des
 - **Interior page (default)** (`src/pages/contact.astro`): PageHeader (pattern sand) → Section tone=base → Section tone=alt → … alternate → CtaStrip or a closing Section with Buttons
 - **Homepage / landing** (`src/pages/index.astro`): Hero variant=ornate animate (+RiceTerraces) → ImpactBand → GallerySlideshow layout=showcase → TwoColumn (boxed break) → ImpactBand tone=crimson → Section tone=seigaiha + LogoStrip → NewsletterBlock
 - **Long-form / legal (Markdown body)** (`src/pages/privacy.astro`): PageHeader → Section tone=base > Prose > <Content /> → Buttons (outline + ghost)
-- **Schedule** (`src/pages/events.astro`): PageHeader → Section: EventsCalendar → Section: Countdown + EventCard layout=feature (next) + EventCard grid (upcoming) → Section tone=alt: past EventCards, or MascotCallout when empty
+- **Schedule** (`src/pages/events.astro`): PageHeader → Section tone=alt: Countdown + EventCard layout=feature + EventSquads (next), or MascotCallout when empty → Section: ProcessSteps + BrandRule + EventFees → Section tone=alt: per year, SeasonStrip + past EventCards (older years in <details>)
 - **Team / about** (`src/pages/team.astro`): PageHeader → story Section (Prose + StatNumbers + Callout) → roster Section (PlayerCard grid) → stats (StatLeaderboardTable / TeamStatsWidget, MascotCallout until data) → FaqAccordion → CtaStrip tone=forest
 - **Shop / product** (`src/pages/shop.astro, src/pages/preorder/[slug].astro`): PageHeader → featured ProductCard → ProductGrid → ThreeColumn (how ordering works) → Prose. Drop page: PageHeader → Countdown + Prose → ProductGallery → PreorderForm
 - **Form page** (`src/pages/join.astro`): PageHeader → Section tone=base: Prose intro + the form island (client:visible) → Toast for the result
@@ -40,6 +40,7 @@ Read this before building or changing a page. It replaces reading `src/pages/des
 | `bg-sand-bold | bg-seigaiha-bold` | Decorative textures; never under text |
 | `bg-drift (+ bg-drift-reverse)` | Animate any texture above |
 | `font-display | font-sans | font-marker` | Headlines | body | brush (logo-like accents only) |
+| `title-sm` | Any heading under 24px (add text-* to resize): Inter bold, because the headline font fills in when small |
 | `eyebrow` | Small caps kicker above a headline |
 | `numeral | numeral-ghost` | Gold ribbed digits | ghost jersey number behind a photo |
 | `site-frame / site-surround` | BaseLayout only: the 1600px page frame over a dimmed seigaiha surround on wide screens |
@@ -141,15 +142,30 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 
 ### Events, team & stats
 
-- **EventCard** (`EventCard.astro`): An event with date chip, venue and register/result CTA. Article id = slug (#slug links).
-  - Options: event · layout: card|feature (big NEXT UP) · as
+- **EventCard** (`EventCard.astro`): An event with date chip and venue. Upcoming: Request a spot (to /join) until entries close. Past: best finish and all squads. Article id = slug (#slug links).
+  - Options: event · layout: card|feature (big NEXT UP, full address) · as
   - Data: events collection entry; getEvents() gives upcoming/past/next
+- **SeasonStrip** (`SeasonStrip.astro`): A whole season on one line: 12 months, events linked to their #slug cards. The default schedule view.
+  - Options: events · year
+  - Data: getEvents().all
+  - Pairs with: EventCard
+- **ProcessSteps** (`ProcessSteps.astro`): Numbered how-it-works steps, e.g. how a player gets onto a squad.
+  - Options: steps[{title, body}] · layout: row|stack · as
+  - Data: site.eventProcess.steps
+- **EventFees** (`EventFees.astro`): League fees per team as format × division × deadline.
+  - Options: event · note
+  - Data: event.data.fees + feeDeadlines; site.eventProcess.feeNote
+  - Avoid: Per-player figures: the captain confirms each player's fee.
+- **EventSquads** (`EventSquads.astro`): Every squad at an event by division, with final places once results are in.
+  - Options: squads · columns: 1|2
+  - Data: event.data.squads
 - **AgendaList** (`AgendaList.astro`): Compact event list; lighter than cards for 1–2 events.
   - Options: events · next (flags Next Up) · showTbd · linkToCards (#slug rows) · as
   - Data: getEvents()
 - **EventsCalendar** (`EventsCalendar.astro`, Astro + island): Month grid; marked days link to EventCards. Opens on the next event month.
   - Options: events · next
   - Data: getEvents()
+  - Avoid: The team's schedule: about one event a month leaves it mostly empty. Use SeasonStrip.
   - Pairs with: EventCard
 - **Countdown** (`Countdown.astro`, Astro + island): Live countdown to an event or drop deadline.
   - Options: target (Date) · passedLabel
@@ -205,6 +221,9 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **Icon** (`brand/Icon.astro`): Every glyph. Decorative unless label is set (icon-only controls).
   - Options: name (src/lib/icons.ts) · label · strokeWidth · class (size-*, text-*)
   - Avoid: Inline SVG copies or icon fonts. New glyph: add its path to src/lib/icons.ts.
+- **BrandRule** (`brand/BrandRule.astro`): Themed horizontal rule: splits content inside a section and adds air between stacked components.
+  - Options: ornament: peaks|field|cloud · spacing: none|sm|md|lg
+  - Avoid: Between two Sections with different tones: the tone change already separates them.
 - **TerracedDivider** (`brand/TerracedDivider.astro`): Section break / card footer.
   - Options: style: rice-terrace|pagoda|refined-peaks · variant: full|line · flip · seed
   - Pairs with: Section (divider prop)

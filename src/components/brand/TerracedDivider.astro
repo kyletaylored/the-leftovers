@@ -10,8 +10,9 @@
  * than one hard swap, because the handoff's own flagship placements use two
  * different ones on purpose:
  *  - `rice-terrace` (default) — flat stepped plateaus, closest to the
- *    motif's actual name. Used for card footers (EventCard) and full-width
- *    section dividers in the handoff.
+ *    motif's actual name. Used for full-width section dividers in the
+ *    handoff. Its viewBox stretches to fit, so keep it tall: in a thin strip
+ *    the ridge flattens and the glyphs squash. Use BrandRule there.
  *  - `pagoda` — smooth C-curve eaves that flick up like temple rooflines,
  *    with finial dots at each peak. Used for the homepage hero in the
  *    handoff — more flourish for the one-per-page moment.
@@ -20,8 +21,8 @@
  *    the lowest-risk swap if a placement needs the old shape's footprint.
  *
  * `variant="line"` (stroke only, no fill) still works for every style — used
- * where the divider sits over an already-coloured background (e.g.
- * EventCard's dark card body) and a second fill would double up.
+ * where the divider sits over an already-coloured background and a second
+ * fill would double up.
  */
 export type TerracedStyle = 'rice-terrace' | 'pagoda' | 'refined-peaks';
 

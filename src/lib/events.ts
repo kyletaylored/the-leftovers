@@ -15,6 +15,31 @@ export function isUpcoming(event: EventEntry, now = new Date()): boolean {
   return end.getTime() + 24 * 60 * 60 * 1000 > now.getTime();
 }
 
+/**
+ * Players can still request a spot: the event hasn't passed and the league's
+ * last entry deadline (when one is set) hasn't either.
+ */
+export function isTakingRequests(event: EventEntry, now = new Date()): boolean {
+  if (!isUpcoming(event, now)) return false;
+  const closes = event.data.feeDeadlines?.late;
+  return !closes || closes.getTime() + 24 * 60 * 60 * 1000 > now.getTime();
+}
+
+export const seasonOf = (event: EventEntry) => event.data.startDate.getUTCFullYear();
+
+/** The squad that placed highest, or undefined before results are in. */
+export function bestFinish(event: EventEntry) {
+  return event.data.squads
+    .filter((squad) => squad.place)
+    .sort((a, b) => (a.place ?? 0) - (b.place ?? 0))[0];
+}
+
+/** "3600 N Himes Ave, Tampa, FL 33607" */
+export function addressLine(location: NonNullable<EventEntry['data']['location']>) {
+  const place = [location.city, [location.region, location.postalCode].filter(Boolean).join(' ')];
+  return [location.street, ...place].filter(Boolean).join(', ');
+}
+
 export async function getEvents() {
   const all = await getCollection('events');
   const upcoming = all

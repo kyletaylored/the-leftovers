@@ -1,0 +1,56 @@
+---
+/**
+ * BrandRule — the themed horizontal rule: a small gold ornament between two
+ * hairlines that fade out at the ends. Use it to split up content inside a
+ * section, or to give stacked components some air.
+ *
+ * It replaces stretching TerracedDivider into thin spaces. That divider's
+ * viewBox is scaled to fit, so at card-footer height its ridge flattens and
+ * its glyphs squash. The ornament here keeps its proportions at any width;
+ * only the hairlines grow.
+ *
+ * `ornament`:
+ *  - `peaks` — a small terraced range, echoing RiceTerraces. Card footers.
+ *  - `field` — the single 田 glyph from the terraces. The quietest option.
+ *  - `cloud` — a ruyi cloud, for a more formal break between big blocks.
+ *
+ * Renders role="separator", the same meaning as an <hr>, which can't hold an
+ * ornament. No JS.
+ */
+import RuyiCloud from './RuyiCloud.astro';
+
+interface Props {
+  ornament?: 'peaks' | 'field' | 'cloud';
+  /** Vertical space around the rule. */
+  spacing?: 'none' | 'sm' | 'md' | 'lg';
+  class?: string;
+}
+
+const { ornament = 'peaks', spacing = 'md', class: className = '' } = Astro.props;
+
+const gaps = { none: '', sm: 'my-6', md: 'my-10', lg: 'my-16' } as const;
+---
+
+<div role="separator" class:list={['flex items-center gap-3 text-gold', gaps[spacing], className]}>
+  <span class="h-px flex-1 bg-linear-to-r from-transparent to-gold/60"></span>
+  {
+    ornament === 'peaks' && (
+      <svg viewBox="0 0 96 28" class="h-6 w-auto shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+        <path d="M2 26C12 26 15 12 22 12S30 20 35 20 42 4 48 4 56 20 61 20 67 12 74 12 84 26 94 26" />
+        <path d="M38 26C43 26 44 13 48 13S53 26 58 26" opacity=".7" />
+        <path d="M14 26C18 26 20 19 22 19S26 26 30 26" opacity=".7" />
+        <path d="M66 26C70 26 72 19 74 19S78 26 82 26" opacity=".7" />
+      </svg>
+    )
+  }
+  {
+    ornament === 'field' && (
+      <svg viewBox="0 0 16 16" class="size-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
+        <rect x="1.5" y="1.5" width="13" height="13" />
+        <path d="M1.5 8h13M8 1.5v13" />
+      </svg>
+    )
+  }
+  {ornament === 'cloud' && <RuyiCloud variant={2} class="h-7 w-20 shrink-0 text-gold" />}
+  <span class="h-px flex-1 bg-linear-to-l from-transparent to-gold/60"></span>
+</div>

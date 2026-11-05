@@ -592,3 +592,11 @@ from earlier decisions here.
   needs a server runtime and caps the free tier at two users), Sveltia and
   Decap (previews can't render `.astro`), and CloudCannon (no free plan). The
   tradeoff is no live preview, so drafts build at `/preview/<slug>` instead.
+- **`/events` calendar replaced by a season view (5 Nov 2026).** The team plays
+  about one event a month at most, so a one-month grid was mostly empty.
+  `SeasonStrip` shows each year on one line above its results. `Calendar` stays
+  on `/design` in case a season gets busy.
+- **Players don't register with the league themselves (5 Nov 2026).** Each event
+  has a captain who sorts join requests into squads, collects event fees and
+  registers the teams. `registrationUrl` became `eventUrl`, and the upcoming
+  card's CTA now goes to `/join`.

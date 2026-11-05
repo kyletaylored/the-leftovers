@@ -44,7 +44,7 @@ const circle = iconStyle === 'circle';
             <Icon name={item.icon} class={centered ? 'size-9' : 'size-6'} strokeWidth={centered ? 1.6 : 1.8} />
           </span>
         )}
-        <Heading class:list={['text-bone', centered ? 'text-2xl sm:text-[1.75rem]' : 'text-xl']}>{item.title}</Heading>
+        <Heading class:list={['text-bone', centered ? 'text-2xl sm:text-[1.75rem]' : 'title-sm']}>{item.title}</Heading>
         <p class:list={['leading-relaxed text-bone-muted', centered ? 'mt-3 max-w-xs text-base' : 'mt-2 text-sm']}>{item.body}</p>
       </li>
     ))

@@ -17,7 +17,7 @@ established: 2022
 # region; it feeds the footer and the SportsTeam structured data.
 homeBase: ""
 
-# Team, Events, Shop and Community are hidden for now (website feedback,
+# Team, Shop and Community are hidden for now (website feedback,
 # Nov 2026): the team wants to build them out properly first. The pages still
 # build, but they are noindex, out of the sitemap, and nothing links to them.
 # To bring one back: re-add it here and untick "Hide from search engines"
@@ -25,6 +25,8 @@ homeBase: ""
 nav:
   - label: Home
     href: /
+  - label: Events
+    href: /events
   - label: Contact
     href: /contact
 
@@ -174,6 +176,22 @@ footerNote: >-
   Free agents welcome. Show up, pay your entry, play the tournament —
   that's the whole tryout.
 
+
+# How a player gets onto a squad. Shown on /events and /join.
+eventProcess:
+  steps:
+    - title: Request a spot
+      body: Send a join request with the event, division, format and position you want. No tryout.
+    - title: Get placed on a squad
+      body: Your event captain sorts every request into squads by division, format and position preference.
+    - title: Pay your event fee
+      body: Your captain confirms your spot and your fee. You pay the captain directly.
+    - title: Your captain registers the team
+      body: The captain enters your squad with the league. Bring your gear and play.
+  feeNote: >-
+    These are the league's fees for a whole team, and they go up as each
+    deadline passes. Your event fee depends on your event, format and
+    division, and your captain confirms it before you pay.
 
 # pblidb.org team stats (unofficial, third-party — derived from public
 # PBLeague pages, not affiliated with PBLI). `query` is sent to their team

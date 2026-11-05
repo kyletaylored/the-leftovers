@@ -108,6 +108,14 @@ const settingsSchema = z.object({
     .array(z.object({ name: z.string(), logo: z.string(), logoAlt: z.string() }))
     .default([]),
   footerNote: z.string(),
+  /** How a player gets onto a squad: shown on /events and /join. */
+  eventProcess: z
+    .object({
+      steps: z.array(z.object({ title: z.string(), body: z.string() })).default([]),
+      /** Shown under a fee table, to say what the numbers are. */
+      feeNote: z.string().default(''),
+    })
+    .prefault({}),
   pblidb: z
     .object({
       /** Fuzzy query sent to pblidb.org's team search (`GET /v1/teams?q=`).

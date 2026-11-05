@@ -1,0 +1,57 @@
+---
+/**
+ * SeasonStrip — a whole season on one line: twelve months, with each event
+ * sitting in the month it starts.
+ *
+ * The team plays about one event a month at most, so a one-month calendar
+ * grid was mostly empty and hid the shape of the season behind paging. This
+ * shows it all at once, needs no JS and links each event to its #slug card.
+ * It wraps to four columns on a phone. Upcoming events are marked with a
+ * filled pip and bold text as well as colour.
+ */
+import { monthShort } from '@/lib/format';
+import { isUpcoming, seasonOf, type EventEntry } from '@/lib/events';
+
+interface Props {
+  events: EventEntry[];
+  year: number;
+  class?: string;
+}
+
+const { events, year, class: className = '' } = Astro.props;
+
+const months = Array.from({ length: 12 }, (_, month) => ({
+  label: monthShort(new Date(Date.UTC(year, month, 1))),
+  events: events.filter((event) => seasonOf(event) === year && event.data.startDate.getUTCMonth() === month),
+}));
+---
+
+<ol class:list={['grid grid-cols-4 gap-px sm:grid-cols-6 lg:grid-cols-12', className]} aria-label={`${year} season`}>
+  {
+    months.map((month) => (
+      <li class:list={['min-h-24 border-t-2 px-1.5 pt-2', month.events.length ? 'border-gold' : 'border-ink-600']}>
+        <span class:list={['text-[0.65rem] font-bold tracking-[0.16em]', month.events.length ? 'text-gold-300' : 'text-bone-muted']}>
+          {month.label}
+        </span>
+        {month.events.map((event) => {
+          const upcoming = isUpcoming(event);
+          return (
+            <a
+              href={`#${event.id}`}
+              class:list={[
+                'tap mt-1 flex items-start gap-1.5 text-xs leading-snug underline-offset-2 hover:underline',
+                upcoming ? 'font-bold text-bone' : 'text-bone-muted',
+              ]}
+            >
+              <span class:list={['mt-1 size-2 shrink-0 rounded-full', upcoming ? 'bg-crimson-400' : 'border border-gold']} aria-hidden="true" />
+              <span>
+                {event.data.title}
+                {upcoming && <span class="sr-only"> (upcoming)</span>}
+              </span>
+            </a>
+          );
+        })}
+      </li>
+    ))
+  }
+</ol>

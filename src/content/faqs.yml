@@ -16,15 +16,16 @@
 - id: cost
   question: What does it cost to play an event with you?
   answer: >-
-    Entry is typically $60–$110 per player depending on the event and format,
-    plus paint and air on the day. We don't take a cut and we don't charge
-    dues — everyone pays their own way.
+    It depends on the event, format and division: each league sets its own
+    fees, and they rise as deadlines pass. Your event captain tells you your
+    event fee before you pay, and you pay it to the captain, who registers
+    the team. Paint and air on the day are on you, and there are no team dues.
   order: 3
 - id: gear
   question: What gear do I need?
   answer: >-
-    Your own marker, mask, pods and a harness. If you're short a piece, ask in
-    the Discord — somebody on the roster has a spare almost every time.
+    Your own marker, mask, pods and a harness. If you're short a piece, tell
+    your event captain — somebody on the roster has a spare almost every time.
   order: 4
 - id: jersey
   question: Do I have to buy a jersey?
@@ -36,7 +37,7 @@
 - id: how-to-start
   question: How do I get on the list for the next event?
   answer: >-
-    Join the Discord and post in the event channel, or email the captain. Slots
-    go in the order people confirm, and confirming means you're actually
-    showing up.
+    Send a join request with the event, division, format and position you
+    want. The event captain sorts requests into squads, confirms your spot and
+    your fee, and registers the team once you've paid.
   order: 6

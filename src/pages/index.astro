@@ -16,8 +16,8 @@
  *
  * Earlier the same month (website feedback) the community-channels,
  * open-slots and "From the Field" blocks were removed because the pages they
- * pointed at (Team, Community) are hidden. The placeholder event drives
- * nothing here, so there is no SportsEvent structured data on this page.
+ * pointed at (Team, Community) are hidden. Events drive nothing here, so
+ * there is no SportsEvent structured data on this page.
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -29,6 +29,7 @@ import GallerySlideshow from '@/components/GallerySlideshow.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
 import LogoStrip from '@/components/LogoStrip.astro';
 import Button from '@/components/Button.astro';
+import BrandRule from '@/components/brand/BrandRule.astro';
 import { site } from '@/lib/settings';
 import { resolveImage } from '@/lib/images';
 import shooter from '@/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp';
@@ -82,12 +83,14 @@ const leagues = await Promise.all(
 
   <section class="bg-ink">
     <div class="mx-auto max-w-5xl px-4 pb-10 pt-16 text-center sm:px-6 lg:pt-24">
+      <BrandRule spacing="none" class="mb-8 lg:mb-10" />
       <p class="eyebrow mb-4">{site.tagline}</p>
       <h2 class="mx-auto max-w-3xl text-2xl leading-tight text-bone sm:text-4xl lg:text-5xl">
         <span class="block">Don’t miss the action.</span>
         <span class="block">Expand your network.</span>
         <span class="block">Make memories.</span>
       </h2>
+      <BrandRule spacing="none" class="mt-8 lg:mt-10" />
     </div>
     <GallerySlideshow galleries={sliderGalleries} layout="showcase" autoplayMs={6000} />
   </section>
@@ -134,7 +137,8 @@ const leagues = await Promise.all(
       <div class="mt-6">
         <Button href="/join" size="sm">Request to join</Button>
       </div>
-      <LogoStrip items={leagues} label="Leagues we want to build in" size="sm" class="mt-12" />
+      <BrandRule ornament="field" spacing="none" class="mt-10" />
+      <LogoStrip items={leagues} label="Leagues we want to build in" size="sm" class="mt-10" />
     </div>
   </Section>
 

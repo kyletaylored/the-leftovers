@@ -223,9 +223,31 @@ export const catalog: CatalogEntry[] = [
   // ---------------------------------------------------------------- events
   {
     name: 'EventCard', file: 'EventCard.astro', kind: 'Astro', group: 'events', section: 'components',
-    use: 'An event with date chip, venue and register/result CTA. Article id = slug (#slug links).',
-    options: 'event · layout: card|feature (big NEXT UP) · as',
+    use: 'An event with date chip and venue. Upcoming: Request a spot (to /join) until entries close. Past: best finish and all squads. Article id = slug (#slug links).',
+    options: 'event · layout: card|feature (big NEXT UP, full address) · as',
     data: 'events collection entry; getEvents() gives upcoming/past/next',
+  },
+  {
+    name: 'SeasonStrip', file: 'SeasonStrip.astro', kind: 'Astro', group: 'events', section: 'calendar',
+    use: 'A whole season on one line: 12 months, events linked to their #slug cards. The default schedule view.',
+    options: 'events · year', data: 'getEvents().all',
+    pairs: ['EventCard'],
+  },
+  {
+    name: 'ProcessSteps', file: 'ProcessSteps.astro', kind: 'Astro', group: 'events', section: 'calendar',
+    use: 'Numbered how-it-works steps, e.g. how a player gets onto a squad.',
+    options: 'steps[{title, body}] · layout: row|stack · as', data: 'site.eventProcess.steps',
+  },
+  {
+    name: 'EventFees', file: 'EventFees.astro', kind: 'Astro', group: 'events', section: 'calendar',
+    use: 'League fees per team as format × division × deadline.',
+    options: 'event · note', data: 'event.data.fees + feeDeadlines; site.eventProcess.feeNote',
+    avoid: 'Per-player figures: the captain confirms each player\'s fee.',
+  },
+  {
+    name: 'EventSquads', file: 'EventSquads.astro', kind: 'Astro', group: 'events', section: 'calendar',
+    use: 'Every squad at an event by division, with final places once results are in.',
+    options: 'squads · columns: 1|2', data: 'event.data.squads',
   },
   {
     name: 'AgendaList', file: 'AgendaList.astro', kind: 'Astro', group: 'events', section: 'calendar',
@@ -237,6 +259,7 @@ export const catalog: CatalogEntry[] = [
     name: 'EventsCalendar', file: 'EventsCalendar.astro', kind: 'Astro + island', group: 'events', section: 'calendar', story: true,
     use: 'Month grid; marked days link to EventCards. Opens on the next event month.',
     options: 'events · next', data: 'getEvents()',
+    avoid: 'The team\'s schedule: about one event a month leaves it mostly empty. Use SeasonStrip.',
     pairs: ['EventCard'],
   },
   {
@@ -350,6 +373,12 @@ export const catalog: CatalogEntry[] = [
     avoid: 'Inline SVG copies or icon fonts. New glyph: add its path to src/lib/icons.ts.',
   },
   {
+    name: 'BrandRule', file: 'brand/BrandRule.astro', kind: 'Astro', group: 'brand', section: 'motifs',
+    use: 'Themed horizontal rule: splits content inside a section and adds air between stacked components.',
+    options: 'ornament: peaks|field|cloud · spacing: none|sm|md|lg',
+    avoid: 'Between two Sections with different tones: the tone change already separates them.',
+  },
+  {
     name: 'TerracedDivider', file: 'brand/TerracedDivider.astro', kind: 'Astro', group: 'brand', section: 'motifs',
     use: 'Section break / card footer.',
     options: 'style: rice-terrace|pagoda|refined-peaks · variant: full|line · flip · seed',
@@ -424,7 +453,7 @@ export const recipes: { name: string; example: string; steps: string }[] = [
   {
     name: 'Schedule',
     example: 'src/pages/events.astro',
-    steps: 'PageHeader → Section: EventsCalendar → Section: Countdown + EventCard layout=feature (next) + EventCard grid (upcoming) → Section tone=alt: past EventCards, or MascotCallout when empty',
+    steps: 'PageHeader → Section tone=alt: Countdown + EventCard layout=feature + EventSquads (next), or MascotCallout when empty → Section: ProcessSteps + BrandRule + EventFees → Section tone=alt: per year, SeasonStrip + past EventCards (older years in <details>)',
   },
   {
     name: 'Team / about',
@@ -451,6 +480,7 @@ export const utilities: { cls: string; use: string }[] = [
   { cls: 'bg-sand-bold | bg-seigaiha-bold', use: 'Decorative textures; never under text' },
   { cls: 'bg-drift (+ bg-drift-reverse)', use: 'Animate any texture above' },
   { cls: 'font-display | font-sans | font-marker', use: 'Headlines | body | brush (logo-like accents only)' },
+  { cls: 'title-sm', use: 'Any heading under 24px (add text-* to resize): Inter bold, because the headline font fills in when small' },
   { cls: 'eyebrow', use: 'Small caps kicker above a headline' },
   { cls: 'numeral | numeral-ghost', use: 'Gold ribbed digits | ghost jersey number behind a photo' },
   { cls: 'site-frame / site-surround', use: 'BaseLayout only: the 1600px page frame over a dimmed seigaiha surround on wide screens' },

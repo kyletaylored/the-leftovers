@@ -65,7 +65,7 @@ team deciding to:
 | `/[slug]`, `/preview/[slug]` | `landing` pages composed in Pages CMS: published, and drafts (noindex) | `BlockRenderer`. `/preview/home` is the homepage rebuilt as blocks; `index.astro` is still what's live |
 | `/` | Home ("direction B"): ornate sand hero, `ImpactBand` manifesto, full-width showcase slider, "How it works" `TwoColumn` CTA, crimson free-agents `ImpactBand`, "2027 Season Loading…" + league logos, newsletter | Direction B promoted Nov 2026 |
 | `/team` | About + Roster + Stats + FAQ on one page, with a jump nav | **Hidden** (Nov 2026). `/about`, `/roster`, `/stats` redirect here |
-| `/events` | Countdown, month calendar, upcoming and past `EventCard`s | **Hidden** |
+| `/events` | Next event with countdown and squads, how it works and fees, then each season's `SeasonStrip` and results | Unhidden 5 Nov 2026, in the nav and sitemap |
 | `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | **Hidden.** Products collection is empty on purpose |
 | `/preorder/[slug]` | One page per jersey drop, with an on-site order form | `PreorderForm` island → Google Form |
 | `/join` | "Request to play" form | `JoinRequestForm` island → Google Form ([JOIN.md](JOIN.md)) |
@@ -75,7 +75,7 @@ team deciding to:
 | `/design` | Design system reference | `noindex`, not in the sitemap. For builders, not visitors |
 | `404` | Mascot empty state | |
 
-**Hidden pages** (Team, Events, Shop, Community) still build but are `noindex`,
+**Hidden pages** (Team, Shop, Community) still build but are `noindex`,
 out of the sitemap, out of the nav and footer, and unlinked from visible pages.
 They're hidden by `seo.noindex: true` in their `src/content/pages/*.md` (the
 CMS's "Hide from search engines" box), and the sitemap follows that tag
@@ -120,8 +120,15 @@ the other:
 - **The roster may be partly fictional.** Several players (J. Smith,
   M. Rodriguez and others) share names with the design mockups. Confirm the
   real roster with the team before treating `src/content/players/` as truth.
-- **Events:** the only entry is `2026-11-series-finals.md`, which says it's a
-  placeholder.
+- **Events are real.** All 10 NXL US events from 2025–26 were copied from
+  PBLeagues on 5 Nov 2026: venues, squads and final places. Check before
+  trusting:
+  - World Cup 2026 lists all 24 entries, but 11 weren't marked paid that day.
+    Remove any that drop out.
+  - Its street is `5990 W Osceola Parkway`, from the NXL's page. PBLeagues and
+    the NXL's map link say 6000. The venue has no published name.
+  - 2025's Cuban-flagged "Leftovers" (Open 3v3) was left out as not ours.
+  - Non-NXL events aren't backfilled.
 - **Results, sponsors, products: empty on purpose.** Each folder has a README
   explaining why. Astro logs "collection … is empty" warnings on every build;
   that's expected.
@@ -178,7 +185,7 @@ docs/design/             Committed, downsized reference plates (see §6)
 | `CountdownIsland` | `/events`, `/shop`, preorders | `Countdown.astro` pins the first value so hydration matches |
 | `StatLeaderboardTable` | `/team` | SSR'd as a full `<table>`, and sorting is the enhancement |
 | `Slideshow` | `/team`, `/community`, `/design` | `GallerySlideshow.astro` optimises images at build time |
-| `Calendar` | `/events` | `EventsCalendar.astro`. Day links are plain `#slug` anchors that work without JS |
+| `Calendar` | `/design` only | `EventsCalendar.astro`. Day links are plain `#slug` anchors that work without JS |
 | `PreorderForm` · `ProductGallery` | `/preorder/[slug]` | The page passes the drop's data |
 | `JoinRequestForm` | `/join` | Events list comes from the collection |
 | `CookieConsent` | Every page (`BaseLayout`), `/design` | Gates Google Tag Manager (`site.gtmId`) behind EU/GDPR opt-in consent |

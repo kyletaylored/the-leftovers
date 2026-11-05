@@ -256,6 +256,17 @@
     font-variant-numeric: lining-nums tabular-nums;
   }
 
+  /* Small heading: for any heading under 24px, where the wide, heavy
+     headline font fills in. Set the size with text-*, and it keeps the
+     uppercase voice of the big headings. */
+  .title-sm {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    line-height: 1.25;
+  }
+
   /* Eyebrow / kicker label above headlines. */
   .eyebrow {
     font-family: var(--font-sans);
