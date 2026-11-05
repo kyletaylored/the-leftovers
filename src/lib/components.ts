@@ -119,6 +119,14 @@ export const catalog: CatalogEntry[] = [
     data: 'faqs collection (sort by order)',
   },
   {
+    name: 'BlockRenderer', file: 'BlockRenderer.astro', kind: 'Astro', group: 'layout', section: 'marketing',
+    use: 'Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.',
+    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, faq',
+    data: 'landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.',
+    avoid: 'Pages that need logic or computed data; hand-write those.',
+    pairs: ['Hero', 'ImpactBand', 'TwoColumn'],
+  },
+  {
     name: 'CtaStrip', file: 'CtaStrip.astro', kind: 'Astro', group: 'content', section: 'blocks',
     use: 'Full-width call-to-action band near the end of a page. Buttons in slot="actions".',
     options: 'title · eyebrow · body · tone: crimson|forest · as',

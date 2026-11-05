@@ -586,3 +586,9 @@ from earlier decisions here.
   times and errors. The SDK is a lazily imported, self-hosted chunk that
   only loads after **Accept analytics**; form input is masked in replays.
   Disclosed on `/privacy`. See `docs/ANALYTICS.md`.
+- **Landing page builder added (5 Nov 2026).** Not in the PRD. The team can
+  compose pages in Pages CMS from a `landing` collection, using its `block`
+  field, rendered by `BlockRenderer`. Chosen over TinaCMS (its visual editor
+  needs a server runtime and caps the free tier at two users), Sveltia and
+  Decap (previews can't render `.astro`), and CloudCannon (no free plan). The
+  tradeoff is no live preview, so drafts build at `/preview/<slug>` instead.

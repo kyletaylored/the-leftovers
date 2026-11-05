@@ -451,7 +451,7 @@ const landing = defineCollection({
     status: z.enum(['draft', 'published']).default('draft'),
     hero: z
       .object({
-        variant: z.enum(['ornate', 'brand', 'image', 'text']).default('ornate'),
+        variant: z.enum(['brand', 'ornate', 'image', 'text']).default('brand'),
         title: optText,
         tagline: optText,
         image: imagePath.nullish(),

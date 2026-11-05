@@ -1,0 +1,275 @@
+---
+/**
+ * BlockRenderer — turns a `landing` entry into a page (the page builder).
+ *
+ * Why it exists: landing pages used to be hand-written .astro files. Now the
+ * team composes them in Pages CMS from the blocks in `landing`
+ * (src/content.config.ts, .pages.yml) and this maps each block's `type` onto
+ * the existing component. It adds no styling of its own beyond the wrappers
+ * those components already use on the homepage, so a block page and a
+ * hand-built page look the same. A new block needs a schema entry, a
+ * .pages.yml entry and a case here.
+ *
+ * `hero` is optional only so /design can show blocks on their own: a real page
+ * always passes it, and it's what owns the page's one h1. Section headings
+ * are h2, and anything inside a titled Section steps down to h3.
+ *
+ * Missing assets never break a page: an unresolved image falls back to
+ * ImagePlaceholder, same as everywhere else. The gallery block is the only
+ * island here, and the fixed hero keeps it below the fold. No-JS behaviour is
+ * whatever each component already does.
+ */
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Hero from '@/components/Hero.astro';
+import Section from '@/components/Section.astro';
+import TwoColumn from '@/components/TwoColumn.astro';
+import ThreeColumn from '@/components/ThreeColumn.astro';
+import CtaStrip from '@/components/CtaStrip.astro';
+import ImpactBand from '@/components/marketing/ImpactBand.astro';
+import FeatureRow from '@/components/marketing/FeatureRow.astro';
+import GallerySlideshow from '@/components/GallerySlideshow.astro';
+import NewsletterBlock from '@/components/NewsletterBlock.astro';
+import FaqAccordion from '@/components/FaqAccordion.astro';
+import LogoStrip from '@/components/LogoStrip.astro';
+import ImagePlaceholder from '@/components/ImagePlaceholder.astro';
+import Button from '@/components/Button.astro';
+import { site } from '@/lib/settings';
+import { resolveImage } from '@/lib/images';
+
+type Landing = CollectionEntry<'landing'>['data'];
+
+interface Props {
+  hero?: Landing['hero'];
+  sections: Landing['sections'];
+}
+
+const { hero, sections } = Astro.props;
+
+const heroImage = await resolveImage(hero?.image ?? undefined);
+
+// Resolve each block's image up front, in order, so the markup stays a plain
+// switch. Blocks without an image just get `asset: undefined`.
+const blocks = await Promise.all(
+  sections.map(async (block) => ({
+    block,
+    asset: 'image' in block ? await resolveImage(block.image ?? undefined) : undefined,
+  }))
+);
+
+const used = new Set(sections.map((block) => block.type));
+const galleries = used.has('gallery') ? await getCollection('galleries') : [];
+const faqItems = used.has('faq')
+  ? (await getCollection('faqs'))
+      .sort((a, b) => a.data.order - b.data.order)
+      .map((faq) => ({ question: faq.data.question, answer: faq.data.answer }))
+  : [];
+const leagues = used.has('announcement')
+  ? await Promise.all(
+      site.leagues.map(async (league) => ({
+        name: league.name,
+        alt: league.logoAlt,
+        src: await resolveImage(league.logo),
+      }))
+    )
+  : [];
+
+/** The CMS stores a reference as a filename, the collection's id has no extension. */
+const galleryById = (value: string) => {
+  const id = value.split('/').pop()?.replace(/\.ya?ml$/, '');
+  return galleries.filter((gallery) => gallery.id === id);
+};
+
+const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boolean);
+---
+
+{
+  hero && (
+    <Hero
+      variant={hero.variant}
+      title={hero.title}
+      tagline={hero.tagline}
+      image={heroImage}
+      imageAlt={hero.imageAlt}
+      animate={hero.animate}
+    >
+      {hero.ctas.map((cta) => (
+        <Button slot="actions" href={cta.href} variant={cta.variant} size="lg">
+          {cta.label}
+        </Button>
+      ))}
+    </Hero>
+  )
+}
+
+{
+  blocks.map(({ block, asset }) => {
+    switch (block.type) {
+      case 'impactBand':
+        return asset ? (
+          <ImpactBand
+            image={asset}
+            imageAlt={block.imageAlt}
+            eyebrow={block.eyebrow}
+            title={block.title}
+            body={block.body}
+            stats={block.stats}
+            ghost={block.ghost}
+            align={block.align}
+            tone={block.tone}
+            treatment={block.treatment}
+            wash={block.wash}
+            backdrop={block.backdrop}
+            shift={block.shift ?? undefined}
+            focus={block.focus}
+          >
+            {block.ctas.map((cta) => (
+              <Button slot="actions" href={cta.href} variant={cta.variant} size="lg">
+                {cta.label}
+              </Button>
+            ))}
+          </ImpactBand>
+        ) : (
+          <Section tone="base">
+            <ImagePlaceholder label={block.imageAlt} ratio="16/7" />
+          </Section>
+        );
+
+      case 'statement':
+        return (
+          <section class="bg-ink">
+            <div class="mx-auto max-w-5xl px-4 pb-10 pt-16 text-center sm:px-6 lg:pt-24">
+              {block.eyebrow && <p class="eyebrow mb-4">{block.eyebrow}</p>}
+              <h2 class="mx-auto max-w-3xl text-2xl leading-tight text-bone sm:text-4xl lg:text-5xl">
+                {block.lines.map((line) => (
+                  <span class="block">{line}</span>
+                ))}
+              </h2>
+            </div>
+          </section>
+        );
+
+      case 'gallery':
+        return (
+          <section class="bg-ink">
+            <GallerySlideshow galleries={galleryById(block.gallery)} layout={block.layout} autoplayMs={6000} />
+          </section>
+        );
+
+      case 'twoColumn':
+        return (
+          <Section tone={block.tone}>
+            <TwoColumn
+              eyebrow={block.eyebrow}
+              title={block.title}
+              image={asset}
+              imageAlt={block.imageAlt}
+              imageSide={block.imageSide}
+            >
+              {paragraphs(block.body).map((text) => (
+                <p>{text}</p>
+              ))}
+              {block.steps.length > 0 && (
+                <ol class="space-y-3">
+                  {block.steps.map((step) => (
+                    <li>
+                      <strong class="text-bone">{step.lead}</strong> {step.text}
+                    </li>
+                  ))}
+                </ol>
+              )}
+              {block.ctas.map((cta) => (
+                <Button slot="actions" href={cta.href} variant={cta.variant}>
+                  {cta.label}
+                </Button>
+              ))}
+            </TwoColumn>
+          </Section>
+        );
+
+      case 'announcement':
+        return (
+          <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
+            <div class="rounded-sm border border-ink-600 bg-ink-800 px-6 py-10 text-center sm:px-10 sm:py-14">
+              <h3 class="text-3xl text-bone sm:text-5xl">{block.heading}</h3>
+              {block.body && (
+                <p class="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-bone-muted sm:text-base">
+                  {block.body}
+                </p>
+              )}
+              {block.ctas.length > 0 && (
+                <div class="mt-6 flex flex-wrap justify-center gap-3">
+                  {block.ctas.map((cta) => (
+                    <Button href={cta.href} variant={cta.variant} size="sm">
+                      {cta.label}
+                    </Button>
+                  ))}
+                </div>
+              )}
+              {block.showLeagues && (
+                <LogoStrip items={leagues} label={block.leaguesLabel} size="sm" class="mt-12" />
+              )}
+            </div>
+          </Section>
+        );
+
+      case 'threeColumn':
+        return (
+          <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
+            <ThreeColumn items={block.items} layout={block.layout} as={block.title ? 'h3' : 'h2'} />
+          </Section>
+        );
+
+      case 'featureRow':
+        return (
+          <Section tone="base">
+            <FeatureRow
+              eyebrow={block.eyebrow}
+              title={block.title}
+              body={block.body}
+              image={asset}
+              imageAlt={block.imageAlt}
+              reverse={block.reverse}
+              ctaLabel={block.ctaLabel}
+              ctaHref={block.ctaHref}
+            />
+          </Section>
+        );
+
+      case 'prose':
+        return (
+          <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
+            <div class="max-w-3xl space-y-4 text-base leading-relaxed text-bone-muted sm:text-lg">
+              {paragraphs(block.body).map((text) => (
+                <p>{text}</p>
+              ))}
+            </div>
+          </Section>
+        );
+
+      case 'ctaStrip':
+        return (
+          <CtaStrip tone={block.tone} eyebrow={block.eyebrow} title={block.title} body={block.body}>
+            {block.ctas.map((cta) => (
+              <Button slot="actions" href={cta.href} variant={cta.variant} size="lg">
+                {cta.label}
+              </Button>
+            ))}
+          </CtaStrip>
+        );
+
+      case 'newsletter':
+        return (
+          <Section tone={block.tone}>
+            <NewsletterBlock eyebrow={block.eyebrow} title={block.title} body={block.body} />
+          </Section>
+        );
+
+      case 'faq':
+        return (
+          <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
+            <FaqAccordion items={faqItems} class="max-w-3xl" />
+          </Section>
+        );
+    }
+  })
+}

@@ -28,6 +28,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import DocSection from '@/components/design/DocSection.astro';
 import Specimen from '@/components/design/Specimen.astro';
 import DesignNav from '@/components/design/DesignNav.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
 import ImpactPlayground from '@/components/design/ImpactPlayground.astro';
 
 // Brand primitives
@@ -218,6 +219,9 @@ const threeColItems: { icon: 'jersey' | 'calendar' | 'trophy'; title: string; bo
 ];
 
 const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Insert'];
+
+const landingHome = (await getCollection('landing')).find((page) => page.id === 'home');
+const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
 ---
 
 <BaseLayout
@@ -965,6 +969,9 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
               <MascotCallout as="h4" title="No products in the collection yet" body="ProductGrid renders here as soon as src/content/products has an entry. Until then the shop page uses its own empty state." />
             )
           }
+        </Specimen>
+        <Specimen title="BlockRenderer: CMS page builder" class="overflow-hidden lg:col-span-2" flush file={['src/components/BlockRenderer.astro', 'src/content/landing/home.yml']} note="Renders a landing entry: a fixed hero, then the sections the team stacked in Pages CMS. Sections here are the home.yml draft's last two. See the full page at /preview/home. Use it for any page the team should be able to compose themselves; hand-write a page only when it needs logic blocks can't express.">
+          <BlockRenderer sections={blockSpecimen} />
         </Specimen>
       </div>
     </DocSection>

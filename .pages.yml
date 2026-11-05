@@ -385,11 +385,11 @@ content:
           - name: variant
             label: Style
             type: select
-            default: ornate
+            default: brand
             required: true
             options:
               values:
-                - { value: ornate, label: 'Ornate (logo, clouds, lanterns)' }
+                - { value: ornate, label: 'Ornate (homepage showpiece)' }
                 - { value: brand, label: Logo }
                 - { value: image, label: Photo background }
                 - { value: text, label: Text only }

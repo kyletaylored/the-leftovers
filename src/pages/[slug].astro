@@ -1,0 +1,38 @@
+---
+/**
+ * Published landing pages, one per `landing` entry with status "published".
+ * Built by BlockRenderer from what the team composed in Pages CMS. Drafts
+ * build at /preview/<slug> instead (src/pages/preview/[slug].astro).
+ *
+ * The collision check exists because Astro silently prefers a static route
+ * over this dynamic one: a landing page titled "Join" would save fine and
+ * then never appear. Failing the build leaves the old site up and says why.
+ */
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+
+export const getStaticPaths = (async () => {
+  const taken = Object.keys(import.meta.glob('/src/pages/**/*.{astro,ts}')).map(
+    (file) => file.replace('/src/pages/', '').split(/[/.]/)[0]
+  );
+  const pages = await getCollection('landing', ({ data }) => data.status === 'published');
+  return pages.map((page) => {
+    if (taken.includes(page.id)) {
+      throw new Error(`Landing page "${page.id}" clashes with the existing /${page.id} page. Rename it.`);
+    }
+    return { params: { slug: page.id }, props: { page } };
+  });
+}) satisfies GetStaticPaths;
+
+const { data } = Astro.props.page;
+---
+
+<BaseLayout
+  title={data.seo.title ?? data.title}
+  description={data.seo.description}
+  noindex={data.seo.noindex}
+>
+  <BlockRenderer hero={data.hero} sections={data.sections} />
+</BaseLayout>

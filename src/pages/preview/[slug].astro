@@ -1,0 +1,23 @@
+---
+/**
+ * Draft landing pages, for the team to review before publishing. Pages CMS
+ * has no live preview, so this is the preview: save a draft, wait for the
+ * deploy, open /preview/<slug>. Always noindex, which also keeps drafts out
+ * of the sitemap (see sitemapNoindex in astro.config.mjs). Nothing links here.
+ */
+import type { GetStaticPaths } from 'astro';
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BlockRenderer from '@/components/BlockRenderer.astro';
+
+export const getStaticPaths = (async () => {
+  const pages = await getCollection('landing', ({ data }) => data.status === 'draft');
+  return pages.map((page) => ({ params: { slug: page.id }, props: { page } }));
+}) satisfies GetStaticPaths;
+
+const { data } = Astro.props.page;
+---
+
+<BaseLayout title={`Draft: ${data.title}`} description={data.seo.description} noindex>
+  <BlockRenderer hero={data.hero} sections={data.sections} />
+</BaseLayout>
