@@ -1,27 +1,41 @@
-# The live homepage rebuilt as blocks: the page builder's proof page. It's a
-# draft, so it builds at /preview/home and src/pages/index.astro stays live.
 title: Home
 status: draft
 hero:
   variant: ornate
-  animate: true
   tagline: Paintball team / Play / Compete / Leftovers
+  animate: true
   ctas:
-    - { label: Join a squad, href: /join, variant: primary }
+    - label: Join a squad
+      href: /join
+      variant: primary
 sections:
   - type: impactBand
     image: /src/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp
-    imageAlt: A Leftovers player in a mask and team jersey aims a paintball marker across a field.
+    imageAlt: A Leftovers player in a mask and team jersey aims a paintball marker
+      across a field.
     eyebrow: Play hard
-    title: "Paintball builds\nbetter people."
-    body: A community-run team built from rotating free agents. Show up, play points, make friends on the field.
+    title: |-
+      Paintball builds
+      better people.
+    body: A community-run team built from rotating free agents. Show up, play
+      points, make friends on the field.
     stats:
-      - { value: '0', label: Tryouts }
-      - { value: '0', label: Bench spots }
-      - { value: 100%, label: Playing time }
+      - value: "0"
+        label: Tryouts
+      - value: "0"
+        label: Bench spots
+      - value: 100%
+        label: Playing time
     ghost: Play
+    align: left
+    tone: ink
+    treatment: fade
+    wash: fade
+    backdrop: auto
     ctas:
-      - { label: Join a squad, href: /join, variant: primary }
+      - label: Join a squad
+        href: /join
+        variant: primary
   - type: statement
     eyebrow: Play / Compete / Leftovers
     lines:
@@ -36,37 +50,58 @@ sections:
     eyebrow: How it works
     title: Three steps to the field
     image: /src/assets/img/events/nxl-lsm25/frinxllsm25ls-1427-x5.webp
-    imageAlt: Leftovers players in a tight huddle with their arms together and paint pods on their hips.
+    imageAlt: Leftovers players in a tight huddle with their arms together and paint
+      pods on their hips.
     imageSide: right
     steps:
-      - { lead: No tryout., text: Say you’re coming and tell us what you want to compete in. }
-      - { lead: Bring your own gear., text: 'Your marker, your mask, your style.' }
-      - { lead: You actually play., text: 'No bench: if you confirmed, you’re playing points.' }
+      - lead: No tryout.
+        text: Say you’re coming and tell us what you want to compete in.
+      - lead: Bring your own gear.
+        text: Your marker, your mask, your style.
+      - lead: You actually play.
+        text: "No bench: if you confirmed, you’re playing points."
     ctas:
-      - { label: Join a squad, href: /join, variant: primary }
-      - { label: Ask a question, href: /contact, variant: outline }
+      - label: Join a squad
+        href: /join
+        variant: primary
+      - label: Ask a question
+        href: /contact
+        variant: outline
   - type: impactBand
     image: /src/assets/img/events/nxl-lso26/lo2nxllso26-219-x5.webp
-    imageAlt: A Leftovers player crouched behind an inflatable bunker sights down a paintball marker.
+    imageAlt: A Leftovers player crouched behind an inflatable bunker sights down a
+      paintball marker.
+    eyebrow: Free agents welcome
+    title: |-
+      No team?
+      No problem.
+    body: If you have no team at all, or your team is missing an event you still
+      want to attend, we have a spot for you.
     align: right
     tone: crimson
-    eyebrow: Free agents welcome
-    title: "No team?\nNo problem."
-    body: If you have no team at all, or your team is missing an event you still want to attend, we have a spot for you.
+    treatment: fade
+    wash: fade
+    backdrop: auto
     ctas:
-      - { label: Request to join, href: /join, variant: gold }
+      - label: Request to join
+        href: /join
+        variant: gold
   - type: announcement
     tone: alt
     eyebrow: Next up
     title: On the Calendar
     heading: 2027 Season Loading…
-    body: Dates go up as the leagues release them. Send a join request and we’ll follow up as soon as there’s an event to play.
+    body: Dates go up as the leagues release them. Send a join request and we’ll
+      follow up as soon as there’s an event to play.
     ctas:
-      - { label: Request to join, href: /join, variant: primary }
+      - label: Request to join
+        href: /join
+        variant: primary
     showLeagues: true
     leaguesLabel: Leagues we want to build in
   - type: newsletter
     tone: base
 seo:
   title: Homepage (block preview)
+  description: Temporary CMS save test.
   noindex: true
