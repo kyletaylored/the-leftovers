@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { expect } from 'storybook/test';
+import { expect, within } from 'storybook/test';
 import Slideshow, { type Slide } from './Slideshow';
 
 const slides: Slide[] = [
@@ -134,5 +134,30 @@ export const GridWithPager: Story = {
     await expect(fifth).toHaveAttribute('aria-current', 'true');
     await expect(canvas.getByText(/photo 5 of 10/i)).toBeVisible();
     await expect(canvasElement.querySelectorAll('figure img').length).toBeGreaterThan(3);
+  },
+};
+
+/** Opening, moving through and closing the lightbox from the grid. */
+export const GridLightbox: Story = {
+  args: { slides: manySlides, layout: 'single', indicators: 'grid', pageSize: 4 },
+  play: async ({ canvas, userEvent }) => {
+    const enlarge = canvas.getByRole('button', { name: /enlarge photo/i });
+    await userEvent.click(enlarge);
+
+    const viewer = await canvas.findByRole('dialog', { name: /photo viewer/i });
+    await expect(within(viewer).getByRole('img', { name: 'Sample photo 1' })).toBeVisible();
+
+    await userEvent.click(within(viewer).getByRole('button', { name: /next photo/i }));
+    await expect(await within(viewer).findByRole('img', { name: 'Sample photo 2' })).toBeVisible();
+
+    const magnify = within(viewer).getByRole('button', { name: /magnify photo/i });
+    await userEvent.click(magnify);
+    await expect(within(viewer).getByRole('button', { name: /zoom out/i })).toHaveAttribute('aria-pressed', 'true');
+
+    await userEvent.click(within(viewer).getByRole('button', { name: /close photo viewer/i }));
+    await expect(canvas.queryByRole('dialog')).toBeNull();
+    // Stays on the photo reached, and focus returns to where it started.
+    await expect(canvas.getByText(/photo 2 of 10/i)).toBeVisible();
+    await expect(enlarge).toHaveFocus();
   },
 };

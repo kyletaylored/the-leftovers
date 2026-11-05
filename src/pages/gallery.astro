@@ -6,7 +6,9 @@
  * Built for bandwidth, because a photo page is the heaviest thing on the site.
  * Only small thumbnails for the current grid page load, plus the large photo
  * in view and its neighbours; the rest load as they're reached. See the
- * `grid` indicator in Slideshow.tsx. Linked from the footer only, for now.
+ * `grid` indicator in Slideshow.tsx. Clicking a photo opens the Lightbox, which
+ * only downloads the full-size file when someone magnifies. Linked from the
+ * footer only, for now.
  */
 import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';

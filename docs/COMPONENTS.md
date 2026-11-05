@@ -122,7 +122,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Options: images[]
   - Data: preorders collection images
 - **GallerySlideshow** (`GallerySlideshow.astro`, Astro + island): Photo carousel from the galleries collection. Use this on pages, not Slideshow directly.
-  - Options: layout: peek|single|hero|showcase · indicators: dashes|thumbnails|grid (paged, lazy; with single) · pageSize (grid, default 8) · captionStyle: below|flag · tone: ink|crimson|forest · autoplayMs · emptyTitle/emptyBody
+  - Options: layout: peek|single|hero|showcase · indicators: dashes|thumbnails|grid (paged, lazy, opens a lightbox; with single) · pageSize (grid, default 8) · captionStyle: below|flag · tone: ink|crimson|forest · autoplayMs · emptyTitle/emptyBody
   - Data: galleries collection
   - Avoid: hero/showcase inside a Section (they are full-bleed).
 - **Gallery** (`Gallery.astro`): Masonry photo grid, zero JS.
@@ -241,4 +241,4 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 
 ### Internal (never import directly on a page)
 
-`Slideshow.tsx`: The carousel island behind GallerySlideshow. · `ui/carousel.tsx`: shadcn/Embla primitive behind Slideshow. · `Calendar.tsx`: The month-grid island behind EventsCalendar. · `CountdownIsland.tsx`: The ticking island behind Countdown.
+`Slideshow.tsx`: The carousel island behind GallerySlideshow. · `Lightbox.tsx`: Full-screen viewer with magnifier, opened from Slideshow indicators="grid". · `ui/carousel.tsx`: shadcn/Embla primitive behind Slideshow. · `Calendar.tsx`: The month-grid island behind EventsCalendar. · `CountdownIsland.tsx`: The ticking island behind Countdown.

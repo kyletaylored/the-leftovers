@@ -72,11 +72,14 @@ const resolved = await Promise.all(
 
       // The grid shows many at once, so it gets its own small files.
       const thumb = indicators === 'grid' ? await getImage({ src: asset, width: 320, format: 'webp' }) : undefined;
+      // Only downloaded when someone magnifies in the lightbox.
+      const zoom = indicators === 'grid' ? await getImage({ src: asset, width: asset.width, format: 'webp' }) : undefined;
 
       const slide: Slide = {
         src: optimized.src,
         srcSet: optimized.srcSet.attribute || undefined,
         thumbSrc: thumb?.src,
+        zoomSrc: zoom?.src,
         width: Number(optimized.attributes.width ?? asset.width),
         height: Number(optimized.attributes.height ?? asset.height),
         alt: photo.alt,

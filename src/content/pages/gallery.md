@@ -1,7 +1,7 @@
 ---
 title: Gallery
 eyebrow: From the field
-intro: Game days at NXL events. Pick a photo from the grid, or swipe through them.
+intro: Game days at NXL events. Pick a photo from the grid, then click it to see it full size and zoom in.
 heroImages: []
 seo:
   title: Photo Gallery
