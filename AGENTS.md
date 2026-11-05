@@ -193,6 +193,16 @@ Docs that drift are worse than no docs. In the same change:
   capture screenshots (desktop and mobile where relevant) and attach or embed
   them in the PR description or a PR comment so the owner can review the visual
   result directly in GitHub.
+  - **Upload them with `gh`'s `--attach`** (on `gh pr create`, `gh pr edit` and
+    `gh pr comment`): reference each file in the body as Markdown,
+    `![Alt text](./shot.png)`, and pass `--attach ./shot.png` (repeatable, up to
+    50). `gh` uploads the file and rewrites the reference to the hosted URL.
+    Use Markdown, not `<img src="./…">`: `gh` doesn't rewrite HTML tags and
+    appends a duplicate image at the end instead.
+  - **Never host screenshots on a branch** (no `pr-assets/*` branches) and never
+    commit them to the repo.
+  - **Keep screenshots outside the repo** (a temp/scratch folder) and **delete
+    them once they're posted**: the copy on GitHub is the record.
 - **Pull before pushing.** Pages CMS commits arrive on `main`, so always
   `git pull --rebase origin main` before pushing or merging. A push/merge to
   `main` deploys to production.
