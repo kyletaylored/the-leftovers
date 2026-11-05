@@ -29,7 +29,7 @@ sections:
       - Expand your network.
       - Make memories.
   - type: gallery
-    gallery: game-day
+    gallery: game-day.yml
     layout: showcase
   - type: twoColumn
     tone: seigaiha

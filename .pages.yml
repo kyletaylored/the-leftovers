@@ -423,7 +423,6 @@ content:
         type: block
         list: true
         blockKey: type
-        description: Add sections, then drag them into the order you want.
         blocks:
           - name: impactBand
             label: Photo band
@@ -481,7 +480,7 @@ content:
                 label: Gallery
                 type: reference
                 required: true
-                options: { collection: galleries, value: '{filename}', label: '{fields.title}' }
+                options: { collection: galleries, value: '{name}', label: '{fields.title}' }
               - name: layout
                 label: Layout
                 type: select
