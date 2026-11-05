@@ -1,0 +1,47 @@
+---
+/**
+ * EventSquads — every Leftovers squad at an event, grouped by division, with
+ * each final place once results are in.
+ *
+ * Squad names are the league's, not ours to tidy: "The Leftovers II" is a
+ * different team at different events, so nothing here links squads across
+ * events. Place and field size are observed values from the event file.
+ */
+import { ordinal } from '@/lib/format';
+import type { EventEntry } from '@/lib/events';
+
+interface Props {
+  squads: EventEntry['data']['squads'];
+  /** `2` flows divisions into two columns from sm up, for wide panels. */
+  columns?: 1 | 2;
+  class?: string;
+}
+
+const { squads, columns = 1, class: className = '' } = Astro.props;
+const divisions = [...new Set(squads.map((squad) => squad.division))];
+---
+
+<div class:list={[columns === 2 && 'sm:columns-2 sm:gap-8', className]}>
+  {
+    divisions.map((division) => (
+      <div class="break-inside-avoid pb-4 last:pb-0">
+        <p class="text-[0.65rem] font-bold uppercase tracking-[0.16em] text-gold-300">{division}</p>
+        <ul class="mt-1">
+          {squads
+            .filter((squad) => squad.division === division)
+            .map((squad) => (
+              <li class="flex items-baseline justify-between gap-3 py-0.5 text-sm">
+                <span class="text-bone">{squad.name}</span>
+                {squad.place && (
+                  <span class="shrink-0 tabular-nums text-bone-muted">
+                    {ordinal(squad.place)}
+                    {squad.fieldSize && ` of ${squad.fieldSize}`}
+                  </span>
+                )}
+              </li>
+            ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>

@@ -48,6 +48,11 @@ import Toast from '@/components/Toast.astro';
 import CookieConsent from '@/components/CookieConsent.tsx';
 import PlayerCard from '@/components/PlayerCard.astro';
 import EventCard from '@/components/EventCard.astro';
+import EventFees from '@/components/EventFees.astro';
+import EventSquads from '@/components/EventSquads.astro';
+import ProcessSteps from '@/components/ProcessSteps.astro';
+import SeasonStrip from '@/components/SeasonStrip.astro';
+import BrandRule from '@/components/brand/BrandRule.astro';
 import EventsCalendar from '@/components/EventsCalendar.astro';
 import AgendaList from '@/components/AgendaList.astro';
 import ImagePlaceholder from '@/components/ImagePlaceholder.astro';
@@ -72,6 +77,7 @@ import CheckboxGroup from '@/components/form/CheckboxGroup.astro';
 import CountryCombobox from '@/components/form/CountryCombobox.tsx';
 
 import { getEvents } from '@/lib/events';
+import { site } from '@/lib/settings';
 import { monthDay } from '@/lib/format';
 import { strokedIconNames, filledIconNames } from '@/lib/icons';
 import type { CloudVariant } from '@/lib/clouds';
@@ -101,8 +107,11 @@ const activePlayer =
   players.find((p) => p.data.status === 'active' && p.data.number !== undefined) ??
   players.find((p) => p.data.status === 'active');
 const openSlot = players.find((p) => p.data.status === 'open-slot');
-const sampleEvent = next ?? upcoming[0] ?? past[0];
 const allEvents = [...upcoming, ...past];
+const sampleEvent = next ?? upcoming[0] ?? past[0];
+const samplePast = past[0];
+const feeEvent = allEvents.find((event) => event.data.fees.length > 0);
+const squadEvent = samplePast ?? sampleEvent;
 const sampleFaqs = faqs.sort((a, b) => a.data.order - b.data.order).slice(0, 3);
 
 // Ticker lines from real collections: upcoming events (the next one flagged)
@@ -337,9 +346,21 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
         </Specimen>
 
         <Specimen
+          title="BrandRule: themed horizontal rule"
+          file="src/components/brand/BrandRule.astro"
+          note={'Use it to split up content inside a section or give stacked components some air. peaks closes cards, field is the quietest, cloud marks a bigger break. spacing sets the gap: none, sm, md or lg.'}
+        >
+          <div class="flex flex-col gap-6 bg-ink-800 p-6">
+            <BrandRule ornament="peaks" spacing="none" />
+            <BrandRule ornament="field" spacing="none" />
+            <BrandRule ornament="cloud" spacing="none" />
+          </div>
+        </Specimen>
+
+        <Specimen
           title="Terraced mountain trim: 3 styles × 2 variants"
           file="src/components/brand/TerracedDivider.astro"
-          note={'variant="full" draws the forest silhouette + gold ridge; variant="line" is stroke only, for use over an already-coloured surface (EventCard footer). seed varies the ridge so two dividers on a page differ; flip points it downward.'}
+          note={'variant="full" draws the forest silhouette + gold ridge; variant="line" is stroke only, for use over an already-coloured surface. Keep it tall: it stretches to fit, so use BrandRule in thin spaces. seed varies the ridge so two dividers on a page differ; flip points it downward.'}
         >
           <div class="grid gap-6 lg:grid-cols-3">
             {terracedStyles.map(({ style, label, note }) => (
@@ -586,12 +607,12 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
           </div>
         </Specimen>
 
-        <Specimen title="EventCard" class="lg:col-span-2" file="src/components/EventCard.astro" note={'Date chip (day · month · ribbed day number), venue, CTA that switches on upcoming/past, terraced footer. layout="feature" is the bigger homepage NEXT UP treatment. The article id is the event slug, so #slug links jump to it.'}>
+        <Specimen title="EventCard" class="lg:col-span-2" file="src/components/EventCard.astro" note={'Date chip (day · month · ribbed day number), venue, BrandRule footer. Upcoming events offer Request a spot until entries close; past events show the best finish and every squad. layout="feature" is the bigger NEXT UP treatment and adds the full address. The article id is the event slug, so #slug links jump to it.'}>
           {
             sampleEvent ? (
               <div class="grid gap-4 md:grid-cols-2">
-                <EventCard event={sampleEvent} as="h4" />
                 <EventCard event={sampleEvent} as="h4" layout="feature" />
+                {samplePast && <EventCard event={samplePast} as="h4" />}
               </div>
             ) : (
               <p class="text-sm text-bone-muted">No events in src/content/events.</p>
@@ -1047,7 +1068,20 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
     {/* ========================================================= CALENDAR */}
     <DocSection id="calendar" number={num('calendar')} title="Calendar" kicker="Month grid + compact agenda">
       <div class="grid items-start gap-5 lg:grid-cols-2">
-        <Specimen title="Month grid" tag="React island" file={['src/components/EventsCalendar.astro', 'src/components/Calendar.tsx']} note="Marked days are real #slug links to the matching EventCard, so it works with zero JS; only month navigation is the island. Opens on the next event's month, never a blank January.">
+        <Specimen title="SeasonStrip" file="src/components/SeasonStrip.astro" note="A whole season on one line, each event in the month it starts. The default for the team's schedule: with about one event a month, a year view says more than a month grid. Links go to the matching EventCard.">
+          <SeasonStrip events={allEvents} year={(next ?? sampleEvent)?.data.startDate.getUTCFullYear() ?? 2026} />
+        </Specimen>
+        <Specimen title="ProcessSteps" file="src/components/ProcessSteps.astro" note={'Numbered how-it-works steps. layout="row" spans a full section; layout="stack" suits a side column. Steps come from eventProcess in site.yml.'}>
+          <ProcessSteps steps={site.eventProcess.steps} as="h4" />
+          <div class="mt-8 max-w-md"><ProcessSteps steps={site.eventProcess.steps} layout="stack" as="h4" /></div>
+        </Specimen>
+        <Specimen title="EventFees" file="src/components/EventFees.astro" note="The league's per-team fees as format × division × deadline. Copy only the divisions we enter, and never turn them into a per-player number here.">
+          {feeEvent ? <EventFees event={feeEvent} note={site.eventProcess.feeNote} /> : <p class="text-sm text-bone-muted">No event has fees yet.</p>}
+        </Specimen>
+        <Specimen title="EventSquads" file="src/components/EventSquads.astro" note="Every squad at an event, grouped by division, with final places once results are in. columns={2} suits a wide panel; EventCard uses one column.">
+          {squadEvent && <EventSquads squads={squadEvent.data.squads} columns={2} />}
+        </Specimen>
+        <Specimen title="Month grid" tag="React island" file={['src/components/EventsCalendar.astro', 'src/components/Calendar.tsx']} note="Marked days are real #slug links to the matching EventCard, so it works with zero JS; only month navigation is the island. Opens on the next event's month, never a blank January. Not used on /events any more: prefer SeasonStrip unless a season gets busy.">
           <EventsCalendar events={allEvents} next={next} class="mx-auto max-w-md" />
         </Specimen>
         <Specimen title="Agenda list: compact" tag="NEW" file="src/components/AgendaList.astro" note="The lighter alternative when there are only 1–2 events. Flags next as Next Up; the TBD row keeps a short schedule from reading as 'season over'. linkToCards turns rows into #slug jumps.">

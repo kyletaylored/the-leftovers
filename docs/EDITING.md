@@ -40,19 +40,36 @@ Active and put the new player's details in).
 
 ## Adding an event
 
-**Events → Add entry.** Name, start date and location are required.
+**Events → Add entry.** Name and start date are required. Add the location as
+soon as you know it, with the full address: Google needs a venue and city before
+it can show the event in search, so an event without one is left out.
+
+Players never sign up through the league link. *League event page* is for details
+and results; the card's **Request a spot** button goes to the join form, and
+the event captain registers each squad. Requests close the day after the
+*Late through* date in **Fee deadlines**.
+
+**Fees:** copy the rows from the league's fee table into **League fees (per
+team)**, only for the divisions we enter. Enter whole dollars, and add the three
+dates in **Fee deadlines**. The Events page shows the next event that has fees.
+
+**Squads:** add every Leftovers squad from the league's team list, with its
+division. The site counts them for you.
 
 **You do not need to mark an event as past.** Leave *Status override* empty and
 the site works it out from the date — an event stays "upcoming" through the end
 of its last day and moves itself to "Played" after that. The override field is
 only there for the odd case where reality disagrees with the calendar.
 
-After the event, come back to the same entry and fill in:
+After the event, come back to the same entry and fill in each squad's **Final
+place** and **Teams in the division** from the league's Places page. The card
+works out the best finish from those. Optionally add:
 
-- **Finish** — e.g. `2nd of 12`
+- **Finish** — replaces the worked-out best finish, e.g. `2nd of 12`
 - **Result summary** — a sentence or two
 
-That's what shows on the event card once it's in the past.
+To change the numbered steps on the Events and Join pages, go to **Site settings
+→ How event sign-up works**.
 
 ---
 

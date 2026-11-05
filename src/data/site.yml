@@ -175,6 +175,22 @@ footerNote: >-
   that's the whole tryout.
 
 
+# How a player gets onto a squad. Shown on /events and /join.
+eventProcess:
+  steps:
+    - title: Request a spot
+      body: Send a join request with the event, division, format and position you want. No tryout.
+    - title: Get placed on a squad
+      body: Your event captain sorts every request into squads by division, format and position preference.
+    - title: Pay your event fee
+      body: Your captain confirms your spot and your fee. You pay the captain directly.
+    - title: Your captain registers the team
+      body: The captain enters your squad with the league. Bring your gear and play.
+  feeNote: >-
+    These are the league's fees for a whole team, and they go up as each
+    deadline passes. Your event fee depends on your event, format and
+    division, and your captain confirms it before you pay.
+
 # pblidb.org team stats (unofficial, third-party — derived from public
 # PBLeague pages, not affiliated with PBLI). `query` is sent to their team
 # search at build time; every matching team gets its own stats widget on

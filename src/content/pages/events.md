@@ -1,15 +1,15 @@
 ---
-title: Events & Calendar
+title: Events
 eyebrow: Schedule
 intro: >-
-  Where we're playing next and everything we've already played.
-  Registration links go straight to the league — we don't handle entries.
+  Where we're playing next, how to get on a squad, and how every squad has
+  finished so far.
 heroImages: []
 seo:
   # Hidden for now (Nov 2026 website feedback): out of search and the sitemap.
   noindex: true
-  title: Events & Calendar — The Leftovers
+  title: Events — The Leftovers
   description: >-
-    Upcoming PBLeague tournaments for The Leftovers plus every event we've
-    played, on a real calendar.
+    Where The Leftovers are playing next, how squads and event fees work, and
+    results from every NXL event we've entered.
 ---

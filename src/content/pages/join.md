@@ -2,9 +2,8 @@
 title: Join a Squad
 eyebrow: Free agents welcome
 intro: >-
-  Tell us the event, your division and the format you want to play, and we'll
-  follow up once we've had a chance to look at the roster. No tryout, no
-  application — this is the whole process.
+  Tell us the event, your division, the format you want to play and your
+  position, and the event captain will find you a squad. No tryout.
 heroImages: []
 seo:
   title: Join a Squad — The Leftovers
@@ -13,13 +12,5 @@ seo:
     division, format and how you'd like to pay once confirmed.
 ---
 
-## How this works
-
-1. Fill in the request below: event, division, format, your current ranking
-   and how you'd like to pay once you're confirmed.
-2. We'll follow up by email. A spot isn't held until we've confirmed you and
-   payment has come through.
-3. Show up with your own gear, cover your entry, and you're playing points.
-
-Nothing here is charged automatically — payment is arranged directly with
-the captain once a spot is confirmed.
+A spot isn't held until your captain has confirmed you and your payment has
+come through. Nothing is charged through this site.

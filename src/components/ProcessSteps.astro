@@ -1,0 +1,48 @@
+---
+/**
+ * ProcessSteps — a numbered "how it works" list. Built for how a player gets
+ * onto a squad (`eventProcess.steps` in site.yml, shared by /events and
+ * /join), but it takes any steps.
+ *
+ * A real <ol>, so the order survives without the styling. The drawn numbers
+ * are aria-hidden so screen readers don't announce each one twice.
+ */
+interface Props {
+  steps: { title: string; body: string }[];
+  /** `row` runs across a full-width section; `stack` suits a side column. */
+  layout?: 'row' | 'stack';
+  as?: 'h2' | 'h3' | 'h4';
+  class?: string;
+}
+
+const { steps, layout = 'row', as: Heading = 'h3', class: className = '' } = Astro.props;
+---
+
+<ol
+  class:list={[
+    'grid gap-8',
+    layout === 'row' ? 'sm:grid-cols-2 lg:grid-cols-4 lg:gap-6' : 'gap-6',
+    className,
+  ]}
+>
+  {
+    steps.map((step, index) => (
+      <li class:list={[layout === 'stack' && 'flex gap-4']}>
+        <span
+          aria-hidden="true"
+          class:list={[
+            'flex size-11 shrink-0 items-center justify-center rounded-full border-2 border-gold bg-ink text-lg text-gold-300',
+            layout === 'row' && 'mb-4',
+          ]}
+          style="font-family: var(--font-display)"
+        >
+          {index + 1}
+        </span>
+        <div>
+          <Heading class="text-xl text-bone">{step.title}</Heading>
+          <p class="mt-2 text-sm leading-relaxed text-bone-muted">{step.body}</p>
+        </div>
+      </li>
+    ))
+  }
+</ol>

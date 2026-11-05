@@ -58,19 +58,69 @@ const events = defineCollection({
   loader: glob({ base: './src/content/events', pattern: '**/*.md' }),
   schema: z.object({
     title: z.string(),
-    /** PBLeague league/series tag, e.g. "PBLeague D4 Series". */
+    /** League/series tag, e.g. "NXL". */
     league: z.string().optional(),
     startDate: z.coerce.date(),
     endDate: z.coerce.date().optional(),
-    /** Optional: events are often announced before the venue is confirmed. */
+    /**
+     * Optional: events are often announced before the venue is confirmed.
+     * Google requires a location on Event structured data, so an event
+     * without one is left out of the JSON-LD until it has one.
+     */
     location: z
       .object({
         venue: z.string(),
+        street: z.string().optional(),
         city: z.string(),
+        /** State or province, e.g. "FL". */
+        region: z.string().optional(),
+        postalCode: z.string().optional(),
+        /** ISO country code. */
+        country: z.string().default('US'),
         mapUrl: z.url().optional(),
       })
       .optional(),
-    registrationUrl: z.url().optional(),
+    /**
+     * The league's page for this event, for details and results. Not a
+     * sign-up link: players request a spot through /join and the event
+     * captain registers the team (see `eventProcess` in site.yml).
+     */
+    eventUrl: z.url().optional(),
+    /** Last day of each league fee tier. `late` is when entries close. */
+    feeDeadlines: z
+      .object({
+        early: z.coerce.date().optional(),
+        regular: z.coerce.date().optional(),
+        late: z.coerce.date().optional(),
+      })
+      .optional(),
+    /** The league's published fees PER TEAM, for the divisions we enter. */
+    fees: z
+      .array(
+        z.object({
+          format: z.string(),
+          division: z.string(),
+          early: z.number().int().nonnegative(),
+          regular: z.number().int().nonnegative(),
+          late: z.number().int().nonnegative(),
+        })
+      )
+      .default([]),
+    /**
+     * Every Leftovers squad entered, as listed by the league. Counts and
+     * best finishes are worked out from this in lib/events.ts.
+     */
+    squads: z
+      .array(
+        z.object({
+          name: z.string(),
+          division: z.string(),
+          /** Final place, from the league's results. */
+          place: z.number().int().positive().optional(),
+          fieldSize: z.number().int().positive().optional().describe('Teams in the division'),
+        })
+      )
+      .default([]),
     /**
      * Optional manual override. Left empty, upcoming/past is DERIVED from the
      * date so the site can never show a stale "upcoming" event just because
