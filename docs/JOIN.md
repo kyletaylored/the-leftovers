@@ -25,7 +25,7 @@ confirmations, exactly like the pre-order form (see `docs/PREORDERS.md`).
 
 Our field names, for the `fieldMap`: `firstName`, `lastName`, `playerClass`,
 `country`, `email`, `phone`, `facebookProfile`, `event`, `division`,
-`teamSize`, `paymentMethod`, `notes`.
+`position`, `teamSize`, `paymentMethod`, `notes`.
 
 **The site's option lists mirror the Google Form word for word** (Nov 2026).
 The site posts those strings as the answers, and Google can drop a choice the
@@ -36,8 +36,9 @@ form doesn't list. If you change an option on the form, change it in
 |---|---|---|
 | Current Player Ranking | Current player ranking | Beginner / Unranked, D5, D4, D3, D2, D1 |
 | Division | Division | D6, D5, D4, D3, D2, D1, Semi-Pro, Pro |
+| Preferred position | Preferred position | checkboxes, at least one: Snake Front, Snake Support, Dorito Front, Dorito Support, Home / Fill, Middle, Versatile / Any |
 | Playing Format Requested | Playing format requested | 3v3, 5v5, X-Ball, 10v10, Mechanical |
-| Country | Country | free text |
+| Country | Country | short text on the Google Form; a searchable picker on the site (see below) |
 | Facebook Profile Link | Facebook profile link | free text, optional |
 | Event | Event | `join.events` in `site.yml` |
 | Payment Method | Preferred method | `join.paymentMethods` in `site.yml` |
@@ -46,6 +47,19 @@ form doesn't list. If you change an option on the form, change it in
 the requester is, division is what they want to play. A player can play up a
 division, so it is asked separately rather than derived. The ranking list has
 "Beginner / Unranked" and no D6 or Pro; the division list has all eight.
+
+**Preferred position** is a checkbox question, so a player can tick several.
+The site posts one `entry.NNN` per ticked box, which is how Google Forms
+encodes checkboxes, and won't submit with none ticked.
+
+**Country** stays a short-text question on the Google Form, and the site
+fills it from a searchable list (`src/components/form/CountryCombobox.tsx`,
+data in `src/lib/countries.ts`). The site always posts the country's English
+name ("United States", "United Kingdom"), so the Sheet column only ever holds
+names from that list. It is pre-filled from the browser's language
+("en-GB" → United Kingdom); the requester can change it. Leave the Google
+Form question as short text: a 250-option dropdown there would add nothing,
+and the site's list would have to match it word for word.
 
 **Event** is not drawn from the events collection (the Events page is hidden,
 and its entry is a placeholder). It is `join.events` in `site.yml`, which you
@@ -71,7 +85,9 @@ One form, kept current rather than one per event:
    so matching wording is a legibility choice, not a strict requirement.
 3. **Current Player Ranking**, **Division** and **Playing Format Requested**
    are each their own dropdown or multiple-choice question, with the options
-   listed above. **Country** and **Facebook Profile Link** are short text.
+   listed above. **Preferred position** is a checkbox question with the
+   options listed above. **Country** and **Facebook Profile Link** are short
+   text.
 4. Every response lands in a linked Google Sheet as a new row — that's the
    list you filter and sort.
 5. Add three columns to that Sheet by hand, filled in as requests are

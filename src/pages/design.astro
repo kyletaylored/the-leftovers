@@ -65,6 +65,7 @@ import ProductGrid from '@/components/marketing/ProductGrid.astro';
 import FormField from '@/components/form/FormField.astro';
 import RadioGroup from '@/components/form/RadioGroup.astro';
 import CheckboxGroup from '@/components/form/CheckboxGroup.astro';
+import CountryCombobox from '@/components/form/CountryCombobox.tsx';
 
 import { getEvents } from '@/lib/events';
 import { strokedIconNames, filledIconNames } from '@/lib/icons';
@@ -181,6 +182,7 @@ const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Ast
   { name: 'ProductCard · ProductGrid', file: 'marketing/ProductGrid.astro', kind: 'Astro', section: 'marketing', use: 'Shop grid with optional filter chips.' },
   { name: 'FormField', file: 'form/FormField.astro', kind: 'Astro', section: 'forms', use: 'Label + input | select | textarea + hint/error.' },
   { name: 'RadioGroup · CheckboxGroup', file: 'form/*.astro', kind: 'Astro', section: 'forms', use: 'Styled real inputs in a fieldset.' },
+  { name: 'CountryCombobox', file: 'form/CountryCombobox.tsx', kind: 'React island', section: 'forms', story: true, use: 'Searchable country picker; pre-fills from browser language; posts one canonical name.' },
   { name: 'PreorderForm · JoinRequestForm', file: '*.tsx', kind: 'React island', section: 'forms', story: true, use: 'Interactive order / join forms.' },
   { name: 'Calendar / EventsCalendar', file: 'Calendar.tsx', kind: 'Astro + island', section: 'calendar', story: true, use: 'Month grid; days anchor to EventCards.' },
   { name: 'AgendaList', file: 'AgendaList.astro', kind: 'Astro', section: 'calendar', use: 'Compact event list with Next Up + TBD row.' },
@@ -840,6 +842,27 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
               { value: 'results', label: 'Event results' },
             ]}
           />
+        </div>
+
+        <div class="my-8 h-px bg-ink-600" />
+
+        <p class="field-label mb-4">Country picker (CountryCombobox)</p>
+        <p class="mb-4 max-w-2xl text-sm text-bone-muted">
+          Use it for any country question instead of a free-text field: it posts one canonical English
+          name (so a Sheet column never holds "usa", "U.S." and "America"), accepts aliases like "UK" or
+          "Holland", and lists the US, Canada and Europe first. The left one guesses from your browser's
+          language; the right one starts on a fixed country. Lives inside a React form, so it's only
+          used from other islands (JoinRequestForm).
+        </p>
+        <div class="mb-6 grid gap-5 md:grid-cols-2">
+          <div>
+            <label class="field-label" for="demo-country">Country: from browser language</label>
+            <CountryCombobox client:visible id="demo-country" name="demo-country" />
+          </div>
+          <div>
+            <label class="field-label" for="demo-country-fixed">Country: defaultCode="CA"</label>
+            <CountryCombobox client:visible id="demo-country-fixed" name="demo-country-fixed" defaultCode="CA" />
+          </div>
         </div>
 
         <div class="my-8 h-px bg-ink-600" />

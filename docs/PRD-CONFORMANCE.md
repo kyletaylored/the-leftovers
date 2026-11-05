@@ -568,3 +568,9 @@ from earlier decisions here.
   `LogoStrip` component. League logos are `leagues` in `site.yml`.
 - **New component: `LogoStrip`.** A static centred logo row, because the
   scrolling `SponsorMarquee` doesn't suit two or three logos.
+- **Join form: preferred position and a country picker (4 Nov 2026).** The
+  Google Form gained a required "Preferred position" checkbox question (Snake
+  Front through Versatile / Any), mirrored on the site with at least one box
+  required. Country is now a searchable picker (`CountryCombobox`) instead of
+  free text, pre-filled from the browser's language. It posts one canonical
+  English name, so the Google Form's question stays short text.

@@ -1,4 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import CountryCombobox from '@/components/form/CountryCombobox';
+import { STROKED_ICONS } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 /**
@@ -61,6 +63,21 @@ const DIVISIONS = ['D6', 'D5', 'D4', 'D3', 'D2', 'D1', 'Semi-Pro', 'Pro'];
 /** "Playing Format Requested" on the form. */
 const FORMATS = ['3v3', '5v5', 'X-Ball', '10v10', 'Mechanical'];
 
+/**
+ * "Preferred position" on the form: checkboxes, required, so at least one.
+ * A player can tick several (a back player who'll also run the snake).
+ */
+const POSITIONS = [
+  'Snake Front',
+  'Snake Support',
+  'Dorito Front',
+  'Dorito Support',
+  'Home / Fill',
+  'Middle',
+  'Versatile / Any',
+];
+const POSITION_REQUIRED = 'Pick at least one position.';
+
 const NOT_SURE = 'not-sure';
 const NOT_SURE_LABEL = 'Not sure yet / general interest';
 
@@ -80,6 +97,14 @@ export default function JoinRequestForm({
   const [error, setError] = useState<string>();
   const [summary, setSummary] = useState('');
   const [copied, setCopied] = useState(false);
+  const [positions, setPositions] = useState<string[]>([]);
+  const firstPosition = useRef<HTMLInputElement>(null);
+
+  // Checkboxes have no native "at least one" rule, so the first box carries
+  // the group's validity: the browser blocks submit and points at the group.
+  useEffect(() => {
+    firstPosition.current?.setCustomValidity(positions.length ? '' : POSITION_REQUIRED);
+  }, [positions, state]);
 
   function buildSummary(data: FormData) {
     const get = (key: string) => String(data.get(key) ?? '').trim();
@@ -93,6 +118,7 @@ export default function JoinRequestForm({
       '',
       `Event: ${eventLabel}`,
       `Division: ${get('division') || 'Not specified'}`,
+      `Preferred position: ${data.getAll('position').map(String).join(', ') || 'Not specified'}`,
       `Playing format requested: ${get('teamSize') || 'Not specified'}`,
       '',
       `Name:  ${get('firstName')} ${get('lastName')}`.trim(),
@@ -138,6 +164,11 @@ export default function JoinRequestForm({
         const id = entry(name);
         if (id && value) params.set(id, value);
       };
+      // Google Forms checkbox questions take one repeated entry.NNN per tick.
+      const putAll = (name: string, values: string[]) => {
+        const id = entry(name);
+        if (id) for (const value of values) if (value) params.append(id, value);
+      };
 
       // "Not sure yet" isn't an option on the Google Form, so it is left
       // blank rather than posted as a value the form might reject.
@@ -156,6 +187,7 @@ export default function JoinRequestForm({
       put('facebookProfile', String(data.get('facebookProfile') ?? '').trim());
       put('event', eventLabel);
       put('division', String(data.get('division') ?? '').trim());
+      putAll('position', data.getAll('position').map(String));
       put('teamSize', String(data.get('teamSize') ?? '').trim());
       put('paymentMethod', String(data.get('paymentMethod') ?? '').trim());
       put('notes', String(data.get('notes') ?? '').trim());
@@ -411,14 +443,7 @@ export default function JoinRequestForm({
             <label className={label} htmlFor="country">
               Country
             </label>
-            <input
-              id="country"
-              name="country"
-              className={field}
-              type="text"
-              required
-              autoComplete="country-name"
-            />
+            <CountryCombobox id="country" name="country" required />
           </div>
         </div>
       </fieldset>
@@ -472,6 +497,53 @@ export default function JoinRequestForm({
               ))}
             </select>
           </div>
+          <fieldset className="sm:col-span-2">
+            <legend className={label}>Preferred position</legend>
+            <p className="field-hint !mt-0 mb-2">Pick at least one. Tick as many as you&rsquo;d play.</p>
+            <div className="grid grid-cols-1 gap-x-4 min-[420px]:grid-cols-2 lg:grid-cols-3">
+              {POSITIONS.map((position, i) => (
+                <label
+                  key={position}
+                  className="flex min-h-11 cursor-pointer items-center gap-3 text-sm text-bone-muted [&:has(:checked)]:text-bone"
+                >
+                  <span className="relative flex size-[18px] shrink-0">
+                    <input
+                      ref={i === 0 ? firstPosition : undefined}
+                      type="checkbox"
+                      name="position"
+                      value={position}
+                      checked={positions.includes(position)}
+                      onChange={(event) =>
+                        setPositions((current) =>
+                          event.target.checked
+                            ? POSITIONS.filter((p) => p === position || current.includes(p))
+                            : current.filter((p) => p !== position)
+                        )
+                      }
+                      className="peer absolute inset-0 size-full cursor-pointer opacity-0"
+                    />
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 rounded-[2px] border-2 border-ink-600 peer-checked:border-gold peer-checked:bg-gold peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-1 peer-focus-visible:outline-gold"
+                    />
+                    <svg
+                      viewBox="0 0 24 24"
+                      className="pointer-events-none absolute inset-0 m-auto size-3 text-ink opacity-0 peer-checked:opacity-100"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d={STROKED_ICONS.check} />
+                    </svg>
+                  </span>
+                  {position}
+                </label>
+              ))}
+            </div>
+          </fieldset>
         </div>
       </fieldset>
 
