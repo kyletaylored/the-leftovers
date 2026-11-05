@@ -1,7 +1,7 @@
 # Handoff: The Leftovers website
 
 **Start here** if you're picking this project up, whether you're a person or an
-agent. It covers what the site is, what state it's in (as of **4 Nov 2026**),
+agent. It covers what the site is, what state it's in (as of **5 Nov 2026**),
 how to work on it without breaking its rules, and what's left to do. Everything
 else in `docs/` goes deeper on one topic.
 
@@ -331,6 +331,11 @@ inline-styled HTML into the repo.
    - `PricingCard`: its "Sponsor a Slot" tier idea needs a business decision.
    - `Toast`: nothing triggers it yet.
    - `AgendaList`, `ImagePlaceholder`, `RadioGroup`, `CheckboxGroup`.
+   - Motion (`/design#motion`): `Ticker`, `RiceTerraces animate` and the
+     `.bg-drift` texture modifier. Pick placements with the owner; the
+     homepage hero foot (drifting sand + swaying terraces) and a ticker under
+     the nav for the next event are the obvious candidates. One moving
+     element per screen.
 6. **Admin view for join requests and payments.** Researched, not built. See
    [JOIN.md](JOIN.md#a-real-admin-interface-researched-not-built).
 

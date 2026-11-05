@@ -241,10 +241,14 @@
   }
 
   /* Topographic contour texture (§ style guide "TEXTURE & MOTIF"). */
+  /* Every texture names its tile (--tex) and tile width (--tex-w), so
+     .bg-drift below can move the same tile. */
   .bg-topo {
+    --tex: url('/img/topo.svg');
+    --tex-w: 720px;
     background-color: var(--color-ink);
-    background-image: url('/img/topo.svg');
-    background-size: 720px auto;
+    background-image: var(--tex);
+    background-size: var(--tex-w) auto;
     background-repeat: repeat;
   }
 
@@ -255,15 +259,17 @@
      decorative only (panels, dividers, OG art); never put text straight on it. */
   .bg-sand,
   .bg-sand-bold {
+    --tex-w: 600px;
     background-color: var(--color-ink);
-    background-size: 600px auto;
+    background-image: var(--tex);
+    background-size: var(--tex-w) auto;
     background-repeat: repeat;
   }
   .bg-sand {
-    background-image: url('/img/sand.svg');
+    --tex: url('/img/sand.svg');
   }
   .bg-sand-bold {
-    background-image: url('/img/sand-bold.svg');
+    --tex: url('/img/sand-bold.svg');
   }
 
   /* Seigaiha (青海波) wave scales, the repeatable version of
@@ -271,15 +277,64 @@
      .bg-seigaiha can sit behind text, .bg-seigaiha-bold is decorative only. */
   .bg-seigaiha,
   .bg-seigaiha-bold {
+    --tex-w: 160px;
     background-color: var(--color-ink);
-    background-size: 160px auto;
+    background-image: var(--tex);
+    background-size: var(--tex-w) auto;
     background-repeat: repeat;
   }
   .bg-seigaiha {
-    background-image: url('/img/seigaiha.svg');
+    --tex: url('/img/seigaiha.svg');
   }
   .bg-seigaiha-bold {
-    background-image: url('/img/seigaiha-bold.svg');
+    --tex: url('/img/seigaiha-bold.svg');
+  }
+
+  /* Drifting texture: add .bg-drift next to any .bg-* texture above and its
+     tile slides slowly sideways, like wind over raked sand. The tile moves on
+     a ::before layer by exactly one tile width per loop, so the loop is
+     seamless, and only transform animates (composited, no repaints). The
+     element becomes a positioned, clipped stacking context; an absolute or
+     fixed utility still wins, since utilities beat this base layer.
+     .bg-drift-reverse drifts the other way, and --drift-duration sets the
+     pace. Reduced-motion visitors get the still texture. */
+  .bg-drift {
+    --drift-duration: 120s;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-image: none;
+  }
+  .bg-drift::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 0 calc(-1 * var(--tex-w));
+    z-index: -1;
+    pointer-events: none;
+    background-image: var(--tex);
+    background-size: var(--tex-w) auto;
+    background-repeat: repeat;
+    animation: tex-drift var(--drift-duration) linear infinite;
+    will-change: transform;
+  }
+  .bg-drift-reverse::before {
+    animation-direction: reverse;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bg-drift::before {
+      animation: none;
+    }
+  }
+
+  /* RiceTerraces animate: the panes stack inside the band. A caller's
+     absolute utility still wins over this base-layer default. */
+  .rt-animated {
+    position: relative;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rt-animated .rt-pane {
+      animation: none !important;
+    }
   }
 
   /* Minimum 44x44px touch targets (§10.1). */
@@ -341,6 +396,37 @@
   }
   .field-hint[data-error='true'] {
     color: var(--color-crimson-400);
+  }
+}
+
+/* .bg-drift: one tile width per loop. */
+@keyframes tex-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(var(--tex-w));
+  }
+}
+
+/* RiceTerraces animate: each depth sways sideways on its own layer, and
+   neighbouring depths swing in opposite directions at different speeds. */
+@keyframes terrace-sway {
+  from {
+    transform: translateX(calc(-1 * var(--sway)));
+  }
+  to {
+    transform: translateX(var(--sway));
+  }
+}
+
+/* Ticker: the track holds two copies, so -50% loops seamlessly. */
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 

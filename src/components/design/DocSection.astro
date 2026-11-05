@@ -19,7 +19,7 @@ interface Props {
 const { id, number, title, kicker, intro } = Astro.props;
 ---
 
-<section id={id} class="mx-auto max-w-[1320px] scroll-mt-24 px-4 pb-14 pt-2 sm:px-6">
+<section id={id} class="mx-auto max-w-[1320px] px-4 pb-14 pt-2 sm:px-6">
   <div class="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
     <h2 class="text-[1.75rem] text-ink">{number} · {title}</h2>
     {kicker && <span class="text-xs text-[#6b6356]">{kicker}</span>}

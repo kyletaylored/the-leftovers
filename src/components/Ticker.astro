@@ -1,0 +1,171 @@
+---
+/**
+ * Ticker — a slim, endlessly scrolling news bar ("NEXT UP · NXL Texas ·
+ * MAR 14 ◆ Roster spots open ◆ …"). Use it for short, glanceable lines:
+ * the next event, a pre-order drop, open roster spots. One per page at
+ * most, never above the hero's h1.
+ *
+ * Pure CSS scroll on a duplicated track (the same technique as
+ * SponsorMarquee). The second copy is aria-hidden AND inert, so screen
+ * readers hear each item once and keyboard users tab through each link once.
+ *
+ * Accessibility (WCAG 2.2.2 Pause, Stop, Hide): it pauses on hover and on
+ * keyboard focus, and a visible 44px Pause/Play button stops it for good.
+ * The button needs JS, so it stays hidden until the script runs; without
+ * JS, hover/focus still pause it. Reduced-motion visitors get a still,
+ * single row they can scroll sideways, and no button.
+ *
+ * Items are passed in, so copy stays in the content collections: build
+ * them from events, preorders or src/data/site.yml at the call site.
+ */
+import Icon from './brand/Icon.astro';
+
+export interface TickerItem {
+  label: string;
+  /** Optional short lead-in, styled as a kicker ("Next up"). */
+  kicker?: string;
+  href?: string;
+}
+
+interface Props {
+  items: (string | TickerItem)[];
+  /** Accessible name for the bar, e.g. "Team news". */
+  label: string;
+  /** gold: gold fill, ink text. crimson: crimson fill, bone text. ink: dark bar with gold rules. */
+  tone?: 'gold' | 'crimson' | 'ink';
+  /** Seconds for one full loop. Longer = slower. Scale it with the copy length. */
+  duration?: number;
+  /** Scroll left-to-right instead. */
+  reverse?: boolean;
+  class?: string;
+}
+
+const { items, label, tone = 'gold', duration = 40, reverse = false, class: className = '' } = Astro.props;
+const list: TickerItem[] = items.map((item) => (typeof item === 'string' ? { label: item } : item));
+// One copy must be wider than the widest screen, or the loop shows a gap, so
+// short lists repeat to at least MIN_ITEMS per copy. Only the first pass is
+// exposed; the repeats are aria-hidden + inert like the second copy.
+const MIN_ITEMS = 8;
+const passes = list.length ? Math.ceil(MIN_ITEMS / list.length) : 0;
+const row = Array.from({ length: passes }, (_, pass) => list.map((item) => ({ ...item, repeat: pass > 0 }))).flat();
+
+const tones = {
+  gold: { bar: 'bg-gold text-ink', kicker: 'rounded-sm bg-ink px-1.5 py-0.5 text-gold-300', sep: 'text-ink/60', btn: 'border-ink/30 hover:bg-ink/10 focus-visible:outline-ink' },
+  crimson: { bar: 'bg-crimson text-bone', kicker: 'text-gold-300', sep: 'text-gold', btn: 'border-bone/30 hover:bg-bone/10 focus-visible:outline-gold' },
+  ink: { bar: 'border-y border-gold/60 bg-ink-900 text-bone', kicker: 'text-gold-300', sep: 'text-gold', btn: 'border-gold/40 hover:bg-gold/10 focus-visible:outline-gold' },
+} as const;
+const t = tones[tone];
+---
+
+{
+  list.length > 0 && (
+    <div
+      role="region"
+      aria-label={label}
+      class:list={['ticker relative flex items-stretch overflow-hidden', t.bar, className]}
+      style={`--ticker-duration:${duration}s`}
+      data-reverse={reverse ? '' : undefined}
+    >
+      <div class="ticker-viewport min-w-0 flex-1 overflow-hidden">
+        <div class="ticker-track flex w-max items-center">
+          {[0, 1].map((copy) => (
+            <ul
+              class="ticker-copy flex shrink-0 items-center"
+              aria-hidden={copy === 1 ? 'true' : undefined}
+              inert={copy === 1 ? true : undefined}
+            >
+              {row.map((item) => (
+                <li
+                  class:list={['flex shrink-0 items-center', item.repeat && 'ticker-repeat']}
+                  aria-hidden={item.repeat && copy === 0 ? 'true' : undefined}
+                  inert={item.repeat && copy === 0 ? true : undefined}
+                >
+                  {item.href ? (
+                    <a
+                      href={item.href}
+                      class="tap inline-flex items-center gap-2 px-1 text-xs font-bold uppercase tracking-[0.14em] underline decoration-current/40 underline-offset-4 hover:decoration-current"
+                    >
+                      {item.kicker && <span class={t.kicker}>{item.kicker}</span>}
+                      {item.label}
+                    </a>
+                  ) : (
+                    <span class="inline-flex min-h-11 items-center gap-2 px-1 text-xs font-bold uppercase tracking-[0.14em]">
+                      {item.kicker && <span class={t.kicker}>{item.kicker}</span>}
+                      {item.label}
+                    </span>
+                  )}
+                  {/* Four-point sparkle, the RiceTerraces star. */}
+                  <svg viewBox="-6 -6 12 12" class:list={['mx-5 size-2.5 shrink-0', t.sep]} aria-hidden="true" focusable="false">
+                    <path d="M0,-6Q1.1,-1.1 6,0Q1.1,1.1 0,6Q-1.1,1.1 -6,0Q-1.1,-1.1 0,-6Z" fill="currentColor" />
+                  </svg>
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      </div>
+      <button
+        type="button"
+        class:list={['ticker-toggle tap relative z-10 inline-flex shrink-0 items-center justify-center border-l', t.btn]}
+        aria-pressed="false"
+        hidden
+      >
+        <span class="ticker-icon-pause"><Icon name="pause" class="size-4" /></span>
+        <span class="ticker-icon-play hidden"><Icon name="play" class="size-4" /></span>
+        <span class="sr-only">Pause scrolling</span>
+      </button>
+    </div>
+  )
+}
+
+<style>
+  .ticker-track {
+    animation: ticker-scroll var(--ticker-duration) linear infinite;
+  }
+  .ticker[data-reverse] .ticker-track {
+    animation-direction: reverse;
+  }
+  /* Hover/focus on the items only, so pressing the button to resume
+     takes effect while the pointer and focus are still on it. */
+  .ticker-viewport:hover .ticker-track,
+  .ticker-viewport:focus-within .ticker-track,
+  .ticker[data-paused] .ticker-track {
+    animation-play-state: paused;
+  }
+  .ticker[data-paused] .ticker-icon-pause {
+    display: none;
+  }
+  .ticker[data-paused] .ticker-icon-play {
+    display: inline;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-viewport {
+      overflow-x: auto;
+    }
+    .ticker-track {
+      animation: none;
+    }
+    .ticker-copy[aria-hidden='true'],
+    .ticker-repeat,
+    .ticker-toggle {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Reveal the Pause/Play button (it's useless without JS) and wire it up.
+  // Reduced-motion visitors have nothing to pause; CSS keeps it hidden.
+  for (const ticker of document.querySelectorAll<HTMLElement>('.ticker')) {
+    const button = ticker.querySelector<HTMLButtonElement>('.ticker-toggle');
+    if (!button) continue;
+    button.hidden = false;
+    // A toggle: the name stays "Pause scrolling" and aria-pressed says
+    // whether it's on (changing both would announce a contradiction).
+    button.addEventListener('click', () => {
+      const paused = button.getAttribute('aria-pressed') !== 'true';
+      button.setAttribute('aria-pressed', String(paused));
+      ticker.toggleAttribute('data-paused', paused);
+    });
+  }
+</script>

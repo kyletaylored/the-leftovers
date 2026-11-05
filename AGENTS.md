@@ -94,6 +94,8 @@ New colour token? Add it to `@theme` in `global.css` **and** a row to
 `src/lib/palette.ts`. New background texture? Add the utility in
 `global.css`, its tile in `public/img/` (sand and seigaiha come from
 `scripts/make-pattern-tiles.mjs`), and a row to `src/lib/textures.ts`.
+The utility sets `--tex` (the tile) and `--tex-w` (its width) rather than
+`background-image` directly, so `.bg-drift` can animate it.
 
 ### Building a new page
 
@@ -130,7 +132,9 @@ Every new or changed component must be documented in the same change:
    `<DocSection>` (Components, Blocks, Marketing, Forms, Calendar, Imagery…),
    wrapped in `<Specimen title file note>`. Show every variant and state, and
    write `note` as "when to use it". Render it with real collection data where
-   it takes any.
+   it takes any. Keep specimen titles unique: each becomes an anchor listed in
+   the page's side nav automatically. A new `<DocSection>` also needs a row
+   in `navGroups` (its number comes from that order).
 2. **Add or update its row in the `index` array** in `src/pages/design.astro`
    (name, file, kind, section anchor, `story`, use-it-for).
 3. **If it's a React island, add or update `ComponentName.stories.tsx`** next
