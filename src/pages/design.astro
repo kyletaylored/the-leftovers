@@ -28,6 +28,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import DocSection from '@/components/design/DocSection.astro';
 import Specimen from '@/components/design/Specimen.astro';
 import DesignNav from '@/components/design/DesignNav.astro';
+import ImpactPlayground from '@/components/design/ImpactPlayground.astro';
 
 // Brand primitives
 import Icon from '@/components/brand/Icon.astro';
@@ -738,6 +739,17 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
               reverse
             />
           </div>
+        </Specimen>
+
+        <Specimen
+          title="ImpactBand: playground"
+          tag="NEW"
+          class="overflow-hidden"
+          flush
+          file={['src/components/marketing/ImpactBand.astro', 'src/components/design/ImpactPlayground.astro']}
+          note={'Try every option on one live band, start from a preset, and copy the matching markup. The sample photos differ in where the subject sits: centred subjects usually need shift (move them away from the copy) or wash="none"; side subjects just need align on the other side. wash, backdrop and shift are desktop-only, so use the Phone preview to check the stacked layout too.'}
+        >
+          <ImpactPlayground />
         </Specimen>
 
         <Specimen

@@ -14,6 +14,10 @@
  * glow behind the logo, and the layered RiceTerraces landscape along the
  * bottom in place of the single-line TerracedDivider.
  *
+ * `animate` adds the slow ambient motion from /design#motion: the sand drifts
+ * sideways (.bg-drift) and, on `ornate`, the RiceTerraces depths sway. Both
+ * are compositor-only transforms and stop for prefers-reduced-motion.
+ *
  * `image` and `video` put photography behind the copy; `text` is copy only.
  *
  * The logo is the LCP element on the homepage, so it is eager, high-priority,
@@ -37,6 +41,8 @@ interface Props {
   video?: string;
   /** Required for `video` — it's the poster AND the reduced-motion fallback. */
   poster?: ImageMetadata;
+  /** Ambient motion: drifting sand, swaying terraces (ornate). */
+  animate?: boolean;
   class?: string;
 }
 
@@ -48,6 +54,7 @@ const {
   imageAlt = '',
   video,
   poster,
+  animate = false,
   class: className = '',
 } = Astro.props;
 
@@ -62,7 +69,7 @@ const ornate = variant === 'ornate';
 const taglineParts = tagline?.split('/').map((part) => part.trim()).filter(Boolean) ?? [];
 ---
 
-<section class:list={['bg-sand relative overflow-hidden', className]}>
+<section class:list={['bg-sand relative overflow-hidden', animate && 'bg-drift', className]}>
   {
     (variant === 'image' || variant === 'video') && backdrop && (
       <>
@@ -179,7 +186,7 @@ const taglineParts = tagline?.split('/').map((part) => part.trim()).filter(Boole
 
   {
     ornate ? (
-      <RiceTerraces seed={7} class="absolute bottom-0 left-0 h-28 sm:h-36 lg:h-auto lg:aspect-[2400/260]" />
+      <RiceTerraces seed={7} animate={animate} class="absolute bottom-0 left-0 h-28 sm:h-36 lg:h-auto lg:aspect-[2400/260]" />
     ) : (
       <TerracedDivider seed={3} style="pagoda" class="absolute bottom-0 left-0 h-14 sm:h-20 lg:h-24" />
     )
