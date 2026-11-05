@@ -33,6 +33,21 @@ const settingsSchema = z.object({
     email: z.string(),
   }),
   discordServerId: z.string().default(''),
+  /**
+   * Search engines and AI crawlers. Verification tokens are optional: a
+   * Search Console *domain* property verified by DNS needs none (see
+   * docs/SEO.md). `aiCrawlers` drives robots.txt:
+   * - allow: every crawler, AI or not (the default; most visibility).
+   * - search-only: AI answer/search bots allowed, AI-training bots blocked.
+   * - block: all known AI bots blocked. Ordinary search engines unaffected.
+   */
+  search: z
+    .object({
+      googleSiteVerification: z.string().default(''),
+      bingSiteVerification: z.string().default(''),
+      aiCrawlers: z.enum(['allow', 'search-only', 'block']).default('allow'),
+    })
+    .prefault({}),
   /** Google Tag Manager container ID (e.g. "GTM-KPXD7QD6"), gated by CookieConsent. */
   gtmId: z.string().default(''),
   facebookPagePlugin: z

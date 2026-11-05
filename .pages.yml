@@ -334,7 +334,11 @@ content:
             }
           - { name: ogImage, label: Social share image, type: image, options: { media: images } }
           - { name: ogImageAlt, label: Social share image alt text, type: string }
-          - { name: noindex, label: Hide from search engines, type: boolean, default: false }
+          - name: noindex
+            label: Hide from search engines
+            type: boolean
+            default: false
+            description: 'Ticked: Google is told not to list this page, and it is left out of the sitemap and llms.txt. The page still works for anyone with the link.'
       - { name: body, label: Body, type: rich-text }
 
   # -- Pre-order drops ------------------------------------------------------
@@ -434,6 +438,11 @@ content:
         fields:
           - { name: title, label: Search-result title, type: string }
           - { name: description, label: Meta description, type: text }
+          - name: noindex
+            label: Hide from search engines
+            type: boolean
+            default: false
+            description: 'Ticked: Google is told not to list this drop, and it is left out of the sitemap and llms.txt.'
       - { name: body, label: The pitch, type: rich-text }
 
   # -- Galleries ------------------------------------------------------------
@@ -604,6 +613,28 @@ content:
           - { name: logo, label: Logo, type: image, options: { media: images }, required: true }
           - { name: logoAlt, label: Logo alt text, type: string, required: true }
       - { name: footerNote, label: Footer note, type: text, required: true }
+      - name: search
+        label: Search engines & AI crawlers
+        type: object
+        fields:
+          - name: googleSiteVerification
+            label: Google Search Console verification code
+            type: string
+            description: 'Only for an "URL prefix" property verified by HTML tag: paste just the content="…" value. A Domain property (verified by DNS) needs nothing here.'
+          - name: bingSiteVerification
+            label: Bing Webmaster verification code
+            type: string
+            description: 'The content="…" value of Bing''s msvalidate.01 tag. Or import the site from Google Search Console in Bing and leave this blank.'
+          - name: aiCrawlers
+            label: AI crawlers
+            type: select
+            default: allow
+            description: 'Google and Bing search are always allowed. This only changes AI bots (ChatGPT, Claude, Perplexity, Gemini training…).'
+            options:
+              values:
+                - { value: allow, label: 'Allow all (most visibility)' }
+                - { value: search-only, label: 'AI search answers only, no AI training' }
+                - { value: block, label: 'Block all AI bots' }
       - {
           name: gtmId,
           label: Google Tag Manager ID,

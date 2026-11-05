@@ -95,7 +95,7 @@ from it, so nothing else needs touching. Update `public/CNAME` to match.
 
 ### After launch
 
-Submit `https://theleftoverspb.com/sitemap-index.xml` in Google Search Console.
+Submit `https://theleftoverspb.com/sitemap-index.xml` in Google Search Console (step-by-step in [SEO.md](SEO.md)).
 
 ---
 

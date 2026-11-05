@@ -126,6 +126,11 @@ Two fields control how the site shows up in Google:
   that doesn't have its own. Keep it under about 155 characters, or Google
   cuts it off with "…".
 
+**Search engines & AI crawlers** holds the Google Search Console and Bing
+verification codes (usually not needed: see `docs/SEO.md`) and whether AI
+bots like ChatGPT and Claude may read the site. "Allow all" gives the most
+visibility; Google and Bing search are allowed whatever you pick.
+
 The image shown when someone shares a link (on Facebook, iMessage, Discord)
 is a designed card, not a setting. If it needs changing, ask whoever
 maintains the code.
@@ -165,6 +170,12 @@ The **SEO** section is worth filling in properly:
 
 Leave them blank and the site falls back to the page title and the site
 description, which is fine but generic.
+
+**Hide from search engines** keeps a page out of Google: it's left out of the
+sitemap and the AI summary (`/llms.txt`) too. The page still works for anyone
+with the link. Team, Events, Shop and Community are ticked right now; untick
+one (and add it back to the nav in Site settings) to bring it back. Pre-order
+drops have the same box.
 
 ---
 

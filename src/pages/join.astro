@@ -25,7 +25,7 @@ const { Content } = await render(page);
 const events = site.join.events.map((label) => ({ id: label, label }));
 ---
 
-<BaseLayout title={page.data.seo.title ?? page.data.title} description={page.data.seo.description}>
+<BaseLayout noindex={page.data.seo.noindex} title={page.data.seo.title ?? page.data.title} description={page.data.seo.description}>
   <PageHeader eyebrow={page.data.eyebrow} title={page.data.title} intro={page.data.intro} images={heroImages} />
 
   <Section tone="base">

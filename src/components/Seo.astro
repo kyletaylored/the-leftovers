@@ -75,7 +75,11 @@ const graph =
 <title>{fullTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
-{noindex && <meta name="robots" content="noindex, nofollow" />}
+{/* "follow": a hidden page's links still count, only the page itself stays out. */}
+{noindex && <meta name="robots" content="noindex, follow" />}
+<link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+{site.search.googleSiteVerification && <meta name="google-site-verification" content={site.search.googleSiteVerification} />}
+{site.search.bingSiteVerification && <meta name="msvalidate.01" content={site.search.bingSiteVerification} />}
 
 <meta property="og:type" content={ogType} />
 <meta property="og:site_name" content={site.title} />
