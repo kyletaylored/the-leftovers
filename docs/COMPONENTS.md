@@ -69,7 +69,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Avoid: Alternating runs of media rows (use FeatureRow).
   - Pairs with: Button
 - **ThreeColumn** (`ThreeColumn.astro`): Icon + title + body benefits row (3 items, stacks on phones).
-  - Options: items[{icon?, title, body}] · as
+  - Options: items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section) · iconStyle: tile|circle (gold ring, favicon badge) · as
 
 ### Content blocks
 
@@ -98,8 +98,8 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 ### Marketing & media
 
 - **ImpactBand** (`marketing/ImpactBand.astro`): Full-bleed action photo fading into big copy (manifesto, recruiting push). Buttons in slot="actions".
-  - Options: image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus · priority (LCP image) · as
-  - Avoid: Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between.
+  - Options: image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus (object-position) · priority (LCP image) · as. Desktop only: shift -30..30 (% of band, negative = left; slide a centred player out from under the copy) · wash: fade|none (none = photo edge to edge, full colour or tinted) · backdrop: none|scrim|panel (default scrim when wash=none)
+  - Avoid: Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between. wash="none" with body text or stats but no backdrop="panel" (scrim alone can fail AA on a bright photo).
   - Pairs with: Hero, TwoColumn
 - **FeatureRow** (`marketing/FeatureRow.astro`): Alternating media + copy rows. Flip every other row with reverse.
   - Options: title · body · eyebrow · ctaLabel+ctaHref · image+imageAlt (topo fallback) · reverse

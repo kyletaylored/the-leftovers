@@ -28,8 +28,27 @@
  *    strength is set per tone (`tint` below): crimson is the most
  *    saturated colour, so it tints at half strength or it floods the photo.
  *
+ * Desktop-only options for photos that won't sit nicely behind the copy:
+ *  - `shift` moves the photo sideways, -30..30 (% of the band; negative =
+ *    left). Most action shots centre the player, so with the copy on the
+ *    right the player ends up half under it and its fade: `shift={-28}` slides
+ *    them clear (the copy column plus fade covers ~80% of the band).
+ *    Away from the copy on a washed band it simply slides (the gap lands
+ *    under the solid wash). Otherwise (wash="none", or toward the copy) it
+ *    also widens so no edge shows, which crops a little more top and
+ *    bottom: keep those shifts small (about 10).
+ *    `focus` (CSS object-position) still picks the crop.
+ *  - `wash="none"` drops the side fade and edge melts so the photo shows
+ *    edge to edge in full colour (or in the duotone tint). Phones keep the
+ *    stacked layout and its fade, so they are always readable.
+ *  - `backdrop` keeps text readable over a busy photo: `scrim` (soft
+ *    shadow gradient behind the copy plus text shadow; the default with
+ *    wash="none") or `panel` (a solid tinted, blurred box). Use `panel`
+ *    whenever there's body text or stats: a scrim alone can't guarantee AA
+ *    over a bright photo.
+ *
  * Pick a photo whose subject is on the side AWAY from the copy, and nudge it
- * with `focus` (CSS object-position). `ghost` puts an outlined word huge
+ * with `focus` or `shift`. `ghost` puts an outlined word huge
  * behind the copy; it is aria-hidden, so don't put meaning there.
  *
  * Headings render at the level the caller passes (default h2). The title
@@ -58,6 +77,12 @@ interface Props {
   ghost?: string;
   tone?: ImpactTone;
   treatment?: 'fade' | 'duotone';
+  /** Desktop: `none` shows the photo edge to edge, no side fade or edge melts. */
+  wash?: 'fade' | 'none';
+  /** Desktop: what sits behind the copy. Default: none with a wash, scrim without. */
+  backdrop?: 'none' | 'scrim' | 'panel';
+  /** Desktop: slide the photo sideways, -30..30 (% of the band, negative = left). */
+  shift?: number;
   as?: 'h2' | 'h3';
   /** Set when the band is above the fold, so the photo isn't lazy-loaded. */
   priority?: boolean;
@@ -77,6 +102,9 @@ const {
   ghost,
   tone = 'ink',
   treatment = 'fade',
+  wash = 'fade',
+  backdrop: backdropProp,
+  shift = 0,
   as: Heading = 'h2',
   priority = false,
   id,
@@ -100,10 +128,29 @@ const sideFade = `linear-gradient(to ${right ? 'left' : 'right'}, ${t.wash} 0%, 
 const downFade = `linear-gradient(to top, ${t.wash} 0%, ${mix(70)} 22%, transparent 60%)`;
 const edgeMelt = `linear-gradient(to bottom, ${t.wash}, transparent 14%, transparent 84%, ${t.wash})`;
 const hasActions = Astro.slots.has('actions');
+
+const washed = wash === 'fade';
+const backdrop = backdropProp ?? (washed ? 'none' : 'scrim');
+// Shift. Moving the photo AWAY from the copy on a washed band just slides it:
+// the strip it uncovers is on the copy side, which the solid wash covers
+// anyway, so there's no zoom and no extra crop. Any other case (wash="none",
+// or moving toward the copy) would expose a bare edge, so the layer widens
+// toward the far side by twice the offset instead: the centre still moves by
+// `shift`, at the cost of cropping a little more top and bottom.
+const s = Math.max(-30, Math.min(30, shift));
+const away = right ? s < 0 : s > 0;
+const shiftVars = !s
+  ? undefined
+  : washed && away
+    ? `--impact-x:${s}%`
+    : `--impact-l:${s < 0 ? 2 * s : 0}%;--impact-r:${s > 0 ? -2 * s : 0}%`;
+const scrim = `linear-gradient(to ${right ? 'left' : 'right'}, ${mix(78)} 0%, ${mix(55)} 30%, ${mix(20)} 52%, transparent 66%)`;
+// Over a full photo, body copy reads better in full bone than bone-muted.
+const bodyColour = washed ? t.body : `${t.body} lg:text-bone`;
 ---
 
 <section id={id} class:list={['relative isolate overflow-hidden', t.bg, className]}>
-  <div class="relative lg:absolute lg:inset-0">
+  <div class="impact-media relative lg:absolute lg:inset-0" style={shiftVars}>
     <Image
       src={image}
       alt={imageAlt}
@@ -113,25 +160,35 @@ const hasActions = Astro.slots.has('actions');
       fetchpriority={priority ? 'high' : undefined}
       decoding="async"
       class:list={[
-        'aspect-[4/3] w-full object-cover sm:aspect-[16/9] lg:aspect-auto lg:h-full',
+        'impact-photo aspect-[4/3] w-full object-cover sm:aspect-[16/9] lg:aspect-auto lg:h-full',
         treatment === 'duotone' && 'grayscale contrast-125',
       ]}
       style={`object-position:${position}`}
     />
     {
       treatment === 'duotone' && (
-        <div class="absolute inset-0 mix-blend-color" style={`background:${t.wash};opacity:${t.tint}`} aria-hidden="true" />
+        <div class="impact-photo absolute inset-0 mix-blend-color" style={`background:${t.wash};opacity:${t.tint}`} aria-hidden="true" />
       )
     }
     {/* Phones/tablets: fade down into the copy below. */}
     <div class="absolute inset-0 lg:hidden" style={`background:${downFade}`} aria-hidden="true" />
     {/* Desktop: fade sideways under the copy, plus top/bottom edge melts. */}
-    <div class="absolute inset-0 hidden lg:block" style={`background:${sideFade}`} aria-hidden="true" />
-    <div class="absolute inset-0 hidden lg:block" style={`background:${edgeMelt}`} aria-hidden="true" />
+    {washed && <div class="absolute inset-0 hidden lg:block" style={`background:${sideFade}`} aria-hidden="true" />}
+    {washed && <div class="absolute inset-0 hidden lg:block" style={`background:${edgeMelt}`} aria-hidden="true" />}
   </div>
+  {/* Scrim sits over the band, not the (shifted) photo, so it stays put. */}
+  {backdrop === 'scrim' && <div class="absolute inset-0 hidden lg:block" style={`background:${scrim}`} aria-hidden="true" />}
 
   <div class="relative mx-auto -mt-16 max-w-7xl px-4 pb-14 sm:-mt-24 sm:px-6 sm:pb-16 lg:mt-0 lg:flex lg:min-h-[36rem] lg:items-center lg:py-20 xl:min-h-[40rem]">
-    <div class:list={['relative max-w-2xl lg:max-w-[56%]', right && 'lg:ml-auto lg:text-right']}>
+    <div
+      class:list={[
+        'relative max-w-2xl lg:max-w-[56%]',
+        right && 'lg:ml-auto lg:text-right',
+        backdrop === 'scrim' && 'impact-scrim',
+        backdrop === 'panel' && 'impact-panel lg:max-w-[48%]',
+      ]}
+      style={backdrop === 'panel' ? `--impact-panel:${mix(84)}` : undefined}
+    >
       {
         ghost && (
           <span
@@ -159,7 +216,7 @@ const hasActions = Astro.slots.has('actions');
       </Heading>
       {
         body && (
-          <p class:list={['relative mt-5 max-w-md text-base leading-relaxed sm:mt-6 sm:text-lg', t.body, right && 'lg:ml-auto']}>
+          <p class:list={['relative mt-5 max-w-md text-base leading-relaxed sm:mt-6 sm:text-lg', bodyColour, right && 'lg:ml-auto']}>
             {body}
           </p>
         )
@@ -201,3 +258,27 @@ const hasActions = Astro.slots.has('actions');
     </div>
   </div>
 </section>
+
+<style>
+  @media (min-width: 1024px) {
+    /* shift: the photo layer grows toward one side (see shiftVars). */
+    .impact-media {
+      left: var(--impact-l, 0);
+      right: var(--impact-r, 0);
+    }
+    /* Only the photo (and its tint) slides; the fades stay put under the copy. */
+    .impact-photo {
+      transform: translateX(var(--impact-x, 0));
+    }
+    .impact-scrim {
+      text-shadow: 0 2px 18px rgb(0 0 0 / 0.55);
+    }
+    .impact-panel {
+      padding: 2.25rem 2.5rem;
+      border: 1px solid color-mix(in srgb, var(--color-gold) 25%, transparent);
+      border-radius: 2px;
+      background: var(--impact-panel);
+      backdrop-filter: blur(10px);
+    }
+  }
+</style>

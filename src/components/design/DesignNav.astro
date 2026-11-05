@@ -14,6 +14,12 @@
  * - Scroll-spy marks the section and specimen in view with
  *   aria-current="true" (gold rail + text), and shows only the current
  *   section's specimens so the rail stays short.
+ * - Desktop / Phone preview (lg+ only): Phone swaps the content column for a
+ *   390px iframe of this same page (`/design?frame=phone`), because media
+ *   queries follow the viewport, so only a real narrow viewport shows the
+ *   true mobile layouts. Inside the frame the doc chrome is hidden and its
+ *   scroll position is posted back, so this rail keeps tracking and its
+ *   links scroll the phone. The choice is remembered (localStorage).
  * - The disclosure is a native <details>. It starts open, so with no JS
  *   the links are visible everywhere; the script closes it on phones,
  *   keeps it open on desktop, and closes it again after a jump on phones.
@@ -29,6 +35,11 @@ interface Props {
 const { groups } = Astro.props;
 ---
 
+{/* Runs during parse, so a framed copy never flashes the doc chrome. */}
+<script is:inline>
+  if (new URLSearchParams(location.search).get('frame') === 'phone') document.documentElement.dataset.frame = 'phone';
+</script>
+
 <aside
   class="design-nav sticky top-[var(--site-header,65px)] z-40 border-b border-[#DAD4C4] bg-[#EFEBE0]/95 backdrop-blur-sm lg:z-auto lg:max-h-[calc(100vh-var(--site-header,65px))] lg:self-start lg:overflow-y-auto lg:border-b-0 lg:border-r lg:bg-transparent lg:backdrop-blur-none"
 >
@@ -41,7 +52,22 @@ const { groups } = Astro.props;
         <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </summary>
-    <nav aria-label="Design system sections" class="max-h-[65vh] overflow-y-auto px-4 pb-4 sm:px-6 lg:max-h-none lg:overflow-visible lg:px-5 lg:pb-10 lg:pt-12">
+    <nav aria-label="Design system sections" class="max-h-[65vh] overflow-y-auto px-4 pb-4 sm:px-6 lg:max-h-none lg:overflow-visible lg:px-5 lg:pb-10 lg:pt-10">
+      <div class="design-preview mb-7 hidden lg:block" hidden>
+        <p class="mb-1.5 text-[0.625rem] font-bold uppercase tracking-[0.2em] text-crimson" id="design-preview-label">Preview</p>
+        <div class="grid grid-cols-2 rounded-sm border border-[#DAD4C4] bg-[#FBF9F4] p-0.5" role="group" aria-labelledby="design-preview-label">
+          {['desktop', 'phone'].map((mode) => (
+            <button
+              type="button"
+              data-preview={mode}
+              aria-pressed={mode === 'desktop' ? 'true' : 'false'}
+              class="min-h-9 cursor-pointer rounded-[2px] text-xs font-bold capitalize text-[#4a443a] hover:text-ink aria-pressed:bg-ink aria-pressed:text-gold-300 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-gold"
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
+      </div>
       {groups.map((group) => (
         <div class="mt-3 first:mt-0 lg:mt-6 lg:first:mt-0">
           <p class="mb-1 text-[0.625rem] font-bold uppercase tracking-[0.2em] text-crimson">{group.label}</p>
@@ -75,6 +101,16 @@ const { groups } = Astro.props;
     html:has(.design-nav) {
       scroll-padding-top: calc(var(--site-header, 65px) + 20px);
     }
+  }
+  /* The framed phone copy: content only, no doc chrome. */
+  html[data-frame] .design-topbar,
+  html[data-frame] .design-nav {
+    display: none !important;
+  }
+  html[data-frame]:has(.design-nav) {
+    scroll-padding-top: calc(var(--site-header, 65px) + 16px);
+    /* Scrolling past the end of the phone never scrolls the outer page. */
+    overscroll-behavior: contain;
   }
 </style>
 
@@ -130,7 +166,12 @@ const { groups } = Astro.props;
     let lastSpecimen = '';
     const mark = (link: HTMLAnchorElement | undefined, on: boolean) =>
       link && (on ? link.setAttribute('aria-current', 'true') : link.removeAttribute('aria-current'));
+    const framed = document.documentElement.dataset.frame === 'phone';
+    let phoneMode = false;
+    let frame: HTMLIFrameElement | undefined;
+
     function update() {
+      if (phoneMode) return; // the framed copy reports instead (see below)
       const line = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--site-header')) || 65) + 80;
       let section = '';
       let specimen = '';
@@ -142,6 +183,14 @@ const { groups } = Astro.props;
           specimen = '';
         }
       }
+      if (framed) {
+        window.parent.postMessage({ type: 'design-spy', section, specimen }, location.origin);
+        return;
+      }
+      apply(section, specimen);
+    }
+
+    function apply(section: string, specimen: string) {
       if (section !== lastSection) {
         mark(sectionLinks.get(lastSection), false);
         mark(sectionLinks.get(section), true);
@@ -181,9 +230,71 @@ const { groups } = Astro.props;
     );
     update();
 
-    // On phones, fold the menu away after a jump.
+    // On phones, fold the menu away after a jump. In Phone preview, jump
+    // inside the frame instead of the (hidden) desktop column.
     nav.addEventListener('click', (e) => {
-      if ((e.target as Element).closest('a') && !desktop.matches) details.open = false;
+      const a = (e.target as Element).closest('a');
+      if (!a) return;
+      if (phoneMode && frame) {
+        e.preventDefault();
+        scrollFrameTo((a.getAttribute('href') ?? '').slice(1));
+        return;
+      }
+      if (!desktop.matches) details.open = false;
     });
+
+    // Scroll the framed copy by its own window. A hash jump (or
+    // scrollIntoView) inside an iframe also scrolls the outer page.
+    function scrollFrameTo(id: string, smooth = true) {
+      const win = frame?.contentWindow;
+      const el = id ? win?.document.getElementById(id) : null;
+      if (!win || !el) return;
+      const pad = parseFloat(win.getComputedStyle(win.document.documentElement).scrollPaddingTop) || 80;
+      win.scrollTo({ top: el.getBoundingClientRect().top + win.scrollY - pad, behavior: smooth ? 'smooth' : 'instant' });
+    }
+
+    // ---- Desktop / Phone preview (not inside the frame itself) ----------
+    const toggle = nav.querySelector<HTMLElement>('.design-preview');
+    const main = document.querySelector<HTMLElement>('.design-main');
+    const phone = document.querySelector<HTMLElement>('.design-phone');
+    if (!framed && toggle && main && phone) {
+      toggle.hidden = false;
+      const KEY = 'design-preview';
+      const buttons = [...toggle.querySelectorAll<HTMLButtonElement>('[data-preview]')];
+      const setMode = (mode: 'desktop' | 'phone', remember = true) => {
+        phoneMode = mode === 'phone' && desktop.matches;
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.preview === (phoneMode ? 'phone' : 'desktop'))));
+        main.hidden = phoneMode;
+        phone.hidden = !phoneMode;
+        if (phoneMode && !frame) {
+          frame = document.createElement('iframe');
+          frame.title = 'Design system at phone width (390 px)';
+          frame.className = 'block h-full w-full border-0 bg-[#EFEBE0]';
+          // No hash in the src (see scrollFrameTo); jump once it has loaded.
+          const start = lastSection || location.hash.slice(1);
+          frame.addEventListener('load', () => scrollFrameTo(start, false), { once: true });
+          frame.src = `${location.pathname}?frame=phone`;
+          phone.querySelector('.design-phone-screen')?.append(frame);
+        }
+        if (remember) {
+          try {
+            localStorage.setItem(KEY, mode);
+          } catch {}
+        }
+        if (!phoneMode) update();
+        else window.scrollTo({ top: 0 });
+      };
+      buttons.forEach((b) => b.addEventListener('click', () => setMode(b.dataset.preview as 'desktop' | 'phone')));
+      window.addEventListener('message', (e) => {
+        if (e.origin !== location.origin || e.source !== frame?.contentWindow || e.data?.type !== 'design-spy') return;
+        if (phoneMode) apply(e.data.section, e.data.specimen);
+      });
+      desktop.addEventListener('change', () => !desktop.matches && phoneMode && setMode('desktop', false));
+      let saved: string | null = null;
+      try {
+        saved = localStorage.getItem(KEY);
+      } catch {}
+      if (saved === 'phone') setMode('phone', false);
+    }
   }
 </script>
