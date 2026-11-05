@@ -64,7 +64,7 @@ team deciding to:
 |---|---|---|
 | `/` | Home ("direction B"): ornate sand hero, `ImpactBand` manifesto, full-width showcase slider, "How it works" `TwoColumn` CTA, crimson free-agents `ImpactBand`, "2027 Season Loading…" + league logos, newsletter | Direction B promoted Nov 2026 |
 | `/team` | About + Roster + Stats + FAQ on one page, with a jump nav | **Hidden** (Nov 2026). `/about`, `/roster`, `/stats` redirect here |
-| `/events` | Next event with countdown and squads, how it works and fees, then each season's `SeasonStrip` and results | **Hidden** |
+| `/events` | Next event with countdown and squads, how it works and fees, then each season's `SeasonStrip` and results | Unhidden 5 Nov 2026, in the nav and sitemap |
 | `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | **Hidden.** Products collection is empty on purpose |
 | `/preorder/[slug]` | One page per jersey drop, with an on-site order form | `PreorderForm` island → Google Form |
 | `/join` | "Request to play" form | `JoinRequestForm` island → Google Form ([JOIN.md](JOIN.md)) |
@@ -74,7 +74,7 @@ team deciding to:
 | `/design` | Design system reference | `noindex`, not in the sitemap. For builders, not visitors |
 | `404` | Mascot empty state | |
 
-**Hidden pages** (Team, Events, Shop, Community) still build but are `noindex`,
+**Hidden pages** (Team, Shop, Community) still build but are `noindex`,
 out of the sitemap, out of the nav and footer, and unlinked from visible pages.
 They're hidden by `seo.noindex: true` in their `src/content/pages/*.md` (the
 CMS's "Hide from search engines" box), and the sitemap follows that tag

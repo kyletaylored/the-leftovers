@@ -190,7 +190,7 @@ description, which is fine but generic.
 
 **Hide from search engines** keeps a page out of Google: it's left out of the
 sitemap and the AI summary (`/llms.txt`) too. The page still works for anyone
-with the link. Team, Events, Shop and Community are ticked right now; untick
+with the link. Team, Shop and Community are ticked right now; untick
 one (and add it back to the nav in Site settings) to bring it back. Pre-order
 drops have the same box.
 

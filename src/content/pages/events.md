@@ -6,8 +6,6 @@ intro: >-
   finished so far.
 heroImages: []
 seo:
-  # Hidden for now (Nov 2026 website feedback): out of search and the sitemap.
-  noindex: true
   title: Events — The Leftovers
   description: >-
     Where The Leftovers are playing next, how squads and event fees work, and
