@@ -187,6 +187,9 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Options: legend · name · options[{value, label}] · defaultValue
 - **CheckboxGroup** (`form/CheckboxGroup.astro`): Multiple choice, in a fieldset.
   - Options: legend · name · options[{value, label}] · defaultValues
+- **ChecklistDropdown** (`form/ChecklistDropdown.tsx`, React island): Several answers from a short list in one field; inline on phones, floating from sm. Read with FormData.getAll(name).
+  - Options: id · name · label · options[] · value+onChange or defaultValue · placeholder · hint · required · requiredMessage
+  - Avoid: One answer only (use a select). A list worth seeing at a glance (use CheckboxGroup).
 - **CountryCombobox** (`form/CountryCombobox.tsx`, React island): Searchable country picker; pre-fills from browser language; posts one canonical name.
   - Options: id · name · required · defaultCode · detect
 - **JoinRequestForm** (`JoinRequestForm.tsx`, React island): The /join "play an event with us" form; posts to Google Forms.
