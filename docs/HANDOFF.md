@@ -64,7 +64,7 @@ team deciding to:
 |---|---|---|
 | `/[slug]`, `/preview/[slug]` | `landing` pages composed in Pages CMS: published, and drafts (noindex) | `BlockRenderer`. `/preview/home` is the homepage rebuilt as blocks; `index.astro` is still what's live |
 | `/` | Home ("direction B"): ornate sand hero, `ImpactBand` manifesto, full-width showcase slider, "How it works" `TwoColumn` CTA, crimson free-agents `ImpactBand`, "2027 Season Loading…" + league logos, newsletter | Direction B promoted Nov 2026 |
-| `/team` | Story, team members, how to join, gallery and FAQ on one page, with a jump nav | **Hidden** (Nov 2026). `/about` and `/roster` redirect here; `/stats` redirects to `/events` |
+| `/about`, `/roster`, `/stats` | Redirect stubs: the first two go home, `/stats` goes to `/events` | `/team` was removed Nov 2026; see §7 for the planned `/about` |
 | `/events` | Next event with countdown and squads, how it works and fees, then each season's `SeasonStrip` and results | Unhidden 5 Nov 2026, in the nav and sitemap |
 | `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | **Hidden.** Products collection is empty on purpose |
 | `/preorder/[slug]` | One page per jersey drop, with an on-site order form | `PreorderForm` island → Google Form |
@@ -75,7 +75,7 @@ team deciding to:
 | `/design` | Design system reference | `noindex`, not in the sitemap. For builders, not visitors |
 | `404` | Mascot empty state | |
 
-**Hidden pages** (Team, Shop, Community) still build but are `noindex`,
+**Hidden pages** (Shop, Community) still build but are `noindex`,
 out of the sitemap, out of the nav and footer, and unlinked from visible pages.
 They're hidden by `seo.noindex: true` in their `src/content/pages/*.md` (the
 CMS's "Hide from search engines" box), and the sitemap follows that tag
@@ -89,8 +89,8 @@ linked from anywhere either, but its closed state still points at `/shop` and
 - All 7 PRD content collections plus `faqs`, `galleries`, `preorders` and `landing` (the page builder: [EDITING.md](EDITING.md#building-a-landing-page)).
   Schemas are in `src/content.config.ts` and CMS forms in `.pages.yml`.
   **Every image field has a required `alt`.**
-- The record is derived, never typed: `/team` and `/events` work it out from
-  each event's squads (`src/lib/events.ts`). `/team` also shows live team stats from
+- The record is derived, never typed: `/events` works it out from each event's
+  squads (`src/lib/events.ts`). `TeamStatsWidget` can show live team stats from
   **pblidb.org** (an unofficial public API, fetched at build time, fails soft;
   see `src/lib/pblidb.ts`).
 - Upcoming vs past is computed from dates (`src/lib/events.ts`). Nobody flips a
@@ -144,7 +144,7 @@ These are all recorded with their reasons in
 |---|---|---|
 | Svelte islands (§4) | **React 19 + shadcn/ui**, every island `client:visible` | Team's call, for tooling. Costs ~4× the JS, but mobile scores held |
 | Cloudflare Pages (§4.1) | **GitHub Pages** (`.github/workflows/deploy.yml`) | Team's call. Cloudflare config is committed and ready |
-| 8-page site map (§5) | `/team` merges About/Roster/Stats | Same subject split across three clicks |
+| 8-page site map (§5) | No About, Roster or Stats page for now | `/team` merged them, then was removed. An `/about` page is planned |
 | Free wordmark font, subset (§9) | **CC Monster Mash Worn**, licensed, **not** subset | The licence forbids subsetting. Per-domain licence, see `ATTRIBUTIONS.md` |
 | Discord as the hub (§8.3) | **No Discord**; `/join` form instead | The team doesn't run one right now. Discord UI hides itself while `social.discord` is empty |
 | `results` collection, player stats and a roster (§6, §8.1) | Removed. Squads and places live on each event, and `team` lists organizers | Players rotate, and nobody was hand-entering stats |
@@ -182,7 +182,7 @@ docs/design/             Committed, downsized reference plates (see §6)
 | Island | Used on | Server half |
 |---|---|---|
 | `CountdownIsland` | `/events`, `/shop`, preorders | `Countdown.astro` pins the first value so hydration matches |
-| `Slideshow` | `/team`, `/community`, `/design` | `GallerySlideshow.astro` optimises images at build time |
+| `Slideshow` | `/`, `/community`, `/design` | `GallerySlideshow.astro` optimises images at build time |
 | `Calendar` | `/design` only | `EventsCalendar.astro`. Day links are plain `#slug` anchors that work without JS |
 | `PreorderForm` · `ProductGallery` | `/preorder/[slug]` | The page passes the drop's data |
 | `JoinRequestForm` | `/join` | Events list comes from the collection |
@@ -322,6 +322,11 @@ inline-styled HTML into the repo.
 
 ### Ready to build (code)
 
+0. **Build `/about`.** List team members as cards alternating left and right,
+   each with image, name, bio and socials. The `team` collection is ready and
+   `ProfileCard` is the closest component. Replace the stub at
+   `src/pages/about.ts`. The FAQs, `TeamStatsWidget` and `src/lib/pblidb.ts` have
+   no page right now, so decide whether they belong there.
 0. **Decide whether the homepage moves to blocks.** `/preview/home` matches   `index.astro` from `src/content/landing/home.yml`. Moving would make the   homepage editable in Pages CMS and take its copy out of the template, but   `index.astro` also emits the `WebSite` schema, which would need a home.
 1. **Move hosting to Cloudflare Pages.** This turns on the CSP and security
    headers, real `_redirects` and preview deploys. Everything needed is
@@ -332,7 +337,7 @@ inline-styled HTML into the repo.
    squad places on each `events` entry.
 4. **More texture on real pages.** The homepage `Hero` now uses `.bg-sand`.
    `<Section tone="sand|seigaiha">` is ready for more: a seigaiha band on
-   `/events`, sand behind `/team#story`.
+   `/events`.
 5. **Components that are built and documented on `/design` but not used on
    any public page yet.** Place each one once its content exists:
    - `FeatureRow`: waiting on photos.

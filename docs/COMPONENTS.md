@@ -26,7 +26,6 @@ Read this before building or changing a page. It replaces reading `src/pages/des
 - **Homepage / landing** (`src/pages/index.astro`): Hero variant=ornate animate (+RiceTerraces) → ImpactBand → GallerySlideshow layout=showcase → TwoColumn (boxed break) → ImpactBand tone=crimson → Section tone=seigaiha + LogoStrip → NewsletterBlock
 - **Long-form / legal (Markdown body)** (`src/pages/privacy.astro`): PageHeader → Section tone=base > Prose > <Content /> → Buttons (outline + ghost)
 - **Schedule** (`src/pages/events.astro`): PageHeader → Section tone=alt: Countdown + EventCard layout=feature + EventSquads (next), or MascotCallout when empty → Section: ProcessSteps + BrandRule + EventFees → Section tone=alt: per year, SeasonStrip + past EventCards (older years in <details>)
-- **Team / about** (`src/pages/team.astro`): PageHeader → story Section (Prose + StatNumbers + Callout) → ProfileCard grid → ThreeColumn (how to join) → GallerySlideshow → TeamStatsWidget → FaqAccordion → CtaStrip tone=forest
 - **Shop / product** (`src/pages/shop.astro, src/pages/preorder/[slug].astro`): PageHeader → featured ProductCard → ProductGrid → ThreeColumn (how ordering works) → Prose. Drop page: PageHeader → Countdown + Prose → ProductGallery → PreorderForm
 - **Form page** (`src/pages/join.astro`): PageHeader → Section tone=base: Prose intro + the form island (client:visible) → Toast for the result
 

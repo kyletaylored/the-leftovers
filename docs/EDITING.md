@@ -17,7 +17,8 @@ separate deploy step — hitting Save is publishing.
 ## Team members
 
 **Team Members** lists the people who run The Leftovers, not players, who rotate
-by event. **Add an entry** with a **Name** and **Role**. The **Bio** is free text.
+by event. They aren't shown on the site yet; they'll appear on the planned About
+page. **Add an entry** with a **Name** and **Role**. The **Bio** is free text.
 
 **Photo alt text** is required. Describe what's in the photo; until there's a
 photo, the person's name is fine. **Sort order** sets who comes first.
@@ -143,7 +144,7 @@ please don't plan a page section around a group feed.
 
 ## Page copy
 
-**Page copy** holds the body text and SEO fields for About, Contact, Shop and
+**Page copy** holds the body text and SEO fields for Contact, Shop and
 Community.
 
 The **SEO** section is worth filling in properly:
@@ -158,7 +159,7 @@ description, which is fine but generic.
 
 **Hide from search engines** keeps a page out of Google: it's left out of the
 sitemap and the AI summary (`/llms.txt`) too. The page still works for anyone
-with the link. Team, Shop and Community are ticked right now; untick
+with the link. Shop and Community are ticked right now; untick
 one (and add it back to the nav in Site settings) to bring it back. Pre-order
 drops have the same box.
 

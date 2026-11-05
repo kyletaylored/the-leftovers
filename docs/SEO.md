@@ -27,7 +27,7 @@ Pre-order drop entry in the CMS. Ticking it:
    drops every page whose robots tag says `noindex`), and
 3. leaves it out of `/llms.txt`.
 
-The page still works for anyone with the link. Team, Events, Shop and
+The page still works for anyone with the link. Events, Shop and
 Community are hidden this way right now (Nov 2026), in their content files.
 
 Code-only pages (`/design`, `/404`, the `/about` `/roster` `/stats` redirect

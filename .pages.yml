@@ -28,7 +28,7 @@ content:
   # -- Team members ---------------------------------------------------------
   - name: team
     label: Team Members
-    description: The people who run The Leftovers. Players aren't listed here; they rotate by event.
+    description: The people who run The Leftovers. Not shown on the site yet; they'll appear on the planned About page.
     type: collection
     path: src/content/team
     filename: '{fields.name}.md'
@@ -241,7 +241,7 @@ content:
   # -- Pages ----------------------------------------------------------------
   - name: pages
     label: Page copy
-    description: 'Body copy, hero images and SEO metadata for Team, Contact, Shop and Community.'
+    description: 'Body copy, hero images and SEO metadata for Contact, Shop and Community.'
     type: collection
     path: src/content/pages
     filename: '{fields.title}.md'
@@ -706,7 +706,7 @@ content:
   # -- FAQs -----------------------------------------------------------------
   - name: faqs
     label: FAQs
-    description: 'Shown on the About page and submitted to Google as FAQ structured data.'
+    description: 'Not shown on the site yet, unless added to a landing page with the FAQs section.'
     type: file
     path: src/content/faqs.yml
     format: yaml

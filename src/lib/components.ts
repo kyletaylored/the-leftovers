@@ -441,11 +441,6 @@ export const recipes: { name: string; example: string; steps: string }[] = [
     steps: 'PageHeader → Section tone=alt: Countdown + EventCard layout=feature + EventSquads (next), or MascotCallout when empty → Section: ProcessSteps + BrandRule + EventFees → Section tone=alt: per year, SeasonStrip + past EventCards (older years in <details>)',
   },
   {
-    name: 'Team / about',
-    example: 'src/pages/team.astro',
-    steps: 'PageHeader → story Section (Prose + StatNumbers + Callout) → ProfileCard grid → ThreeColumn (how to join) → GallerySlideshow → TeamStatsWidget → FaqAccordion → CtaStrip tone=forest',
-  },
-  {
     name: 'Shop / product',
     example: 'src/pages/shop.astro, src/pages/preorder/[slug].astro',
     steps: 'PageHeader → featured ProductCard → ProductGrid → ThreeColumn (how ordering works) → Prose. Drop page: PageHeader → Countdown + Prose → ProductGallery → PreorderForm',

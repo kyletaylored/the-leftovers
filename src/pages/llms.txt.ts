@@ -35,8 +35,9 @@ export const GET: APIRoute = async ({ site: origin }) => {
     ({ data }) => data.status !== 'draft' && !data.seo.noindex
   );
 
-  const teamPublic = pages.some((p) => p.id === 'team');
-  const faqs = teamPublic
+  // FAQs are only listed once a public page shows them.
+  const faqsPublic = pages.some((p) => p.id === 'about');
+  const faqs = faqsPublic
     ? (await getCollection('faqs')).sort((a, b) => a.data.order - b.data.order)
     : [];
 

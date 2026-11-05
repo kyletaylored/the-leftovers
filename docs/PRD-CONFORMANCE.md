@@ -610,3 +610,6 @@ from earlier decisions here.
   `closedToRequests` box is ticked.
 - **Sponsors on every page (5 Nov 2026).** `SponsorBand` sits above the footer,
   through `BaseLayout`, using the existing `LogoStrip`.
+- **`/team` removed (5 Nov 2026).** At the owner's request, ahead of a planned
+  `/about` page listing team members. `/about` and `/roster` redirect home
+  until then. The `team` collection stays, unused, ready for that page.
