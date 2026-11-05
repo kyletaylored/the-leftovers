@@ -28,6 +28,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import DocSection from '@/components/design/DocSection.astro';
 import Specimen from '@/components/design/Specimen.astro';
 import DesignNav from '@/components/design/DesignNav.astro';
+import ImpactPlayground from '@/components/design/ImpactPlayground.astro';
 
 // Brand primitives
 import Icon from '@/components/brand/Icon.astro';
@@ -210,6 +211,12 @@ const num = (id: string) => {
 };
 const nav = navGroups.map((g) => ({ ...g, sections: g.sections.map((sec) => ({ ...sec, number: num(sec.id) })) }));
 
+const threeColItems: { icon: 'jersey' | 'calendar' | 'trophy'; title: string; body: string }[] = [
+  { icon: 'jersey', title: 'Bring your own gear', body: 'Your marker, mask and pods. No loaners.' },
+  { icon: 'calendar', title: 'Pick your events', body: 'Confirm the dates you can make. No season commitment.' },
+  { icon: 'trophy', title: 'Play real points', body: 'No bench. Everyone on the roster plays.' },
+];
+
 const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Insert'];
 ---
 
@@ -220,7 +227,7 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
 >
   <div class="bg-[#EFEBE0] text-[#1a1712]">
     {/* ---------------------------------------------------------- top bar */}
-    <div class="border-b-2 border-gold bg-ink">
+    <div class="design-topbar border-b-2 border-gold bg-ink">
       <div class="mx-auto flex max-w-[1320px] flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3.5 sm:px-6">
         <p class="flex items-center gap-2.5">
           <span class="font-marker text-[1.375rem] tracking-[0.02em] text-brand-red">The Leftovers</span>
@@ -232,7 +239,14 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
 
     <div class="mx-auto max-w-[1600px] lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
     <DesignNav groups={nav} />
-    <div class="min-w-0">
+    {/* Phone preview stage (DesignNav fills it with an iframe on demand). */}
+    <div class="design-phone sticky top-[var(--site-header,65px)] h-[calc(100vh-var(--site-header,65px))] py-6" hidden>
+      <div class="mx-auto flex h-[calc(100%-1.5rem)] w-[406px] flex-col rounded-[2.25rem] border-[8px] border-ink bg-ink shadow-2xl shadow-ink/30">
+        <div class="design-phone-screen min-h-0 flex-1 overflow-hidden rounded-[1.75rem]"></div>
+      </div>
+      <p class="mt-2 text-center font-mono text-[0.625rem] text-[#6b6356]">390 px · same page, real phone breakpoints</p>
+    </div>
+    <div class="design-main min-w-0">
     {/* ------------------------------------------------------------ intro */}
     <div class="mx-auto max-w-[1320px] px-4 pb-8 pt-12 sm:px-6">
       <p class="mb-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-crimson">
@@ -657,15 +671,25 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
             <Button href="/community" variant="outline" size="sm">Visit the community</Button>
           </MascotCallout>
         </Specimen>
-        <Specimen title="ThreeColumn" class="lg:col-span-2" file="src/components/ThreeColumn.astro" note="Icon + title + body benefits row.">
-          <ThreeColumn
-            as="h4"
-            items={[
-              { icon: 'jersey', title: 'Bring your own gear', body: 'Your marker, mask and pods. No loaners.' },
-              { icon: 'calendar', title: 'Pick your events', body: 'Confirm the dates you can make. No season commitment.' },
-              { icon: 'trophy', title: 'Play real points', body: 'No bench. Everyone on the roster plays.' },
-            ]}
-          />
+        <Specimen
+          title="ThreeColumn"
+          class="lg:col-span-2"
+          file="src/components/ThreeColumn.astro"
+          note={'Icon + title + body benefits row. Default: compact left-aligned cards for a supporting list. layout="centered": bigger and centred, for a short row that is the point of the section (how it works, values). iconStyle="circle": a gold ring on ink, like the favicon badge. The two combine.'}
+        >
+          <div class="grid gap-8">
+            {[
+              { layout: 'card', iconStyle: 'tile', label: 'default (layout="card" iconStyle="tile")' },
+              { layout: 'card', iconStyle: 'circle', label: 'iconStyle="circle"' },
+              { layout: 'centered', iconStyle: 'tile', label: 'layout="centered"' },
+              { layout: 'centered', iconStyle: 'circle', label: 'layout="centered" iconStyle="circle"' },
+            ].map((v) => (
+              <div>
+                <code class="mb-2 block font-mono text-[0.625rem] text-gold-300">{v.label}</code>
+                <ThreeColumn as="h4" items={threeColItems} layout={v.layout as 'card' | 'centered'} iconStyle={v.iconStyle as 'tile' | 'circle'} />
+              </div>
+            ))}
+          </div>
         </Specimen>
         <Specimen
           title="TwoColumn: image + copy CTA"
@@ -715,6 +739,17 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
               reverse
             />
           </div>
+        </Specimen>
+
+        <Specimen
+          title="ImpactBand: playground"
+          tag="NEW"
+          class="overflow-hidden"
+          flush
+          file={['src/components/marketing/ImpactBand.astro', 'src/components/design/ImpactPlayground.astro']}
+          note={'Try every option on one live band, start from a preset, and copy the matching markup. The sample photos differ in where the subject sits: centred subjects usually need shift (move them away from the copy) or wash="none"; side subjects just need align on the other side. wash, backdrop and shift are desktop-only, so use the Phone preview to check the stacked layout too.'}
+        >
+          <ImpactPlayground />
         </Specimen>
 
         <Specimen
@@ -780,6 +815,64 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
             eyebrow={'tone="ink" treatment="duotone" (black)'}
             title={'Black &\nwhite.'}
             body="The black option: ink is the default tone, and with duotone the photo goes black and white."
+          />
+        </Specimen>
+
+        <Specimen
+          title="ImpactBand: shift, full colour and text backdrops"
+          tag="NEW"
+          class="overflow-hidden"
+          flush
+          file="src/components/marketing/ImpactBand.astro"
+          note={'Desktop-only fixes for photos that fight the layout. shift (-30..30, % of the band, negative = left) slides a centred subject out from under the copy without leaving a gap. wash="none" drops the fades so the photo runs edge to edge in full colour, or in the duotone tint. backdrop keeps the copy readable over it: scrim (the default with wash="none", for a headline over a darker photo) or panel (a solid tinted box; use it whenever there is body text or stats). Phones always keep the stacked layout, so check these at desktop width.'}
+        >
+          <ImpactBand
+            as="h3"
+            image={shooterImg}
+            imageAlt="A Leftovers player aims a paintball marker across a field."
+            align="right"
+            tone="crimson"
+            treatment="duotone"
+            shift={-28}
+            eyebrow={'shift={-28}'}
+            title={'Eyes\nup.'}
+            body="Same photo and tone as above, slid 28% left so the player clears the copy and its fade."
+          />
+          <ImpactBand
+            as="h3"
+            image={shooterImg}
+            imageAlt="A Leftovers player aims a paintball marker across a field."
+            align="right"
+            wash="none"
+            shift={-8}
+            eyebrow={'wash="none" (backdrop scrim)'}
+            title={'Full\ncolour.'}
+          />
+          <ImpactBand
+            as="h3"
+            image={shooterImg}
+            imageAlt="A Leftovers player aims a paintball marker across a field."
+            align="right"
+            tone="crimson"
+            treatment="duotone"
+            wash="none"
+            backdrop="panel"
+            shift={-8}
+            eyebrow={'wash="none" treatment="duotone" backdrop="panel"'}
+            title={'Tinted,\nedge to edge.'}
+            body="The panel keeps body copy on a solid crimson tint, so it passes AA over any part of the photo."
+          >
+            <Button slot="actions" href="/join" variant="gold">Join a squad</Button>
+          </ImpactBand>
+          <ImpactBand
+            as="h3"
+            image={sprintImg}
+            imageAlt="Three Leftovers players sprint out from behind a red inflatable bunker."
+            wash="none"
+            backdrop="panel"
+            eyebrow={'wash="none" backdrop="panel" (ink)'}
+            title={'Off the\nbreak.'}
+            body="Full colour with an ink panel: the most colourful option that still reads."
           />
         </Specimen>
 

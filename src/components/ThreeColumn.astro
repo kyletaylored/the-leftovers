@@ -2,28 +2,50 @@
 /**
  * ThreeColumn — the icon/feature grid (§7). Mobile stacks; columns are added
  * going up, never removed going down.
+ *
+ * Two independent options (defaults render the original compact cards):
+ *  - `layout="centered"`: icon, title and body centred, everything larger.
+ *    For a short "how it works" / values row that should read as a feature,
+ *    not a list. Keep the body to one or two sentences.
+ *  - `iconStyle="circle"`: the icon sits in a gold ring on ink, the favicon's
+ *    badge shape, instead of the square tile.
  */
 import Icon, { type IconName } from './brand/Icon.astro';
 
 interface Props {
   items: Array<{ icon?: IconName; title: string; body: string }>;
   as?: 'h2' | 'h3' | 'h4';
+  layout?: 'card' | 'centered';
+  iconStyle?: 'tile' | 'circle';
   class?: string;
 }
-const { items, as: Heading = 'h3', class: className = '' } = Astro.props;
+const { items, as: Heading = 'h3', layout = 'card', iconStyle = 'tile', class: className = '' } = Astro.props;
+const centered = layout === 'centered';
+const circle = iconStyle === 'circle';
 ---
 
 <ul class:list={['grid gap-5 sm:grid-cols-2 lg:grid-cols-3', className]}>
   {
     items.map((item) => (
-      <li class="rounded-sm border border-ink-600 bg-ink-800 p-6 transition-colors hover:border-gold/50">
+      <li
+        class:list={[
+          'rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/50',
+          centered ? 'flex flex-col items-center px-6 py-9 text-center sm:px-8 sm:py-10' : 'p-6',
+        ]}
+      >
         {item.icon && (
-          <span class="mb-4 inline-flex size-12 items-center justify-center rounded-sm bg-ink-900 text-gold">
-            <Icon name={item.icon} class="size-6" />
+          <span
+            class:list={[
+              'inline-flex items-center justify-center text-gold',
+              circle ? 'rounded-full border-2 border-gold bg-ink' : 'rounded-sm bg-ink-900',
+              centered ? 'mb-6 size-20' : 'mb-4 size-12',
+            ]}
+          >
+            <Icon name={item.icon} class={centered ? 'size-9' : 'size-6'} strokeWidth={centered ? 1.6 : 1.8} />
           </span>
         )}
-        <Heading class="text-xl text-bone">{item.title}</Heading>
-        <p class="mt-2 text-sm leading-relaxed text-bone-muted">{item.body}</p>
+        <Heading class:list={['text-bone', centered ? 'text-2xl sm:text-[1.75rem]' : 'text-xl']}>{item.title}</Heading>
+        <p class:list={['leading-relaxed text-bone-muted', centered ? 'mt-3 max-w-xs text-base' : 'mt-2 text-sm']}>{item.body}</p>
       </li>
     ))
   }

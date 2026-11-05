@@ -1,0 +1,277 @@
+---
+/**
+ * ImpactPlayground — the /design "build your own ImpactBand" tool. Doc chrome
+ * only; never use on a public page.
+ *
+ * Renders ONE real ImpactBand, then a small script flips its data-* attributes
+ * and CSS variables from the controls. That works because ImpactBand keeps a
+ * fixed DOM and puts every option in CSS (see its doc comment), and the shift
+ * maths is the same function the component uses (src/lib/impact.ts), so what
+ * you see here is exactly what the component renders. The panel also prints
+ * the matching <ImpactBand …> markup to copy.
+ *
+ * Sample photos are real team shots chosen for where the subject sits
+ * (centre, left, right, a wide group), which is what decides whether you need
+ * `shift`/`focus`. Without JS the band shows the default options and the
+ * controls are hidden.
+ */
+import { getImage } from 'astro:assets';
+import ImpactBand from '@/components/marketing/ImpactBand.astro';
+import Button from '@/components/Button.astro';
+import centred from '@/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp';
+import left from '@/assets/img/events/nxl-lso26/lo2nxllso26-219-x5.webp';
+import right from '@/assets/img/events/social/fb-825327377-12228758.webp';
+import wide from '@/assets/img/events/nxl-lso26/lo3nxllso26-51-x5.webp';
+
+const samples = [
+  { key: 'centred', label: 'Subject centred', src: centred, alt: 'A Leftovers player aims a paintball marker across a field.' },
+  { key: 'left', label: 'Subject left', src: left, alt: 'A Leftovers player behind an inflatable bunker sights down a marker.' },
+  { key: 'right', label: 'Subject right', src: right, alt: 'A Leftovers player dives in behind an orange inflatable bunker, marker low.' },
+  { key: 'wide', label: 'Wide group', src: wide, alt: 'Three Leftovers players sprint out from behind a red inflatable bunker.' },
+];
+const photos = await Promise.all(
+  samples.map(async (s) => {
+    const img = await getImage({ src: s.src, widths: [640, 960, 1440, 1920, 2400], format: 'webp' });
+    const thumb = await getImage({ src: s.src, width: 160, format: 'webp' });
+    return { key: s.key, label: s.label, alt: s.alt, src: img.src, srcset: img.srcSet.attribute, thumb: thumb.src };
+  })
+);
+
+type Choice = { name: string; label: string; options: string[] };
+const choices: Choice[] = [
+  { name: 'align', label: 'align', options: ['left', 'right'] },
+  { name: 'tone', label: 'tone', options: ['ink', 'crimson', 'forest'] },
+  { name: 'treatment', label: 'treatment', options: ['fade', 'duotone'] },
+  { name: 'wash', label: 'wash (desktop)', options: ['fade', 'none'] },
+  { name: 'backdrop', label: 'backdrop (desktop)', options: ['auto', 'none', 'scrim', 'panel'] },
+];
+const toggles = [
+  { name: 'eyebrow', label: 'eyebrow', on: true },
+  { name: 'body', label: 'body', on: true },
+  { name: 'actions', label: 'actions', on: true },
+  { name: 'ghost', label: 'ghost word', on: false },
+];
+/** Presets: option sets worth starting from. `photo` switches the sample too. */
+const presets = [
+  { label: 'Default', set: { align: 'left', tone: 'ink', treatment: 'fade', wash: 'fade', backdrop: 'auto', shift: 0 } },
+  { label: 'Crimson duotone', set: { align: 'right', tone: 'crimson', treatment: 'duotone', wash: 'fade', backdrop: 'auto', shift: 0 } },
+  { label: 'Forest poster', set: { align: 'left', tone: 'forest', treatment: 'duotone', wash: 'fade', backdrop: 'auto', shift: 0 } },
+  { label: 'Centred subject fix', set: { photo: 'centred', align: 'right', tone: 'crimson', treatment: 'duotone', wash: 'fade', backdrop: 'auto', shift: -28 } },
+  { label: 'Full colour + scrim', set: { photo: 'centred', align: 'right', tone: 'ink', treatment: 'fade', wash: 'none', backdrop: 'auto', shift: -8 } },
+  { label: 'Full colour + panel', set: { photo: 'wide', align: 'left', tone: 'ink', treatment: 'fade', wash: 'none', backdrop: 'panel', shift: 0 } },
+  { label: 'Tinted edge to edge', set: { photo: 'centred', align: 'right', tone: 'crimson', treatment: 'duotone', wash: 'none', backdrop: 'panel', shift: -8 } },
+];
+const seg =
+  'cursor-pointer rounded-[2px] px-2.5 py-1.5 text-xs font-semibold text-bone-muted hover:text-bone has-[:checked]:bg-gold has-[:checked]:text-ink has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-gold';
+---
+
+<div class="impact-playground" data-playground data-photos={JSON.stringify(photos)} data-presets={JSON.stringify(presets)}>
+  <form class="pg-controls hidden border-b border-ink-600 p-5 sm:p-[22px]" aria-label="ImpactBand options" onsubmit="return false">
+    <fieldset class="mb-5">
+      <legend class="mb-2 text-[0.625rem] font-bold uppercase tracking-[0.16em] text-gold-300">Presets</legend>
+      <div class="flex flex-wrap gap-2">
+        {presets.map((p, i) => (
+          <button type="button" data-preset={i} class="min-h-9 cursor-pointer rounded-sm border border-ink-600 px-3 text-xs font-semibold text-bone hover:border-gold aria-pressed:border-gold aria-pressed:bg-gold/15" aria-pressed="false">
+            {p.label}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+
+    <fieldset class="mb-5">
+      <legend class="mb-2 text-[0.625rem] font-bold uppercase tracking-[0.16em] text-gold-300">Sample photo</legend>
+      <div class="flex flex-wrap gap-3">
+        {photos.map((p, i) => (
+          <label class="group cursor-pointer text-center">
+            <input type="radio" name="photo" value={p.key} checked={i === 0} class="peer sr-only" />
+            <img src={p.thumb} alt="" width="96" height="64" class="h-16 w-24 rounded-sm object-cover opacity-60 ring-2 ring-transparent group-hover:opacity-100 peer-checked:opacity-100 peer-checked:ring-gold peer-focus-visible:ring-gold-300" />
+            <span class="mt-1 block text-[0.625rem] text-bone-muted peer-checked:text-bone">{p.label}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+
+    <div class="grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
+      {choices.map((c) => (
+        <fieldset>
+          <legend class="mb-1.5 font-mono text-[0.625rem] text-gold-300">{c.label}</legend>
+          <div class="inline-flex flex-wrap gap-0.5 rounded-sm border border-ink-600 bg-ink-900 p-0.5">
+            {c.options.map((o, i) => (
+              <label class={seg}>
+                <input type="radio" name={c.name} value={o} checked={i === 0} class="sr-only" />
+                {o}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      ))}
+      <label class="block">
+        <span class="mb-1.5 flex justify-between font-mono text-[0.625rem] text-gold-300">shift (desktop) <output name="shiftOut">0</output></span>
+        <input type="range" name="shift" min="-30" max="30" step="1" value="0" class="w-full accent-gold" />
+      </label>
+      <label class="block">
+        <span class="mb-1.5 flex justify-between font-mono text-[0.625rem] text-gold-300">focus x · y <output name="focusOut">auto</output></span>
+        <span class="flex gap-2">
+          <input type="range" name="focusX" min="0" max="100" step="1" value="70" class="w-full accent-gold" aria-label="Focus x (%)" />
+          <input type="range" name="focusY" min="0" max="100" step="1" value="35" class="w-full accent-gold" aria-label="Focus y (%)" />
+        </span>
+      </label>
+      <fieldset>
+        <legend class="mb-1.5 font-mono text-[0.625rem] text-gold-300">content</legend>
+        <div class="flex flex-wrap gap-x-4 gap-y-1">
+          {toggles.map((t) => (
+            <label class="inline-flex min-h-9 cursor-pointer items-center gap-1.5 text-xs text-bone">
+              <input type="checkbox" name={t.name} checked={t.on} class="size-4 accent-gold" />
+              {t.label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="mt-5">
+      <div class="mb-1.5 flex items-center justify-between">
+        <span class="font-mono text-[0.625rem] text-gold-300">markup</span>
+        <button type="button" class="pg-copy min-h-9 cursor-pointer rounded-sm border border-ink-600 px-3 text-xs font-semibold text-bone hover:border-gold">Copy</button>
+      </div>
+      <pre class="overflow-x-auto rounded-sm bg-ink-900 p-3 text-[0.6875rem] leading-relaxed text-bone"><code class="pg-code"></code></pre>
+      <p class="pg-hint mt-2 text-[0.6875rem] text-bone-muted" aria-live="polite"></p>
+    </div>
+  </form>
+
+  <ImpactBand
+    as="h3"
+    image={centred}
+    imageAlt={samples[0].alt}
+    eyebrow="Playground"
+    title={'Build your\nown band.'}
+    body="Switch the options above. Check at desktop width: wash, backdrop and shift only change the desktop layout."
+    ghost="Leftovers"
+  >
+    <Button slot="actions" href="/join" variant="gold">Join a squad</Button>
+  </ImpactBand>
+</div>
+
+<script>
+  import { impactShiftVars } from '@/lib/impact';
+
+  type Photo = { key: string; label: string; alt: string; src: string; srcset: string };
+  type Preset = { label: string; set: Record<string, string | number> };
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-playground]')) {
+    const form = root.querySelector<HTMLFormElement>('.pg-controls')!;
+    const band = root.querySelector<HTMLElement>('section.impact')!;
+    const img = band.querySelector<HTMLImageElement>('img.impact-photo')!;
+    const code = root.querySelector<HTMLElement>('.pg-code')!;
+    const hint = root.querySelector<HTMLElement>('.pg-hint')!;
+    const photos: Photo[] = JSON.parse(root.dataset.photos!);
+    const presets: Preset[] = JSON.parse(root.dataset.presets!);
+    const parts = {
+      eyebrow: band.querySelector<HTMLElement>('.impact-eyebrow'),
+      body: band.querySelector<HTMLElement>('.impact-body'),
+      actions: band.querySelector<HTMLElement>('.impact-actions'),
+      ghost: band.querySelector<HTMLElement>('.impact-ghost'),
+    };
+    form.classList.remove('hidden');
+    img.loading = 'eager'; // swapping photos shouldn't wait on lazy-loading
+    let focusTouched = false;
+
+    const val = (name: string) => (form.elements.namedItem(name) as RadioNodeList | HTMLInputElement).value;
+    const checked = (name: string) => (form.elements.namedItem(name) as HTMLInputElement).checked;
+    const setVal = (name: string, v: string | number) => {
+      const el = form.elements.namedItem(name);
+      if (el instanceof RadioNodeList) {
+        for (const r of el) (r as HTMLInputElement).checked = (r as HTMLInputElement).value === String(v);
+      } else if (el instanceof HTMLInputElement) el.value = String(v);
+    };
+
+    function render() {
+      const o = {
+        photo: val('photo'),
+        align: val('align') as 'left' | 'right',
+        tone: val('tone'),
+        treatment: val('treatment'),
+        wash: val('wash') as 'fade' | 'none',
+        backdrop: val('backdrop'),
+        shift: Number(val('shift')),
+      };
+      const autoFocus = o.align === 'right' ? '30% 35%' : '70% 35%';
+      if (!focusTouched) {
+        const [x, y] = autoFocus.split(' ').map(parseFloat);
+        setVal('focusX', x);
+        setVal('focusY', y);
+      }
+      const focus = focusTouched ? `${val('focusX')}% ${val('focusY')}%` : autoFocus;
+
+      for (const k of ['align', 'tone', 'treatment', 'wash', 'backdrop'] as const) band.dataset[k] = o[k];
+      const vars = { ...impactShiftVars(o.shift, o.align, o.wash), '--impact-focus': focus };
+      for (const [k, v] of Object.entries(vars)) band.style.setProperty(k, v);
+
+      const photo = photos.find((p) => p.key === o.photo) ?? photos[0];
+      if (img.dataset.key !== photo.key) {
+        img.srcset = photo.srcset;
+        img.src = photo.src;
+        img.alt = photo.alt;
+        img.dataset.key = photo.key;
+      }
+      for (const [k, el] of Object.entries(parts)) if (el) el.hidden = !checked(k);
+
+      (form.elements.namedItem('shiftOut') as HTMLOutputElement).value = String(o.shift);
+      (form.elements.namedItem('focusOut') as HTMLOutputElement).value = focusTouched ? focus : 'auto';
+
+      // Markup with only the non-default props.
+      const props: string[] = ['as="h2"', 'image={photo}', `imageAlt="${photo.alt}"`];
+      if (o.align !== 'left') props.push(`align="${o.align}"`);
+      if (o.tone !== 'ink') props.push(`tone="${o.tone}"`);
+      if (o.treatment !== 'fade') props.push(`treatment="${o.treatment}"`);
+      if (o.wash !== 'fade') props.push(`wash="${o.wash}"`);
+      if (o.backdrop !== 'auto') props.push(`backdrop="${o.backdrop}"`);
+      if (o.shift) props.push(`shift={${o.shift}}`);
+      if (focusTouched) props.push(`focus="${focus}"`);
+      if (checked('eyebrow')) props.push('eyebrow="…"');
+      props.push(`title={'Build your\\nown band.'}`);
+      if (checked('body')) props.push('body="…"');
+      if (checked('ghost')) props.push('ghost="Leftovers"');
+      const inner = checked('actions') ? `>\n  <Button slot="actions" href="/join" variant="gold">Join a squad</Button>\n</ImpactBand>` : ' />';
+      code.textContent = `<ImpactBand\n  ${props.join('\n  ')}\n${inner.startsWith('>') ? inner : inner.trim()}`;
+
+      // The one rule a preset can't enforce for you.
+      hint.textContent =
+        o.wash === 'none' && checked('body') && o.backdrop !== 'panel'
+          ? 'Body text over a full photo: use backdrop="panel" so it passes AA.'
+          : '';
+
+      // Highlight a preset only while the options still match it.
+      root.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((b) => {
+        const p = presets[Number(b.dataset.preset)].set;
+        const match = Object.entries(p).every(([k, v]) => String((o as Record<string, unknown>)[k]) === String(v));
+        b.setAttribute('aria-pressed', String(match));
+      });
+    }
+
+    form.addEventListener('input', (e) => {
+      const name = (e.target as HTMLInputElement).name;
+      if (name === 'focusX' || name === 'focusY') focusTouched = true;
+      render();
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const p = presets[Number(b.dataset.preset)].set;
+        for (const [k, v] of Object.entries(p)) setVal(k, v);
+        focusTouched = false;
+        render();
+      })
+    );
+    root.querySelector('.pg-copy')!.addEventListener('click', async (e) => {
+      const btn = e.currentTarget as HTMLButtonElement;
+      try {
+        await navigator.clipboard.writeText(code.textContent ?? '');
+        btn.textContent = 'Copied';
+      } catch {
+        btn.textContent = 'Select and copy';
+      }
+      setTimeout(() => (btn.textContent = 'Copy'), 1500);
+    });
+    render();
+  }
+</script>

@@ -15,6 +15,15 @@
   # to be allowlisted here explicitly rather than silently loading.
   Content-Security-Policy: default-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; font-src 'self'; frame-src https://discord.com https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://browser-intake-datadoghq.com https://sdk-configuration.browser-intake-datadoghq.com; worker-src blob:; form-action 'self' https://buttondown.com https://*.list-manage.com https://docs.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'
 
+# /design (noindex doc page) frames ITSELF for its phone preview, so it may be
+# framed by the same origin, and may frame 'self'. "!" detaches the stricter
+# site-wide values first, or Cloudflare would join the two.
+/design
+  ! X-Frame-Options
+  ! Content-Security-Policy
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; font-src 'self'; frame-src 'self' https://discord.com https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://browser-intake-datadoghq.com https://sdk-configuration.browser-intake-datadoghq.com; worker-src blob:; form-action 'self' https://buttondown.com https://*.list-manage.com https://docs.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'self'
+
 # Fonts and hashed build assets are immutable — cache them hard.
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable

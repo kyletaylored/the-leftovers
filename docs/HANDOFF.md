@@ -332,11 +332,10 @@ inline-styled HTML into the repo.
    - `PricingCard`: its "Sponsor a Slot" tier idea needs a business decision.
    - `Toast`: nothing triggers it yet.
    - `AgendaList`, `ImagePlaceholder`, `RadioGroup`, `CheckboxGroup`.
-   - Motion (`/design#motion`): `Ticker`, `RiceTerraces animate` and the
-     `.bg-drift` texture modifier. Pick placements with the owner; the
-     homepage hero foot (drifting sand + swaying terraces) and a ticker under
-     the nav for the next event are the obvious candidates. One moving
-     element per screen.
+   - `Ticker` (`/design#motion`): a ticker under the nav for the next
+     event is the obvious candidate, but not in the same view as the
+     animated homepage hero. (`<Hero animate>`, drifting sand + swaying
+     terraces, is live on the homepage since 5 Nov 2026.)
 6. **Admin view for join requests and payments.** Researched, not built. See
    [JOIN.md](JOIN.md#a-real-admin-interface-researched-not-built).
 

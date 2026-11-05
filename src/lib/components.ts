@@ -65,7 +65,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'Hero', file: 'Hero.astro', kind: 'Astro', group: 'layout', section: 'blocks',
     use: 'Homepage / landing-page opener. Owns the page h1.',
-    options: 'variant: brand|ornate|image|video|text · title · tagline (split on "/") · image+imageAlt · video+poster',
+    options: 'variant: brand|ornate|image|video|text · title · tagline (split on "/") · image+imageAlt · video+poster · animate (drifting sand + swaying terraces on ornate)',
     avoid: 'Interior pages (use PageHeader). ornate is the once-per-site showpiece (homepage).',
     pairs: ['ImpactBand', 'Section'],
   },
@@ -91,7 +91,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'ThreeColumn', file: 'ThreeColumn.astro', kind: 'Astro', group: 'layout', section: 'blocks',
     use: 'Icon + title + body benefits row (3 items, stacks on phones).',
-    options: 'items[{icon?, title, body}] · as',
+    options: 'items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section) · iconStyle: tile|circle (gold ring, favicon badge) · as',
   },
 
   // --------------------------------------------------------------- content
@@ -142,8 +142,8 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'ImpactBand', file: 'marketing/ImpactBand.astro', kind: 'Astro', group: 'marketing', section: 'marketing',
     use: 'Full-bleed action photo fading into big copy (manifesto, recruiting push). Buttons in slot="actions".',
-    options: 'image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus · priority (LCP image) · as',
-    avoid: 'Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between.',
+    options: 'image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus (object-position) · priority (LCP image) · as. Desktop only: shift -30..30 (% of band, negative = left; slide a centred player out from under the copy) · wash: fade|none (none = photo edge to edge, full colour or tinted) · backdrop: auto|none|scrim|panel (auto = scrim when wash=none). Try combinations in the /design#impactband-playground',
+    avoid: 'Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between. wash="none" with body text or stats but no backdrop="panel" (scrim alone can fail AA on a bright photo).',
     pairs: ['Hero', 'TwoColumn'],
   },
   {
@@ -209,7 +209,7 @@ export const catalog: CatalogEntry[] = [
     use: 'Slim scrolling news bar: next event, a drop, open roster spots. Full-bleed, under the nav or between sections.',
     options: 'items[string|{label, kicker?, href?}] · label (accessible name) · tone: gold|crimson|ink · duration (s) · reverse',
     data: 'build items from events/players/preorders at the call site',
-    avoid: 'More than one per page, above the h1, or in the same view as other motion.',
+    avoid: 'More than one per page, above the h1, or in the same view as other motion (incl. an animated hero).',
   },
 
   // ---------------------------------------------------------------- events
@@ -387,7 +387,7 @@ export const catalog: CatalogEntry[] = [
     name: '.bg-drift', file: 'src/styles/global.css', kind: 'CSS utility', group: 'brand', section: 'motion',
     use: 'Add next to any .bg-* texture to drift its tile sideways (hero / PageHeader).',
     options: '.bg-drift-reverse · [--drift-duration:Ns]',
-    avoid: 'Pairing with another moving element in the same view.',
+    avoid: 'A Ticker or autoplaying slideshow in the same view.',
   },
 
   // ------------------------------------------------------------------ site
@@ -406,7 +406,7 @@ export const recipes: { name: string; example: string; steps: string }[] = [
   {
     name: 'Homepage / landing',
     example: 'src/pages/index.astro',
-    steps: 'Hero variant=ornate (+RiceTerraces) → ImpactBand → GallerySlideshow layout=showcase → TwoColumn (boxed break) → ImpactBand tone=crimson → Section tone=seigaiha + LogoStrip → NewsletterBlock',
+    steps: 'Hero variant=ornate animate (+RiceTerraces) → ImpactBand → GallerySlideshow layout=showcase → TwoColumn (boxed break) → ImpactBand tone=crimson → Section tone=seigaiha + LogoStrip → NewsletterBlock',
   },
   {
     name: 'Long-form / legal (Markdown body)',
@@ -456,5 +456,5 @@ export const rules: string[] = [
   'Tokens only, never raw hex. Images from src/assets/img via <Image>/getImage (CSP: img-src self).',
   'Islands hydrate client:visible and never above the fold.',
   'Full-bleed blocks (ImpactBand, CtaStrip, Ticker, GallerySlideshow hero/showcase) sit between Sections; never two full-bleed photo blocks in a row.',
-  'At most one moving element per view (Ticker, bg-drift, animated RiceTerraces, autoplay slideshow).',
+  'Motion stays ambient: drifting sand, swaying terraces and lanterns may share a hero, but never put a Ticker or an autoplaying slideshow in the same view as other motion.',
 ];

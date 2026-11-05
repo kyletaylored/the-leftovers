@@ -28,14 +28,39 @@
  *    strength is set per tone (`tint` below): crimson is the most
  *    saturated colour, so it tints at half strength or it floods the photo.
  *
+ * Desktop-only options for photos that won't sit nicely behind the copy:
+ *  - `shift` moves the photo sideways, -30..30 (% of the band; negative =
+ *    left). Most action shots centre the player, so with the copy on the
+ *    right the player ends up half under it and its fade: `shift={-28}` slides
+ *    them clear (the copy column plus fade covers ~80% of the band).
+ *    Away from the copy on a washed band it simply slides (the gap lands
+ *    under the solid wash). Otherwise (wash="none", or toward the copy) it
+ *    also widens so no edge shows, which crops a little more top and
+ *    bottom: keep those shifts small (about 10).
+ *    `focus` (CSS object-position) still picks the crop.
+ *  - `wash="none"` drops the side fade and edge melts so the photo shows
+ *    edge to edge in full colour (or in the duotone tint). Phones keep the
+ *    stacked layout and its fade, so they are always readable.
+ *  - `backdrop` keeps text readable over a busy photo: `scrim` (soft
+ *    shadow gradient behind the copy plus text shadow; the default with
+ *    wash="none") or `panel` (a solid tinted, blurred box). Use `panel`
+ *    whenever there's body text or stats: a scrim alone can't guarantee AA
+ *    over a bright photo.
+ *
+ * Implementation: every option is a data-* attribute or CSS variable on the
+ * <section>, styled in this file's <style> block, so the DOM never changes
+ * shape. The /design playground relies on that: it flips the same attributes
+ * on one rendered band. Shift maths is shared via src/lib/impact.ts.
+ *
  * Pick a photo whose subject is on the side AWAY from the copy, and nudge it
- * with `focus` (CSS object-position). `ghost` puts an outlined word huge
+ * with `focus` or `shift`. `ghost` puts an outlined word huge
  * behind the copy; it is aria-hidden, so don't put meaning there.
  *
  * Headings render at the level the caller passes (default h2). The title
  * accepts "\n" for deliberate line breaks; keep titles to two short lines.
  */
 import { Image } from 'astro:assets';
+import { impactShiftVars, toStyle } from '@/lib/impact';
 
 interface Stat {
   value: string | number;
@@ -58,6 +83,12 @@ interface Props {
   ghost?: string;
   tone?: ImpactTone;
   treatment?: 'fade' | 'duotone';
+  /** Desktop: `none` shows the photo edge to edge, no side fade or edge melts. */
+  wash?: 'fade' | 'none';
+  /** Desktop: what sits behind the copy. `auto` = none with a wash, scrim without. */
+  backdrop?: 'auto' | 'none' | 'scrim' | 'panel';
+  /** Desktop: slide the photo sideways, -30..30 (% of the band, negative = left). */
+  shift?: number;
   as?: 'h2' | 'h3';
   /** Set when the band is above the fold, so the photo isn't lazy-loaded. */
   priority?: boolean;
@@ -77,33 +108,35 @@ const {
   ghost,
   tone = 'ink',
   treatment = 'fade',
+  wash = 'fade',
+  backdrop = 'auto',
+  shift = 0,
   as: Heading = 'h2',
   priority = false,
   id,
   class: className = '',
 } = Astro.props;
 
-const right = align === 'right';
 const lines = title.split('\n');
-const position = focus ?? (right ? '30% 35%' : '70% 35%');
-
-const tones = {
-  ink: { wash: 'var(--color-ink)', bg: 'bg-ink', body: 'text-bone-muted', bar: 'bg-crimson', label: 'text-bone-muted', tint: 1 },
-  crimson: { wash: 'var(--color-crimson)', bg: 'bg-crimson', body: 'text-bone', bar: 'bg-gold', label: 'text-bone', tint: 0.45 },
-  forest: { wash: 'var(--color-forest)', bg: 'bg-forest', body: 'text-bone', bar: 'bg-gold', label: 'text-bone', tint: 0.75 },
-} as const;
-const t = tones[tone];
-const mix = (pct: number) => `color-mix(in srgb, ${t.wash} ${pct}%, transparent)`;
-
-// Solid under the copy column (0–44%), then a quick fall-off to the photo.
-const sideFade = `linear-gradient(to ${right ? 'left' : 'right'}, ${t.wash} 0%, ${t.wash} 44%, ${mix(80)} 56%, ${mix(35)} 67%, transparent 80%)`;
-const downFade = `linear-gradient(to top, ${t.wash} 0%, ${mix(70)} 22%, transparent 60%)`;
-const edgeMelt = `linear-gradient(to bottom, ${t.wash}, transparent 14%, transparent 84%, ${t.wash})`;
+const position = focus ?? (align === 'right' ? '30% 35%' : '70% 35%');
 const hasActions = Astro.slots.has('actions');
+// Every option is a data-* attribute or CSS variable on the <section>, and
+// all the styling lives in the <style> block below. One fixed DOM, so the
+// /design playground can switch options live with the component's own CSS.
+const vars = toStyle({ ...impactShiftVars(shift, align, wash), '--impact-focus': position });
 ---
 
-<section id={id} class:list={['relative isolate overflow-hidden', t.bg, className]}>
-  <div class="relative lg:absolute lg:inset-0">
+<section
+  id={id}
+  class:list={['impact relative isolate overflow-hidden', className]}
+  data-tone={tone}
+  data-align={align}
+  data-treatment={treatment}
+  data-wash={wash}
+  data-backdrop={backdrop}
+  style={vars}
+>
+  <div class="impact-media relative lg:absolute lg:inset-0">
     <Image
       src={image}
       alt={imageAlt}
@@ -112,33 +145,24 @@ const hasActions = Astro.slots.has('actions');
       loading={priority ? 'eager' : 'lazy'}
       fetchpriority={priority ? 'high' : undefined}
       decoding="async"
-      class:list={[
-        'aspect-[4/3] w-full object-cover sm:aspect-[16/9] lg:aspect-auto lg:h-full',
-        treatment === 'duotone' && 'grayscale contrast-125',
-      ]}
-      style={`object-position:${position}`}
+      class="impact-photo aspect-[4/3] w-full object-cover sm:aspect-[16/9] lg:aspect-auto lg:h-full"
     />
-    {
-      treatment === 'duotone' && (
-        <div class="absolute inset-0 mix-blend-color" style={`background:${t.wash};opacity:${t.tint}`} aria-hidden="true" />
-      )
-    }
+    <div class="impact-photo impact-tint absolute inset-0" aria-hidden="true"></div>
     {/* Phones/tablets: fade down into the copy below. */}
-    <div class="absolute inset-0 lg:hidden" style={`background:${downFade}`} aria-hidden="true" />
+    <div class="impact-down absolute inset-0 lg:hidden" aria-hidden="true"></div>
     {/* Desktop: fade sideways under the copy, plus top/bottom edge melts. */}
-    <div class="absolute inset-0 hidden lg:block" style={`background:${sideFade}`} aria-hidden="true" />
-    <div class="absolute inset-0 hidden lg:block" style={`background:${edgeMelt}`} aria-hidden="true" />
+    <div class="impact-side absolute inset-0 hidden lg:block" aria-hidden="true"></div>
+    <div class="impact-melt absolute inset-0 hidden lg:block" aria-hidden="true"></div>
   </div>
+  {/* Scrim sits over the band, not the (shifted) photo, so it stays put. */}
+  <div class="impact-scrim absolute inset-0 hidden" aria-hidden="true"></div>
 
   <div class="relative mx-auto -mt-16 max-w-7xl px-4 pb-14 sm:-mt-24 sm:px-6 sm:pb-16 lg:mt-0 lg:flex lg:min-h-[36rem] lg:items-center lg:py-20 xl:min-h-[40rem]">
-    <div class:list={['relative max-w-2xl lg:max-w-[56%]', right && 'lg:ml-auto lg:text-right']}>
+    <div class="impact-copy relative max-w-2xl lg:max-w-[56%]">
       {
         ghost && (
           <span
-            class:list={[
-              'pointer-events-none absolute -top-10 select-none font-display text-[5.5rem] uppercase leading-none text-transparent opacity-60 sm:-top-14 sm:text-[8rem] lg:-top-20 lg:text-[11rem]',
-              right ? 'right-0' : 'left-0',
-            ]}
+            class="impact-ghost pointer-events-none absolute -top-10 left-0 select-none font-display text-[5.5rem] uppercase leading-none text-transparent opacity-60 sm:-top-14 sm:text-[8rem] lg:-top-20 lg:text-[11rem]"
             style="-webkit-text-stroke:1px color-mix(in srgb, var(--color-gold) 35%, transparent)"
             aria-hidden="true"
           >
@@ -148,8 +172,8 @@ const hasActions = Astro.slots.has('actions');
       }
       {
         eyebrow && (
-          <p class:list={['eyebrow relative mb-3 flex items-center gap-3 sm:mb-4', right && 'lg:flex-row-reverse']}>
-            <span class:list={['block h-[3px] w-8 sm:w-10', t.bar]} aria-hidden="true" />
+          <p class="impact-eyebrow eyebrow relative mb-3 flex items-center gap-3 sm:mb-4">
+            <span class="impact-bar block h-[3px] w-8 sm:w-10" aria-hidden="true" />
             {eyebrow}
           </p>
         )
@@ -157,21 +181,10 @@ const hasActions = Astro.slots.has('actions');
       <Heading class="relative text-4xl leading-[0.92] text-bone sm:text-5xl xl:text-[4rem]">
         {lines.map((line) => <span class="block">{line}</span>)}
       </Heading>
-      {
-        body && (
-          <p class:list={['relative mt-5 max-w-md text-base leading-relaxed sm:mt-6 sm:text-lg', t.body, right && 'lg:ml-auto']}>
-            {body}
-          </p>
-        )
-      }
+      {body && <p class="impact-body relative mt-5 max-w-md text-base leading-relaxed sm:mt-6 sm:text-lg">{body}</p>}
       {
         stats.length > 0 && (
-          <dl
-            class:list={[
-              'relative mt-7 grid grid-cols-3 items-end gap-4 sm:mt-8 sm:flex sm:flex-wrap sm:gap-x-3 sm:gap-y-4',
-              right && 'lg:justify-end',
-            ]}
-          >
+          <dl class="impact-row relative mt-7 grid grid-cols-3 items-end gap-4 sm:mt-8 sm:flex sm:flex-wrap sm:gap-x-3 sm:gap-y-4">
             {/* The gold slash between stats is a pseudo-element (a <dl> may
                 only contain dt/dd groups), shown from sm up; phones get an
                 even three-column grid instead so nothing wraps mid-row. */}
@@ -182,7 +195,7 @@ const hasActions = Astro.slots.has('actions');
                   i > 0 && "sm:pl-8 sm:before:absolute sm:before:bottom-6 sm:before:left-1 sm:before:text-xl sm:before:text-gold sm:before:content-['/']",
                 ]}
               >
-                <dt class:list={['mt-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] sm:text-xs sm:tracking-[0.2em]', t.label]}>
+                <dt class="impact-label mt-1 text-[0.6rem] font-bold uppercase tracking-[0.16em] sm:text-xs sm:tracking-[0.2em]">
                   {stat.label}
                 </dt>
                 <dd class="numeral text-3xl leading-[0.85] sm:text-5xl">{stat.value}</dd>
@@ -193,7 +206,7 @@ const hasActions = Astro.slots.has('actions');
       }
       {
         hasActions && (
-          <div class:list={['relative mt-8 flex flex-col gap-3 sm:flex-row', right && 'lg:justify-end']}>
+          <div class="impact-row impact-actions relative mt-8 flex flex-col gap-3 sm:flex-row">
             <slot name="actions" />
           </div>
         )
@@ -201,3 +214,138 @@ const hasActions = Astro.slots.has('actions');
     </div>
   </div>
 </section>
+
+<style>
+  /* ---- tone: the wash colour, tint strength and text colours ---------- */
+  .impact {
+    --wash: var(--color-ink);
+    --tint: 1;
+    --body: var(--color-bone-muted);
+    --bar: var(--color-crimson);
+    --dir: to right; /* from the copy side toward the photo */
+    background: var(--wash);
+  }
+  .impact[data-tone='crimson'] {
+    --wash: var(--color-crimson);
+    /* the most saturated colour: half strength, or it floods the photo */
+    --tint: 0.45;
+    --body: var(--color-bone);
+    --bar: var(--color-gold);
+  }
+  .impact[data-tone='forest'] {
+    --wash: var(--color-forest);
+    --tint: 0.75;
+    --body: var(--color-bone);
+    --bar: var(--color-gold);
+  }
+  .impact[data-align='right'] {
+    --dir: to left;
+  }
+  .impact-body,
+  .impact-label {
+    color: var(--body);
+  }
+  .impact-bar {
+    background: var(--bar);
+  }
+
+  /* ---- photo, treatment, fades ---------------------------------------- */
+  .impact-photo {
+    object-position: var(--impact-focus);
+  }
+  .impact[data-treatment='duotone'] img.impact-photo {
+    filter: grayscale(1) contrast(1.25);
+  }
+  .impact-tint {
+    display: none;
+    background: var(--wash);
+    opacity: var(--tint);
+    mix-blend-mode: color;
+  }
+  .impact[data-treatment='duotone'] .impact-tint {
+    display: block;
+  }
+  .impact-down {
+    background: linear-gradient(to top, var(--wash) 0%, color-mix(in srgb, var(--wash) 70%, transparent) 22%, transparent 60%);
+  }
+  /* Solid under the copy column (0–44%), then a quick fall-off to the photo. */
+  .impact-side {
+    background: linear-gradient(
+      var(--dir),
+      var(--wash) 0%,
+      var(--wash) 44%,
+      color-mix(in srgb, var(--wash) 80%, transparent) 56%,
+      color-mix(in srgb, var(--wash) 35%, transparent) 67%,
+      transparent 80%
+    );
+  }
+  .impact-melt {
+    background: linear-gradient(to bottom, var(--wash), transparent 14%, transparent 84%, var(--wash));
+  }
+  .impact-scrim {
+    background: linear-gradient(
+      var(--dir),
+      color-mix(in srgb, var(--wash) 78%, transparent) 0%,
+      color-mix(in srgb, var(--wash) 55%, transparent) 30%,
+      color-mix(in srgb, var(--wash) 20%, transparent) 52%,
+      transparent 66%
+    );
+  }
+
+  @media (min-width: 1024px) {
+    /* shift: the layer grows toward one side, or only the photo slides
+       (src/lib/impact.ts decides which). The fades never move. */
+    .impact-media {
+      left: var(--impact-l, 0);
+      right: var(--impact-r, 0);
+    }
+    .impact-photo {
+      transform: translateX(var(--impact-x, 0));
+    }
+
+    /* wash="none": photo edge to edge; body copy in full bone. */
+    .impact[data-wash='none'] .impact-side,
+    .impact[data-wash='none'] .impact-melt {
+      display: none;
+    }
+    .impact[data-wash='none'] {
+      --body: var(--color-bone);
+    }
+
+    /* backdrop: scrim (also the auto choice without a wash) or panel. */
+    .impact[data-backdrop='scrim'] .impact-scrim,
+    .impact[data-wash='none'][data-backdrop='auto'] .impact-scrim {
+      display: block;
+    }
+    .impact[data-backdrop='scrim'] .impact-copy,
+    .impact[data-wash='none'][data-backdrop='auto'] .impact-copy {
+      text-shadow: 0 2px 18px rgb(0 0 0 / 0.55);
+    }
+    .impact[data-backdrop='panel'] .impact-copy {
+      padding: 2.25rem 2.5rem;
+      border: 1px solid color-mix(in srgb, var(--color-gold) 25%, transparent);
+      border-radius: 2px;
+      background: color-mix(in srgb, var(--wash) 84%, transparent);
+      backdrop-filter: blur(10px);
+    }
+
+    /* align="right": mirror the copy column. */
+    .impact[data-align='right'] .impact-copy {
+      margin-left: auto;
+      text-align: right;
+    }
+    .impact[data-align='right'] .impact-eyebrow {
+      flex-direction: row-reverse;
+    }
+    .impact[data-align='right'] .impact-body {
+      margin-left: auto;
+    }
+    .impact[data-align='right'] .impact-row {
+      justify-content: flex-end;
+    }
+    .impact[data-align='right'] .impact-ghost {
+      left: auto;
+      right: 0;
+    }
+  }
+</style>

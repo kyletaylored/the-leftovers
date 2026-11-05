@@ -17,12 +17,12 @@ Read this before building or changing a page. It replaces reading `src/pages/des
 - Tokens only, never raw hex. Images from src/assets/img via <Image>/getImage (CSP: img-src self).
 - Islands hydrate client:visible and never above the fold.
 - Full-bleed blocks (ImpactBand, CtaStrip, Ticker, GallerySlideshow hero/showcase) sit between Sections; never two full-bleed photo blocks in a row.
-- At most one moving element per view (Ticker, bg-drift, animated RiceTerraces, autoplay slideshow).
+- Motion stays ambient: drifting sand, swaying terraces and lanterns may share a hero, but never put a Ticker or an autoplaying slideshow in the same view as other motion.
 
 ## Page recipes
 
 - **Interior page (default)** (`src/pages/contact.astro`): PageHeader (pattern sand) → Section tone=base → Section tone=alt → … alternate → CtaStrip or a closing Section with Buttons
-- **Homepage / landing** (`src/pages/index.astro`): Hero variant=ornate (+RiceTerraces) → ImpactBand → GallerySlideshow layout=showcase → TwoColumn (boxed break) → ImpactBand tone=crimson → Section tone=seigaiha + LogoStrip → NewsletterBlock
+- **Homepage / landing** (`src/pages/index.astro`): Hero variant=ornate animate (+RiceTerraces) → ImpactBand → GallerySlideshow layout=showcase → TwoColumn (boxed break) → ImpactBand tone=crimson → Section tone=seigaiha + LogoStrip → NewsletterBlock
 - **Long-form / legal (Markdown body)** (`src/pages/privacy.astro`): PageHeader → Section tone=base > Prose > <Content /> → Buttons (outline + ghost)
 - **Schedule** (`src/pages/events.astro`): PageHeader → Section: EventsCalendar → Section: Countdown + EventCard layout=feature (next) + EventCard grid (upcoming) → Section tone=alt: past EventCards, or MascotCallout when empty
 - **Team / about** (`src/pages/team.astro`): PageHeader → story Section (Prose + StatNumbers + Callout) → roster Section (PlayerCard grid) → stats (StatLeaderboardTable / TeamStatsWidget, MascotCallout until data) → FaqAccordion → CtaStrip tone=forest
@@ -55,7 +55,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Avoid: On the homepage (use Hero). Never add a second h1 below it.
   - Pairs with: Section
 - **Hero** (`Hero.astro`): Homepage / landing-page opener. Owns the page h1.
-  - Options: variant: brand|ornate|image|video|text · title · tagline (split on "/") · image+imageAlt · video+poster
+  - Options: variant: brand|ornate|image|video|text · title · tagline (split on "/") · image+imageAlt · video+poster · animate (drifting sand + swaying terraces on ornate)
   - Avoid: Interior pages (use PageHeader). ornate is the once-per-site showpiece (homepage).
   - Pairs with: ImpactBand, Section
 - **Section** (`Section.astro`): Every content band below the header: container, heading block, background.
@@ -69,7 +69,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Avoid: Alternating runs of media rows (use FeatureRow).
   - Pairs with: Button
 - **ThreeColumn** (`ThreeColumn.astro`): Icon + title + body benefits row (3 items, stacks on phones).
-  - Options: items[{icon?, title, body}] · as
+  - Options: items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section) · iconStyle: tile|circle (gold ring, favicon badge) · as
 
 ### Content blocks
 
@@ -98,8 +98,8 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 ### Marketing & media
 
 - **ImpactBand** (`marketing/ImpactBand.astro`): Full-bleed action photo fading into big copy (manifesto, recruiting push). Buttons in slot="actions".
-  - Options: image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus · priority (LCP image) · as
-  - Avoid: Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between.
+  - Options: image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus (object-position) · priority (LCP image) · as. Desktop only: shift -30..30 (% of band, negative = left; slide a centred player out from under the copy) · wash: fade|none (none = photo edge to edge, full colour or tinted) · backdrop: auto|none|scrim|panel (auto = scrim when wash=none). Try combinations in the /design#impactband-playground
+  - Avoid: Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between. wash="none" with body text or stats but no backdrop="panel" (scrim alone can fail AA on a bright photo).
   - Pairs with: Hero, TwoColumn
 - **FeatureRow** (`marketing/FeatureRow.astro`): Alternating media + copy rows. Flip every other row with reverse.
   - Options: title · body · eyebrow · ctaLabel+ctaHref · image+imageAlt (topo fallback) · reverse
@@ -130,7 +130,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **Ticker** (`Ticker.astro`): Slim scrolling news bar: next event, a drop, open roster spots. Full-bleed, under the nav or between sections.
   - Options: items[string|{label, kicker?, href?}] · label (accessible name) · tone: gold|crimson|ink · duration (s) · reverse
   - Data: build items from events/players/preorders at the call site
-  - Avoid: More than one per page, above the h1, or in the same view as other motion.
+  - Avoid: More than one per page, above the h1, or in the same view as other motion (incl. an animated hero).
 
 ### Events, team & stats
 
@@ -218,7 +218,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **Badge** (`brand/Badge.astro`): Round team crest.
 - **.bg-drift** (`src/styles/global.css`, CSS utility): Add next to any .bg-* texture to drift its tile sideways (hero / PageHeader).
   - Options: .bg-drift-reverse · [--drift-duration:Ns]
-  - Avoid: Pairing with another moving element in the same view.
+  - Avoid: A Ticker or autoplaying slideshow in the same view.
 
 ### Site chrome (already in BaseLayout; never add to a page)
 
