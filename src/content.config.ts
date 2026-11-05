@@ -302,7 +302,173 @@ const faqs = defineCollection({
   }),
 });
 
+/**
+ * Landing pages: the page builder (Nov 2026).
+ *
+ * A landing page is a fixed `hero` plus an ordered list of `sections`, picked
+ * and dragged into order in Pages CMS (`type: block` in .pages.yml). Each
+ * block's `type` selects an existing component in BlockRenderer.astro, so
+ * editors compose pages but can't invent styling.
+ *
+ * The hero is deliberately NOT a block. Fixing it to the top guarantees the
+ * one-h1 rule and keeps React islands (the gallery block) below the fold.
+ *
+ * `optText` accepts null and '' because a form can save an untouched optional
+ * field either way; both mean "not set". Buttons are a list for the same
+ * reason: an empty list is no button, never a half-filled one.
+ */
+const optText = z
+  .string()
+  .nullish()
+  .transform((value) => value || undefined);
+
+const optList = <T extends z.ZodType>(item: T) =>
+  z
+    .array(item)
+    .nullish()
+    .transform((value) => value ?? []);
+
+const ctas = optList(
+  z.object({
+    label: z.string(),
+    href: z.string(),
+    variant: z.enum(['primary', 'outline', 'gold', 'ghost']).default('primary'),
+  })
+);
+
+const sectionTone = z.enum(['base', 'alt', 'topo', 'sand', 'seigaiha']).default('base');
+
+const landingBlock = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('impactBand'),
+    image: imagePath,
+    imageAlt: z.string().min(1),
+    eyebrow: optText,
+    title: z.string(),
+    body: optText,
+    stats: optList(z.object({ value: z.string(), label: z.string() })),
+    ghost: optText,
+    align: z.enum(['left', 'right']).default('left'),
+    tone: z.enum(['ink', 'crimson', 'forest']).default('ink'),
+    treatment: z.enum(['fade', 'duotone']).default('fade'),
+    wash: z.enum(['fade', 'none']).default('fade'),
+    backdrop: z.enum(['auto', 'none', 'scrim', 'panel']).default('auto'),
+    shift: z.number().min(-30).max(30).nullish(),
+    focus: optText,
+    ctas,
+  }),
+  z.object({
+    type: z.literal('statement'),
+    eyebrow: optText,
+    lines: z.array(z.string()).min(1),
+  }),
+  z.object({
+    type: z.literal('gallery'),
+    /** A `galleries` entry. A string, not reference(): see BlockRenderer. */
+    gallery: z.string(),
+    layout: z.enum(['showcase', 'hero', 'peek', 'single']).default('showcase'),
+  }),
+  z.object({
+    type: z.literal('twoColumn'),
+    tone: sectionTone,
+    eyebrow: optText,
+    title: z.string(),
+    image: imagePath.nullish(),
+    imageAlt: z.string().min(1),
+    imageSide: z.enum(['left', 'right']).default('right'),
+    body: optText,
+    /** Numbered steps: a bold lead-in, then the sentence. */
+    steps: optList(z.object({ lead: z.string(), text: z.string() })),
+    ctas,
+  }),
+  z.object({
+    type: z.literal('announcement'),
+    tone: sectionTone,
+    eyebrow: optText,
+    title: optText,
+    heading: z.string(),
+    body: optText,
+    ctas,
+    /** Adds the leagues logo row from Site settings. */
+    showLeagues: z.boolean().default(false),
+    leaguesLabel: optText,
+  }),
+  z.object({
+    type: z.literal('threeColumn'),
+    tone: sectionTone,
+    eyebrow: optText,
+    title: optText,
+    layout: z.enum(['card', 'centered']).default('card'),
+    items: z.array(z.object({ title: z.string(), body: z.string() })).min(1),
+  }),
+  z.object({
+    type: z.literal('featureRow'),
+    eyebrow: optText,
+    title: z.string(),
+    body: z.string(),
+    image: imagePath.nullish(),
+    imageAlt: z.string().min(1),
+    reverse: z.boolean().default(false),
+    ctaLabel: optText,
+    ctaHref: optText,
+  }),
+  z.object({
+    type: z.literal('prose'),
+    tone: sectionTone,
+    eyebrow: optText,
+    title: optText,
+    /** Plain text. A blank line starts a new paragraph. */
+    body: z.string(),
+  }),
+  z.object({
+    type: z.literal('ctaStrip'),
+    tone: z.enum(['crimson', 'forest']).default('crimson'),
+    eyebrow: optText,
+    title: z.string(),
+    body: optText,
+    ctas,
+  }),
+  z.object({
+    type: z.literal('newsletter'),
+    tone: sectionTone,
+    eyebrow: optText,
+    title: optText,
+    body: optText,
+  }),
+  z.object({
+    type: z.literal('faq'),
+    tone: sectionTone,
+    eyebrow: optText,
+    title: optText,
+  }),
+]);
+
+const landing = defineCollection({
+  loader: glob({ base: './src/content/landing', pattern: '**/*.{yml,yaml}' }),
+  schema: z.object({
+    title: z.string(),
+    /** Drafts build at /preview/<slug>, noindexed. Published: /<slug>. */
+    status: z.enum(['draft', 'published']).default('draft'),
+    hero: z
+      .object({
+        variant: z.enum(['ornate', 'brand', 'image', 'text']).default('ornate'),
+        title: optText,
+        tagline: optText,
+        image: imagePath.nullish(),
+        imageAlt: optText,
+        animate: z.boolean().default(false),
+        ctas,
+      })
+      .refine((hero) => hero.variant !== 'image' || (hero.image && hero.imageAlt), {
+        message: 'A photo hero needs both an image and its alt text.',
+      }),
+    sections: z.array(landingBlock).default([]),
+    seo,
+  }),
+});
+
 export const collections = {
+  landing,
   players,
   events,
   results,
