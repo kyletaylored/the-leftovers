@@ -50,7 +50,7 @@ const year = new Date().getFullYear();
         <h2 class="title-sm text-sm tracking-[0.2em] text-bone">Explore</h2>
         <ul class="mt-4 grid grid-cols-2 gap-x-4">
           {
-            site.nav.map((item) => (
+            [...site.nav, ...site.footerNav].map((item) => (
               <li>
                 <a
                   href={item.href}

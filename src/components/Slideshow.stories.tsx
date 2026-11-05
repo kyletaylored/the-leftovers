@@ -109,3 +109,30 @@ export const ShowcaseCrimson: Story = {
     await expect(canvas.getByText('Off the break')).toBeInTheDocument();
   },
 };
+
+const manySlides: Slide[] = Array.from({ length: 10 }, (_, index) => ({
+  src: `https://picsum.photos/seed/leftovers-grid-${index}/800/600`,
+  thumbSrc: `https://picsum.photos/seed/leftovers-grid-${index}/160/120`,
+  width: 800,
+  height: 600,
+  alt: `Sample photo ${index + 1}`,
+}));
+
+/** Paged thumbnail grid for browsing many photos, as on /gallery. */
+export const GridWithPager: Story = {
+  args: { slides: manySlides, layout: 'single', indicators: 'grid', pageSize: 4, captionStyle: 'flag' },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // Lazy: only the first photo and its neighbours are mounted.
+    await expect(canvasElement.querySelectorAll('figure img')).toHaveLength(3);
+    await expect(canvas.queryByRole('button', { name: /go to slide 5/i })).toBeNull();
+
+    await userEvent.click(canvas.getByRole('button', { name: /next page of photos/i }));
+    const fifth = await canvas.findByRole('button', { name: /go to slide 5/i });
+    await expect(canvas.queryByRole('button', { name: /go to slide 1$/i })).toBeNull();
+
+    await userEvent.click(fifth);
+    await expect(fifth).toHaveAttribute('aria-current', 'true');
+    await expect(canvas.getByText(/photo 5 of 10/i)).toBeVisible();
+    await expect(canvasElement.querySelectorAll('figure img').length).toBeGreaterThan(3);
+  },
+};

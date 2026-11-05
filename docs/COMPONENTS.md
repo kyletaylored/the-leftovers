@@ -122,7 +122,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Options: images[]
   - Data: preorders collection images
 - **GallerySlideshow** (`GallerySlideshow.astro`, Astro + island): Photo carousel from the galleries collection. Use this on pages, not Slideshow directly.
-  - Options: layout: peek|single|hero|showcase · indicators: dashes|thumbnails · captionStyle: below|flag · tone: ink|crimson|forest · autoplayMs · emptyTitle/emptyBody
+  - Options: layout: peek|single|hero|showcase · indicators: dashes|thumbnails|grid (paged, lazy; with single) · pageSize (grid, default 8) · captionStyle: below|flag · tone: ink|crimson|forest · autoplayMs · emptyTitle/emptyBody
   - Data: galleries collection
   - Avoid: hero/showcase inside a Section (they are full-bleed).
 - **Gallery** (`Gallery.astro`): Masonry photo grid, zero JS.
@@ -174,9 +174,9 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **StatNumber** (`StatNumber.astro`): One big gold ribbed figure + label.
   - Options: value · label · size: md|sm|lg
   - Data: computed from collections, never typed into content
-- **TeamStatsWidget** (`TeamStatsWidget.astro`): Live team match cards from pblidb.org (build-time fetch, fails soft).
-  - Options: widget
-  - Data: src/lib/pblidb.ts
+- **TeamStatsWidget** (`TeamStatsWidget.astro`): A squad record from pblidb.org (build-time fetch, fails soft). Show ATTRIBUTION with it.
+  - Options: widget · as
+  - Data: getTeamWidgets() in src/lib/pblidb.ts
 
 ### Forms
 

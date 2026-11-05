@@ -34,6 +34,12 @@ import { FULL_BLEED_SIZES } from '@/lib/layout';
  *    mid-page recap/sponsor reel).
  *  - `indicators`: `dashes` (default) when captions carry the context, or
  *    `thumbnails` when the shots themselves are worth previewing.
+ *    `grid` (Nov 2026) is for browsing many photos: a paged grid of small
+ *    thumbnails with a pager and "Photo 3 of 10" counter. It's built to save
+ *    bandwidth: thumbnails use `thumbSrc`, only the current grid page's are
+ *    in the DOM, and a large photo only mounts once it or a neighbour is
+ *    reached, then stays mounted. Photos show whole (object-contain), not
+ *    cropped. With JS off, the first photo and first grid page still show.
  *  - `captionStyle`: `below` (default, figcaption strip) or `flag` (the
  *    clipped crimson ribbon on the image's bottom-left). `hero` always flags.
  *  - `showcase` (Nov 2026): the full-bleed sports-poster slider (think
@@ -56,6 +62,8 @@ export interface Slide {
   /** Rendered src + srcset, produced by Astro's image service. */
   src: string;
   srcSet?: string;
+  /** Small version for the `grid` indicator. Falls back to `src`. */
+  thumbSrc?: string;
   width: number;
   height: number;
   alt: string;
@@ -65,7 +73,7 @@ export interface Slide {
 }
 
 export type SlideshowLayout = 'peek' | 'single' | 'hero' | 'showcase';
-export type SlideshowIndicators = 'dashes' | 'thumbnails';
+export type SlideshowIndicators = 'dashes' | 'thumbnails' | 'grid';
 export type SlideshowCaptionStyle = 'below' | 'flag';
 export type SlideshowTone = 'ink' | 'crimson' | 'forest';
 
@@ -82,6 +90,8 @@ interface SlideshowProps {
   autoplayMs?: number;
   layout?: SlideshowLayout;
   indicators?: SlideshowIndicators;
+  /** `grid` indicators: thumbnails per page. */
+  pageSize?: number;
   captionStyle?: SlideshowCaptionStyle;
   /** `showcase` only: overlay colour. */
   tone?: SlideshowTone;
@@ -125,6 +135,10 @@ function CaptionFlag({
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');
+
+/** A slide and the ones either side of it, wrapping at the ends. */
+const neighbours = (index: number, total: number) =>
+  total > 0 ? [index, (index + 1) % total, (index - 1 + total) % total] : [];
 
 /** Square, on-brand control button for the showcase bar (44px target). */
 function ShowcaseButton({
@@ -176,12 +190,14 @@ export default function Slideshow({
   autoplayMs,
   layout = 'peek',
   indicators = 'dashes',
+  pageSize = 8,
   captionStyle = 'below',
   tone = 'ink',
   className,
 }: SlideshowProps) {
   const isHero = layout === 'hero';
   const isShowcase = layout === 'showcase';
+  const isGrid = indicators === 'grid' && !isHero && !isShowcase;
   const flag = isHero || captionStyle === 'flag';
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
@@ -190,6 +206,11 @@ export default function Slideshow({
   const [motionOK, setMotionOK] = useState(false);
   const [playing, setPlaying] = useState(true);
   const [held, setHeld] = useState(false);
+  // Grid mode: the thumbnail page on show, and which large photos have been
+  // reached. Both are derived from `current` but can't be computed from it:
+  // paging doesn't move the photo, and `seen` only ever grows.
+  const [page, setPage] = useState(0);
+  const [seen, setSeen] = useState(() => new Set(neighbours(0, slides.length)));
 
   useEffect(() => {
     setMotionOK(!window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -235,9 +256,17 @@ export default function Slideshow({
     };
   }, [api, autoplayMs, isShowcase]);
 
+  useEffect(() => {
+    if (!isGrid) return;
+    setPage(Math.floor(current / pageSize));
+    setSeen((prev) => new Set([...prev, ...neighbours(current, slides.length)]));
+  }, [current, isGrid, pageSize, slides.length]);
+
   const scrollTo = useCallback((index: number) => api?.scrollTo(index), [api]);
 
   if (slides.length === 0) return null;
+
+  const pageCount = Math.ceil(slides.length / pageSize);
 
   if (isShowcase) {
     const autoplay = Boolean(autoplayMs) && motionOK && slides.length > 1;
@@ -406,33 +435,40 @@ export default function Slideshow({
   return (
     <div className={cn('relative', className)}>
       <Carousel setApi={setApi} opts={{ loop: slides.length > 2 }} className="w-full">
-        <CarouselContent>
+        <CarouselContent className={isGrid ? 'ml-0' : undefined}>
           {slides.map((slide, index) => (
             <CarouselItem
               key={slide.src}
               aria-label={`${index + 1} of ${slides.length}`}
               className={cn(
                 'basis-full',
+                isGrid && 'pl-0',
                 layout === 'peek' && 'sm:basis-4/5 lg:basis-2/3'
               )}
             >
               <figure className="relative overflow-hidden rounded-sm border border-border bg-card">
-                <img
-                  src={slide.src}
-                  srcSet={slide.srcSet}
-                  sizes={
-                    layout === 'peek'
-                      ? '(min-width: 1024px) 60vw, (min-width: 640px) 78vw, 92vw'
-                      : '(min-width: 1320px) 1320px, 100vw'
-                  }
-                  width={slide.width}
-                  height={slide.height}
-                  alt={slide.alt}
-                  // Only the hero layout can be above the fold.
-                  loading={index === 0 && isHero ? 'eager' : 'lazy'}
-                  decoding="async"
-                  className={cn(aspectFor[layout], 'w-full object-cover')}
-                />
+                {isGrid && !seen.has(index) ? (
+                  // Holds the slide's space until it's near enough to load.
+                  <div className={cn(aspectFor[layout], 'w-full bg-ink-900')} />
+                ) : (
+                  <img
+                    src={slide.src}
+                    srcSet={slide.srcSet}
+                    sizes={
+                      layout === 'peek'
+                        ? '(min-width: 1024px) 60vw, (min-width: 640px) 78vw, 92vw'
+                        : '(min-width: 1320px) 1320px, 100vw'
+                    }
+                    width={slide.width}
+                    height={slide.height}
+                    alt={slide.alt}
+                    // Only the hero layout and a grid page's first photo can
+                    // be the page's main image.
+                    loading={index === 0 && (isHero || isGrid) ? 'eager' : 'lazy'}
+                    decoding="async"
+                    className={cn(aspectFor[layout], 'w-full', isGrid ? 'bg-ink-900 object-contain' : 'object-cover')}
+                  />
+                )}
                 {(slide.caption ?? slide.kicker) &&
                   (flag ? (
                     <figcaption>
@@ -515,6 +551,56 @@ export default function Slideshow({
               <img src={slide.src} alt="" loading="lazy" decoding="async" className="size-full object-cover" />
             </button>
           ))}
+        </div>
+      )}
+
+      {slides.length > 1 && isGrid && (
+        <div className="mt-4">
+          <ul className="grid grid-cols-4 gap-2">
+            {slides.slice(page * pageSize, (page + 1) * pageSize).map((slide, offset) => {
+              const index = page * pageSize + offset;
+              return (
+                <li key={slide.src}>
+                  <button
+                    type="button"
+                    onClick={() => scrollTo(index)}
+                    aria-label={`Go to slide ${index + 1}`}
+                    aria-current={index === current ? 'true' : undefined}
+                    className={cn(
+                      'block aspect-[4/3] w-full overflow-hidden rounded-sm transition-colors',
+                      index === current
+                        ? 'border-2 border-gold'
+                        : 'border border-ink-600 opacity-70 hover:opacity-100'
+                    )}
+                  >
+                    <img
+                      src={slide.thumbSrc ?? slide.src}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="size-full object-cover"
+                    />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="mt-4 flex items-center justify-between gap-3">
+            {pageCount > 1 && (
+              <ShowcaseButton label="Previous page of photos" onClick={() => setPage((page - 1 + pageCount) % pageCount)}>
+                <Arrow left />
+              </ShowcaseButton>
+            )}
+            <p className="flex-1 text-center text-sm text-bone-muted" aria-live="polite">
+              Photo {current + 1} of {slides.length}
+              {pageCount > 1 && ` · Page ${page + 1} of ${pageCount}`}
+            </p>
+            {pageCount > 1 && (
+              <ShowcaseButton label="Next page of photos" onClick={() => setPage((page + 1) % pageCount)}>
+                <Arrow />
+              </ShowcaseButton>
+            )}
+          </div>
         </div>
       )}
 

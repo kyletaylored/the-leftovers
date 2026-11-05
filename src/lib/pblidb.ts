@@ -1,47 +1,77 @@
 /**
- * pblidb.org — a third-party, unofficial team-stats database derived from
- * public PBLeague pages (not affiliated with PBLI). Real public JSON API,
- * no auth, no hard rate limit, but they explicitly ask consumers to fetch
- * at build time and cache rather than call per-request — see their own
- * `/docs`. Every response is stamped with the disclaimer text below; render
- * it, don't drop it, since it's the whole reason this is legally simple.
+ * pblidb.org (PBL Stats) — a third-party, unofficial stats database derived
+ * from public PBLeague pages, not affiliated with PBLI. Public JSON API, no
+ * auth. It asks static sites to fetch at build time and cache, which is why
+ * this isn't the browser widget. The data refreshes about weekly.
  *
- * All fetches happen at Astro build time (same SSG model as the `results`/
- * `players` collections) and fail soft: a network error, timeout, or 4xx/5xx
- * returns `null`/`[]` instead of throwing, so pblidb.org being unreachable
- * never breaks the site build — the stats section just doesn't render for
- * that run. See `getTeamWidgets` for the shape a page actually renders.
+ * One build-time call, and it fails soft: a network error, timeout or 4xx/5xx
+ * returns [] so pblidb.org being unreachable never breaks the site build.
+ *
+ * Two filters matter, both in `getTeamWidgets`:
+ *  - OUR_TEAMS, because a search for "leftovers" also finds unrelated teams.
+ *    It's keyed on `sourceTeamId`, not `id`: slugs with a number on the end
+ *    (`the-leftovers-5`) can change between refreshes.
+ *  - Decided results, not `matchesPlayed`. That count includes matches pblidb
+ *    has no result for yet, and a card reading "0-0, 58 matches" misleads.
+ *
+ * The list lives here rather than in site.yml because it isn't in .pages.yml,
+ * so a CMS save of Site settings could drop it.
  */
 
 const BASE_URL = 'https://pblidb.org/v1';
 const TIMEOUT_MS = 8000;
-export const ATTRIBUTION = 'Data via pblidb.org — unofficial, not affiliated with PBLI.';
+const TEAM_QUERY = 'leftovers';
+export const ATTRIBUTION = 'Data via PBL Stats (pblidb.org). Unofficial, not affiliated with PBLI.';
+
+/**
+ * Left out on purpose: Dynamic Leftovers, Leftovers (Open 3v3) and THE
+ * LEFTOVERS (Portugal Open). pblidb splits the main team into four empty
+ * records, so all four are listed until it's clear which are ours.
+ */
+const OUR_TEAMS = new Set([
+  'LxgIo5LPaqVNPuku', // The Leftovers
+  'eOnEgoLcO0JMTXP0', // The Leftovers
+  'HFg6YKCb2wETwcro', // The Leftovers
+  'vBF7C4LnYzNnbxwC', // The Leftovers
+  'INFWOMAJMpLZasFj', // The Leftovers 10v10
+  'PCOSr0KmbpAFNzjm', // The Leftovers 3-Man
+  'LiB1Gpa4Sv1qak3v', // The Leftovers AM
+  '5FDJWUUpH21YlIME', // The Leftovers AM II
+  '4JFWOnM6wQRydvxv', // The Leftovers I
+  'wHXha72N1R66VyDA', // The Leftovers I.5
+  'WwNOkn7W3MpvQAW4', // The Leftovers II
+  'VKarJUbVYj24cVL1', // The Leftovers II.5
+  'Vs5AJMp9au763iam', // The Leftovers III
+  'a6PiaoddRvu1nLbd', // The Leftovers III.5
+  'bAfMtRuQ2CvQ7Im6', // The Leftovers INTERM
+  'c47UfA2etI0gEVyP', // The Leftovers IV
+  'oPSJGyDLVyByNWZY', // The Leftovers IV.5
+  'PRlX8AYApieGQuFm', // The Leftovers Kidz
+  '9iTfSEoYiJ4Js89W', // The Leftovers Ladies
+  'ZnYfxjtmKt5YgYDO', // The Leftovers NOV
+  'V6afYioxALcu5Rax', // The Leftovers NOV II
+  'rCF6SLYslo0UIrMS', // The Leftovers NOV III
+  'cu3RtBfIabCn2Yqo', // The Leftovers NOV IV
+  '06HfZPdqkBftZccs', // The Leftovers NOV V
+  'iG64QxBdbNlJHb8N', // The Leftovers OG
+  '7ceoL4yiwwbLd1uE', // The Leftovers OG II
+  'H7EmTALkNlPvTIAe', // The Leftovers OG III
+  'UU2qrX8nVqNjYzxb', // The Leftovers V
+  'nk4C3N0Uno37NBPD', // The Leftovers VI
+]);
 
 export interface PblidbTeamSummary {
   id: string;
   canonicalName: string;
   sourceTeamId: string;
-}
-
-export interface PblidbEventStats {
-  eventId: string;
   matchesPlayed: number;
   wins: number;
   losses: number;
   ties: number;
-}
-
-export interface PblidbTeamStats {
-  matchesPlayed: number;
-  wins: number;
-  losses: number;
-  ties: number;
-  byEvent: PblidbEventStats[];
-}
-
-export interface TeamWidgetData {
-  team: PblidbTeamSummary;
-  stats: PblidbTeamStats;
+  scheduled: number;
+  events: number;
+  lastPlayed: string | null;
+  lastEventName: string | null;
 }
 
 async function pblidbFetch<T>(path: string): Promise<T | null> {
@@ -62,30 +92,15 @@ async function pblidbFetch<T>(path: string): Promise<T | null> {
   }
 }
 
-/** `GET /v1/teams?q=` — pblidb's own fuzzy match over team names. */
-export async function searchTeams(query: string): Promise<PblidbTeamSummary[]> {
-  if (!query.trim()) return [];
-  const results = await pblidbFetch<PblidbTeamSummary[]>(`/teams?q=${encodeURIComponent(query)}`);
-  return results ?? [];
-}
+/** Wins, losses and ties: the matches pblidb actually has a result for. */
+export const decidedMatches = (team: PblidbTeamSummary) => team.wins + team.losses + team.ties;
 
-export async function getTeamStats(teamId: string): Promise<PblidbTeamStats | null> {
-  return pblidbFetch<PblidbTeamStats>(`/teams/${encodeURIComponent(teamId)}/stats`);
-}
-
-/**
- * Resolves a fuzzy query into one stats widget per matching team — the
- * "multiple Leftovers teams, one widget each" feature. Teams with zero
- * recorded matches are dropped: an empty widget for a team pblidb barely
- * has data on isn't useful, it just pads the page.
- */
-export async function getTeamWidgets(query: string): Promise<TeamWidgetData[]> {
-  const teams = await searchTeams(query);
-  const withStats = await Promise.all(
-    teams.map(async (team) => {
-      const stats = await getTeamStats(team.id);
-      return stats && stats.matchesPlayed > 0 ? { team, stats } : null;
-    })
+/** Our teams with at least one known result, most matches first. */
+export async function getTeamWidgets(): Promise<PblidbTeamSummary[]> {
+  const data = await pblidbFetch<{ teams: PblidbTeamSummary[] }>(
+    `/team-summaries?q=${TEAM_QUERY}&limit=200`
   );
-  return withStats.flatMap((widget) => (widget ? [widget] : []));
+  return (data?.teams ?? []).filter(
+    (team) => OUR_TEAMS.has(team.sourceTeamId) && decidedMatches(team) > 0
+  );
 }

@@ -663,7 +663,7 @@ content:
   - name: galleries
     label: Photo galleries
     description: >-
-      Feeds the slideshow on the Community page. One entry per set — an event,
+      Every photo here shows on the Gallery page. One entry per set — an event,
       a season, a jersey drop. Every photo needs alt text.
     type: collection
     path: src/content/galleries
@@ -742,6 +742,14 @@ content:
         label: Navigation
         type: object
         list: true
+        fields:
+          - { name: label, label: Label, type: string, required: true }
+          - { name: href, label: Path, type: string, required: true }
+      - name: footerNav
+        label: Footer-only links
+        type: object
+        list: true
+        description: Shown in the footer after the navigation links, but not in the header.
         fields:
           - { name: label, label: Label, type: string, required: true }
           - { name: href, label: Path, type: string, required: true }
