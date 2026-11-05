@@ -49,6 +49,8 @@ import Toast from '@/components/Toast.astro';
 import CookieConsent from '@/components/CookieConsent.tsx';
 import ProfileCard from '@/components/ProfileCard.astro';
 import SponsorBand from '@/components/SponsorBand.astro';
+import TeamStatsWidget from '@/components/TeamStatsWidget.astro';
+import { getTeamWidgets } from '@/lib/pblidb';
 import EventCard from '@/components/EventCard.astro';
 import EventFees from '@/components/EventFees.astro';
 import EventSquads from '@/components/EventSquads.astro';
@@ -105,6 +107,7 @@ const [members, faqs, products, { upcoming, past, next }] = await Promise.all([
   getEvents(),
 ]);
 
+const teamWidgets = (await getTeamWidgets()).slice(0, 3);
 const sampleMember = members.sort((a, b) => a.data.order - b.data.order)[0];
 const allEvents = [...upcoming, ...past];
 const sampleEvent = next ?? upcoming[0] ?? past[0];
@@ -912,6 +915,18 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
           </div>
         </Specimen>
 
+        <Specimen title="TeamStatsWidget" class="lg:col-span-2" file={['src/components/TeamStatsWidget.astro', 'src/lib/pblidb.ts']} note="A squad's record from pblidb.org, fetched at build time. Shown here with live data, so it's empty if pblidb is unreachable. Only squads with known results qualify. Not on a public page yet.">
+          {
+            teamWidgets.length > 0 ? (
+              <div class="grid gap-4 sm:grid-cols-3">
+                {teamWidgets.map((widget) => <TeamStatsWidget widget={widget} as="h4" />)}
+              </div>
+            ) : (
+              <MascotCallout as="h4" title="No team stats this build" body="pblidb.org was unreachable, or none of our squads have results yet." />
+            )
+          }
+        </Specimen>
+
         <Specimen title="SponsorBand: above the footer" class="overflow-hidden lg:col-span-2" flush file="src/components/SponsorBand.astro" note="The sponsors row on every page, rendered by BaseLayout. Logos wrap onto new lines as sponsors are added, title tier first. Don't add it to a page yourself.">
           <SponsorBand />
         </Specimen>
@@ -956,6 +971,9 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
             <Slideshow client:visible slides={slides} layout="single" captionStyle="flag" />
           </Specimen>
 
+          <Specimen title="Carousel: grid with pager" tag="React island" file="src/components/Slideshow.tsx" note={'For browsing many photos, as on /gallery: a paged thumbnail grid. Lazy by design, so only nearby large photos and the current grid page load. indicators="grid", pageSize sets thumbnails per page (default 8). Use GallerySlideshow on real pages so thumbnails get their own small files.'}>
+            <Slideshow client:visible slides={slides} layout="single" captionStyle="flag" indicators="grid" pageSize={4} />
+          </Specimen>
           <Specimen title="Carousel: thumbnail strip" tag="React island" file="src/components/Slideshow.tsx" note={'indicators="thumbnails". Use when the shots themselves are worth previewing.'}>
             <Slideshow client:visible slides={slides} layout="single" captionStyle="flag" indicators="thumbnails" />
           </Specimen>

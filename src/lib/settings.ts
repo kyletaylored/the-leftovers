@@ -23,6 +23,8 @@ const settingsSchema = z.object({
   established: z.number(),
   homeBase: z.string().default(''),
   nav: z.array(linkSchema).min(1),
+  /** Extra links shown in the footer only, after `nav`. */
+  footerNav: z.array(linkSchema).default([]),
   primaryCta: linkSchema,
   social: z.object({
     instagram: z.string().optional(),
@@ -114,16 +116,6 @@ const settingsSchema = z.object({
       steps: z.array(z.object({ title: z.string(), body: z.string() })).default([]),
       /** Shown under a fee table, to say what the numbers are. */
       feeNote: z.string().default(''),
-    })
-    .prefault({}),
-  pblidb: z
-    .object({
-      /** Fuzzy query sent to pblidb.org's team search (`GET /v1/teams?q=`).
-       *  "leftovers" matches every "The Leftovers"/"Leftovers" team pblidb
-       *  has indexed across seasons/divisions, not just ours — that's the
-       *  point (§6, multi-widget stats). Leave blank to turn the stats
-       *  section off without a code change. */
-      query: z.string().default(''),
     })
     .prefault({}),
   // /join — request-to-play form (name, contact, division, player class,

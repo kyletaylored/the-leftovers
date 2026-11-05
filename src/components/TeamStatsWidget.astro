@@ -1,42 +1,41 @@
 ---
 /**
- * TeamStatsWidget — one card per pblidb.org team match (§6, live team
- * stats). pblidb has indexed several teams named "Leftovers"/"The
- * Leftovers" across different seasons/divisions — not all of them are us —
- * so this renders one widget per match rather than assuming a single team,
- * and leans on the visible name + match count to disambiguate rather than
- * guessing which one is "the real one".
+ * TeamStatsWidget — one squad's record from pblidb.org, fetched at build time
+ * by getTeamWidgets() in src/lib/pblidb.ts, which also decides which squads
+ * qualify.
+ *
+ * "Results" counts only matches with a known result, so it always agrees with
+ * the record beside it. pblidb's own match count can be higher while its data
+ * is still being backfilled. Show ATTRIBUTION from the same file near any use.
  */
-import type { TeamWidgetData } from '@/lib/pblidb';
+import { decidedMatches, type PblidbTeamSummary } from '@/lib/pblidb';
 
 interface Props {
-  widget: TeamWidgetData;
+  widget: PblidbTeamSummary;
+  as?: 'h2' | 'h3' | 'h4';
   class?: string;
 }
 
-const { widget, class: className = '' } = Astro.props;
-const { team, stats } = widget;
-const record = `${stats.wins}-${stats.losses}${stats.ties ? `-${stats.ties}` : ''}`;
+const { widget, as: Heading = 'h3', class: className = '' } = Astro.props;
+const record = `${widget.wins}-${widget.losses}${widget.ties ? `-${widget.ties}` : ''}`;
 ---
 
-<div
-  class:list={['rounded-sm border border-ink-600 bg-ink-800 p-5', className]}
-  data-team-name={team.canonicalName.toLowerCase()}
->
+<div class:list={['rounded-sm border border-ink-600 bg-ink-800 p-5', className]}>
   <p class="eyebrow mb-1">pblidb.org</p>
-  <h3 class="title-sm text-bone">{team.canonicalName}</h3>
+  <Heading class="title-sm text-bone">{widget.canonicalName}</Heading>
   <dl class="mt-4 grid grid-cols-3 gap-3 text-center">
     <div>
       <dt class="text-[0.65rem] uppercase tracking-[0.14em] text-bone-muted">Record</dt>
       <dd class="numeral mt-1 text-2xl leading-none">{record}</dd>
     </div>
     <div>
-      <dt class="text-[0.65rem] uppercase tracking-[0.14em] text-bone-muted">Matches</dt>
-      <dd class="numeral mt-1 text-2xl leading-none">{stats.matchesPlayed}</dd>
+      <dt class="text-[0.65rem] uppercase tracking-[0.14em] text-bone-muted">Results</dt>
+      <dd class="numeral mt-1 text-2xl leading-none">{decidedMatches(widget)}</dd>
     </div>
     <div>
       <dt class="text-[0.65rem] uppercase tracking-[0.14em] text-bone-muted">Events</dt>
-      <dd class="numeral mt-1 text-2xl leading-none">{stats.byEvent.length}</dd>
+      <dd class="numeral mt-1 text-2xl leading-none">{widget.events}</dd>
     </div>
   </dl>
+  {widget.lastEventName && <p class="mt-4 text-xs text-bone-muted">Last played: {widget.lastEventName}</p>}
 </div>

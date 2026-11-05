@@ -30,6 +30,11 @@ nav:
   - label: Contact
     href: /contact
 
+# Extra links in the footer only, after the ones above.
+footerNav:
+  - label: Gallery
+    href: /gallery
+
 primaryCta:
   label: Join a squad
   href: /join
@@ -192,15 +197,6 @@ eventProcess:
     These are the league's fees for a whole team, and they go up as each
     deadline passes. Your event fee depends on your event, format and
     division, and your captain confirms it before you pay.
-
-# pblidb.org team stats (unofficial, third-party — derived from public
-# PBLeague pages, not affiliated with PBLI). `query` is sent to their team
-# search at build time; every matching team gets its own stats widget on
-# the team stats section, since pblidb has indexed several unrelated-but-similarly-named
-# "Leftovers" teams across seasons and divisions. Leave blank to turn the
-# section off without a code change.
-pblidb:
-  query: leftovers
 
 # /join — request-to-play form. Leave `endpoint` EMPTY and the form still
 # works: it formats the request and hands it to the requester to send

@@ -183,7 +183,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'GallerySlideshow', file: 'GallerySlideshow.astro', kind: 'Astro + island', group: 'marketing', section: 'marketing', story: true,
     use: 'Photo carousel from the galleries collection. Use this on pages, not Slideshow directly.',
-    options: 'layout: peek|single|hero|showcase · indicators: dashes|thumbnails · captionStyle: below|flag · tone: ink|crimson|forest · autoplayMs · emptyTitle/emptyBody',
+    options: 'layout: peek|single|hero|showcase · indicators: dashes|thumbnails|grid (paged, lazy; with single) · pageSize (grid, default 8) · captionStyle: below|flag · tone: ink|crimson|forest · autoplayMs · emptyTitle/emptyBody',
     data: 'galleries collection',
     avoid: 'hero/showcase inside a Section (they are full-bleed).',
   },
@@ -288,9 +288,9 @@ export const catalog: CatalogEntry[] = [
     data: 'computed from collections, never typed into content',
   },
   {
-    name: 'TeamStatsWidget', file: 'TeamStatsWidget.astro', kind: 'Astro', group: 'events', section: 'index',
-    use: 'Live team match cards from pblidb.org (build-time fetch, fails soft).',
-    options: 'widget', data: 'src/lib/pblidb.ts',
+    name: 'TeamStatsWidget', file: 'TeamStatsWidget.astro', kind: 'Astro', group: 'events', section: 'marketing',
+    use: 'A squad record from pblidb.org (build-time fetch, fails soft). Show ATTRIBUTION with it.',
+    options: 'widget · as', data: 'getTeamWidgets() in src/lib/pblidb.ts',
   },
 
   // ----------------------------------------------------------------- forms

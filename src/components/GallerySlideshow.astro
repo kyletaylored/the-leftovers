@@ -29,6 +29,8 @@ interface Props {
   /** See Slideshow.tsx — `peek` (default), `single`, full-bleed `hero` or `showcase`. */
   layout?: SlideshowLayout;
   indicators?: SlideshowIndicators;
+  /** `grid` indicators: thumbnails per page. */
+  pageSize?: number;
   captionStyle?: SlideshowCaptionStyle;
   /** `showcase` only: overlay colour (ink | crimson | forest). */
   tone?: SlideshowTone;
@@ -42,6 +44,7 @@ const {
   autoplayMs,
   layout,
   indicators,
+  pageSize,
   captionStyle,
   tone,
   emptyTitle = 'No photos up yet',
@@ -67,9 +70,13 @@ const resolved = await Promise.all(
         format: 'webp',
       });
 
+      // The grid shows many at once, so it gets its own small files.
+      const thumb = indicators === 'grid' ? await getImage({ src: asset, width: 320, format: 'webp' }) : undefined;
+
       const slide: Slide = {
         src: optimized.src,
         srcSet: optimized.srcSet.attribute || undefined,
+        thumbSrc: thumb?.src,
         width: Number(optimized.attributes.width ?? asset.width),
         height: Number(optimized.attributes.height ?? asset.height),
         alt: photo.alt,
@@ -95,6 +102,7 @@ const slides: Slide[] = resolved.flatMap((slide) => (slide ? [slide] : []));
       autoplayMs={autoplayMs}
       layout={layout}
       indicators={indicators}
+      pageSize={pageSize}
       captionStyle={captionStyle}
       tone={tone}
       className={className}

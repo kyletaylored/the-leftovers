@@ -64,6 +64,7 @@ team deciding to:
 |---|---|---|
 | `/[slug]`, `/preview/[slug]` | `landing` pages composed in Pages CMS: published, and drafts (noindex) | `BlockRenderer`. `/preview/home` is the homepage rebuilt as blocks; `index.astro` is still what's live |
 | `/` | Home ("direction B"): ornate sand hero, `ImpactBand` manifesto, full-width showcase slider, "How it works" `TwoColumn` CTA, crimson free-agents `ImpactBand`, "2027 Season Loading…" + league logos, newsletter | Direction B promoted Nov 2026 |
+| `/gallery` | Every gallery photo: large photo, paged thumbnail grid, lazy loaded | Footer link only (`footerNav` in `site.yml`) |
 | `/about`, `/roster`, `/stats` | Redirect stubs: the first two go home, `/stats` goes to `/events` | `/team` was removed Nov 2026; see §7 for the planned `/about` |
 | `/events` | Next event with countdown and squads, how it works and fees, then each season's `SeasonStrip` and results | Unhidden 5 Nov 2026, in the nav and sitemap |
 | `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | **Hidden.** Products collection is empty on purpose |
@@ -182,7 +183,7 @@ docs/design/             Committed, downsized reference plates (see §6)
 | Island | Used on | Server half |
 |---|---|---|
 | `CountdownIsland` | `/events`, `/shop`, preorders | `Countdown.astro` pins the first value so hydration matches |
-| `Slideshow` | `/`, `/community`, `/design` | `GallerySlideshow.astro` optimises images at build time |
+| `Slideshow` | `/`, `/gallery`, `/community`, `/design` | `GallerySlideshow.astro` optimises images at build time |
 | `Calendar` | `/design` only | `EventsCalendar.astro`. Day links are plain `#slug` anchors that work without JS |
 | `PreorderForm` · `ProductGallery` | `/preorder/[slug]` | The page passes the drop's data |
 | `JoinRequestForm` | `/join` | Events list comes from the collection |
@@ -306,7 +307,7 @@ inline-styled HTML into the repo.
    CMS under Photo galleries → Game day.
 
 1. **Photography, placement and player photos.** Event photos are in; they need
-   curating, alt text and galleries. Player photos are still missing. It unblocks player photos,
+   curating, alt text and galleries. Only 10 of about 60 are on `/gallery` so far. Player photos are still missing. It unblocks player photos,
    galleries, the mockup-B manifesto band, the `Hero` video variant, and real
    carousel slides on `/design`.
 2. **Finish the team members.** Add Matt's bio and photo, real roles, and
@@ -325,8 +326,10 @@ inline-styled HTML into the repo.
 0. **Build `/about`.** List team members as cards alternating left and right,
    each with image, name, bio and socials. The `team` collection is ready and
    `ProfileCard` is the closest component. Replace the stub at
-   `src/pages/about.ts`. The FAQs, `TeamStatsWidget` and `src/lib/pblidb.ts` have
-   no page right now, so decide whether they belong there.
+   `src/pages/about.ts`. The FAQs and `TeamStatsWidget` have no public page right
+   now, so decide whether they belong there. pblidb is still backfilling, and most
+   squads have no results yet; `OUR_TEAMS` in `src/lib/pblidb.ts` lists all four
+   records for the main team until it's clear which are ours.
 0. **Decide whether the homepage moves to blocks.** `/preview/home` matches   `index.astro` from `src/content/landing/home.yml`. Moving would make the   homepage editable in Pages CMS and take its copy out of the template, but   `index.astro` also emits the `WebSite` schema, which would need a home.
 1. **Move hosting to Cloudflare Pages.** This turns on the CSP and security
    headers, real `_redirects` and preview deploys. Everything needed is
