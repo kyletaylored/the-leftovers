@@ -1,49 +1,83 @@
 ---
+/**
+ * /events — what's next, how to get on a squad, and the record so far.
+ *
+ * Nov 2026 rework. The team plays about one event a month at most, so the
+ * month-grid calendar was replaced by one SeasonStrip per year, sitting above
+ * that year's results (see docs/PRD-CONFORMANCE.md). Only the newest season
+ * starts open: every older one is a native <details>, because most visitors
+ * are on phones and a full record stacks into a very long page.
+ *
+ * Only events with a location get a SportsEvent node: Google requires one,
+ * and a node without it is a Search Console error, not a partial result.
+ */
 import { getEntry } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHeader from '@/components/PageHeader.astro';
 import { resolveHeroImages } from '@/lib/images';
 import Section from '@/components/Section.astro';
 import EventCard from '@/components/EventCard.astro';
+import EventFees from '@/components/EventFees.astro';
+import EventSquads from '@/components/EventSquads.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
+import ProcessSteps from '@/components/ProcessSteps.astro';
+import SeasonStrip from '@/components/SeasonStrip.astro';
 import Button from '@/components/Button.astro';
 import Countdown from '@/components/Countdown.astro';
-import EventsCalendar from '@/components/EventsCalendar.astro';
-import { getEvents } from '@/lib/events';
+import BrandRule from '@/components/brand/BrandRule.astro';
+import Icon from '@/components/brand/Icon.astro';
+import { getEvents, seasonOf } from '@/lib/events';
 import { isoDate } from '@/lib/format';
+import { site } from '@/lib/settings';
 
 const page = await getEntry('pages', 'events');
 if (!page) throw new Error('Missing content file: src/content/pages/events.md');
 const heroImages = await resolveHeroImages(page.data.heroImages);
 
-const { upcoming, past, next } = await getEvents();
+const { all, upcoming, past, next } = await getEvents();
+const later = upcoming.slice(1);
+const feeEvent = [...upcoming, ...past].find((event) => event.data.fees.length > 0);
+const seasons = [...new Set(all.map(seasonOf))].sort((a, b) => b - a);
 
-/** Every scheduled event gets its own SportsEvent node (§10.3). */
-const schema = upcoming.map((event) => ({
-  '@type': 'SportsEvent',
-  name: `${event.data.title}${event.data.league ? ` — ${event.data.league}` : ''}`,
-  startDate: isoDate(event.data.startDate),
-  endDate: isoDate(event.data.endDate ?? event.data.startDate),
-  eventStatus: 'https://schema.org/EventScheduled',
-  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
-  ...(event.data.location
-    ? {
-        location: {
-          '@type': 'Place',
-          name: event.data.location.venue,
-          address: { '@type': 'PostalAddress', addressLocality: event.data.location.city },
+const schema = upcoming.flatMap((event) => {
+  const { title, league, location, startDate, endDate, eventUrl } = event.data;
+  if (!location) return [];
+  const name = [league, title, seasonOf(event)].filter(Boolean).join(' ');
+  return [
+    {
+      '@type': 'SportsEvent',
+      name,
+      description: `The Leftovers paintball team at ${name} in ${location.city}.`,
+      url: new URL(`/events#${event.id}`, Astro.site).href,
+      image: new URL('/og-default.png', Astro.site).href,
+      startDate: isoDate(startDate),
+      endDate: isoDate(endDate ?? startDate),
+      eventStatus: 'https://schema.org/EventScheduled',
+      eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+      location: {
+        '@type': 'Place',
+        name: location.venue,
+        address: {
+          '@type': 'PostalAddress',
+          ...(location.street ? { streetAddress: location.street } : {}),
+          addressLocality: location.city,
+          ...(location.region ? { addressRegion: location.region } : {}),
+          ...(location.postalCode ? { postalCode: location.postalCode } : {}),
+          addressCountry: location.country,
         },
-      }
-    : {}),
-  competitor: { '@id': new URL('/#team', Astro.site).href },
-  ...(event.data.registrationUrl ? { url: event.data.registrationUrl } : {}),
-}));
+      },
+      ...(league ? { organizer: { '@type': 'Organization', name: league } } : {}),
+      competitor: { '@id': new URL('/#team', Astro.site).href },
+      ...(eventUrl ? { sameAs: eventUrl } : {}),
+    },
+  ];
+});
 ---
 
 <BaseLayout
   noindex={page.data.seo.noindex}
   title={page.data.seo.title ?? page.data.title}
-  description={page.data.seo.description ?? `Upcoming PBLeague tournaments for The Leftovers plus every event we've played. ${upcoming.length} on the schedule right now.`}
+  description={page.data.seo.description}
   schema={schema}
 >
   <PageHeader
@@ -53,33 +87,37 @@ const schema = upcoming.map((event) => ({
     images={heroImages}
   />
 
-  <Section tone="base" title="Calendar" kicker="Tap a marked day">
-    <EventsCalendar events={[...upcoming, ...past]} next={next} class="mx-auto max-w-md" />
-  </Section>
-
-  <Section tone="alt" title="Upcoming" kicker={`${upcoming.length} scheduled`}>
+  <Section tone="alt" title={next ? 'Next up' : 'On the calendar'}>
     {
-      upcoming.length > 0 ? (
+      next ? (
         <>
-          {next && (
-            <div class="mb-8 flex flex-wrap items-center gap-6 rounded-sm border border-gold/40 bg-ink-800 p-5 sm:p-6">
-              <div>
-                <p class="eyebrow mb-1">Next one up</p>
-                <p class="text-2xl text-bone sm:text-3xl" style="font-family: var(--font-display)">
-                  {next.data.title}
-                </p>
+          <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+            <div class="flex flex-col gap-6">
+              <div class="rounded-sm border border-gold/40 bg-ink-800 p-5 sm:p-6">
+                <p class="eyebrow mb-3">Starts in</p>
+                <Countdown target={next.data.startDate} />
               </div>
-              <Countdown target={next.data.startDate} />
+              <EventCard event={next} as="h3" layout="feature" />
             </div>
-          )}
 
-          <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {upcoming.map((event) => (
-              <li class="flex">
-                <EventCard event={event} class="w-full" />
-              </li>
-            ))}
-          </ul>
+            {next.data.squads.length > 0 && (
+              <div class="rounded-sm border border-ink-600 bg-ink-800 p-5 sm:p-6">
+                <h3 class="text-2xl text-bone">{next.data.squads.length} squads on the entry list</h3>
+                <p class="mb-5 mt-1 text-sm text-bone-muted">As listed by the league. Squads can still change before the event.</p>
+                <EventSquads squads={next.data.squads} columns={2} />
+              </div>
+            )}
+          </div>
+
+          {later.length > 0 && (
+            <ul class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {later.map((event) => (
+                <li class="flex">
+                  <EventCard event={event} class="w-full" />
+                </li>
+              ))}
+            </ul>
+          )}
         </>
       ) : (
         <MascotCallout
@@ -92,24 +130,65 @@ const schema = upcoming.map((event) => ({
     }
   </Section>
 
-  <Section tone="base" title="Played" kicker={`${past.length} events`}>
+  <Section tone="base" eyebrow="How it works" title="From request to the field">
+    <ProcessSteps steps={site.eventProcess.steps} />
+    <div class="mt-8">
+      <Button href="/join">Request a spot</Button>
+    </div>
+
     {
-      past.length > 0 ? (
-        <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {past.map((event) => (
-            <li class="flex">
-              <EventCard event={event} class="w-full" />
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <MascotCallout title="No results on the board yet" body="Ask us again after the first tournament." />
+      feeEvent && (
+        <>
+          <BrandRule ornament="field" spacing="lg" />
+          <h3 class="mb-2 text-2xl text-bone sm:text-3xl">What events cost</h3>
+          <p class="mb-6 max-w-3xl text-sm leading-relaxed text-bone-muted sm:text-base">
+            Every event prices its formats and divisions differently. Here's {feeEvent.data.title} {seasonOf(feeEvent)} for the divisions we entered.
+          </p>
+          <EventFees event={feeEvent} note={site.eventProcess.feeNote} />
+        </>
       )
     }
+  </Section>
 
-    <p class="mt-8 text-sm text-bone-muted">
-      Per-player stat lines from these events live on the
-      <a href="/team#stats" class="text-gold-300 underline underline-offset-4">stats page</a>.
-    </p>
+  <Section tone="alt" eyebrow="The record" title="Season by season">
+    {
+      seasons.map((year, index) => {
+        const played = past.filter((event) => seasonOf(event) === year);
+        const body = (
+          <>
+            <SeasonStrip events={all} year={year} class="mb-8" />
+            {played.length > 0 && (
+              <ul class="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {played.map((event) => (
+                  <li>
+                    <EventCard event={event} as="h4" />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        );
+        return index === 0 ? (
+          <>
+            <h3 class="mb-5 text-2xl text-bone sm:text-3xl">{year}</h3>
+            {body}
+          </>
+        ) : (
+          <>
+            <BrandRule ornament="cloud" spacing="lg" />
+            <details class="group/season">
+              <summary class="tap flex cursor-pointer list-none items-center gap-3 [&::-webkit-details-marker]:hidden">
+                <h3 class="text-2xl text-bone sm:text-3xl">{year}</h3>
+                <span class="text-sm text-gold-300 underline underline-offset-4">
+                  {played.length} {played.length === 1 ? 'event' : 'events'}
+                </span>
+                <Icon name="chevron" class="size-4 text-gold-300 transition-transform group-open/season:rotate-180" />
+              </summary>
+              <div class="mt-5">{body}</div>
+            </details>
+          </>
+        );
+      })
+    }
   </Section>
 </BaseLayout>

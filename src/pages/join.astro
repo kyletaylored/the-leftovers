@@ -10,6 +10,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import PageHeader from '@/components/PageHeader.astro';
 import Section from '@/components/Section.astro';
 import Prose from '@/components/Prose.astro';
+import ProcessSteps from '@/components/ProcessSteps.astro';
 import JoinRequestForm from '@/components/JoinRequestForm.tsx';
 import { resolveHeroImages } from '@/lib/images';
 import { site } from '@/lib/settings';
@@ -20,8 +21,7 @@ const heroImages = await resolveHeroImages(page.data.heroImages);
 const { Content } = await render(page);
 
 // The Event dropdown is `join.events` in site.yml, not the events collection:
-// it has to match the Google Form's Event question word for word (docs/JOIN.md),
-// and the Events page is hidden for now.
+// it has to match the Google Form's Event question word for word (docs/JOIN.md).
 const events = site.join.events.map((label) => ({ id: label, label }));
 ---
 
@@ -31,7 +31,9 @@ const events = site.join.events.map((label) => ({ id: label, label }));
   <Section tone="base">
     <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-16">
       <div>
-        <Prose>
+        <h2 class="mb-6 text-2xl text-bone sm:text-3xl">How it works</h2>
+        <ProcessSteps steps={site.eventProcess.steps} layout="stack" />
+        <Prose class="mt-6">
           <Content />
         </Prose>
       </div>

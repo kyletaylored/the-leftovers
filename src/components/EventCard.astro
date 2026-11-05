@@ -1,18 +1,22 @@
 ---
 /**
- * EventCard — date badge, location, PBLeague tag, register/result CTA, and
- * the terraced-mountain divider as the card footer (§7 custom components).
+ * EventCard — date badge, location, league tag, CTAs and a BrandRule footer
+ * (§7 custom components).
  *
- * The CTA switches on derived upcoming/past state (lib/events.ts): an
- * upcoming event offers registration, a past one shows the result summary.
+ * The CTAs switch on derived state (lib/events.ts). An upcoming event offers
+ * "Request a spot", which goes to /join because the event captain registers
+ * the team, and says so once entries have closed. A past event shows the best
+ * finish and an expandable list of every squad. The list is a native
+ * <details>, so it needs no JS.
  */
 import { Image } from 'astro:assets';
 import Icon from './brand/Icon.astro';
-import TerracedDivider from './brand/TerracedDivider.astro';
+import BrandRule from './brand/BrandRule.astro';
 import Button from './Button.astro';
+import EventSquads from './EventSquads.astro';
 import { resolveImage } from '@/lib/images';
-import { dateRange, dayNum, dayOfWeek, monthShort, isoDate } from '@/lib/format';
-import { isUpcoming, type EventEntry } from '@/lib/events';
+import { dateRange, dayNum, dayOfWeek, monthShort, isoDate, ordinal } from '@/lib/format';
+import { addressLine, bestFinish, isTakingRequests, isUpcoming, seasonOf, type EventEntry } from '@/lib/events';
 
 interface Props {
   event: EventEntry;
@@ -25,17 +29,22 @@ interface Props {
 const { event, as: Heading = 'h3', layout = 'card', class: className = '' } = Astro.props;
 // Lets the Calendar's day links (#slug) jump straight to this card.
 const anchorId = event.id;
-const { title, league, startDate, endDate, location, registrationUrl, cover, coverAlt, resultSummary, placement } =
+const { title, league, startDate, endDate, location, eventUrl, squads, cover, coverAlt, resultSummary, placement } =
   event.data;
 
 const coverAsset = await resolveImage(cover);
 const upcoming = isUpcoming(event);
+const takingRequests = isTakingRequests(event);
+const best = bestFinish(event);
+const finish = placement ?? (best?.fieldSize && `${ordinal(best.place ?? 0)} of ${best.fieldSize}`);
+const fullTitle = `${title} ${seasonOf(event)}`;
+const squadCount = `${squads.length} ${squads.length === 1 ? 'squad' : 'squads'}`;
 ---
 
 <article
   id={anchorId}
   class:list={[
-    'group relative flex flex-col overflow-hidden rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/50 target:border-gold target:ring-2 target:ring-gold/50',
+    'group relative flex scroll-mt-24 flex-col overflow-hidden rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/50 target:border-gold target:ring-2 target:ring-gold/50',
     className,
   ]}
 >
@@ -88,7 +97,7 @@ const upcoming = isUpcoming(event);
         <Heading
           class:list={[
             'text-bone',
-            layout === 'feature' ? 'text-3xl sm:text-4xl' : 'text-xl sm:text-2xl',
+            layout === 'feature' ? 'text-3xl sm:text-4xl' : 'text-2xl',
           ]}
         >
           {title}
@@ -98,13 +107,14 @@ const upcoming = isUpcoming(event);
             <p class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-bone-muted">
               <Icon name="pin" class="size-4 shrink-0 text-gold" />
               <span>{location.venue}</span>
-              <span aria-hidden="true">·</span>
-              <span>{location.city}</span>
+              {layout === 'card' && <span aria-hidden="true">·</span>}
+              {layout === 'card' && <span>{[location.city, location.region].filter(Boolean).join(', ')}</span>}
             </p>
           ) : (
             <p class="mt-2 text-sm italic text-bone-muted">Venue to be confirmed</p>
           )
         }
+        {layout === 'feature' && location && <p class="mt-1 text-sm text-bone-muted">{addressLine(location)}</p>}
         <p class="mt-1 text-sm text-bone-muted">
           <time datetime={isoDate(startDate)}>{dateRange(startDate, endDate)}</time>
         </p>
@@ -112,38 +122,46 @@ const upcoming = isUpcoming(event);
     </div>
 
     {
-      !upcoming && (resultSummary || placement) && (
+      !upcoming && (resultSummary || finish) && (
         <div class="mt-4 border-l-2 border-gold/70 pl-3">
-          {placement && (
+          {finish && (
             <p class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
-              Finished {placement}
+              Best finish {finish}
             </p>
           )}
+          {best && !placement && <p class="mt-1 text-sm text-bone-muted">{best.name}, {best.division}</p>}
           {resultSummary && <p class="mt-1 text-sm leading-relaxed text-bone-muted">{resultSummary}</p>}
         </div>
       )
     }
 
-    <div class="mt-5 flex flex-wrap gap-3 pt-1">
+    {
+      !upcoming && squads.length > 0 && (
+        <details class="group/squads mt-3">
+          <summary class="tap flex cursor-pointer list-none items-center gap-2 text-sm text-gold-300 underline underline-offset-4 [&::-webkit-details-marker]:hidden">
+            All {squadCount}
+            <Icon name="chevron" class="size-4 transition-transform group-open/squads:rotate-180" />
+          </summary>
+          <EventSquads squads={squads} class="mt-2" />
+        </details>
+      )
+    }
+
+    <div class="mt-auto flex flex-wrap items-center gap-3 pt-5">
+      {takingRequests && <Button href="/join" size="sm">Request a spot</Button>}
       {
-        upcoming && registrationUrl ? (
-          <Button href={registrationUrl} external size="sm">
-            Register for {title}
+        upcoming && !takingRequests && (
+          <p class="text-sm font-bold text-bone">Entries are closed for this event</p>
+        )
+      }
+      {
+        eventUrl && (
+          <Button href={eventUrl} external variant="ghost" size="sm" aria-label={`${upcoming ? 'Details' : 'Results'} for ${fullTitle} on PBLeagues`}>
+            {upcoming ? 'Event details' : 'Full results'}
           </Button>
-        ) : upcoming ? (
-          <Button href="/events" variant="outline" size="sm">
-            Event details
-          </Button>
-        ) : (
-          location?.mapUrl && (
-            <Button href={location.mapUrl} external variant="ghost" size="sm">
-              {location.venue} on the map
-            </Button>
-          )
         )
       }
     </div>
+    <BrandRule spacing="none" class="mt-4 opacity-70" />
   </div>
-
-  <TerracedDivider variant="line" seed={startDate.getDate()} class="h-6 opacity-70" />
 </article>

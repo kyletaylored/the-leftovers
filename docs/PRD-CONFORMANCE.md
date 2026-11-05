@@ -586,3 +586,11 @@ from earlier decisions here.
   times and errors. The SDK is a lazily imported, self-hosted chunk that
   only loads after **Accept analytics**; form input is masked in replays.
   Disclosed on `/privacy`. See `docs/ANALYTICS.md`.
+- **`/events` calendar replaced by a season view (5 Nov 2026).** The team plays
+  about one event a month at most, so a one-month grid was mostly empty.
+  `SeasonStrip` shows each year on one line above its results. `Calendar` stays
+  on `/design` in case a season gets busy.
+- **Players don't register with the league themselves (5 Nov 2026).** Each event
+  has a captain who sorts join requests into squads, collects event fees and
+  registers the teams. `registrationUrl` became `eventUrl`, and the upcoming
+  card's CTA now goes to `/join`.

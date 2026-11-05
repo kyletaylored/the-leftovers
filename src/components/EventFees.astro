@@ -1,0 +1,101 @@
+---
+/**
+ * EventFees — an event's league fees as a format × division × deadline table.
+ *
+ * Leagues price by format and division, and the price rises at each deadline,
+ * so the honest shape is that whole matrix. The rows are the league's fees
+ * PER TEAM, copied by hand for the divisions we enter; a visitor's own event
+ * fee comes from their captain. Never divide these into a per-player number
+ * here: squad sizes and any costs on top aren't settled.
+ *
+ * There is deliberately no "current price" highlight. This is a static site,
+ * so a highlight would go stale between deploys; the dates in the header are
+ * always true. Formats group under a row header, and the table fits a phone
+ * without sideways scrolling.
+ */
+import { money, monthDay } from '@/lib/format';
+import type { EventEntry } from '@/lib/events';
+
+interface Props {
+  event: EventEntry;
+  /** What the numbers are; see `eventProcess.feeNote` in site.yml. */
+  note?: string;
+  class?: string;
+}
+
+const { event, note, class: className = '' } = Astro.props;
+const { title, startDate, fees, feeDeadlines, eventUrl } = event.data;
+
+const formats = [...new Set(fees.map((fee) => fee.format))];
+const tiers = [
+  { label: 'Early', through: feeDeadlines?.early },
+  { label: 'Regular', through: feeDeadlines?.regular },
+  { label: 'Late', through: feeDeadlines?.late },
+];
+---
+
+<div class={className}>
+  <div class="overflow-hidden rounded-sm border border-ink-600 bg-ink-800">
+    <table class="w-full border-collapse text-left text-sm">
+      <caption class="sr-only">
+        League fees per team for {title} {startDate.getUTCFullYear()}, by format, division and deadline
+      </caption>
+      <thead>
+        <tr class="border-b border-gold/40 align-bottom">
+          <th scope="col" class="px-3 py-3 text-[0.65rem] font-bold uppercase tracking-[0.16em] text-bone-muted sm:px-5">
+            Division
+          </th>
+          {
+            tiers.map((tier) => (
+              <th scope="col" class="px-2 py-3 text-right sm:px-5">
+                <span class="block text-[0.65rem] font-bold uppercase tracking-[0.16em] text-gold-300">{tier.label}</span>
+                {tier.through && (
+                  <span class="mt-0.5 block whitespace-nowrap text-[0.6rem] font-normal uppercase tracking-[0.04em] text-bone-muted">
+                    To {monthDay(tier.through)}
+                  </span>
+                )}
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      {
+        formats.map((format) => (
+          <tbody>
+            <tr>
+              <th
+                scope="rowgroup"
+                colspan="4"
+                class="bg-ink-900 px-3 py-2 text-left text-[0.65rem] font-bold uppercase tracking-[0.2em] text-bone sm:px-5"
+              >
+                {format}
+              </th>
+            </tr>
+            {fees
+              .filter((fee) => fee.format === format)
+              .map((fee) => (
+                <tr class="border-t border-ink-600">
+                  <th scope="row" class="px-3 py-2.5 font-normal text-bone sm:px-5">
+                    {fee.division}
+                  </th>
+                  {[fee.early, fee.regular, fee.late].map((amount) => (
+                    <td class="px-2 py-2.5 text-right tabular-nums text-bone-muted sm:px-5">{money(amount)}</td>
+                  ))}
+                </tr>
+              ))}
+          </tbody>
+        ))
+      }
+    </table>
+  </div>
+  {note && <p class="mt-4 max-w-3xl text-sm leading-relaxed text-bone-muted">{note}</p>}
+  {
+    eventUrl && (
+      <p class="mt-2 text-sm">
+        <a href={eventUrl} rel="noopener" target="_blank" class="tap inline-flex items-center text-gold-300 underline underline-offset-4">
+          Every division on PBLeagues
+        </a>
+      </p>
+    )
+  }
+</div>

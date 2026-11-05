@@ -129,18 +129,53 @@ content:
       - name: location
         label: Location
         type: object
-        required: true
+        description: >-
+          Leave empty until the venue is confirmed. Google only shows an event
+          in search once it has a venue and city, and the full address helps.
         fields:
           - { name: venue, label: Venue, type: string, required: true }
-          - { name: city, label: City / state, type: string, required: true }
+          - { name: street, label: Street address, type: string }
+          - { name: city, label: City, type: string, required: true }
+          - { name: region, label: State, type: string, description: 'e.g. FL' }
+          - { name: postalCode, label: ZIP code, type: string }
+          - { name: country, label: Country code, type: string, default: US }
           - { name: mapUrl, label: Map link, type: string, pattern: { regex: '^https?://.+' } }
       - {
-          name: registrationUrl,
-          label: Registration URL,
+          name: eventUrl,
+          label: League event page,
           type: string,
           pattern: { regex: '^https?://.+' },
-          description: 'Links straight to the league. We never take entries ourselves.',
+          description: 'The event on the league site, for details and results. Players sign up through the join form, not here.',
         }
+      - name: feeDeadlines
+        label: Fee deadlines
+        type: object
+        description: 'Last day of each fee tier. Join requests close after the Late date.'
+        fields:
+          - { name: early, label: Early through, type: date }
+          - { name: regular, label: Regular through, type: date }
+          - { name: late, label: Late through, type: date }
+      - name: fees
+        label: League fees (per team)
+        type: object
+        list: true
+        description: 'Copy these from the league fee table, only for divisions we enter.'
+        fields:
+          - { name: format, label: Format, type: string, required: true, description: 'e.g. X-Ball' }
+          - { name: division, label: Division, type: string, required: true, description: 'e.g. Division 5' }
+          - { name: early, label: Early fee, type: number, required: true }
+          - { name: regular, label: Regular fee, type: number, required: true }
+          - { name: late, label: Late fee, type: number, required: true }
+      - name: squads
+        label: Squads
+        type: object
+        list: true
+        description: 'Every Leftovers squad entered, from the league team list. Add the place after the event.'
+        fields:
+          - { name: name, label: Squad name, type: string, required: true }
+          - { name: division, label: Division, type: string, required: true }
+          - { name: place, label: Final place, type: number }
+          - { name: fieldSize, label: Teams in the division, type: number }
       - name: status
         label: Status override
         type: select
@@ -568,6 +603,19 @@ content:
           - { name: provider, label: Provider name, type: string }
           - { name: scriptSrc, label: Widget script URL, type: string }
           - { name: elementClass, label: Widget element class, type: string }
+      - name: eventProcess
+        label: How event sign-up works
+        type: object
+        description: 'The numbered steps on the Events and Join pages.'
+        fields:
+          - name: steps
+            label: Steps
+            type: object
+            list: true
+            fields:
+              - { name: title, label: Step, type: string, required: true }
+              - { name: body, label: Details, type: text, required: true }
+          - { name: feeNote, label: Note under the fee table, type: text }
       - name: mailingList
         label: Mailing list
         type: object

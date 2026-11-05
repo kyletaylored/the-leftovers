@@ -8,7 +8,7 @@ import { expect, waitFor } from 'storybook/test';
  */
 function Roles() {
   return (
-    <div className="grid gap-8 sm:grid-cols-3">
+    <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
       <div>
         <p className="font-marker text-5xl leading-none text-brand-red">The Leftovers</p>
         <p className="mt-2 text-xs text-bone-muted">
@@ -19,6 +19,12 @@ function Roles() {
         <h2 className="font-display text-4xl uppercase leading-none text-bone">Meet the Crew</h2>
         <p className="mt-2 text-xs text-bone-muted">
           Gasoek One · <code>font-display</code>. Every heading, uppercase, tight leading. Wide and heavy: keep headlines short.
+        </p>
+      </div>
+      <div>
+        <h3 className="title-sm text-bone">Request a spot</h3>
+        <p className="mt-2 text-xs text-bone-muted">
+          Inter bold · <code>title-sm</code>. Any heading under 24px, where the headline font fills in.
         </p>
       </div>
       <div>

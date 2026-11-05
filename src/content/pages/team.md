@@ -29,9 +29,9 @@ next person a slot than make them wait a season for one.
 
 ## How the roster actually works
 
-There is no tryout, no dues, and no bench. Before each event we post the date
-in the Discord and the Facebook page, and slots go to whoever confirms first
-and pays their own entry. Some people play one event a year. Some have played
+There is no tryout, no dues, and no bench. Each event has a captain who sorts
+join requests into squads by division, format and position, collects event
+fees and registers the teams. Some people play one event a year. Some have played
 every event since the beginning. Both count.
 
 That churn is the point, not a problem to be solved. It means:
