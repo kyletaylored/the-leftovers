@@ -36,8 +36,8 @@ form doesn't list. If you change an option on the form, change it in
 |---|---|---|
 | Current Player Ranking | Current player ranking | Beginner / Unranked, D5, D4, D3, D2, D1 |
 | Division | Division | D6, D5, D4, D3, D2, D1, Semi-Pro, Pro |
-| Preferred position | Preferred position | checkboxes, at least one: Snake Front, Snake Support, Dorito Front, Dorito Support, Home / Fill, Middle, Versatile / Any |
-| Playing Format Requested | Playing format requested | 3v3, 5v5, X-Ball, 10v10, Mechanical |
+| Preferred position | Preferred position | checkboxes, at least one, shown as a checklist dropdown: Snake Front, Snake Support, Dorito Front, Dorito Support, Home / Fill, Middle, Versatile / Any |
+| Playing Format Requested | Playing format requested | checkboxes, at least one, shown as a checklist dropdown: 3v3, 5v5, X-Ball, 10v10, Mechanical |
 | Country | Country | short text on the Google Form; a searchable picker on the site (see below) |
 | Facebook Profile Link | Facebook profile link | free text, optional |
 | Event | Event | `join.events` in `site.yml` |
@@ -48,9 +48,12 @@ the requester is, division is what they want to play. A player can play up a
 division, so it is asked separately rather than derived. The ranking list has
 "Beginner / Unranked" and no D6 or Pro; the division list has all eight.
 
-**Preferred position** is a checkbox question, so a player can tick several.
-The site posts one `entry.NNN` per ticked box, which is how Google Forms
-encodes checkboxes, and won't submit with none ticked.
+**Preferred position** and **Playing Format Requested** are checkbox questions,
+so a player can tick several. The site shows each as a checklist dropdown
+(`src/components/form/ChecklistDropdown.tsx`), posts one `entry.NNN` per ticked
+box, which is how Google Forms encodes checkboxes, and won't submit with none
+ticked. Keep both as checkbox questions on the form: a dropdown or multiple-choice
+question only takes one answer.
 
 **Country** stays a short-text question on the Google Form, and the site
 fills it from a searchable list (`src/components/form/CountryCombobox.tsx`,
@@ -83,9 +86,9 @@ One form, kept current rather than one per event:
    string to this question's `entry.NNN`, and Google's `formResponse`
    endpoint doesn't hard-validate free-form POSTs against the option list,
    so matching wording is a legibility choice, not a strict requirement.
-3. **Current Player Ranking**, **Division** and **Playing Format Requested**
-   are each their own dropdown or multiple-choice question, with the options
-   listed above. **Preferred position** is a checkbox question with the
+3. **Current Player Ranking** and **Division** are each their own dropdown or
+   multiple-choice question, with the options listed above. **Preferred
+   position** and **Playing Format Requested** are checkbox questions with the
    options listed above. **Country** and **Facebook Profile Link** are short
    text.
 4. Every response lands in a linked Google Sheet as a new row — that's the

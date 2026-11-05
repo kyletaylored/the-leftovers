@@ -79,6 +79,7 @@ import FormField from '@/components/form/FormField.astro';
 import RadioGroup from '@/components/form/RadioGroup.astro';
 import CheckboxGroup from '@/components/form/CheckboxGroup.astro';
 import CountryCombobox from '@/components/form/CountryCombobox.tsx';
+import ChecklistDropdown from '@/components/form/ChecklistDropdown.tsx';
 
 import { getEvents } from '@/lib/events';
 import { site } from '@/lib/settings';
@@ -1075,6 +1076,20 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
             <label class="field-label" for="demo-country-fixed">Country: defaultCode="CA"</label>
             <CountryCombobox client:visible id="demo-country-fixed" name="demo-country-fixed" defaultCode="CA" />
           </div>
+        </div>
+
+        <div class="my-8 h-px bg-ink-600" />
+
+        <p class="field-label mb-4">Checklist dropdown (ChecklistDropdown)</p>
+        <p class="mb-4 max-w-2xl text-sm text-bone-muted">
+          Use it when someone can pick several answers from a short list and the options don't need to
+          be on show all the time. On phones the list opens inline and pushes the page down, with a Done
+          button; from the sm breakpoint it floats. Ticked boxes submit under one name, which is what a
+          Google Form checkbox question needs. Used by JoinRequestForm.
+        </p>
+        <div class="mb-6 grid gap-5 md:grid-cols-2">
+          <ChecklistDropdown client:visible id="demo-formats" name="demo-formats" label="Empty, with a hint" options={['3v3', '5v5', 'X-Ball', '10v10', 'Mechanical']} hint="Tick every format you'd play." />
+          <ChecklistDropdown client:visible id="demo-formats-set" name="demo-formats-set" label="With answers" options={['3v3', '5v5', 'X-Ball', '10v10', 'Mechanical']} defaultValue={['5v5', 'X-Ball']} />
         </div>
 
         <div class="my-8 h-px bg-ink-600" />

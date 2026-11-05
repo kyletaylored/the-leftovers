@@ -315,6 +315,12 @@ export const catalog: CatalogEntry[] = [
     options: 'legend · name · options[{value, label}] · defaultValues',
   },
   {
+    name: 'ChecklistDropdown', file: 'form/ChecklistDropdown.tsx', kind: 'React island', group: 'forms', section: 'forms', story: true,
+    use: 'Several answers from a short list in one field; inline on phones, floating from sm. Read with FormData.getAll(name).',
+    options: 'id · name · label · options[] · value+onChange or defaultValue · placeholder · hint · required · requiredMessage',
+    avoid: 'One answer only (use a select). A list worth seeing at a glance (use CheckboxGroup).',
+  },
+  {
     name: 'CountryCombobox', file: 'form/CountryCombobox.tsx', kind: 'React island', group: 'forms', section: 'forms', story: true,
     use: 'Searchable country picker; pre-fills from browser language; posts one canonical name.',
     options: 'id · name · required · defaultCode · detect',
