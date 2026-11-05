@@ -613,6 +613,39 @@ content:
           - { name: logo, label: Logo, type: image, options: { media: images }, required: true }
           - { name: logoAlt, label: Logo alt text, type: string, required: true }
       - { name: footerNote, label: Footer note, type: text, required: true }
+      - name: datadogRum
+        label: Datadog RUM
+        type: object
+        description: 'Performance and error monitoring. Loads only for visitors who accept analytics. Off until Application ID and Client token are both set.'
+        fields:
+          - { name: applicationId, label: Application ID, type: string }
+          - { name: clientToken, label: Client token, type: string, description: 'Starts with "pub". Public by design.' }
+          - { name: remoteConfigurationId, label: Remote configuration ID, type: string, description: 'Optional. Lets sampling be changed in Datadog without a deploy.' }
+          - name: site
+            label: Datadog site
+            type: select
+            default: datadoghq.com
+            options:
+              values:
+                - { value: datadoghq.com, label: 'US1 (datadoghq.com)' }
+                - { value: us3.datadoghq.com, label: 'US3' }
+                - { value: us5.datadoghq.com, label: 'US5' }
+                - { value: datadoghq.eu, label: 'EU1 (datadoghq.eu)' }
+                - { value: ap1.datadoghq.com, label: 'AP1' }
+                - { value: ap2.datadoghq.com, label: 'AP2' }
+          - { name: service, label: Service name, type: string, default: the-leftovers }
+          - { name: env, label: Environment, type: string, default: production }
+          - { name: sessionSampleRate, label: Sessions recorded (%), type: number, default: 100 }
+          - { name: sessionReplaySampleRate, label: Session Replay (%), type: number, default: 0, description: '0 turns Session Replay off.' }
+          - name: defaultPrivacyLevel
+            label: Replay privacy
+            type: select
+            default: mask-user-input
+            options:
+              values:
+                - { value: mask-user-input, label: 'Mask what visitors type (recommended)' }
+                - { value: mask, label: 'Mask all text' }
+                - { value: allow, label: 'Mask nothing' }
       - name: search
         label: Search engines & AI crawlers
         type: object

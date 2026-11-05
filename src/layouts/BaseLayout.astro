@@ -29,6 +29,19 @@ interface Props {
 
 const { bodyClass = '', ...seo } = Astro.props;
 
+// Datadog RUM is on only when both public IDs are set (see datadog-rum.ts).
+const rum = site.datadogRum;
+const rumEnabled = Boolean(rum.applicationId && rum.clientToken);
+const rumConfig = rumEnabled
+  ? JSON.stringify({
+      ...rum,
+      // The deployed commit (set by GitHub Actions), so Datadog can tell deploys apart.
+      version: process.env.GITHUB_SHA?.slice(0, 7) || undefined,
+    }).replace(/</g, '\\u003c')
+  : '';
+// The consent banner is needed if any consent-gated analytics is configured.
+const needsConsent = Boolean(site.gtmId) || rumEnabled;
+
 /** Emitted on every page so the team itself is one crawlable entity. */
 const organizationSchema = {
   '@type': 'SportsTeam',
@@ -107,6 +120,16 @@ const organizationSchema = {
         </script>
       )
     }
+    {
+      rumEnabled && (
+        <>
+          <script type="application/json" id="datadog-rum-config" set:html={rumConfig} />
+          <script>
+            import '@/scripts/datadog-rum';
+          </script>
+        </>
+      )
+    }
   </head>
 
   <body class:list={['flex min-h-dvh flex-col', bodyClass]}>
@@ -115,6 +138,6 @@ const organizationSchema = {
       <slot />
     </main>
     <Footer />
-    {site.gtmId && <CookieConsent gtmId={site.gtmId} client:visible />}
+    {needsConsent && <CookieConsent gtmId={site.gtmId} client:visible />}
   </body>
 </html>

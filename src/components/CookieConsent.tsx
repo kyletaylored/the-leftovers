@@ -16,9 +16,14 @@
  * - Any element with `[data-cookie-consent-open]` (such as the "Cookie settings"
  *   button in the footer) or a `leftovers:open-cookie-consent` window event
  *   re-opens the banner so visitors can withdraw or change consent at any time.
+ * - Dispatches a `leftovers:consent` window event (`detail`: the choice)
+ *   whenever the visitor chooses, so other consent-gated analytics, such as
+ *   Datadog RUM (src/scripts/datadog-rum.ts), start or stop without a reload.
+ *   Specimens with `disableScriptLoad` don't dispatch it.
  * - With JS disabled, GTM never loads and no analytics cookies are set.
  */
 import { useEffect, useState } from 'react';
+import { CONSENT_EVENT, DEFAULT_CONSENT_STORAGE_KEY } from '@/lib/consent';
 
 export type ConsentChoice = 'undecided' | 'accepted' | 'declined';
 
@@ -51,14 +56,16 @@ declare global {
   }
 }
 
-export const DEFAULT_CONSENT_STORAGE_KEY = 'leftovers_cookie_consent';
+export { DEFAULT_CONSENT_STORAGE_KEY };
 
 function clearAnalyticsCookies() {
   if (typeof document === 'undefined') return;
   const cookies = document.cookie ? document.cookie.split(';') : [];
   for (const raw of cookies) {
     const name = raw.split('=')[0]?.trim();
-    if (name && (name === '_ga' || name === '_gid' || name === '_gat' || name.startsWith('_ga_'))) {
+    // _ga*: Google Analytics. _dd_s*: Datadog RUM's session cookie (_dd_s_v2
+    // since SDK v7). datadog-rum.ts deletes it again after the SDK stops.
+    if (name && (name === '_ga' || name === '_gid' || name === '_gat' || name.startsWith('_ga_') || name.startsWith('_dd_s'))) {
       document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax`;
     }
   }
@@ -183,6 +190,9 @@ export default function CookieConsent({
       // Ignore storage write errors in restricted browsing modes.
     }
     applyGtmConsent(next, gtmId, disableScriptLoad);
+    if (!disableScriptLoad) {
+      window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: next }));
+    }
   }
 
   if (!hydrated) {

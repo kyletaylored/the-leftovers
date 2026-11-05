@@ -581,3 +581,8 @@ from earlier decisions here.
   sitemap, replacing the hand-kept exclusion list. robots.txt gained an AI
   crawler policy setting (`search.aiCrawlers`) and `/llms.txt` was added.
   Neither is in §10.3; both are build-time files with no runtime cost.
+- **Datadog RUM added, behind the same consent as GTM (4 Nov 2026).** Real
+  User Monitoring and 20% Session Replay, so the team can see real load
+  times and errors. The SDK is a lazily imported, self-hosted chunk that
+  only loads after **Accept analytics**; form input is masked in replays.
+  Disclosed on `/privacy`. See `docs/ANALYTICS.md`.

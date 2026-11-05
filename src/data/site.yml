@@ -63,6 +63,27 @@ facebookPagePlugin:
 # disable analytics and hide the consent banner.
 gtmId: GTM-KPXD7QD6
 
+# Datadog Real User Monitoring (docs/ANALYTICS.md). Like GTM, it only loads
+# after a visitor clicks "Accept analytics". Off until applicationId and
+# clientToken are both filled in. Both are public values, safe to commit.
+datadogRum:
+  applicationId: e20a2262-d00c-4979-8cd1-62dbcc3ba4b4
+  clientToken: pub469bc3a1c76d6f1c29313eafac5a3525
+  # Lets sampling and other options be changed in Datadog's UI without a
+  # deploy. Values set there override the ones below.
+  remoteConfigurationId: 53936841-a219-484e-89df-1a54167f73b4
+  # Your Datadog region: datadoghq.com (US1), us3.datadoghq.com,
+  # us5.datadoghq.com, datadoghq.eu, ap1.datadoghq.com…
+  site: datadoghq.com
+  service: the-leftovers
+  env: production
+  # Percent of consenting visitors' sessions to record (0–100).
+  sessionSampleRate: 100
+  # Percent of those to also capture as Session Replay. 0 = off.
+  sessionReplaySampleRate: 20
+  # Replay privacy: mask | mask-user-input | allow.
+  defaultPrivacyLevel: mask-user-input
+
 # Search engines and AI crawlers (docs/SEO.md).
 search:
   # Only needed for a Search Console "URL prefix" property verified by HTML
