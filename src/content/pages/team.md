@@ -3,16 +3,15 @@ title: The Team
 eyebrow: Who we are
 intro: >-
   The Leftovers started as the players nobody drafted. That's still the whole
-  idea — the story, the crew, the stats, and the open slots all live here now.
+  idea — the story, the people who run it and how to join all live here now.
 heroImages: []
 seo:
   # Hidden for now (Nov 2026 website feedback): out of search and the sitemap.
   noindex: true
-  title: The Leftovers — Team, Roster & Stats
+  title: The Leftovers — Our Team
   description: >-
-    How a group chat became a registered tournament team. Meet the roster,
-    see the open slots, and check the stats — every figure entered by hand
-    after each tournament.
+    How a group chat became a registered tournament team. Meet the people
+    who run it and find out how to join.
 ---
 
 ## We were the leftovers
@@ -43,8 +42,8 @@ That churn is the point, not a problem to be solved. It means:
 ## What we're not
 
 We're not a pro team, we're not sponsored into six figures, and we're not going
-to pretend the record is better than it is — results go on the
-[stats below](#stats) as they happen.
+to pretend the record is better than it is — every result goes on the
+[events page](/events).
 
 What we are is a team that exists so that people who want to play tournament
 paintball can, without waiting to be picked.

@@ -25,74 +25,29 @@ media:
     categories: [image]
 
 content:
-  # -- Players --------------------------------------------------------------
-  - name: players
-    label: Roster
-    description: >-
-      One file per player. Set Status to "Open slot" to render the dashed
-      "OPEN SLOT — JOIN THE ROSTER" card instead of a player card.
+  # -- Team members ---------------------------------------------------------
+  - name: team
+    label: Team Members
+    description: The people who run The Leftovers. Players aren't listed here; they rotate by event.
     type: collection
-    path: src/content/players
+    path: src/content/team
     filename: '{fields.name}.md'
     format: yaml-frontmatter
     view:
-      fields: [name, number, role, status]
+      fields: [name, role]
       primary: name
-      sort: [order, name, number]
+      sort: [order, name]
     fields:
       - { name: name, label: Name, type: string, required: true }
-      - {
-          name: number,
-          label: Jersey number,
-          type: number,
-          description: 'Rendered with the gold ribbed-numeral treatment.',
-        }
-      - {
-          name: role,
-          label: Position,
-          type: select,
-          options: { values: [Front, Mid, Back, Snake, Insert, Support, Any position] },
-          required: true,
-        }
-      - {
-          name: status,
-          label: Status,
-          type: select,
-          default: active,
-          options:
-            {
-              values:
-                [
-                  { value: active, label: Active player },
-                  { value: open-slot, label: Open slot (join CTA) },
-                ],
-            },
-          required: true,
-        }
+      - { name: role, label: Role, type: string, required: true, description: 'e.g. "Organizer"' }
       - { name: photo, label: Photo, type: image, options: { media: images } }
       - name: photoAlt
         label: Photo alt text
         type: string
         required: true
         description: >-
-          Describe the photo for screen readers and image search, e.g. "Kyle
-          Taylor laning the break in a Leftovers jersey". Required whenever a
-          photo is set.
-      - { name: joined, label: Joined the team, type: date }
-      - {
-          name: order,
-          label: Sort order,
-          type: number,
-          default: 100,
-          description: 'Lower sorts first on the roster page.',
-        }
-      - {
-          name: featured,
-          label: Show on the homepage,
-          type: boolean,
-          default: false,
-          description: 'The homepage shows the first three featured players.',
-        }
+          Describe the photo for screen readers and image search. Required
+          even before there's a photo; the person's name is fine until then.
       - name: socials
         label: Socials
         type: object
@@ -100,6 +55,7 @@ content:
           - { name: instagram, label: Instagram URL, type: string, pattern: { regex: '^https?://.+' } }
           - { name: tiktok, label: TikTok URL, type: string, pattern: { regex: '^https?://.+' } }
           - { name: youtube, label: YouTube URL, type: string, pattern: { regex: '^https?://.+' } }
+      - { name: order, label: Sort order, type: number, default: 100, description: Lower sorts first. }
       - { name: body, label: Bio, type: rich-text }
 
   # -- Events ---------------------------------------------------------------
@@ -117,7 +73,7 @@ content:
       primary: title
       sort: [startDate, title]
     fields:
-      - { name: title, label: Event name, type: string, required: true }
+      - { name: title, label: Event name, type: string, required: true, description: 'Include the year, e.g. "Lone Star Open 2026".' }
       - {
           name: league,
           label: League / series tag,
@@ -155,6 +111,14 @@ content:
           - { name: early, label: Early through, type: date }
           - { name: regular, label: Regular through, type: date }
           - { name: late, label: Late through, type: date }
+      - name: closedToRequests
+        label: Closed to new players
+        type: boolean
+        default: false
+        description: >-
+          Tick this to replace "Request a spot" with a closed note. Leave it
+          off and requests stay open until the event ends, whatever the league
+          deadlines are.
       - name: fees
         label: League fees (per team)
         type: object
@@ -193,50 +157,6 @@ content:
         }
       - { name: resultSummary, label: Result summary, type: text, description: 'A sentence or two, after the event.' }
       - { name: body, label: Notes, type: rich-text }
-
-  # -- Results --------------------------------------------------------------
-  - name: results
-    label: Results & stat lines
-    description: >-
-      One file per event played. PBLeague exports results to the organiser,
-      not as a public feed, so these are entered by hand (§8.1). Enter raw
-      counts only — every rate and total on the stats page is calculated.
-    type: collection
-    path: src/content/results
-    filename: '{fields.event}.yml'
-    format: yaml
-    view:
-      fields: [event, placement, record]
-      primary: event
-    fields:
-      - {
-          name: event,
-          label: Event,
-          type: reference,
-          required: true,
-          options: { collection: events, value: '{filename}', label: '{fields.title}' },
-        }
-      - { name: placement, label: Final placement, type: number }
-      - { name: fieldSize, label: Teams in the bracket, type: number }
-      - { name: record, label: 'Win-loss record', type: string, pattern: { regex: '^\d+\s*-\s*\d+$' } }
-      - name: players
-        label: Player stat lines
-        type: object
-        list: true
-        fields:
-          - {
-              name: player,
-              label: Player,
-              type: reference,
-              required: true,
-              options: { collection: players, value: '{filename}', label: '{fields.name}' },
-            }
-          - { name: gamesPlayed, label: Games played, type: number, default: 0 }
-          - { name: eliminations, label: Eliminations, type: number, default: 0 }
-          - { name: deaths, label: Times eliminated, type: number, default: 0 }
-          - { name: flagPulls, label: Flag pulls, type: number, default: 0 }
-          - { name: flagHangs, label: Flag hangs, type: number, default: 0 }
-          - { name: penalties, label: Penalties, type: number, default: 0 }
 
   # -- Products -------------------------------------------------------------
   - name: products
@@ -506,8 +426,22 @@ content:
           - name: statement
             label: Big statement
             fields:
+              - { name: framed, label: Decorative rule above and below, type: boolean, default: false }
               - { name: eyebrow, label: Kicker, type: string }
               - { name: lines, label: Lines, type: string, list: true, required: true }
+          - name: divider
+            label: Divider
+            fields:
+              - name: ornament
+                label: Ornament
+                type: select
+                default: peaks
+                options:
+                  values:
+                    - { value: peaks, label: 'Peaks (terraced range)' }
+                    - { value: field, label: 'Field (one small glyph, the quietest)' }
+                    - { value: cloud, label: 'Cloud (formal, for big breaks)' }
+              - { name: spacing, label: Space around it, type: select, default: md, options: { values: [sm, md, lg] } }
           - name: gallery
             label: Photo gallery
             fields:
@@ -741,10 +675,6 @@ content:
       sort: [order, title]
     fields:
       - { name: title, label: Gallery title, type: string, required: true }
-      - name: event
-        label: Event (optional)
-        type: reference
-        options: { collection: events, value: '{filename}', label: '{fields.title}' }
       - { name: order, label: Sort order, type: number, default: 1 }
       - name: photos
         label: Photos

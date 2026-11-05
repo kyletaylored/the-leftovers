@@ -33,6 +33,7 @@ import FaqAccordion from '@/components/FaqAccordion.astro';
 import LogoStrip from '@/components/LogoStrip.astro';
 import ImagePlaceholder from '@/components/ImagePlaceholder.astro';
 import Button from '@/components/Button.astro';
+import BrandRule from '@/components/brand/BrandRule.astro';
 import { site } from '@/lib/settings';
 import { resolveImage } from '@/lib/images';
 
@@ -138,12 +139,14 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boole
         return (
           <section class="bg-ink">
             <div class="mx-auto max-w-5xl px-4 pb-10 pt-16 text-center sm:px-6 lg:pt-24">
+              {block.framed && <BrandRule spacing="none" class="mb-8 lg:mb-10" />}
               {block.eyebrow && <p class="eyebrow mb-4">{block.eyebrow}</p>}
               <h2 class="mx-auto max-w-3xl text-2xl leading-tight text-bone sm:text-4xl lg:text-5xl">
                 {block.lines.map((line) => (
                   <span class="block">{line}</span>
                 ))}
               </h2>
+              {block.framed && <BrandRule spacing="none" class="mt-8 lg:mt-10" />}
             </div>
           </section>
         );
@@ -206,7 +209,10 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boole
                 </div>
               )}
               {block.showLeagues && (
-                <LogoStrip items={leagues} label={block.leaguesLabel} size="sm" class="mt-12" />
+                <>
+                  <BrandRule ornament="cloud" spacing="none" class="mt-10" />
+                  <LogoStrip items={leagues} label={block.leaguesLabel} class="mt-10" />
+                </>
               )}
             </div>
           </Section>
@@ -255,6 +261,13 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boole
               </Button>
             ))}
           </CtaStrip>
+        );
+
+      case 'divider':
+        return (
+          <div class="mx-auto max-w-5xl px-4 sm:px-6">
+            <BrandRule ornament={block.ornament} spacing={block.spacing} />
+          </div>
         );
 
       case 'newsletter':

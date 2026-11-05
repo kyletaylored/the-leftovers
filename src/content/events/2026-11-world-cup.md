@@ -1,5 +1,5 @@
 ---
-title: World Cup
+title: World Cup 2026
 league: NXL
 startDate: 2026-11-11
 endDate: 2026-11-15

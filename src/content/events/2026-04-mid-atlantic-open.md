@@ -1,5 +1,5 @@
 ---
-title: Mid-Atlantic Open
+title: Mid-Atlantic Open 2026
 league: NXL
 startDate: 2026-04-30
 endDate: 2026-05-03

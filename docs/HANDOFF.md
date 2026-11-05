@@ -29,7 +29,7 @@ site is its home base. Its jobs are:
 
 1. **Show the brand**: the takeout-box mascot, the brush wordmark, gold ribbed
    numerals, ruyi clouds, terraced mountains.
-2. **Give people a reason to come back**: events, roster, stats.
+2. **Give people a reason to come back**: events and the season record.
 3. **Convert visitors** into players (`/join`), community members (socials,
    mailing list) and buyers (jersey pre-orders).
 
@@ -46,7 +46,7 @@ team deciding to:
   and join requests go to Google Forms, the mailing list posts to its provider,
   and the store is an external link.
 - **$0 to run.** Free hosting, free CMS, no subscriptions.
-- **A non-developer can update it.** The roster, events, results and
+- **A non-developer can update it.** Team members, events, landing pages and
   pre-orders are all editable in Pages CMS. A save is a commit to `main`, and
   that triggers a deploy.
 - **Mobile-first, fast, and SEO-correct are launch requirements**, not polish
@@ -64,7 +64,7 @@ team deciding to:
 |---|---|---|
 | `/[slug]`, `/preview/[slug]` | `landing` pages composed in Pages CMS: published, and drafts (noindex) | `BlockRenderer`. `/preview/home` is the homepage rebuilt as blocks; `index.astro` is still what's live |
 | `/` | Home ("direction B"): ornate sand hero, `ImpactBand` manifesto, full-width showcase slider, "How it works" `TwoColumn` CTA, crimson free-agents `ImpactBand`, "2027 Season Loading…" + league logos, newsletter | Direction B promoted Nov 2026 |
-| `/team` | About + Roster + Stats + FAQ on one page, with a jump nav | **Hidden** (Nov 2026). `/about`, `/roster`, `/stats` redirect here |
+| `/team` | Story, team members, how to join, gallery and FAQ on one page, with a jump nav | **Hidden** (Nov 2026). `/about` and `/roster` redirect here; `/stats` redirects to `/events` |
 | `/events` | Next event with countdown and squads, how it works and fees, then each season's `SeasonStrip` and results | Unhidden 5 Nov 2026, in the nav and sitemap |
 | `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | **Hidden.** Products collection is empty on purpose |
 | `/preorder/[slug]` | One page per jersey drop, with an on-site order form | `PreorderForm` island → Google Form |
@@ -89,8 +89,8 @@ linked from anywhere either, but its closed state still points at `/shop` and
 - All 7 PRD content collections plus `faqs`, `galleries`, `preorders` and `landing` (the page builder: [EDITING.md](EDITING.md#building-a-landing-page)).
   Schemas are in `src/content.config.ts` and CMS forms in `.pages.yml`.
   **Every image field has a required `alt`.**
-- Stats are derived, never typed. `src/lib/stats.ts` computes every rate and
-  total from raw counts in `results`. `/team` also shows live team stats from
+- The record is derived, never typed: `/team` and `/events` work it out from
+  each event's squads (`src/lib/events.ts`). `/team` also shows live team stats from
   **pblidb.org** (an unofficial public API, fetched at build time, fails soft;
   see `src/lib/pblidb.ts`).
 - Upcoming vs past is computed from dates (`src/lib/events.ts`). Nobody flips a
@@ -117,9 +117,9 @@ the other:
   (`icpl`, `infamous`, `kinetic`, `nxl-eu`, `nxl-us`) with no sponsor entries.
   The folder codes come from the photographers' filenames, not confirmed event
   names. Rename a folder if you know the real name, and fix any paths.
-- **The roster may be partly fictional.** Several players (J. Smith,
-  M. Rodriguez and others) share names with the design mockups. Confirm the
-  real roster with the team before treating `src/content/players/` as truth.
+- **Team members are placeholders in part.** Kyle's bio predates this list and
+  needs his review. Matt Engles has no bio or photo yet, and both roles are
+  a generic "Organizer".
 - **Events are real.** All 10 NXL US events from 2025–26 were copied from
   PBLeagues on 5 Nov 2026: venues, squads and final places. Check before
   trusting:
@@ -129,8 +129,7 @@ the other:
     the NXL's map link say 6000. The venue has no published name.
   - 2025's Cuban-flagged "Leftovers" (Open 3v3) was left out as not ours.
   - Non-NXL events aren't backfilled.
-- **Results, sponsors, products: empty on purpose.** Each folder has a README
-  explaining why. Astro logs "collection … is empty" warnings on every build;
+- **Products: empty on purpose.** The folder has a README explaining why. Astro logs "collection … is empty" warnings on every build;
   that's expected.
 - **The jersey pre-order** (`preorders/2026-leftovers-jersey.md`) has
   `closesAt: 2026-10-02`, which is in the past. Check with the team whether that
@@ -148,7 +147,7 @@ These are all recorded with their reasons in
 | 8-page site map (§5) | `/team` merges About/Roster/Stats | Same subject split across three clicks |
 | Free wordmark font, subset (§9) | **CC Monster Mash Worn**, licensed, **not** subset | The licence forbids subsetting. Per-domain licence, see `ATTRIBUTIONS.md` |
 | Discord as the hub (§8.3) | **No Discord**; `/join` form instead | The team doesn't run one right now. Discord UI hides itself while `social.discord` is empty |
-| `results` is hand-entered only (§8.1) | Also pulls pblidb.org at build time | A free public source appeared. Fails soft |
+| `results` collection, player stats and a roster (§6, §8.1) | Removed. Squads and places live on each event, and `team` lists organizers | Players rotate, and nobody was hand-entering stats |
 | Payment off-site via Bonfire (§8.2) | Pre-orders collect **orders** on-site via Google Forms, and payment is arranged manually | No store chosen yet. Still zero payment/PCI surface |
 
 ---
@@ -161,7 +160,7 @@ src/
   content/<collection>/  One file per player, event, preorder, page…
   data/site.yml          Site settings: nav, socials, mailing list, embeds, form URLs
   lib/                   Build-time logic, plus the data shared by /design and Storybook
-    stats.ts events.ts format.ts settings.ts images.ts pblidb.ts
+    events.ts format.ts settings.ts images.ts pblidb.ts
     palette.ts icons.ts textures.ts clouds.ts
   components/
     brand/               Icon, Wordmark, MascotMark, RuyiCloud, TerracedDivider, Lantern, Badge
@@ -183,7 +182,6 @@ docs/design/             Committed, downsized reference plates (see §6)
 | Island | Used on | Server half |
 |---|---|---|
 | `CountdownIsland` | `/events`, `/shop`, preorders | `Countdown.astro` pins the first value so hydration matches |
-| `StatLeaderboardTable` | `/team` | SSR'd as a full `<table>`, and sorting is the enhancement |
 | `Slideshow` | `/team`, `/community`, `/design` | `GallerySlideshow.astro` optimises images at build time |
 | `Calendar` | `/design` only | `EventsCalendar.astro`. Day links are plain `#slug` anchors that work without JS |
 | `PreorderForm` · `ProductGallery` | `/preorder/[slug]` | The page passes the drop's data |
@@ -256,7 +254,7 @@ npm run og               # after npm run build: screenshot /design/og-card into 
 - **CMS edits land as commits on `main`**, so pull before you push.
 - Commit straight to `main` (that's this repo's history), or use a PR if the
   owner asks.
-- **Known build noise:** "collection products/results/sponsors is empty"
+- **Known build noise:** "collection products is empty"
   warnings, and two `FormEvent` deprecation hints. All expected.
 - `_reference/` (gitignored, local only) holds the full-resolution originals.
   See §6.
@@ -311,8 +309,8 @@ inline-styled HTML into the repo.
    curating, alt text and galleries. Player photos are still missing. It unblocks player photos,
    galleries, the mockup-B manifesto band, the `Hero` video variant, and real
    carousel slides on `/design`.
-2. **Confirm the real roster and the next real event.** Replace the
-   placeholders through the CMS.
+2. **Finish the team members.** Add Matt's bio and photo, real roles, and
+   review Kyle's bio.
 3. **Close or extend the jersey pre-order** (its close date has passed).
 4. **Mailing list:** `mailingList.formAction` in `site.yml` is empty. Pick
    Buttondown or Mailchimp and paste in the form action.
@@ -331,14 +329,13 @@ inline-styled HTML into the repo.
 2. **Phase 2 (PRD §12): `/news` recap posts.** For now `/news` redirects to
    `/events`.
 3. **Phase 3: a CSV importer** that turns a PBLI results export into the
-   `results` collection format.
+   squad places on each `events` entry.
 4. **More texture on real pages.** The homepage `Hero` now uses `.bg-sand`.
    `<Section tone="sand|seigaiha">` is ready for more: a seigaiha band on
    `/events`, sand behind `/team#story`.
 5. **Components that are built and documented on `/design` but not used on
    any public page yet.** Place each one once its content exists:
-   - `TwoColumn`, `FeatureRow` and `ProfileCard`: waiting on photos or a bio.
-   - `StatStrip`: waiting on results.
+   - `FeatureRow`: waiting on photos.
    - `SponsorMarquee`: waiting on enough sponsors to scroll. Two partners
      (Infamous, Kinetic) now show on Contact through `LogoStrip`.
    - `PricingCard`: its "Sponsor a Slot" tier idea needs a business decision.

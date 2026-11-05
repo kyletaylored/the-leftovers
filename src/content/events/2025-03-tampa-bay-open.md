@@ -1,5 +1,5 @@
 ---
-title: Tampa Bay Open
+title: Tampa Bay Open 2025
 league: NXL
 startDate: 2025-03-07
 endDate: 2025-03-09

@@ -81,8 +81,7 @@ than code:
 |---|---|
 | [![Component library v2 (buttons, fields, badges, cards, banners, toast) beside three phone mockups: homepage, roster and navigation](docs/design/component-library-mobile.webp)](docs/design/component-library-mobile.webp) | [![Homepage variant with a photo hero, crimson next-up band and photo PlayerCards, plus a shop row and footer](docs/design/homepage-mockup-c.webp)](docs/design/homepage-mockup-c.webp) |
 
-The mobile column is the reference for phone layouts. The photo variant of
-PlayerCard is waiting on player photography.
+The mobile column is the reference for phone layouts.
 
 ### The jersey: where the textures come from
 
@@ -115,9 +114,6 @@ choice only matters for the few things that genuinely need state:
   `Countdown.astro`, which computes the first value at build time so
   hydration matches the server HTML exactly (see the comment in the island;
   getting this wrong throws React hydration error #418 on every page).
-- **`StatLeaderboardTable.tsx`** — sortable/filterable career stats,
-  server-rendered as a complete `<table>`. With JS blocked it is still a
-  perfectly usable stats table; sorting is the enhancement.
 - **`Slideshow.tsx`** — photo carousel on shadcn/ui's Carousel (Embla), with
   `peek` / `single` / `hero` layouts and dash or thumbnail indicators.
   `GallerySlideshow.astro` optimizes every image at build time and passes
@@ -189,7 +185,6 @@ src/
   data/site.yml            Site settings: nav, socials, mailing list, shop URLs
   lib/
     settings.ts            Parses site.yml through Zod at build time
-    stats.ts               Derives every stat from the results collection
     events.ts              Derives upcoming/past from dates
     format.ts              Dates, money, rates — all UTC (see below)
     images.ts              Maps a CMS image path to an optimizable asset
@@ -213,10 +208,9 @@ scripts/                   make-og-default, prep-brand-assets, make-pattern-tile
 
 ### Decisions worth knowing before you change something
 
-- **Nothing derivable is editable.** Win rates, records, upcoming-vs-past, and
-  per-player totals are all computed in `src/lib` from raw counts. The CMS only
-  ever collects things a human observed. This is the main defence against a
-  stats page that quietly contradicts itself (PRD §13).
+- **Nothing derivable is editable.** Upcoming-vs-past, best finishes and season
+  counts are all computed in `src/lib` from raw data. The CMS only ever collects
+  things a human observed, so the site can't quietly contradict itself (PRD §13).
 - **Dates are formatted in UTC, deliberately.** The CMS collects date-only
   values (`2026-09-19`), which parse to UTC midnight. Formatting those in a
   local zone renders the previous day anywhere west of Greenwich — including on

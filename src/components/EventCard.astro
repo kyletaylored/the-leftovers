@@ -5,7 +5,7 @@
  *
  * The CTAs switch on derived state (lib/events.ts). An upcoming event offers
  * "Request a spot", which goes to /join because the event captain registers
- * the team, and says so once entries have closed. A past event shows the best
+ * the team, until the event ends or the CMS closes it. A past event shows the best
  * finish and an expandable list of every squad. The list is a native
  * <details>, so it needs no JS.
  */
@@ -16,7 +16,7 @@ import Button from './Button.astro';
 import EventSquads from './EventSquads.astro';
 import { resolveImage } from '@/lib/images';
 import { dateRange, dayNum, dayOfWeek, monthShort, isoDate, ordinal } from '@/lib/format';
-import { addressLine, bestFinish, isTakingRequests, isUpcoming, seasonOf, type EventEntry } from '@/lib/events';
+import { addressLine, bestFinish, fullTitle, isTakingRequests, isUpcoming, type EventEntry } from '@/lib/events';
 
 interface Props {
   event: EventEntry;
@@ -29,7 +29,7 @@ interface Props {
 const { event, as: Heading = 'h3', layout = 'card', class: className = '' } = Astro.props;
 // Lets the Calendar's day links (#slug) jump straight to this card.
 const anchorId = event.id;
-const { title, league, startDate, endDate, location, eventUrl, squads, cover, coverAlt, resultSummary, placement } =
+const { league, startDate, endDate, location, eventUrl, squads, cover, coverAlt, resultSummary, placement } =
   event.data;
 
 const coverAsset = await resolveImage(cover);
@@ -37,7 +37,7 @@ const upcoming = isUpcoming(event);
 const takingRequests = isTakingRequests(event);
 const best = bestFinish(event);
 const finish = placement ?? (best?.fieldSize && `${ordinal(best.place ?? 0)} of ${best.fieldSize}`);
-const fullTitle = `${title} ${seasonOf(event)}`;
+const name = fullTitle(event);
 const squadCount = `${squads.length} ${squads.length === 1 ? 'squad' : 'squads'}`;
 ---
 
@@ -100,7 +100,7 @@ const squadCount = `${squads.length} ${squads.length === 1 ? 'squad' : 'squads'}
             layout === 'feature' ? 'text-3xl sm:text-4xl' : 'text-2xl',
           ]}
         >
-          {title}
+          {name}
         </Heading>
         {
           location ? (
@@ -151,12 +151,12 @@ const squadCount = `${squads.length} ${squads.length === 1 ? 'squad' : 'squads'}
       {takingRequests && <Button href="/join" size="sm">Request a spot</Button>}
       {
         upcoming && !takingRequests && (
-          <p class="text-sm font-bold text-bone">Entries are closed for this event</p>
+          <p class="text-sm font-bold text-bone">Closed to new players for this event</p>
         )
       }
       {
         eventUrl && (
-          <Button href={eventUrl} external variant="ghost" size="sm" aria-label={`${upcoming ? 'Details' : 'Results'} for ${fullTitle} on PBLeagues`}>
+          <Button href={eventUrl} external variant="ghost" size="sm" aria-label={`${upcoming ? 'Details' : 'Results'} for ${name} on PBLeagues`}>
             {upcoming ? 'Event details' : 'Full results'}
           </Button>
         )

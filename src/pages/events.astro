@@ -26,7 +26,7 @@ import Button from '@/components/Button.astro';
 import Countdown from '@/components/Countdown.astro';
 import BrandRule from '@/components/brand/BrandRule.astro';
 import Icon from '@/components/brand/Icon.astro';
-import { getEvents, seasonOf } from '@/lib/events';
+import { fullTitle, getEvents, seasonOf } from '@/lib/events';
 import { isoDate } from '@/lib/format';
 import { site } from '@/lib/settings';
 
@@ -40,9 +40,9 @@ const feeEvent = [...upcoming, ...past].find((event) => event.data.fees.length >
 const seasons = [...new Set(all.map(seasonOf))].sort((a, b) => b - a);
 
 const schema = upcoming.flatMap((event) => {
-  const { title, league, location, startDate, endDate, eventUrl } = event.data;
+  const { league, location, startDate, endDate, eventUrl } = event.data;
   if (!location) return [];
-  const name = [league, title, seasonOf(event)].filter(Boolean).join(' ');
+  const name = [league, fullTitle(event)].filter(Boolean).join(' ');
   return [
     {
       '@type': 'SportsEvent',
@@ -142,7 +142,7 @@ const schema = upcoming.flatMap((event) => {
           <BrandRule ornament="field" spacing="lg" />
           <h3 class="mb-2 text-2xl text-bone sm:text-3xl">What events cost</h3>
           <p class="mb-6 max-w-3xl text-sm leading-relaxed text-bone-muted sm:text-base">
-            Every event prices its formats and divisions differently. Here's {feeEvent.data.title} {seasonOf(feeEvent)} for the divisions we entered.
+            Every event prices its formats and divisions differently. Here's {fullTitle(feeEvent)} for the divisions we entered.
           </p>
           <EventFees event={feeEvent} note={site.eventProcess.feeNote} />
         </>

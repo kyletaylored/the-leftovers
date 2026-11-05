@@ -1,40 +1,26 @@
 # Editing the site
 
-For whoever's running the roster. **You don't need to install anything, and you
+For whoever's running the site. **You don't need to install anything, and you
 can't break the site by typing in the wrong box** — if something's badly wrong
 the build fails and the live site just stays as it was.
 
 Everything below happens at **[app.pagescms.org](https://app.pagescms.org)**.
 Sign in with GitHub, pick the `the-leftovers` repo, and you'll see a sidebar
-with Roster, Events, Results, Shop items, Sponsors, Page copy, FAQs and Site
-settings.
+with Team Members, Events, Shop items, Sponsors, Page copy, Landing pages, FAQs
+and Site settings.
 
 **Every save goes live in about a minute.** There's no publish button and no
 separate deploy step — hitting Save is publishing.
 
 ---
 
-## Adding a player
+## Team members
 
-**Roster → Add entry.**
+**Team Members** lists the people who run The Leftovers, not players, who rotate
+by event. **Add an entry** with a **Name** and **Role**. The **Bio** is free text.
 
-- **Name**, **Position** and **Status** are the only required fields.
-- **Jersey number** gets the gold ribbed-numeral treatment. If there's no photo
-  yet, the number becomes the whole card, which looks deliberate — so it's
-  worth filling in even before you have a picture.
-- **Photo alt text** is required whenever you add a photo. Write what's in the
-  picture: *"Dani Okafor in the back corner, marker raised"*. Blind visitors
-  hear it and Google Images reads it, so it's worth ten seconds.
-- **Show on the homepage** puts them in the homepage roster row. The homepage
-  shows the first three, by sort order.
-- **Bio** is free text and appears under "Player Notes" on the roster page.
-
-### Open slots
-
-An open slot is just a Roster entry with **Status: Open slot**. It renders as
-the dashed "OPEN SLOT — JOIN THE ROSTER" card with the mascot, and the roster
-page counts them automatically. To close one, delete the entry (or flip it to
-Active and put the new player's details in).
+**Photo alt text** is required. Describe what's in the photo; until there's a
+photo, the person's name is fine. **Sort order** sets who comes first.
 
 ---
 
@@ -43,6 +29,9 @@ Active and put the new player's details in).
 **Events → Add entry.** Name and start date are required. Add the location as
 soon as you know it, with the full address: Google needs a venue and city before
 it can show the event in search, so an event without one is left out.
+
+**Include the year in the name**, like *Lone Star Open 2026*, so you can tell the
+same event apart across seasons in this list.
 
 Players never sign up through the league link. *League event page* is for details
 and results; the card's **Request a spot** button goes to the join form, and
@@ -55,6 +44,10 @@ dates in **Fee deadlines**. The Events page shows the next event that has fees.
 
 **Squads:** add every Leftovers squad from the league's team list, with its
 division. The site counts them for you.
+
+**Requests stay open until the event ends.** The **Request a spot** button doesn't
+depend on the league's fee deadlines. To stop taking players sooner, tick **Closed
+to new players** and the button is replaced with a note saying so.
 
 **You do not need to mark an event as past.** Leave *Status override* empty and
 the site works it out from the date — an event stays "upcoming" through the end
@@ -70,31 +63,6 @@ works out the best finish from those. Optionally add:
 
 To change the numbered steps on the Events and Join pages, go to **Site settings
 → How event sign-up works**.
-
----
-
-## Entering results after a tournament
-
-This is the one genuinely fiddly job, and there's no way around it: PBLeague
-exports results to the event organiser, not as a feed anyone can plug into. So
-after each event someone types the sheet in.
-
-**Results → Add entry.**
-
-1. Pick the **Event** from the dropdown.
-2. Fill in **Final placement**, **Teams in the bracket**, and the
-   **Win-loss record** (like `4-1`).
-3. Add one **Player stat line** per person who played, with raw counts:
-   games played, eliminations, times eliminated, flag pulls, flag hangs,
-   penalties.
-
-**Only enter counts.** Don't try to work out win rates, elimination ratios or
-per-game averages — the site calculates all of those, on both the stats page
-and the homepage numbers. If you enter a rate by hand it will eventually
-disagree with the raw numbers, and then nobody knows which one is lying.
-
-If you type a number wrong, fix that one field and save. Everything downstream
-recalculates.
 
 ---
 
@@ -221,7 +189,8 @@ site handles the design, so a page always looks like the rest of the site.
 | Section | Use it for |
 |---|---|
 | **Photo band** | A big action photo with bold copy. The strongest section |
-| **Big statement** | A few large lines of text, centred |
+| **Big statement** | A few large lines of text, centred, with optional decorative rules |
+| **Divider** | A decorative rule between two sections on the same background |
 | **Photo gallery** | A slider of one of your Photo galleries |
 | **Photo and text** | A calm boxed section, with numbered steps if you need them |
 | **Announcement panel** | A boxed notice, with league logos if you want them |
@@ -247,6 +216,3 @@ Two rules keep pages looking right:
    means something didn't match what the site expects. The live site is
    untouched — it's still serving the last good version, so nothing is broken
    for visitors. Tell whoever maintains the code and mention what you edited.
-3. **Numbers look off on the stats page?** They're calculated from the Results
-   entries, so the mistake is almost always a typo in a stat line. Find the
-   event and check its counts.

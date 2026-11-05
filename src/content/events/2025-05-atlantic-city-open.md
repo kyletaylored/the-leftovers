@@ -1,5 +1,5 @@
 ---
-title: Atlantic City Open
+title: Atlantic City Open 2025
 league: NXL
 startDate: 2025-05-02
 endDate: 2025-05-04

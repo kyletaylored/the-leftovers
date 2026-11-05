@@ -47,7 +47,8 @@ import Button from '@/components/Button.astro';
 import Pill from '@/components/ui/Pill.astro';
 import Toast from '@/components/Toast.astro';
 import CookieConsent from '@/components/CookieConsent.tsx';
-import PlayerCard from '@/components/PlayerCard.astro';
+import ProfileCard from '@/components/ProfileCard.astro';
+import SponsorBand from '@/components/SponsorBand.astro';
 import EventCard from '@/components/EventCard.astro';
 import EventFees from '@/components/EventFees.astro';
 import EventSquads from '@/components/EventSquads.astro';
@@ -97,17 +98,14 @@ import infamousLogo from '@/assets/img/sponsors/infamous-paintball.png';
 import kineticLogo from '@/assets/img/sponsors/kinetic-paintball.png';
 
 // ---------------------------------------------------------------- data --
-const [players, faqs, products, { upcoming, past, next }] = await Promise.all([
-  getCollection('players'),
+const [members, faqs, products, { upcoming, past, next }] = await Promise.all([
+  getCollection('team'),
   getCollection('faqs'),
   getCollection('products'),
   getEvents(),
 ]);
 
-const activePlayer =
-  players.find((p) => p.data.status === 'active' && p.data.number !== undefined) ??
-  players.find((p) => p.data.status === 'active');
-const openSlot = players.find((p) => p.data.status === 'open-slot');
+const sampleMember = members.sort((a, b) => a.data.order - b.data.order)[0];
 const allEvents = [...upcoming, ...past];
 const sampleEvent = next ?? upcoming[0] ?? past[0];
 const samplePast = past[0];
@@ -115,16 +113,14 @@ const feeEvent = allEvents.find((event) => event.data.fees.length > 0);
 const squadEvent = samplePast ?? sampleEvent;
 const sampleFaqs = faqs.sort((a, b) => a.data.order - b.data.order).slice(0, 3);
 
-// Ticker lines from real collections: upcoming events (the next one flagged)
-// and open roster spots. Falls back to recent events if none are upcoming.
-const openSlots = players.filter((p) => p.data.status === 'open-slot').length;
+// Ticker lines from real collections: upcoming events, the next one flagged.
+// Falls back to recent events if none are upcoming.
 const tickerItems: TickerItem[] = [
   ...(upcoming.length ? upcoming : past.slice(0, 3)).slice(0, 4).map((e, i) => ({
     kicker: upcoming.length && i === 0 ? 'Next up' : undefined,
     label: `${e.data.title} · ${monthDay(e.data.startDate)}${e.data.location ? ` · ${e.data.location.city}` : ''}`,
     href: `/events#${e.id}`,
   })),
-  ...(openSlots ? [{ kicker: 'Join', label: `${openSlots} roster ${openSlots === 1 ? 'spot' : 'spots'} open`, href: '/join' }] : []),
 ];
 
 // Slides for the carousel variants — local assets only (the CSP is
@@ -530,7 +526,7 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
           tag="NEW"
           flush
           file="src/components/Ticker.astro"
-          note={'Short glanceable lines: the next event, a pre-order drop, open roster spots. Build items from collections at the call site (these come from events and players). It pauses on hover and focus, and the Pause button stops it for good (WCAG 2.2.2). Scale duration with the copy length so it reads at a walking pace. Use one per page, full-bleed, under the nav or between sections; never above the h1.'}
+          note={'Short glanceable lines: the next event, a pre-order drop. Build items from collections at the call site (these come from events and players). It pauses on hover and focus, and the Pause button stops it for good (WCAG 2.2.2). Scale duration with the copy length so it reads at a walking pace. Use one per page, full-bleed, under the nav or between sections; never above the h1.'}
         >
           <div class="grid gap-3 py-5">
             <Ticker items={tickerItems} label="Team news (gold specimen)" />
@@ -608,11 +604,14 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
       </div>
 
       <div class="mb-5 grid gap-5 lg:grid-cols-3">
-        <Specimen title="PlayerCard" file="src/components/PlayerCard.astro" note="Numeral beside the photo in a gold frame, crimson name-plate, role pill, corner cloud picked from the jersey number. Open slots get the dashed mascot card. Pass a players collection entry.">
-          <div class="grid grid-cols-2 gap-4">
-            {activePlayer && <PlayerCard player={activePlayer} as="h4" />}
-            {openSlot && <PlayerCard player={openSlot} as="h4" />}
-          </div>
+        <Specimen title="ProfileCard" file="src/components/ProfileCard.astro" note="A short bio with a role, optional photo and social links. Use it for the people who run the team (the team collection).">
+          {
+            sampleMember && (
+              <ProfileCard name={sampleMember.data.name} role={sampleMember.data.role} as="h3">
+                The bio goes in the default slot.
+              </ProfileCard>
+            )
+          }
         </Specimen>
 
         <Specimen title="EventCard" class="lg:col-span-2" file="src/components/EventCard.astro" note={'Date chip (day · month · ribbed day number), venue, BrandRule footer. Upcoming events offer Request a spot until entries close; past events show the best finish and every squad. layout="feature" is the bigger NEXT UP treatment and adds the full address. The article id is the event slug, so #slug links jump to it.'}>
@@ -636,7 +635,7 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
             <Toast message="That didn't send. Try again." tone="error" mascot={false} />
           </div>
         </Specimen>
-        <Specimen title="StatNumber" file="src/components/StatNumber.astro" note="A headline figure with its label. Composes into StatStrip on the homepage/team page.">
+        <Specimen title="StatNumber" file="src/components/StatNumber.astro" note="A headline figure with its label. Composes into a row on the homepage/team page.">
           <div class="flex flex-wrap gap-10">
             <StatNumber value="12" label="Events played" size="sm" />
             <StatNumber value="48" label="Points won" />
@@ -913,6 +912,10 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
           </div>
         </Specimen>
 
+        <Specimen title="SponsorBand: above the footer" class="overflow-hidden lg:col-span-2" flush file="src/components/SponsorBand.astro" note="The sponsors row on every page, rendered by BaseLayout. Logos wrap onto new lines as sponsors are added, title tier first. Don't add it to a page yourself.">
+          <SponsorBand />
+        </Specimen>
+
         <Specimen
           title="LogoStrip: leagues and partners"
           file="src/components/LogoStrip.astro"
@@ -1105,7 +1108,7 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
     <DocSection id="imagery" number={num('imagery')} title="Imagery placeholders" kicker="Real photography lands later; these hold slots on-brand meanwhile">
       <Specimen title="ImagePlaceholder" tag="NEW" file="src/components/ImagePlaceholder.astro" note="Striped, labelled, brand borders. Never a broken-image icon or an empty grey box. The label is announced (role=img), so name the shot. Ratios match the real component slots.">
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div><ImagePlaceholder label="player photo" ratio="4/5" showRatio /><p class="mt-1.5 text-[0.6875rem] text-bone-muted">PlayerCard</p></div>
+          <div><ImagePlaceholder label="player photo" ratio="4/5" showRatio /><p class="mt-1.5 text-[0.6875rem] text-bone-muted">Portrait</p></div>
           <div><ImagePlaceholder label="event cover" ratio="16/9" angle={115} showRatio /><p class="mt-1.5 text-[0.6875rem] text-bone-muted">EventCard</p></div>
           <div><ImagePlaceholder label="product shot" ratio="1/1" angle={65} showRatio /><p class="mt-1.5 text-[0.6875rem] text-bone-muted">ProductCard</p></div>
           <div><ImagePlaceholder label="action photo" ratio="3/2" angle={95} showRatio /><p class="mt-1.5 text-[0.6875rem] text-bone-muted">Gallery / hero</p></div>

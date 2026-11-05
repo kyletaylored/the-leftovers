@@ -1,0 +1,43 @@
+---
+/**
+ * SponsorBand — the sponsors row above the footer, on every page.
+ *
+ * BaseLayout renders it, so a sponsor added in the CMS shows up site-wide with
+ * no page edits. It's built on LogoStrip because that wraps: a long sponsor
+ * list grows onto new rows instead of overflowing, at the small logo size so
+ * the band stays modest. Title sponsors come first, then gold, then
+ * supporting, alphabetical within a tier.
+ *
+ * Renders nothing if there are no sponsors. No JS.
+ */
+import { getCollection } from 'astro:content';
+import LogoStrip from './LogoStrip.astro';
+import { resolveImage } from '@/lib/images';
+
+const tiers = ['title', 'gold', 'supporting'];
+
+const sponsors = (await getCollection('sponsors')).sort(
+  (a, b) =>
+    tiers.indexOf(a.data.tier) - tiers.indexOf(b.data.tier) ||
+    a.data.name.localeCompare(b.data.name)
+);
+
+const items = await Promise.all(
+  sponsors.map(async ({ data }) => ({
+    name: data.name,
+    alt: data.logoAlt,
+    href: data.url,
+    src: await resolveImage(data.logo),
+  }))
+);
+---
+
+{
+  items.length > 0 && (
+    <section aria-label="Our sponsors" class="border-t border-ink-600 bg-ink-900">
+      <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+        <LogoStrip items={items} label="Proudly supported by" size="sm" />
+      </div>
+    </section>
+  )
+}

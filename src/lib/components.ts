@@ -121,7 +121,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'BlockRenderer', file: 'BlockRenderer.astro', kind: 'Astro', group: 'layout', section: 'marketing',
     use: 'Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.',
-    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, faq',
+    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, faq',
     data: 'landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.',
     avoid: 'Pages that need logic or computed data; hand-write those.',
     pairs: ['Hero', 'ImpactBand', 'TwoColumn'],
@@ -223,7 +223,7 @@ export const catalog: CatalogEntry[] = [
   // ---------------------------------------------------------------- events
   {
     name: 'EventCard', file: 'EventCard.astro', kind: 'Astro', group: 'events', section: 'components',
-    use: 'An event with date chip and venue. Upcoming: Request a spot (to /join) until entries close. Past: best finish and all squads. Article id = slug (#slug links).',
+    use: 'An event with date chip and venue. Upcoming: Request a spot (to /join) until the event ends or closedToRequests is ticked. Past: best finish and all squads. Article id = slug (#slug links).',
     options: 'event · layout: card|feature (big NEXT UP, full address) · as',
     data: 'events collection entry; getEvents() gives upcoming/past/next',
   },
@@ -276,32 +276,16 @@ export const catalog: CatalogEntry[] = [
     use: 'The ticking island behind Countdown.',
   },
   {
-    name: 'PlayerCard', file: 'PlayerCard.astro', kind: 'Astro', group: 'events', section: 'components',
-    use: 'Roster card; open-slot entries render the dashed "join" card.',
-    options: 'player · href · as', data: 'players collection entry',
-  },
-  {
     name: 'ProfileCard', file: 'ProfileCard.astro', kind: 'Astro', group: 'events', section: 'components',
-    use: 'Bio card for non-rostered people (coach, organiser).',
+    use: 'Bio card for the people who run the team. Bio in the default slot.',
     options: 'name · role · image+imageAlt · links[{icon, href, label}] · as',
-    avoid: 'Rostered players (use PlayerCard).',
+    data: 'team collection entry',
   },
   {
     name: 'StatNumber', file: 'StatNumber.astro', kind: 'Astro', group: 'events', section: 'components',
     use: 'One big gold ribbed figure + label.',
     options: 'value · label · size: md|sm|lg',
-    data: 'computed in src/lib/stats.ts, never typed into content',
-  },
-  {
-    name: 'StatStrip', file: 'StatStrip.astro', kind: 'Astro', group: 'events', section: 'components',
-    use: 'Band of team StatNumbers.',
-    options: 'stats', data: 'src/lib/stats.ts (results collection)',
-    avoid: 'Before real results exist (use MascotCallout).',
-  },
-  {
-    name: 'StatLeaderboardTable', file: 'StatLeaderboardTable.tsx', kind: 'React island', group: 'events', section: 'index', story: true,
-    use: 'Sortable player stats table.',
-    options: 'rows · roles', data: 'src/lib/stats.ts',
+    data: 'computed from collections, never typed into content',
   },
   {
     name: 'TeamStatsWidget', file: 'TeamStatsWidget.astro', kind: 'Astro', group: 'events', section: 'index',
@@ -429,6 +413,7 @@ export const catalog: CatalogEntry[] = [
 
   // ------------------------------------------------------------------ site
   { name: 'Nav', file: 'Nav.astro', kind: 'Astro', group: 'site', section: 'index', use: 'Site navigation. Rendered by BaseLayout.' },
+  { name: 'SponsorBand', file: 'SponsorBand.astro', kind: 'Astro', group: 'site', section: 'marketing', use: 'Sponsors row above the footer. Rendered by BaseLayout.', data: 'sponsors collection' },
   { name: 'Footer', file: 'Footer.astro', kind: 'Astro', group: 'site', section: 'index', use: 'Site footer. Rendered by BaseLayout.' },
   { name: 'Seo', file: 'Seo.astro', kind: 'Astro', group: 'site', section: 'index', use: 'Head metadata. Pass title/description/noindex/schema to BaseLayout instead.' },
 ];
@@ -458,7 +443,7 @@ export const recipes: { name: string; example: string; steps: string }[] = [
   {
     name: 'Team / about',
     example: 'src/pages/team.astro',
-    steps: 'PageHeader → story Section (Prose + StatNumbers + Callout) → roster Section (PlayerCard grid) → stats (StatLeaderboardTable / TeamStatsWidget, MascotCallout until data) → FaqAccordion → CtaStrip tone=forest',
+    steps: 'PageHeader → story Section (Prose + StatNumbers + Callout) → ProfileCard grid → ThreeColumn (how to join) → GallerySlideshow → TeamStatsWidget → FaqAccordion → CtaStrip tone=forest',
   },
   {
     name: 'Shop / product',

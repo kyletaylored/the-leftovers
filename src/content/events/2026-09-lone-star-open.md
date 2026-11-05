@@ -1,5 +1,5 @@
 ---
-title: Lone Star Open
+title: Lone Star Open 2026
 league: NXL
 startDate: 2026-09-17
 endDate: 2026-09-20

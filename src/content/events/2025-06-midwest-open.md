@@ -1,5 +1,5 @@
 ---
-title: Midwest Open
+title: Midwest Open 2025
 league: NXL
 startDate: 2025-06-19
 endDate: 2025-06-22
