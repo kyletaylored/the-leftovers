@@ -34,10 +34,18 @@ interface Props {
   flip?: boolean;
   /** Drop the far mountain layer for a shorter, simpler band. */
   simple?: boolean;
+  /**
+   * Let the depths sway slowly sideways, neighbouring layers in opposite
+   * directions at different speeds. Each depth then renders as its own
+   * stacked <svg> so the browser can move it on the compositor (no
+   * repaints), with mirrored copies past both edges so a swing never shows
+   * a gap. Reduced-motion visitors get the still landscape.
+   */
+  animate?: boolean;
   class?: string;
 }
 
-const { seed = 1, flip = false, simple = false, class: className = '' } = Astro.props;
+const { seed = 1, flip = false, simple = false, animate = false, class: className = '' } = Astro.props;
 
 const W = 2400;
 const H = 260;
@@ -172,7 +180,8 @@ const yAt = (ys: number[], x: number) => ys[Math.min(ys.length - 1, Math.max(0, 
 // 田 glyphs: one per front plateau (terrace tops + flat paddies), then mid
 // peaks fill the gaps. Every glyph keeps GLYPH_GAP from every other, across
 // both layers, so two never sit side by side.
-type Glyph = { x: number; y: number; s: number; o: number };
+type Layer = 'far' | 'mid' | 'front';
+type Glyph = { x: number; y: number; s: number; o: number; layer: Layer };
 const glyphs: Glyph[] = [];
 const roomFor = (x: number) => glyphs.every((g) => Math.abs(g.x - x) >= GLYPH_GAP);
 segments.forEach((seg) => {
@@ -180,13 +189,13 @@ segments.forEach((seg) => {
   if (cx < 40 || cx > W - 40 || !roomFor(cx)) return;
   if (seg.kind === 'terrace' || seg.kind === 'flat') {
     const s = 14;
-    glyphs.push({ x: cx, y: yAt(frontY, cx) - s / 2 - 2, s, o: 0.95 });
+    glyphs.push({ x: cx, y: yAt(frontY, cx) - s / 2 - 2, s, o: 0.95, layer: 'front' });
   }
 });
 peaks(midY, GLYPH_GAP).forEach(([x, y]) => {
   if (!roomFor(x) || x < 40 || x > W - 40) return;
   const s = 10;
-  glyphs.push({ x, y: y - s / 2 - 1.5, s, o: 0.6 });
+  glyphs.push({ x, y: y - s / 2 - 1.5, s, o: 0.6, layer: 'mid' });
 });
 
 // Finials on the pagoda eaves.
@@ -209,32 +218,54 @@ const sparkles = simple
 
 const ids = { far: uid('rt-far'), mid: uid('rt-mid'), front: uid('rt-front'), shade: uid('rt-shade') };
 const contours = (count: number, gap: number) => Array.from({ length: count }, (_, k) => (k + 1) * gap);
+
+// Still: one <svg> holding every depth. Animated: one stacked <svg> per depth
+// (a "pane"), so each can move on its own compositor layer.
+const depths: Layer[] = simple ? ['mid', 'front'] : ['far', 'mid', 'front'];
+const panes: Layer[][] = animate ? depths.map((d) => [d]) : [depths];
+/** Sway per depth: amplitude (% of the band's width), period, direction. */
+const sway: Record<Layer, string> = {
+  far: '--sway:1.2%;animation:terrace-sway 41s ease-in-out infinite alternate',
+  mid: '--sway:1.8%;animation:terrace-sway 29s ease-in-out infinite alternate-reverse',
+  front: '--sway:2.6%;animation:terrace-sway 19s ease-in-out infinite alternate',
+};
+const layerId = (d: Layer) => `${ids[d]}-g`;
 ---
 
-<div class:list={['pointer-events-none w-full', className]} aria-hidden="true">
+<div
+  class:list={['pointer-events-none w-full', animate && 'rt-animated overflow-hidden', className]}
+  style={animate && flip ? 'transform:scaleY(-1)' : undefined}
+  aria-hidden="true"
+>
+  {panes.map((pane) => (
   <svg
     viewBox={`0 0 ${W} ${H}`}
     width="100%"
     height="100%"
     preserveAspectRatio="xMidYMax slice"
-    style={`display:block;${flip ? 'transform:scaleY(-1);' : ''}`}
+    class={animate ? 'rt-pane absolute inset-0' : undefined}
+    style={animate
+      ? `display:block;overflow:visible;will-change:transform;${sway[pane[0]]}`
+      : `display:block;${flip ? 'transform:scaleY(-1);' : ''}`}
     role="presentation"
     focusable="false"
   >
     <defs>
-      <clipPath id={ids.far}><path d={fillD(farY)} /></clipPath>
-      <clipPath id={ids.mid}><path d={fillD(midY)} /></clipPath>
-      <clipPath id={ids.front}><path d={fillD(frontY)} /></clipPath>
+      {pane.includes('far') && <clipPath id={ids.far}><path d={fillD(farY)} /></clipPath>}
+      {pane.includes('mid') && <clipPath id={ids.mid}><path d={fillD(midY)} /></clipPath>}
+      {pane.includes('front') && <clipPath id={ids.front}><path d={fillD(frontY)} /></clipPath>}
       {/* Darkens each layer toward its base so the depths separate. */}
-      <linearGradient id={ids.shade} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0.35" stop-color="var(--color-ink)" stop-opacity="0" />
-        <stop offset="1" stop-color="var(--color-ink)" stop-opacity="0.55" />
-      </linearGradient>
+      {(pane.includes('mid') || pane.includes('front')) && (
+        <linearGradient id={animate ? `${ids.shade}-${pane[0]}` : ids.shade} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0.35" stop-color="var(--color-ink)" stop-opacity="0" />
+          <stop offset="1" stop-color="var(--color-ink)" stop-opacity="0.55" />
+        </linearGradient>
+      )}
     </defs>
 
     {
-      !simple && (
-        <g>
+      pane.includes('far') && (
+        <g id={animate ? layerId('far') : undefined}>
           <path d={fillD(farY)} style="fill: color-mix(in srgb, var(--color-forest) 38%, var(--color-ink))" />
           <g clip-path={`url(#${ids.far})`} stroke="var(--color-gold)" fill="none" stroke-width="1">
             {contours(5, 13).map((dy, k) => (
@@ -253,9 +284,10 @@ const contours = (count: number, gap: number) => Array.from({ length: count }, (
       )
     }
 
-    <g>
+    {pane.includes('mid') && (
+    <g id={animate ? layerId('mid') : undefined}>
       <path d={fillD(midY)} fill="var(--color-forest-600)" />
-      <path d={fillD(midY)} fill={`url(#${ids.shade})`} />
+      <path d={fillD(midY)} fill={`url(#${animate ? `${ids.shade}-mid` : ids.shade})`} />
       <g clip-path={`url(#${ids.mid})`} stroke="var(--color-gold)" fill="none" stroke-width="1.1">
         {contours(4, 11).map((dy, k) => (
           <path
@@ -268,10 +300,12 @@ const contours = (count: number, gap: number) => Array.from({ length: count }, (
       </g>
       <path d={ridgeD(midY)} fill="none" stroke="var(--color-gold)" stroke-width="1.6" stroke-opacity="0.8" stroke-linejoin="round" />
     </g>
+    )}
 
-    <g>
+    {pane.includes('front') && (
+    <g id={animate ? layerId('front') : undefined}>
       <path d={fillD(frontY)} fill="var(--color-forest)" />
-      <path d={fillD(frontY)} fill={`url(#${ids.shade})`} />
+      <path d={fillD(frontY)} fill={`url(#${animate ? `${ids.shade}-front` : ids.shade})`} />
       <g clip-path={`url(#${ids.front})`} stroke="var(--color-gold)" fill="none" stroke-width="1.2">
         {contours(3, 9).map((dy, k) => (
           <path d={ridgeD(frontY)} transform={`translate(0 ${dy})`} stroke-opacity={0.5 - k * 0.13} />
@@ -279,9 +313,20 @@ const contours = (count: number, gap: number) => Array.from({ length: count }, (
       </g>
       <path d={ridgeD(frontY)} fill="none" stroke="var(--color-gold)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round" />
     </g>
+    )}
 
+    {/* Animated panes: mirror images of the depth past both edges, reflected
+        at x=0 and x=W so the ridge stays continuous, for the sway to reveal. */}
+    {animate && (
+      <>
+        <use href={`#${layerId(pane[0])}`} transform="scale(-1 1)" />
+        <use href={`#${layerId(pane[0])}`} transform={`translate(${2 * W} 0) scale(-1 1)`} />
+      </>
+    )}
+
+    {glyphs.some((g) => pane.includes(g.layer)) && (
     <g stroke="var(--color-gold)" fill="var(--color-ink)" fill-opacity="0.6">
-      {glyphs.map(({ x, y, s, o }) => (
+      {glyphs.filter((g) => pane.includes(g.layer)).map(({ x, y, s, o }) => (
         <g transform={`translate(${f(x)} ${f(y)})`} stroke-opacity={o} stroke-width={s > 11 ? 1.5 : 1.1}>
           <rect x={f(-s / 2)} y={f(-s / 2)} width={f(s)} height={f(s)} />
           <line x1={f(-s / 2)} y1="0" x2={f(s / 2)} y2="0" />
@@ -289,7 +334,9 @@ const contours = (count: number, gap: number) => Array.from({ length: count }, (
         </g>
       ))}
     </g>
+    )}
 
+    {pane.includes('front') && (
     <g fill="var(--color-gold)">
       {finials.map(([x, y]) => (
         <>
@@ -298,5 +345,7 @@ const contours = (count: number, gap: number) => Array.from({ length: count }, (
         </>
       ))}
     </g>
+    )}
   </svg>
+  ))}
 </div>

@@ -94,6 +94,8 @@ New colour token? Add it to `@theme` in `global.css` **and** a row to
 `src/lib/palette.ts`. New background texture? Add the utility in
 `global.css`, its tile in `public/img/` (sand and seigaiha come from
 `scripts/make-pattern-tiles.mjs`), and a row to `src/lib/textures.ts`.
+The utility sets `--tex` (the tile) and `--tex-w` (its width) rather than
+`background-image` directly, so `.bg-drift` can animate it.
 
 ### Building a new page
 

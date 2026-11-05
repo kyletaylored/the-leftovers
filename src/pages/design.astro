@@ -56,6 +56,7 @@ import ThreeColumn from '@/components/ThreeColumn.astro';
 import FaqAccordion from '@/components/FaqAccordion.astro';
 import Gallery from '@/components/Gallery.astro';
 import LogoStrip from '@/components/LogoStrip.astro';
+import Ticker, { type TickerItem } from '@/components/Ticker.astro';
 import Slideshow, { type Slide } from '@/components/Slideshow.tsx';
 import FeatureRow from '@/components/marketing/FeatureRow.astro';
 import ImpactBand from '@/components/marketing/ImpactBand.astro';
@@ -68,6 +69,7 @@ import CheckboxGroup from '@/components/form/CheckboxGroup.astro';
 import CountryCombobox from '@/components/form/CountryCombobox.tsx';
 
 import { getEvents } from '@/lib/events';
+import { monthDay } from '@/lib/format';
 import { strokedIconNames, filledIconNames } from '@/lib/icons';
 import type { CloudVariant } from '@/lib/clouds';
 import type { TerracedStyle } from '@/components/brand/TerracedDivider.astro';
@@ -99,6 +101,18 @@ const openSlot = players.find((p) => p.data.status === 'open-slot');
 const sampleEvent = next ?? upcoming[0] ?? past[0];
 const allEvents = [...upcoming, ...past];
 const sampleFaqs = faqs.sort((a, b) => a.data.order - b.data.order).slice(0, 3);
+
+// Ticker lines from real collections: upcoming events (the next one flagged)
+// and open roster spots. Falls back to recent events if none are upcoming.
+const openSlots = players.filter((p) => p.data.status === 'open-slot').length;
+const tickerItems: TickerItem[] = [
+  ...(upcoming.length ? upcoming : past.slice(0, 3)).slice(0, 4).map((e, i) => ({
+    kicker: upcoming.length && i === 0 ? 'Next up' : undefined,
+    label: `${e.data.title} · ${monthDay(e.data.startDate)}${e.data.location ? ` · ${e.data.location.city}` : ''}`,
+    href: `/events#${e.id}`,
+  })),
+  ...(openSlots ? [{ kicker: 'Join', label: `${openSlots} roster ${openSlots === 1 ? 'spot' : 'spots'} open`, href: '/join' }] : []),
+];
 
 // Slides for the carousel variants — local assets only (the CSP is
 // img-src 'self'), resolved through the image service like GallerySlideshow.
@@ -155,11 +169,13 @@ const terracedStyles: { style: TerracedStyle; label: string; note: string }[] = 
  * The component index. ADD A ROW when you add a component, and keep `story`
  * true only if a `*.stories.tsx` exists. `section` is the anchor on this page.
  */
-const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Astro + island'; section: string; story?: boolean; use: string }[] = [
+const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Astro + island' | 'CSS utility'; section: string; story?: boolean; use: string }[] = [
   { name: 'Icon', file: 'brand/Icon.astro', kind: 'Astro', section: 'icons', use: 'Every glyph. Paths live in src/lib/icons.ts.' },
   { name: 'RuyiCloud', file: 'brand/RuyiCloud.astro', kind: 'Astro', section: 'motifs', use: 'Corner/background cloud accent, coloured via text-*.' },
   { name: 'TerracedDivider', file: 'brand/TerracedDivider.astro', kind: 'Astro', section: 'motifs', use: 'Section break / card footer. Pick a style.' },
-  { name: 'RiceTerraces', file: 'brand/RiceTerraces.astro', kind: 'Astro', section: 'motifs', use: 'Layered gold-lined terraced landscape. The showpiece foot of the ornate hero.' },
+  { name: 'RiceTerraces', file: 'brand/RiceTerraces.astro', kind: 'Astro', section: 'motifs', use: 'Layered gold-lined terraced landscape. The showpiece foot of the ornate hero. animate sways the depths (see Motion).' },
+  { name: '.bg-drift', file: '../styles/global.css', kind: 'CSS utility', section: 'motion', use: 'Utility, not a component: add to any .bg-* texture to drift its tile sideways. .bg-drift-reverse, --drift-duration.' },
+  { name: 'Ticker', file: 'Ticker.astro', kind: 'Astro', section: 'motion', use: 'Scrolling news bar: next event, drops, open spots. gold | crimson | ink; pause button; one per page.' },
   { name: 'CloudCorner', file: 'brand/CloudCorner.astro', kind: 'Astro', section: 'motifs', use: 'Gilded ruyi-cloud cluster with swaying paper lanterns, for hero corners.' },
   { name: 'Wordmark · MascotMark · Lantern · Badge', file: 'brand/*.astro', kind: 'Astro', section: 'motifs', use: 'Logo art, mascot, lantern (outline | paper), crest.' },
   { name: 'Button', file: 'Button.astro', kind: 'Astro', section: 'components', use: 'Every button and CTA link. Never hand-roll one.' },
@@ -193,6 +209,7 @@ const index: { name: string; file: string; kind: 'Astro' | 'React island' | 'Ast
 const sections = [
   ['foundations', 'Foundations'],
   ['motifs', 'Motifs'],
+  ['motion', 'Motion'],
   ['icons', 'Icons'],
   ['components', 'Components'],
   ['blocks', 'Blocks'],
@@ -427,6 +444,69 @@ const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Ins
             <div class="flex flex-col items-center gap-1.5"><Lantern variant="paper" class="h-28 w-auto" cord={20} /><code class="text-[0.625rem] text-bone-muted">paper</code></div>
             <div class="flex flex-col items-center gap-1.5"><Lantern variant="paper" tone="crimson" sway class="h-28 w-auto" cord={20} /><code class="text-[0.625rem] text-bone-muted">paper crimson sway</code></div>
             <div class="flex flex-col items-center gap-1.5"><Badge class="size-16" /><code class="text-[0.625rem] text-bone-muted">Badge</code></div>
+          </div>
+        </Specimen>
+      </div>
+    </DocSection>
+
+    {/* =========================================================== MOTION */}
+    <DocSection
+      id="motion"
+      number="02.5"
+      title="Motion"
+      kicker="Drifting sand · swaying terraces · ticker"
+      intro="Slow, ambient movement for showpiece moments. All CSS, composited (transform only), and switched off for visitors who ask for reduced motion, who get the still version. One moving element per screen: never pair a drifting background with a ticker in the same view, and keep motion out of anything a visitor has to read while it moves."
+    >
+      <div class="grid gap-5">
+        <Specimen
+          title="Drifting textures: .bg-drift"
+          tag="NEW"
+          file="src/styles/global.css (.bg-drift)"
+          note={'Add bg-drift next to any texture class (bg-sand bg-drift) and its tile slides sideways, one tile per loop, about 5px a second. bg-drift-reverse goes the other way; set --drift-duration to change the pace. Use on a hero or PageHeader behind short copy. Text-safe textures stay text-safe while drifting, because the pattern moves slowly and stays faint.'}
+        >
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['bg-sand bg-drift', 'bg-sand bg-drift'],
+              ['bg-sand-bold bg-drift bg-drift-reverse', 'bg-sand-bold bg-drift-reverse'],
+              ['bg-topo bg-drift', 'bg-topo bg-drift'],
+              ['bg-seigaiha bg-drift [--drift-duration:40s]', 'bg-seigaiha [--drift-duration:40s]'],
+            ].map(([cls, label]) => (
+              <div>
+                <div class:list={[cls, 'h-40 border border-ink-600']} />
+                <code class="mt-1.5 block font-mono text-[0.625rem] text-gold-300">{label}</code>
+              </div>
+            ))}
+          </div>
+        </Specimen>
+
+        <Specimen
+          title="RiceTerraces animate: swaying depths"
+          tag="NEW"
+          file="src/components/brand/RiceTerraces.astro"
+          note={'animate puts each depth on its own layer and sways it sideways: the far mountains and front paddies one way, the mid steps the other, each at its own pace (41s, 29s, 19s round trips). Mirror images past both edges mean a swing never shows a gap. Same sizing classes as the still version. Shown here over a drifting bg-sand, the full showpiece hero foot.'}
+        >
+          <div class="grid gap-4">
+            <div class="bg-sand bg-drift pt-16">
+              <RiceTerraces seed={7} animate class="h-28 sm:h-36 lg:h-auto lg:aspect-[2400/260]" />
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div><RiceTerraces seed={2} animate class="h-28 bg-ink-900" /><code class="mt-1.5 block font-mono text-[0.625rem] text-bone-muted">seed=2 animate</code></div>
+              <div><RiceTerraces seed={5} simple animate flip class="h-28 bg-ink-900" /><code class="mt-1.5 block font-mono text-[0.625rem] text-bone-muted">seed=5 simple animate flip</code></div>
+            </div>
+          </div>
+        </Specimen>
+
+        <Specimen
+          title="Ticker: scrolling news bar"
+          tag="NEW"
+          flush
+          file="src/components/Ticker.astro"
+          note={'Short glanceable lines: the next event, a pre-order drop, open roster spots. Build items from collections at the call site (these come from events and players). It pauses on hover and focus, and the Pause button stops it for good (WCAG 2.2.2). Scale duration with the copy length so it reads at a walking pace. Use one per page, full-bleed, under the nav or between sections; never above the h1.'}
+        >
+          <div class="grid gap-3 py-5">
+            <Ticker items={tickerItems} label="Team news (gold specimen)" />
+            <Ticker items={tickerItems} label="Team news (crimson specimen)" tone="crimson" reverse duration={50} />
+            <Ticker items={tickerItems} label="Team news (ink specimen)" tone="ink" duration={60} />
           </div>
         </Specimen>
       </div>
