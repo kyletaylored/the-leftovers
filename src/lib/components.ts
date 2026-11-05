@@ -472,6 +472,7 @@ export const utilities: { cls: string; use: string }[] = [
   { cls: 'bg-sand-bold | bg-seigaiha-bold', use: 'Decorative textures; never under text' },
   { cls: 'bg-drift (+ bg-drift-reverse)', use: 'Animate any texture above' },
   { cls: 'font-display | font-sans | font-marker', use: 'Headlines | body | brush (logo-like accents only)' },
+  { cls: 'title-sm', use: 'Any heading under 24px (add text-* to resize): Inter bold, because the headline font fills in when small' },
   { cls: 'eyebrow', use: 'Small caps kicker above a headline' },
   { cls: 'numeral | numeral-ghost', use: 'Gold ribbed digits | ghost jersey number behind a photo' },
   { cls: 'site-frame / site-surround', use: 'BaseLayout only: the 1600px page frame over a dimmed seigaiha surround on wide screens' },

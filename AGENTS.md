@@ -115,7 +115,7 @@ The utility sets `--tex` (the tile) and `--tex-w` (its width) rather than
    extend it with a prop and keep existing call sites' output unchanged.
    Don't fork it or restyle it inline.
 3. **Use tokens, never raw hex.** Colours, fonts and the `.numeral`,
-   `.eyebrow`, `.field-*`, `.bg-*` texture (see `src/lib/textures.ts`) and `.tap` utilities live in
+   `.title-sm` (any heading under 24px), `.eyebrow`, `.field-*`, `.bg-*` texture (see `src/lib/textures.ts`) and `.tap` utilities live in
    `src/styles/global.css`. Respect the fill/text split: `crimson` and `gold`
    are fills, while `crimson-400` and `gold-300` are their AA-passing text
    colours. (The `/design` page's cream "paper" chrome is the one deliberate

@@ -40,6 +40,7 @@ Read this before building or changing a page. It replaces reading `src/pages/des
 | `bg-sand-bold | bg-seigaiha-bold` | Decorative textures; never under text |
 | `bg-drift (+ bg-drift-reverse)` | Animate any texture above |
 | `font-display | font-sans | font-marker` | Headlines | body | brush (logo-like accents only) |
+| `title-sm` | Any heading under 24px (add text-* to resize): Inter bold, because the headline font fills in when small |
 | `eyebrow` | Small caps kicker above a headline |
 | `numeral | numeral-ghost` | Gold ribbed digits | ghost jersey number behind a photo |
 | `site-frame / site-surround` | BaseLayout only: the 1600px page frame over a dimmed seigaiha surround on wide screens |

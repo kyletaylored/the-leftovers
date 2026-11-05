@@ -27,21 +27,18 @@ const { steps, layout = 'row', as: Heading = 'h3', class: className = '' } = Ast
 >
   {
     steps.map((step, index) => (
-      <li class:list={[layout === 'stack' && 'flex gap-4']}>
-        <span
-          aria-hidden="true"
-          class:list={[
-            'flex size-11 shrink-0 items-center justify-center rounded-full border-2 border-gold bg-ink text-lg text-gold-300',
-            layout === 'row' && 'mb-4',
-          ]}
-          style="font-family: var(--font-display)"
-        >
-          {index + 1}
-        </span>
-        <div>
-          <Heading class="text-xl text-bone">{step.title}</Heading>
-          <p class="mt-2 text-sm leading-relaxed text-bone-muted">{step.body}</p>
+      <li>
+        <div class="flex items-center gap-3">
+          <span
+            aria-hidden="true"
+            class="flex size-11 shrink-0 items-center justify-center rounded-full border-2 border-gold bg-ink text-lg text-gold-300"
+            style="font-family: var(--font-display)"
+          >
+            {index + 1}
+          </span>
+          <Heading class="title-sm text-bone">{step.title}</Heading>
         </div>
+        <p class:list={['mt-2 text-sm leading-relaxed text-bone-muted', layout === 'stack' && 'pl-14']}>{step.body}</p>
       </li>
     ))
   }

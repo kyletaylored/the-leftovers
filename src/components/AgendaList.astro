@@ -59,7 +59,7 @@ const {
               <span class="numeral text-[1.375rem] leading-none">{dayNum(startDate)}</span>
             </div>
             <div class="min-w-0 flex-1">
-              <Heading class="truncate text-base text-bone">{title}</Heading>
+              <Heading class="title-sm truncate text-base text-bone">{title}</Heading>
               <p class="mt-1 text-xs text-bone-muted">
                 <time datetime={isoDate(startDate)}>{dateRange(startDate, endDate)}</time>
                 {league && <> · {league}</>}
@@ -87,7 +87,7 @@ const {
           </span>
         </div>
         <div class="min-w-0 flex-1">
-          <Heading class="text-base text-bone-muted">Next Event TBD</Heading>
+          <Heading class="title-sm text-base text-bone-muted">Next Event TBD</Heading>
           <p class="mt-1 text-xs text-bone-muted">Posted once confirmed</p>
         </div>
       </li>
