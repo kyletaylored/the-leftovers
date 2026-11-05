@@ -1,5 +1,5 @@
 ---
-title: Tampa Bay Open
+title: Tampa Bay Open 2026
 league: NXL
 startDate: 2026-03-19
 endDate: 2026-03-22

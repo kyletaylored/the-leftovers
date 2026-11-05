@@ -90,7 +90,7 @@ const money = (amount: number, currency: string) =>
     maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
   }).format(amount);
 
-// Shared with NewsletterBlock (Astro) and StatLeaderboardTable via the same
+// Shared with NewsletterBlock (Astro) via the same
 // .field-label/.field-input classes in global.css — per the Sept 2026
 // design-handoff audit's form-field spec. Don't retype the values here.
 const field = 'field-input';

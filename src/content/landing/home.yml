@@ -23,6 +23,7 @@ sections:
     ctas:
       - { label: Join a squad, href: /join, variant: primary }
   - type: statement
+    framed: true
     eyebrow: Play / Compete / Leftovers
     lines:
       - Don’t miss the action.

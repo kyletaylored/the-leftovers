@@ -5,19 +5,18 @@
 /shop/        /shop        301
 /community/   /community   301
 /contact/     /contact     301
-/team/        /team        301
 
-# About/Roster/Stats merged into /team (Oct 2026). GitHub Pages ignores this
+# Old About/Roster/Stats links. GitHub Pages ignores this
 # file entirely — see docs/DEPLOY.md — so the real redirect mechanism today
 # is the meta-refresh stubs at src/pages/{about,roster,stats}.ts. These rules
 # exist so the move to Cloudflare Pages is correct on day one with no
 # follow-up edit.
-/about        /team#story  301
-/about/*      /team#story  301
-/roster       /team#crew   301
-/roster/*     /team#crew   301
-/stats        /team#stats  301
-/stats/*      /team#stats  301
+/about        /            302
+/about/*      /            302
+/roster       /            301
+/roster/*     /            301
+/stats        /events      301
+/stats/*      /events      301
 
 # The PRD's phase-2 news section isn't built yet; point early links at events.
 /news         /events      302

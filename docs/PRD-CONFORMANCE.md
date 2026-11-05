@@ -600,3 +600,16 @@ from earlier decisions here.
   has a captain who sorts join requests into squads, collects event fees and
   registers the teams. `registrationUrl` became `eventUrl`, and the upcoming
   card's CTA now goes to `/join`.
+- **Roster and hand-entered stats removed (5 Nov 2026).** The `results`
+  collection, player stats and the `players` roster (§6, §8.1) are gone, at the
+  owner's request. Players rotate by event and nobody was entering stat lines;
+  squads and places already live on each event. `team` now lists organizers.
+- **Requests close with the event, not the league's deadline (5 Nov 2026).** The
+  late-fee date used to close "Request a spot", but it only sets what a team
+  pays. Requests now stay open until the event ends, unless the new
+  `closedToRequests` box is ticked.
+- **Sponsors on every page (5 Nov 2026).** `SponsorBand` sits above the footer,
+  through `BaseLayout`, using the existing `LogoStrip`.
+- **`/team` removed (5 Nov 2026).** At the owner's request, ahead of a planned
+  `/about` page listing team members. `/about` and `/roster` redirect home
+  until then. The `team` collection stays, unused, ready for that page.

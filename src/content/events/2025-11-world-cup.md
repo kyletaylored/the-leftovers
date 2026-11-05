@@ -1,5 +1,5 @@
 ---
-title: World Cup
+title: World Cup 2025
 league: NXL
 startDate: 2025-11-12
 endDate: 2025-11-16

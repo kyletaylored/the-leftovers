@@ -12,6 +12,7 @@ import '@/styles/global.css';
 import { site } from '@/lib/settings';
 import Nav from '@/components/Nav.astro';
 import Footer from '@/components/Footer.astro';
+import SponsorBand from '@/components/SponsorBand.astro';
 import Seo from '@/components/Seo.astro';
 import CookieConsent from '@/components/CookieConsent.tsx';
 
@@ -140,6 +141,7 @@ const organizationSchema = {
       <main id="main" class="flex-1">
         <slot />
       </main>
+      <SponsorBand />
       <Footer />
     </div>
     {needsConsent && <CookieConsent gtmId={site.gtmId} client:visible />}

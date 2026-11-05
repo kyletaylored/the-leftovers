@@ -16,16 +16,26 @@ export function isUpcoming(event: EventEntry, now = new Date()): boolean {
 }
 
 /**
- * Players can still request a spot: the event hasn't passed and the league's
- * last entry deadline (when one is set) hasn't either.
+ * Players can still request a spot: the event hasn't passed and nobody has
+ * ticked "Closed to new players" in the CMS. The league's fee deadlines are
+ * deliberately not part of this. They set what a team pays, not when the
+ * captain stops taking players.
  */
 export function isTakingRequests(event: EventEntry, now = new Date()): boolean {
-  if (!isUpcoming(event, now)) return false;
-  const closes = event.data.feeDeadlines?.late;
-  return !closes || closes.getTime() + 24 * 60 * 60 * 1000 > now.getTime();
+  return isUpcoming(event, now) && !event.data.closedToRequests;
 }
 
 export const seasonOf = (event: EventEntry) => event.data.startDate.getUTCFullYear();
+
+/** The name without its year, for places already grouped by season. */
+export const shortTitle = (event: EventEntry) => event.data.title.replace(/\s+\d{4}$/, '');
+
+/**
+ * "Lone Star Open 2026". Titles carry the year so the same event in different
+ * seasons can be told apart in the CMS; this still reads right if an editor
+ * leaves it off, and never doubles it.
+ */
+export const fullTitle = (event: EventEntry) => `${shortTitle(event)} ${seasonOf(event)}`;
 
 /** The squad that placed highest, or undefined before results are in. */
 export function bestFinish(event: EventEntry) {

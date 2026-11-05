@@ -1,6 +1,6 @@
 /**
- * Shared markup for the tiny /about, /roster, /stats redirect stubs (Oct
- * 2026 page merge — see src/pages/team.astro).
+ * Shared markup for the tiny /about, /roster, /stats redirect stubs, kept so
+ * old links land somewhere instead of 404ing.
  *
  * These deliberately do NOT use BaseLayout: no nav/footer chrome to flash
  * before a redirect that should be instant, and no reason to load the full

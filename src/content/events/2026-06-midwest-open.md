@@ -1,5 +1,5 @@
 ---
-title: Midwest Open
+title: Midwest Open 2026
 league: NXL
 startDate: 2026-06-25
 endDate: 2026-06-28

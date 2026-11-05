@@ -1,5 +1,5 @@
 ---
-title: Lone Star Open
+title: Lone Star Open 2025
 league: NXL
 startDate: 2025-09-11
 endDate: 2025-09-14

@@ -1,4 +1,4 @@
-import { defineCollection, reference } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import * as z from 'astro/zod';
 import { glob, file } from 'astro/loaders';
 
@@ -35,22 +35,20 @@ const seo = z
   })
   .prefault({});
 
-const players = defineCollection({
-  loader: glob({ base: './src/content/players', pattern: '**/*.md' }),
+/**
+ * The people who run The Leftovers: a plain bio, not a roster. Players rotate
+ * event by event, so they aren't listed here (see the squads on each event).
+ */
+const team = defineCollection({
+  loader: glob({ base: './src/content/team', pattern: '**/*.md' }),
   schema: z.object({
     name: z.string(),
-    /** Jersey number — rendered with the gold ribbed numeral treatment. */
-    number: z.number().int().min(0).max(99).optional(),
-    role: z.string().describe('Sniper / Support / Rush / Back / Insert'),
+    role: z.string().describe('e.g. "Organizer"'),
     photo: imagePath.optional(),
     photoAlt: z.string().optional(),
     socials,
-    status: z.enum(['active', 'open-slot']).default('active'),
-    joined: z.coerce.date().optional(),
-    /** Lower sorts first on the roster; ties fall back to jersey number. */
+    /** Lower sorts first. */
     order: z.number().default(100),
-    featured: z.boolean().default(false),
-    seo,
   }),
 });
 
@@ -86,7 +84,7 @@ const events = defineCollection({
      * captain registers the team (see `eventProcess` in site.yml).
      */
     eventUrl: z.url().optional(),
-    /** Last day of each league fee tier. `late` is when entries close. */
+    /** Last day of each league fee tier. Pricing only: see closedToRequests. */
     feeDeadlines: z
       .object({
         early: z.coerce.date().optional(),
@@ -94,6 +92,8 @@ const events = defineCollection({
         late: z.coerce.date().optional(),
       })
       .optional(),
+    /** Ticked when the captain stops taking players. See isTakingRequests. */
+    closedToRequests: z.boolean().default(false),
     /** The league's published fees PER TEAM, for the divisions we enter. */
     fees: z
       .array(
@@ -133,34 +133,6 @@ const events = defineCollection({
     resultSummary: z.string().optional(),
     placement: z.string().optional().describe('e.g. "2nd of 14"'),
     seo,
-  }),
-});
-
-const results = defineCollection({
-  loader: glob({ base: './src/content/results', pattern: '**/*.{yml,yaml}' }),
-  schema: z.object({
-    event: reference('events'),
-    /** Final team placement at this event. */
-    placement: z.number().int().positive().optional(),
-    fieldSize: z.number().int().positive().optional().describe('Teams in the bracket'),
-    record: z.string().optional().describe('e.g. "4-1"'),
-    /**
-     * Per-player stat lines, entered by hand after each event (PRD §8.1 —
-     * there is no public PBLeague API; a CSV importer is a phase-3 item).
-     */
-    players: z
-      .array(
-        z.object({
-          player: reference('players'),
-          gamesPlayed: z.number().int().min(0).default(0),
-          eliminations: z.number().int().min(0).default(0),
-          deaths: z.number().int().min(0).default(0),
-          flagPulls: z.number().int().min(0).default(0),
-          flagHangs: z.number().int().min(0).default(0),
-          penalties: z.number().int().min(0).default(0),
-        })
-      )
-      .default([]),
   }),
 });
 
@@ -323,8 +295,6 @@ const galleries = defineCollection({
   loader: glob({ base: './src/content/galleries', pattern: '**/*.{yml,yaml}' }),
   schema: z.object({
     title: z.string(),
-    /** Optional link back to the event these were shot at. */
-    event: reference('events').optional(),
     order: z.number().default(100),
     photos: z
       .array(
@@ -409,8 +379,15 @@ const landingBlock = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('statement'),
+    /** A BrandRule above and below. */
+    framed: z.boolean().default(false),
     eyebrow: optText,
     lines: z.array(z.string()).min(1),
+  }),
+  z.object({
+    type: z.literal('divider'),
+    ornament: z.enum(['peaks', 'field', 'cloud']).default('peaks'),
+    spacing: z.enum(['sm', 'md', 'lg']).default('md'),
   }),
   z.object({
     type: z.literal('gallery'),
@@ -519,9 +496,8 @@ const landing = defineCollection({
 
 export const collections = {
   landing,
-  players,
+  team,
   events,
-  results,
   sponsors,
   products,
   preorders,

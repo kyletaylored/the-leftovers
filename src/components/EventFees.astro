@@ -15,6 +15,7 @@
  */
 import { money, monthDay } from '@/lib/format';
 import type { EventEntry } from '@/lib/events';
+import { fullTitle } from '@/lib/events';
 
 interface Props {
   event: EventEntry;
@@ -24,7 +25,7 @@ interface Props {
 }
 
 const { event, note, class: className = '' } = Astro.props;
-const { title, startDate, fees, feeDeadlines, eventUrl } = event.data;
+const { fees, feeDeadlines, eventUrl } = event.data;
 
 const formats = [...new Set(fees.map((fee) => fee.format))];
 const tiers = [
@@ -38,7 +39,7 @@ const tiers = [
   <div class="overflow-hidden rounded-sm border border-ink-600 bg-ink-800">
     <table class="w-full border-collapse text-left text-sm">
       <caption class="sr-only">
-        League fees per team for {title} {startDate.getUTCFullYear()}, by format, division and deadline
+        League fees per team for {fullTitle(event)}, by format, division and deadline
       </caption>
       <thead>
         <tr class="border-b border-gold/40 align-bottom">

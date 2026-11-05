@@ -10,7 +10,7 @@
  * filled pip and bold text as well as colour.
  */
 import { monthShort } from '@/lib/format';
-import { isUpcoming, seasonOf, type EventEntry } from '@/lib/events';
+import { isUpcoming, seasonOf, shortTitle, type EventEntry } from '@/lib/events';
 
 interface Props {
   events: EventEntry[];
@@ -45,7 +45,7 @@ const months = Array.from({ length: 12 }, (_, month) => ({
             >
               <span class:list={['mt-1 size-2 shrink-0 rounded-full', upcoming ? 'bg-crimson-400' : 'border border-gold']} aria-hidden="true" />
               <span>
-                {event.data.title}
+                {shortTitle(event)}
                 {upcoming && <span class="sr-only"> (upcoming)</span>}
               </span>
             </a>

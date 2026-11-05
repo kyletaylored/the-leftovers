@@ -26,7 +26,6 @@ Read this before building or changing a page. It replaces reading `src/pages/des
 - **Homepage / landing** (`src/pages/index.astro`): Hero variant=ornate animate (+RiceTerraces) → ImpactBand → GallerySlideshow layout=showcase → TwoColumn (boxed break) → ImpactBand tone=crimson → Section tone=seigaiha + LogoStrip → NewsletterBlock
 - **Long-form / legal (Markdown body)** (`src/pages/privacy.astro`): PageHeader → Section tone=base > Prose > <Content /> → Buttons (outline + ghost)
 - **Schedule** (`src/pages/events.astro`): PageHeader → Section tone=alt: Countdown + EventCard layout=feature + EventSquads (next), or MascotCallout when empty → Section: ProcessSteps + BrandRule + EventFees → Section tone=alt: per year, SeasonStrip + past EventCards (older years in <details>)
-- **Team / about** (`src/pages/team.astro`): PageHeader → story Section (Prose + StatNumbers + Callout) → roster Section (PlayerCard grid) → stats (StatLeaderboardTable / TeamStatsWidget, MascotCallout until data) → FaqAccordion → CtaStrip tone=forest
 - **Shop / product** (`src/pages/shop.astro, src/pages/preorder/[slug].astro`): PageHeader → featured ProductCard → ProductGrid → ThreeColumn (how ordering works) → Prose. Drop page: PageHeader → Countdown + Prose → ProductGallery → PreorderForm
 - **Form page** (`src/pages/join.astro`): PageHeader → Section tone=base: Prose intro + the form island (client:visible) → Toast for the result
 
@@ -74,7 +73,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **ThreeColumn** (`ThreeColumn.astro`): Icon + title + body benefits row (3 items, stacks on phones).
   - Options: items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section) · iconStyle: tile|circle (gold ring, favicon badge) · as
 - **BlockRenderer** (`BlockRenderer.astro`): Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.
-  - Options: hero (omit only on /design) · sections[]. Blocks: impactBand, statement, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, faq
+  - Options: hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, faq
   - Data: landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.
   - Avoid: Pages that need logic or computed data; hand-write those.
   - Pairs with: Hero, ImpactBand, TwoColumn
@@ -142,7 +141,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 
 ### Events, team & stats
 
-- **EventCard** (`EventCard.astro`): An event with date chip and venue. Upcoming: Request a spot (to /join) until entries close. Past: best finish and all squads. Article id = slug (#slug links).
+- **EventCard** (`EventCard.astro`): An event with date chip and venue. Upcoming: Request a spot (to /join) until the event ends or closedToRequests is ticked. Past: best finish and all squads. Article id = slug (#slug links).
   - Options: event · layout: card|feature (big NEXT UP, full address) · as
   - Data: events collection entry; getEvents() gives upcoming/past/next
 - **SeasonStrip** (`SeasonStrip.astro`): A whole season on one line: 12 months, events linked to their #slug cards. The default schedule view.
@@ -169,22 +168,12 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Pairs with: EventCard
 - **Countdown** (`Countdown.astro`, Astro + island): Live countdown to an event or drop deadline.
   - Options: target (Date) · passedLabel
-- **PlayerCard** (`PlayerCard.astro`): Roster card; open-slot entries render the dashed "join" card.
-  - Options: player · href · as
-  - Data: players collection entry
-- **ProfileCard** (`ProfileCard.astro`): Bio card for non-rostered people (coach, organiser).
+- **ProfileCard** (`ProfileCard.astro`): Bio card for the people who run the team. Bio in the default slot.
   - Options: name · role · image+imageAlt · links[{icon, href, label}] · as
-  - Avoid: Rostered players (use PlayerCard).
+  - Data: team collection entry
 - **StatNumber** (`StatNumber.astro`): One big gold ribbed figure + label.
   - Options: value · label · size: md|sm|lg
-  - Data: computed in src/lib/stats.ts, never typed into content
-- **StatStrip** (`StatStrip.astro`): Band of team StatNumbers.
-  - Options: stats
-  - Data: src/lib/stats.ts (results collection)
-  - Avoid: Before real results exist (use MascotCallout).
-- **StatLeaderboardTable** (`StatLeaderboardTable.tsx`, React island): Sortable player stats table.
-  - Options: rows · roles
-  - Data: src/lib/stats.ts
+  - Data: computed from collections, never typed into content
 - **TeamStatsWidget** (`TeamStatsWidget.astro`): Live team match cards from pblidb.org (build-time fetch, fails soft).
   - Options: widget
   - Data: src/lib/pblidb.ts
@@ -248,7 +237,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 
 ### Site chrome (already in BaseLayout; never add to a page)
 
-`CookieConsent`, `Nav`, `Footer`, `Seo`.
+`CookieConsent`, `Nav`, `SponsorBand`, `Footer`, `Seo`.
 
 ### Internal (never import directly on a page)
 

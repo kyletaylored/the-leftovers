@@ -7,6 +7,6 @@ a false claim, not filler, so every entry here was confirmed by the team:
   NXL events.
 - **Kinetic Paintball** makes the team's custom jerseys.
 
-Both are shown on the Contact page's sponsorship section (`LogoStrip`). The
-`SponsorMarquee` component renders nothing for an empty collection, so pages
-stay correct if every entry is removed.
+Both show above the footer on every page (`SponsorBand`) and in the Contact
+page's sponsorship section. Both render nothing for an empty collection, so
+pages stay correct if every entry is removed.
