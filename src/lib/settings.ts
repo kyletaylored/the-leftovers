@@ -48,6 +48,25 @@ const settingsSchema = z.object({
       aiCrawlers: z.enum(['allow', 'search-only', 'block']).default('allow'),
     })
     .prefault({}),
+  /**
+   * Datadog Real User Monitoring, gated by CookieConsent like GTM. Off until
+   * both applicationId and clientToken are set; both are public values.
+   * `site` is the Datadog region host, e.g. datadoghq.com or datadoghq.eu.
+   */
+  datadogRum: z
+    .object({
+      applicationId: z.string().default(''),
+      clientToken: z.string().default(''),
+      /** Optional: Datadog-hosted config (sampling etc.) editable in the Datadog UI. */
+      remoteConfigurationId: z.string().default(''),
+      site: z.string().default('datadoghq.com'),
+      service: z.string().default('the-leftovers'),
+      env: z.string().default('production'),
+      sessionSampleRate: z.number().min(0).max(100).default(100),
+      sessionReplaySampleRate: z.number().min(0).max(100).default(0),
+      defaultPrivacyLevel: z.enum(['mask', 'mask-user-input', 'allow']).default('mask-user-input'),
+    })
+    .prefault({}),
   /** Google Tag Manager container ID (e.g. "GTM-KPXD7QD6"), gated by CookieConsent. */
   gtmId: z.string().default(''),
   facebookPagePlugin: z

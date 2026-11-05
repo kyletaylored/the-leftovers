@@ -9,9 +9,11 @@
   Cross-Origin-Opener-Policy: same-origin
   # Static site; inline style-src is required by Astro's scoped <style> blocks.
   # Google Tag Manager / Google Analytics origins are allowlisted for visitors
-  # who opt in via CookieConsent. Any social-widget script added per §8.3 has
+  # who opt in via CookieConsent, and so is Datadog RUM's intake (US1; change
+  # the host if datadogRum.site changes region). worker-src blob: is Session
+  # Replay's compression worker. Any social-widget script added per §8.3 has
   # to be allowlisted here explicitly rather than silently loading.
-  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; font-src 'self'; frame-src https://discord.com https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com; form-action 'self' https://buttondown.com https://*.list-manage.com https://docs.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; font-src 'self'; frame-src https://discord.com https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://browser-intake-datadoghq.com https://sdk-configuration.browser-intake-datadoghq.com; worker-src blob:; form-action 'self' https://buttondown.com https://*.list-manage.com https://docs.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'
 
 # Fonts and hashed build assets are immutable — cache them hard.
 /_astro/*

@@ -30,15 +30,25 @@ We use **Google Tag Manager** (`GTM-KPXD7QD6`) and **Google Analytics** to
 understand basic site traffic — such as which pages and event listings people
 visit.
 
+We also use **Datadog Real User Monitoring** to see how fast pages load and
+whether anything breaks for visitors: page load timings, errors, the pages you
+view and the buttons you click, plus your browser, device type and rough
+location (from your IP address). For a share of visits it also records a
+**session replay**, a reconstruction of how the page looked and responded
+during your visit. Anything you type into a form is masked and never
+recorded. Datadog processes this data for us in the United States.
+
 - **Opt-in by default:** Analytics storage is set to `denied` by default.
-  Google Tag Manager and Google Analytics cookies (`_ga`, `_ga_*`, `_gid`) are
-  **only** loaded if you click **Accept analytics** in the cookie banner.
+  Google Tag Manager, Google Analytics and Datadog are **only** loaded if you
+  click **Accept analytics** in the cookie banner, and only then can they set
+  their cookies: `_ga`, `_ga_*` and `_gid` (Google), and `_dd_s_v2` (Datadog,
+  a session ID that expires after 15 minutes of inactivity).
 - **Essential storage:** We store a single preference key
   (`leftovers_cookie_consent`) in your browser's `localStorage` so we remember
   whether you accepted or declined analytics.
 - **Changing your mind:** You can switch back to **Essential only** at any time
   using the **Cookie settings** link in the site footer (or the button below).
-  Doing so disables analytics storage and clears existing `_ga` cookies.
+  Doing so stops Google Analytics and Datadog and clears their cookies.
 
 ## Join requests and jersey pre-orders
 
