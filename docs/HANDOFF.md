@@ -64,7 +64,7 @@ team deciding to:
 |---|---|---|
 | `/[slug]`, `/preview/[slug]` | `landing` pages composed in Pages CMS: published, and drafts (noindex) | `BlockRenderer`. `/preview/home` is the homepage rebuilt as blocks; `index.astro` is still what's live |
 | `/` | Home ("direction B"): ornate sand hero, `ImpactBand` manifesto, full-width showcase slider, "How it works" `TwoColumn` CTA, crimson free-agents `ImpactBand`, "2027 Season Loading…" + league logos, newsletter | Direction B promoted Nov 2026 |
-| `/gallery` | Every gallery photo: large photo, paged thumbnail grid, lazy loaded | Footer link only (`footerNav` in `site.yml`) |
+| `/gallery` | All 61 event photos: large photo, paged thumbnail grid, lightbox with magnifier, lazy loaded | Footer link only (`footerNav` in `site.yml`) |
 | `/about`, `/roster`, `/stats` | Redirect stubs: the first two go home, `/stats` goes to `/events` | `/team` was removed Nov 2026; see §7 for the planned `/about` |
 | `/events` | Next event with countdown and squads, how it works and fees, then each season's `SeasonStrip` and results | Unhidden 5 Nov 2026, in the nav and sitemap |
 | `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | **Hidden.** Products collection is empty on purpose |
@@ -307,7 +307,8 @@ inline-styled HTML into the repo.
    CMS under Photo galleries → Game day.
 
 1. **Photography, placement and player photos.** Event photos are in; they need
-   curating, alt text and galleries. Only 10 of about 60 are on `/gallery` so far. Player photos are still missing. It unblocks player photos,
+   curating. All 61 are on `/gallery` with alt text, grouped by event in `src/content/galleries/`.
+   Confirm the gallery titles: they come from folder codes. Player photos are still missing. It unblocks player photos,
    galleries, the mockup-B manifesto band, the `Hero` video variant, and real
    carousel slides on `/design`.
 2. **Finish the team members.** Add Matt's bio and photo, real roles, and

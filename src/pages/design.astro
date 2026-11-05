@@ -971,7 +971,7 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
             <Slideshow client:visible slides={slides} layout="single" captionStyle="flag" />
           </Specimen>
 
-          <Specimen title="Carousel: grid with pager" tag="React island" file="src/components/Slideshow.tsx" note={'For browsing many photos, as on /gallery: a paged thumbnail grid. Lazy by design, so only nearby large photos and the current grid page load. indicators="grid", pageSize sets thumbnails per page (default 8). Use GallerySlideshow on real pages so thumbnails get their own small files.'}>
+          <Specimen title="Carousel: grid with pager" tag="React island" file="src/components/Slideshow.tsx" note={'For browsing many photos, as on /gallery: a paged thumbnail grid. Lazy by design, so only nearby large photos and the current grid page load. The enlarge button or a click on the photo opens the Lightbox, with a magnifier. indicators="grid", pageSize sets thumbnails per page (default 8). Use GallerySlideshow on real pages so thumbnails get their own small files.'}>
             <Slideshow client:visible slides={slides} layout="single" captionStyle="flag" indicators="grid" pageSize={4} />
           </Specimen>
           <Specimen title="Carousel: thumbnail strip" tag="React island" file="src/components/Slideshow.tsx" note={'indicators="thumbnails". Use when the shots themselves are worth previewing.'}>

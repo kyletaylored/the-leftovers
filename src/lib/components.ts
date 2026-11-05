@@ -183,13 +183,17 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'GallerySlideshow', file: 'GallerySlideshow.astro', kind: 'Astro + island', group: 'marketing', section: 'marketing', story: true,
     use: 'Photo carousel from the galleries collection. Use this on pages, not Slideshow directly.',
-    options: 'layout: peek|single|hero|showcase · indicators: dashes|thumbnails|grid (paged, lazy; with single) · pageSize (grid, default 8) · captionStyle: below|flag · tone: ink|crimson|forest · autoplayMs · emptyTitle/emptyBody',
+    options: 'layout: peek|single|hero|showcase · indicators: dashes|thumbnails|grid (paged, lazy, opens a lightbox; with single) · pageSize (grid, default 8) · captionStyle: below|flag · tone: ink|crimson|forest · autoplayMs · emptyTitle/emptyBody',
     data: 'galleries collection',
     avoid: 'hero/showcase inside a Section (they are full-bleed).',
   },
   {
     name: 'Slideshow', file: 'Slideshow.tsx', kind: 'React island', group: 'marketing', section: 'marketing', story: true, internal: true,
     use: 'The carousel island behind GallerySlideshow.',
+  },
+  {
+    name: 'Lightbox', file: 'Lightbox.tsx', kind: 'React island', group: 'marketing', section: 'marketing', story: true, internal: true,
+    use: 'Full-screen viewer with magnifier, opened from Slideshow indicators="grid".',
   },
   {
     name: 'Carousel primitive', file: 'ui/carousel.tsx', kind: 'React island', group: 'marketing', section: 'marketing', internal: true,

@@ -84,8 +84,10 @@ When a batch closes, flip the item to **Sold out** rather than deleting it.
 
 ## Homepage photo slider
 
-Every photo in **Photo galleries** shows on the [Gallery](/gallery) page, so to add
-one there, add it to a gallery with its alt text.
+Every photo in **Photo galleries** shows on the [Gallery](/gallery) page, one gallery
+per event, so to add one there, add it to a gallery with its alt text. Visitors can
+click any photo to see it full size and zoom in. To remove a photo from the site,
+delete it from its gallery.
 
 **Photo galleries → Game day.** Every photo in this gallery shows in the
 homepage slider, in list order.

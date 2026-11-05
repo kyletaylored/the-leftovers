@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
 import { FULL_BLEED_SIZES } from '@/lib/layout';
+import Lightbox from './Lightbox';
 
 /**
  * Slideshow — the photo carousel, built on shadcn/ui's Carousel (Embla).
@@ -40,6 +41,8 @@ import { FULL_BLEED_SIZES } from '@/lib/layout';
  *    in the DOM, and a large photo only mounts once it or a neighbour is
  *    reached, then stays mounted. Photos show whole (object-contain), not
  *    cropped. With JS off, the first photo and first grid page still show.
+ *    Clicking the photo, or the enlarge button, opens the Lightbox, which
+ *    magnifies using `zoomSrc`.
  *  - `captionStyle`: `below` (default, figcaption strip) or `flag` (the
  *    clipped crimson ribbon on the image's bottom-left). `hero` always flags.
  *  - `showcase` (Nov 2026): the full-bleed sports-poster slider (think
@@ -64,6 +67,8 @@ export interface Slide {
   srcSet?: string;
   /** Small version for the `grid` indicator. Falls back to `src`. */
   thumbSrc?: string;
+  /** Full-size version for the `grid` lightbox's magnifier. Falls back to `src`. */
+  zoomSrc?: string;
   width: number;
   height: number;
   alt: string;
@@ -211,6 +216,7 @@ export default function Slideshow({
   // paging doesn't move the photo, and `seen` only ever grows.
   const [page, setPage] = useState(0);
   const [seen, setSeen] = useState(() => new Set(neighbours(0, slides.length)));
+  const [lightbox, setLightbox] = useState(false);
 
   useEffect(() => {
     setMotionOK(!window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -466,7 +472,8 @@ export default function Slideshow({
                     // be the page's main image.
                     loading={index === 0 && (isHero || isGrid) ? 'eager' : 'lazy'}
                     decoding="async"
-                    className={cn(aspectFor[layout], 'w-full', isGrid ? 'bg-ink-900 object-contain' : 'object-cover')}
+                    onClick={isGrid ? () => setLightbox(true) : undefined}
+                    className={cn(aspectFor[layout], 'w-full', isGrid ? 'cursor-zoom-in bg-ink-900 object-contain' : 'object-cover')}
                   />
                 )}
                 {(slide.caption ?? slide.kicker) &&
@@ -552,6 +559,30 @@ export default function Slideshow({
             </button>
           ))}
         </div>
+      )}
+
+      {isGrid && (
+        // One button for the whole carousel, not one per slide: it has to
+        // still exist for the dialog to hand focus back to on close.
+        <button
+          type="button"
+          onClick={() => setLightbox(true)}
+          aria-label="Enlarge photo"
+          className="tap absolute right-3 top-3 z-10 grid size-11 place-items-center border border-bone/40 bg-ink/60 text-bone transition-colors hover:border-gold hover:text-gold"
+        >
+          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+          </svg>
+        </button>
+      )}
+
+      {isGrid && lightbox && (
+        <Lightbox
+          slides={slides}
+          index={current}
+          onNavigate={(index) => api?.scrollTo(index, true)}
+          onClose={() => setLightbox(false)}
+        />
       )}
 
       {slides.length > 1 && isGrid && (
