@@ -12,8 +12,7 @@ homeTitle: The Leftovers — Community Paintball Team for Free Agents
 description: >-
   A community-run paintball team built from rotating free agents. No tryout,
   no bench: make the date, cover your entry and play a tournament with us.
-# The year The Leftovers started. Leave out until it's confirmed: the footer,
-# llms.txt and the SportsTeam structured data all skip it when it's missing.
+established: 2022
 # Optional. Leave blank until the team decides how it wants to describe its
 # region; it feeds the footer and the SportsTeam structured data.
 homeBase: ""

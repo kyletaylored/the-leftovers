@@ -41,13 +41,9 @@ const year = new Date().getFullYear();
           <Wordmark class="h-10 w-auto" size="footer" label={false} />
         </div>
         <p class="mt-4 max-w-sm text-sm leading-relaxed text-bone-muted">{site.footerNote}</p>
-        {
-          (site.established || site.homeBase) && (
-            <p class="eyebrow mt-4">
-              {[site.established && `Est. ${site.established}`, site.homeBase].filter(Boolean).join(' · ')}
-            </p>
-          )
-        }
+        <p class="eyebrow mt-4">
+          Est. {site.established}{site.homeBase && ` · ${site.homeBase}`}
+        </p>
       </div>
 
       <nav aria-label="Footer">

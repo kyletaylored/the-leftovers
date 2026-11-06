@@ -46,7 +46,7 @@ export const GET: APIRoute = async ({ site: origin }) => {
     '',
     `> ${site.description.replace(/\s+/g, ' ').trim()}`,
     '',
-    `${site.title} is a community paintball team${site.established ? ` (est. ${site.established})` : ''}. Contact: ${site.social.email}.`,
+    `${site.title} is a community paintball team (est. ${site.established}). Contact: ${site.social.email}.`,
     '',
     '## Pages',
     '',

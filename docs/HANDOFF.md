@@ -118,12 +118,10 @@ the other:
   (`icpl`, `infamous`, `kinetic`, `nxl-eu`, `nxl-us`) with no sponsor entries.
   The folder codes come from the photographers' filenames, not confirmed event
   names. Rename a folder if you know the real name, and fix any paths.
-- **Team members need review.** Matt Engles created The Leftovers; Kyle Taylor
-  joined in 2026 and builds the site and its systems. Matt's bio is drawn from
-  public sources and needs Matt's OK. There are no photos yet, and Kyle's
-  "Organizer" role is still generic.
-- **The start year is unknown.** `established` is blank in `site.yml`, so the
-  footer, `llms.txt` and structured data leave it out. The old 2022 was wrong.
+- **Team members need review.** Matt Engles created The Leftovers in 2022; Kyle
+  Taylor joined in 2026 and builds the site and its systems. Matt's bio comes from
+  the Planet Paintball Podcast (Ep 104) and needs Matt's OK. There are no photos
+  yet, and Kyle's "Organizer" role is still generic.
 - **Events are real.** All 10 NXL US events from 2025–26 were copied from
   PBLeagues on 5 Nov 2026: venues, squads and final places. Check before
   trusting:
@@ -314,8 +312,8 @@ inline-styled HTML into the repo.
    Confirm the gallery titles: they come from folder codes. Player photos are still missing. It unblocks player photos,
    galleries, the mockup-B manifesto band, the `Hero` video variant, and real
    carousel slides on `/design`.
-2. **Finish the team members.** Get Matt's OK on the bio, add photos and a real
-   role for Kyle, and fill in the year The Leftovers started.
+2. **Finish the team members.** Get Matt's OK on the bio, and add photos and a
+   real role for Kyle.
 3. **Close or extend the jersey pre-order** (its close date has passed).
 4. **Mailing list:** `mailingList.formAction` in `site.yml` is empty. Pick
    Buttondown or Mailchimp and paste in the form action.

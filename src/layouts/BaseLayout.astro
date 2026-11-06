@@ -54,7 +54,7 @@ const organizationSchema = {
   // A square logo for the entity; the wide share card is its `image`.
   logo: new URL('/img/leftovers-logo.png', Astro.site).href,
   image: new URL('/og-default.png', Astro.site).href,
-  ...(site.established ? { foundingDate: String(site.established) } : {}),
+  foundingDate: String(site.established),
   ...(site.homeBase ? { areaServed: site.homeBase } : {}),
   email: site.social.email,
   sameAs: [

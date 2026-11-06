@@ -5,6 +5,6 @@ photoAlt: Matt Engles
 order: 1
 ---
 
-Created The Leftovers, a free-agent program that puts teams together for players
-without a full-time squad, so they can still play major events. Also founded
-the Chiefs and is a former NXL Marketing & Media Director.
+Founded the Chiefs in 2013, then created The Leftovers in 2022 while marketing and
+media director for the NXL, after hearing from too many players who couldn't make
+an event without a squad.
