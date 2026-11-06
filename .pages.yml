@@ -559,8 +559,16 @@ content:
               - { name: cite, label: Who said it, type: string, required: true }
               - { name: source, label: Where or when, type: string, description: 'e.g. "NXL World Cup, 2024"' }
               - { name: sourceUrl, label: Link to the original, type: string, pattern: { regex: '^https?://.+' }, description: 'Turns "Where or when" into a link, so fill that in too.' }
-              - { name: image, label: Photo, type: image, options: { media: images }, description: Optional. A tall photo works best. Without one the quote is centred. }
+              - { name: image, label: Photo, type: image, options: { media: images }, description: Optional. With a photo the quote is a wide band; without one it's large and centred. }
               - { name: imageAlt, label: Photo alt text, type: string, description: Required when a photo is set. }
+              - name: align
+                label: Quote side
+                type: select
+                default: left
+                options: { values: [left, right] }
+                description: Which side the quote sits on when there's a photo. Pick the side away from the person, and vary it between quotes.
+              - { name: shift, label: Slide photo sideways, type: number, description: 'Desktop only, -30 to 30. Negative moves the photo left. Use it when the person sits under the quote.' }
+              - { name: focus, label: Photo focus, type: string, description: 'Which part of the photo stays in view, e.g. "30% 20%" (across, then down).' }
           - name: faq
             label: FAQs
             fields:

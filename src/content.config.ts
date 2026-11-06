@@ -486,9 +486,13 @@ const landingBlock = z.discriminatedUnion('type', [
       source: optText,
       /** Link to the original. */
       sourceUrl: optText,
-      /** Optional. Without one the quote is centred. */
+      /** Optional. With one it's an ImpactBand; without, it's centred. */
       image: imagePath.nullish(),
       imageAlt: optText,
+      /** Which side the quote sits on, with a photo. */
+      align: z.enum(['left', 'right']).default('left'),
+      shift: z.number().min(-30).max(30).nullish(),
+      focus: optText,
     })
     .refine((quote) => !quote.image || quote.imageAlt, {
       message: 'A quote with a photo needs alt text.',

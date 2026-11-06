@@ -315,9 +315,24 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boole
         );
 
       case 'quote':
-        return (
+        return asset ? (
+          <ImpactBand
+            compact
+            image={asset}
+            imageAlt={block.imageAlt ?? ''}
+            align={block.align}
+            shift={block.shift ?? undefined}
+            focus={block.focus}
+            eyebrow={block.eyebrow}
+            title={block.title}
+          >
+            <Callout feature align="inherit" class="relative" cite={block.cite} source={block.source} href={block.sourceUrl}>
+              {block.quote}
+            </Callout>
+          </ImpactBand>
+        ) : (
           <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
-            <Callout feature cite={block.cite} source={block.source} href={block.sourceUrl} image={asset} imageAlt={block.imageAlt}>
+            <Callout feature cite={block.cite} source={block.source} href={block.sourceUrl}>
               {block.quote}
             </Callout>
           </Section>

@@ -87,7 +87,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Options: tone: outline|gold|crimson|forest|muted · size: md|sm
   - Avoid: As a button or link.
 - **Callout** (`Callout.astro`): Pull quote / emphasis inside a Section (slot = quote). Also the CMS quote block.
-  - Options: cite · source (where or when; needs cite) · href (links source) · feature (large standalone quote: centred, or beside a portrait image+imageAlt)
+  - Options: cite · source (where or when; needs cite) · href (links source) · feature (large standalone quote in headline type) · align: center|inherit (inherit inside an ImpactBand)
   - Avoid: Quoting a real person without their OK.
 - **FaqAccordion** (`FaqAccordion.astro`): FAQ list, native <details>, zero JS.
   - Options: items[{question, answer}]
@@ -106,7 +106,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 ### Marketing & media
 
 - **ImpactBand** (`marketing/ImpactBand.astro`): Full-bleed action photo fading into big copy (manifesto, recruiting push). Buttons in slot="actions".
-  - Options: image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus (object-position) · priority (LCP image) · as. Desktop only: shift -30..30 (% of band, negative = left; slide a centred player out from under the copy) · wash: fade|none (none = photo edge to edge, full colour or tinted) · backdrop: auto|none|scrim|panel (auto = scrim when wash=none). Try combinations in the /design#impactband-playground
+  - Options: image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus (object-position) · priority (LCP image) · as · default slot (other copy in place of title, e.g. a feature Callout). Desktop only: compact (shorter band) · shift -30..30 (% of band, negative = left; slide a centred player out from under the copy) · wash: fade|none (none = photo edge to edge, full colour or tinted) · backdrop: auto|none|scrim|panel (auto = scrim when wash=none). Try combinations in the /design#impactband-playground
   - Avoid: Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between. wash="none" with body text or stats but no backdrop="panel" (scrim alone can fail AA on a bright photo).
   - Pairs with: Hero, TwoColumn
 - **FeatureRow** (`marketing/FeatureRow.astro`): Alternating media + copy rows. Flip every other row with reverse.

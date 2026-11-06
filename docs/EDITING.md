@@ -201,7 +201,7 @@ site handles the design, so a page always looks like the rest of the site.
 | **Photo band** | A big action photo with bold copy. The strongest section |
 | **Big statement** | A few large lines of text, centred, with optional decorative rules |
 | **Team members** | Everyone in Team Members as large cards that alternate sides, in sort order |
-| **Quote** | Someone's exact words with their name, plus an optional line for where or when, a link to the original and a photo. With a photo it sits beside the quote; without one it's large and centred. Get their OK before quoting them by name |
+| **Quote** | Someone's exact words with their name, plus an optional line for where or when, a link to the original and a photo. With a photo it's a wide band, and **Quote side** picks left or right; without one it's large and centred. Keep quotes short, and don't put two photo bands next to each other. Get their OK before quoting them by name |
 | **Divider** | A decorative rule between two sections on the same background |
 | **Photo gallery** | A slider of one of your Photo galleries |
 | **Photo and text** | A calm boxed section, with numbered steps if you need them |

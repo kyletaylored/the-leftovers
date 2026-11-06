@@ -726,8 +726,13 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
         <Specimen title="Callout: feature quote" class="lg:col-span-2" file="src/components/Callout.astro" note="The CMS Quote block without a photo: large and centred, so it can stand as its own section. source says where or when, and href links it to the original. Use it for what someone actually said, with their OK. The text here is a sample.">
           <Callout feature cite="Who said it" source="Where or when" href="#">Paintball builds better people.</Callout>
         </Specimen>
-        <Specimen title="Callout: feature quote with a photo" class="lg:col-span-2" file="src/components/Callout.astro" note="The CMS Quote block with a photo beside the quote, stacking on phones. Use a portrait crop of the person quoted. The text here is a sample.">
-          <Callout feature cite="Who said it" source="Where or when" href="#" image={shooterImg} imageAlt="A sample photo.">Paintball builds better people.</Callout>
+        <Specimen title="Callout: feature quote in an ImpactBand" class="overflow-hidden lg:col-span-2" flush file={['src/components/Callout.astro', 'src/components/marketing/ImpactBand.astro']} note="The CMS Quote block with a photo. The quote can sit on either side: pick the one away from the person and vary it down the page. It counts as a full-bleed photo block, so keep a boxed section between it and another band. The text here is a sample.">
+          <ImpactBand compact image={shooterImg} imageAlt="A sample photo." as="h3">
+            <Callout feature align="inherit" class="relative" cite="Who said it" source="Where or when" href="#">Paintball builds better people.</Callout>
+          </ImpactBand>
+          <ImpactBand compact align="right" image={shooterImg} imageAlt="A sample photo." as="h3">
+            <Callout feature align="inherit" class="relative" cite="Who said it" source="Where or when" href="#">Paintball builds better people.</Callout>
+          </ImpactBand>
         </Specimen>
         <Specimen title="MascotCallout: empty state" file="src/components/MascotCallout.astro" note="The honest empty state. Use it instead of an empty grid. Slot takes action Buttons.">
           <MascotCallout as="h4" title="No photos up yet" body="Somebody always forgets to bring a camera.">

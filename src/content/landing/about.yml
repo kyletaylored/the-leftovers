@@ -19,13 +19,21 @@ sections:
 
       By 2022 Matt was the NXL's marketing and media director, and kept hearing the same thing from players: they couldn't make an event because they didn't have a squad. So Matt posted that a free-agent D5 X-ball team was forming. The players loved it, and the program has kept growing ever since.
   - type: quote
-    tone: alt
     quote: I'll keep making teams as long as people keep wanting to play.
     cite: Matt Engles
     source: Planet Paintball Podcast, Ep 104
     sourceUrl: https://open.spotify.com/episode/3Ag1mlyud2KpMB9fl8SM2T
-    image: /src/assets/img/players/matt-engles.webp
-    imageAlt: Matt Engles in a green cap and sunglasses, seen in profile.
+    image: /src/assets/img/events/nxl-lso26/lo2nxllso26-132-x5.webp
+    imageAlt: Matt Engles in a cap and sunglasses talks Leftovers players through a clipboard, in black and white.
+    align: right
+    shift: -14
+    focus: 30% 12%
+  - type: featureRow
+    eyebrow: The name
+    title: Why "The Leftovers"?
+    body: That first team was joking around in the group chat about feeling like leftover scraps, and the name stuck. It fits, too. These are the players who didn't get picked for dodgeball, banding together anyway. The takeout box came later, because Chinese food is always good again the next day.
+    image: /src/assets/img/events/nxl-lsm25/satnxllsm25ls-1901-x5.webp
+    imageAlt: A group of Leftovers teammates in mud-spotted black and red jerseys pose in two rows in front of a tent.
   - type: impactBand
     image: /src/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp
     imageAlt: A Leftovers player in a mask and team jersey aims a paintball marker across a field.
@@ -37,24 +45,20 @@ sections:
       - { value: '19', label: Squads at one World Cup }
       - { value: '11', label: Countries at that event }
     ghost: Army
-  - type: featureRow
-    eyebrow: The name
-    title: Why "The Leftovers"?
-    body: That first team was joking around in the group chat about feeling like leftover scraps, and the name stuck. It fits, too. These are the players who didn't get picked for dodgeball, banding together anyway. The takeout box came later, because Chinese food is always good again the next day.
-    image: /src/assets/img/events/nxl-lsm25/satnxllsm25ls-1901-x5.webp
-    imageAlt: A group of Leftovers teammates in mud-spotted black and red jerseys pose in two rows in front of a tent.
-  - type: quote
-    tone: alt
-    quote: Would I say it's worth it? My experience says hell, yes.
-    cite: Amber Wong
-    source: Leftovers II, NXL World Cup 2024
-    sourceUrl: https://www.facebook.com/amberwong.pb/posts/joining-the-leftovers-program-that-matt-engles-created-was-a-whole-experience-yo/10164404255734498/
-    image: /src/assets/img/players/amber-wong.webp
-    imageAlt: Amber Wong aims a marker around a green inflatable bunker, with a teammate crouched behind.
   - type: team
     tone: base
     eyebrow: Who runs it
     title: The people behind it
+  - type: quote
+    quote: Would I say it's worth it? My experience says hell, yes.
+    cite: Amber Wong
+    source: Leftovers II, NXL World Cup 2024
+    sourceUrl: https://www.facebook.com/amberwong.pb/posts/joining-the-leftovers-program-that-matt-engles-created-was-a-whole-experience-yo/10164404255734498/
+    image: /src/assets/img/events/nxl-floryda24/nxlfloryda2024leftovers-59.webp
+    imageAlt: Amber Wong sprints across a muddy field in a red and purple jersey, with other players around.
+    align: right
+    shift: -24
+    focus: 50% 30%
   - type: ctaStrip
     tone: crimson
     eyebrow: Free agents welcome

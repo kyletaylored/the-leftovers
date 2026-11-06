@@ -327,7 +327,7 @@ inline-styled HTML into the repo.
 
 0. **Publish `/about`.** It's a hidden draft at `/preview/about`
    (`src/content/landing/about.yml`). Before publishing, get Matt's OK on the copy
-   and stats and Amber's OK on the quote and photo, and add Kyle's photo. Then delete
+   and stats and Amber's OK on the quote, and add Kyle's photo. Then delete
    `src/pages/about.ts` and set the entry to `published`, or the build fails on
    the clash. The FAQs and `TeamStatsWidget` have no public page right now, so
    decide whether they belong there. pblidb is still backfilling, and most
