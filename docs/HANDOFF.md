@@ -325,11 +325,12 @@ inline-styled HTML into the repo.
 
 ### Ready to build (code)
 
-0. **Build `/about`.** List team members as cards alternating left and right,
-   each with image, name, bio and contact links. The `team` collection is ready,
-   `ProfileCard` is the closest component and `memberLinks` builds its links. Replace the stub at
-   `src/pages/about.ts`. The FAQs and `TeamStatsWidget` have no public page right
-   now, so decide whether they belong there. pblidb is still backfilling, and most
+0. **Publish `/about`.** It's a hidden draft at `/preview/about`
+   (`src/content/landing/about.yml`). Before publishing, get Matt's OK on the copy
+   and stats and Amber's OK on the quote, and add photos. Then delete
+   `src/pages/about.ts` and set the entry to `published`, or the build fails on
+   the clash. The FAQs and `TeamStatsWidget` have no public page right now, so
+   decide whether they belong there. pblidb is still backfilling, and most
    squads have no results yet; `OUR_TEAMS` in `src/lib/pblidb.ts` lists all four
    records for the main team until it's clear which are ours.
 0. **Decide whether the homepage moves to blocks.** `/preview/home` matches   `index.astro` from `src/content/landing/home.yml`. Moving would make the   homepage editable in Pages CMS and take its copy out of the template, but   `index.astro` also emits the `WebSite` schema, which would need a home.

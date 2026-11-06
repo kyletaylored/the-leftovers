@@ -467,6 +467,13 @@ const landingBlock = z.discriminatedUnion('type', [
     body: optText,
   }),
   z.object({
+    /** Every `team` entry as alternating cards. */
+    type: z.literal('team'),
+    tone: sectionTone,
+    eyebrow: optText,
+    title: optText,
+  }),
+  z.object({
     type: z.literal('quote'),
     tone: sectionTone,
     eyebrow: optText,

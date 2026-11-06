@@ -17,8 +17,8 @@ separate deploy step — hitting Save is publishing.
 ## Team members
 
 **Team Members** lists the people who run The Leftovers, not players, who rotate
-by event. They aren't shown on the site yet; they'll appear on the planned About
-page. **Add an entry** with a **Name** and **Role**. The **Bio** is free text.
+by event. They appear on any landing page with a **Team members** block, such as
+the About draft. **Add an entry** with a **Name** and **Role**. The **Bio** is free text.
 
 **Contact email** and everything under **Socials** (Instagram, Facebook, TikTok,
 YouTube, Website) are optional, and only the ones you fill in will show. Anything
@@ -200,6 +200,7 @@ site handles the design, so a page always looks like the rest of the site.
 |---|---|
 | **Photo band** | A big action photo with bold copy. The strongest section |
 | **Big statement** | A few large lines of text, centred, with optional decorative rules |
+| **Team members** | Everyone in Team Members as large cards that alternate sides, in sort order |
 | **Quote** | Someone's exact words with their name, plus an optional line for where or when and a link to the original. Get their OK before quoting them by name |
 | **Divider** | A decorative rule between two sections on the same background |
 | **Photo gallery** | A slider of one of your Photo galleries |

@@ -122,7 +122,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'BlockRenderer', file: 'BlockRenderer.astro', kind: 'Astro', group: 'layout', section: 'marketing',
     use: 'Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.',
-    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, quote, faq',
+    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, team, quote, faq',
     data: 'landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.',
     avoid: 'Pages that need logic or computed data; hand-write those.',
     pairs: ['Hero', 'ImpactBand', 'TwoColumn'],
@@ -283,7 +283,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'ProfileCard', file: 'ProfileCard.astro', kind: 'Astro', group: 'events', section: 'components',
     use: 'Bio card for the people who run the team. Bio in the default slot.',
-    options: 'name · role · image+imageAlt · links[{icon, href, label}] · as',
+    options: 'name · role · image+imageAlt · links (memberLinks in lib/team.ts) · layout: compact|row (large, for an About page; placeholder when no photo) · reverse (row only; flip every other card) · as',
     data: 'team collection entry',
   },
   {

@@ -3,9 +3,14 @@
  * ProfileCard — the generic bio card (§7), for the people who run the team
  * (the `team` collection). The bio goes in the default slot. `links` comes from
  * `memberLinks` in lib/team.ts; each label is the link's full accessible name.
+ *
+ * `layout="row"` is the large version for an About page, with `reverse` to put
+ * the photo on the other side. That flips the visual order only, so the reading
+ * order stays the same. A row without a photo shows a labelled placeholder.
  */
 import { Image } from 'astro:assets';
 import Icon, { type IconName } from './brand/Icon.astro';
+import ImagePlaceholder from './ImagePlaceholder.astro';
 
 interface Props {
   name: string;
@@ -13,18 +18,55 @@ interface Props {
   image?: ImageMetadata;
   imageAlt?: string;
   links?: Array<{ icon: IconName; href: string; label: string }>;
+  layout?: 'compact' | 'row';
+  /** Row layout only. */
+  reverse?: boolean;
   as?: 'h2' | 'h3';
   class?: string;
 }
-const { name, role, image, imageAlt, links = [], as: Heading = 'h3', class: className = '' } =
-  Astro.props;
+const {
+  name,
+  role,
+  image,
+  imageAlt,
+  links = [],
+  layout = 'compact',
+  reverse = false,
+  as: Heading = 'h3',
+  class: className = '',
+} = Astro.props;
+const row = layout === 'row';
 ---
 
 <article
-  class:list={['flex gap-4 rounded-sm border border-ink-600 bg-ink-800 p-5', className]}
+  class:list={[
+    'flex rounded-sm border border-ink-600 bg-ink-800 p-5',
+    row ? 'flex-col gap-5 sm:p-6 md:flex-row md:items-center md:gap-8' : 'gap-4',
+    row && reverse && 'md:flex-row-reverse',
+    className,
+  ]}
 >
   {
-    image && (
+    row && (
+      <div class="w-full shrink-0 md:w-2/5">
+        {image ? (
+          <Image
+            src={image}
+            alt={imageAlt ?? `${name}, ${role}`}
+            widths={[320, 480, 640]}
+            sizes="(min-width: 768px) 40vw, 92vw"
+            loading="lazy"
+            decoding="async"
+            class="aspect-square w-full rounded-sm object-cover"
+          />
+        ) : (
+          <ImagePlaceholder label={`Photo of ${name}`} ratio="1/1" />
+        )}
+      </div>
+    )
+  }
+  {
+    !row && image && (
       <Image
         src={image}
         alt={imageAlt ?? `${name}, ${role}`}
@@ -37,9 +79,9 @@ const { name, role, image, imageAlt, links = [], as: Heading = 'h3', class: clas
     )
   }
   <div class="min-w-0">
-    <Heading class="title-sm text-bone">{name}</Heading>
+    <Heading class:list={['title-sm text-bone', row && 'text-xl']}>{name}</Heading>
     <p class="mt-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">{role}</p>
-    <div class="mt-2 text-sm leading-relaxed text-bone-muted">
+    <div class:list={['mt-2 leading-relaxed text-bone-muted', row ? 'text-base' : 'text-sm']}>
       <slot />
     </div>
     {

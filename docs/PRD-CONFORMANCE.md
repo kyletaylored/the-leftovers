@@ -613,6 +613,10 @@ from earlier decisions here.
 - **`/team` removed (5 Nov 2026).** At the owner's request, ahead of a planned
   `/about` page listing team members. `/about` and `/roster` redirect home
   until then. The `team` collection stays, unused, ready for that page.
+- **`/about` is a hidden draft (6 Nov 2026).** At the owner's request it's a
+  `landing` entry at `/preview/about` rather than the hand-built page in §5, so
+  the team can edit it in Pages CMS. `/about` still redirects home until it's
+  published.
 - **`/gallery` added (5 Nov 2026).** Not in §5's site map. A footer-only photo
   page, using a new `grid` indicator on `Slideshow` that loads photos as
   they're reached rather than all at once.

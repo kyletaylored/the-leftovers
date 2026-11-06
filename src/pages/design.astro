@@ -609,6 +609,21 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
       </div>
 
       <div class="mb-5 grid gap-5 lg:grid-cols-3">
+        <Specimen title="ProfileCard: row" class="lg:col-span-3" file="src/components/ProfileCard.astro" note={'layout="row" is the large version for an About page: a bigger photo beside the bio. Set reverse on every other card so they alternate sides. Without a photo it shows a labelled placeholder. The CMS Team members block does all of this for you.'}>
+          {
+            sampleMember && (
+              <div class="grid gap-5">
+                <ProfileCard layout="row" name={sampleMember.data.name} role={sampleMember.data.role} as="h3">
+                  The bio goes in the default slot.
+                </ProfileCard>
+                <ProfileCard layout="row" reverse name={sampleMember.data.name} role={sampleMember.data.role} as="h3">
+                  With reverse, the photo moves to the other side from md up.
+                </ProfileCard>
+              </div>
+            )
+          }
+        </Specimen>
+
         <Specimen title="ProfileCard" file="src/components/ProfileCard.astro" note="A short bio with a role, optional photo and contact links. Use it for the people who run the team (the team collection), with memberLinks for the links. Every link is optional; these are samples.">
           {
             sampleMember && (
