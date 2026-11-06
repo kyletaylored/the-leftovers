@@ -58,6 +58,9 @@
  *
  * Headings render at the level the caller passes (default h2). The title
  * accepts "\n" for deliberate line breaks; keep titles to two short lines.
+ *
+ * The default slot takes other copy in place of a title (the CMS quote block
+ * puts a Callout there), and `compact` makes the band shorter to suit it.
  */
 import { FULL_BLEED_SIZES } from '@/lib/layout';
 import { Image } from 'astro:assets';
@@ -78,7 +81,8 @@ interface Props {
   /** object-position for the photo, e.g. "70% 30%". */
   focus?: string;
   eyebrow?: string;
-  title: string;
+  /** Leave out only when the default slot carries the copy. */
+  title?: string;
   body?: string;
   stats?: Stat[];
   ghost?: string;
@@ -93,6 +97,8 @@ interface Props {
   as?: 'h2' | 'h3';
   /** Set when the band is above the fold, so the photo isn't lazy-loaded. */
   priority?: boolean;
+  /** Desktop: a shorter band, for a quote rather than a manifesto. */
+  compact?: boolean;
   id?: string;
   class?: string;
 }
@@ -114,11 +120,12 @@ const {
   shift = 0,
   as: Heading = 'h2',
   priority = false,
+  compact = false,
   id,
   class: className = '',
 } = Astro.props;
 
-const lines = title.split('\n');
+const lines = title?.split('\n') ?? [];
 const position = focus ?? (align === 'right' ? '30% 35%' : '70% 35%');
 const hasActions = Astro.slots.has('actions');
 // Every option is a data-* attribute or CSS variable on the <section>, and
@@ -158,7 +165,12 @@ const vars = toStyle({ ...impactShiftVars(shift, align, wash), '--impact-focus':
   {/* Scrim sits over the band, not the (shifted) photo, so it stays put. */}
   <div class="impact-scrim absolute inset-0 hidden" aria-hidden="true"></div>
 
-  <div class="relative mx-auto -mt-16 max-w-7xl px-4 pb-14 sm:-mt-24 sm:px-6 sm:pb-16 lg:mt-0 lg:flex lg:min-h-[36rem] lg:items-center lg:py-20 xl:min-h-[40rem]">
+  <div
+    class:list={[
+      'relative mx-auto -mt-16 max-w-7xl px-4 pb-14 sm:-mt-24 sm:px-6 sm:pb-16 lg:mt-0 lg:flex lg:items-center lg:py-20',
+      compact ? 'lg:min-h-[30rem]' : 'lg:min-h-[36rem] xl:min-h-[40rem]',
+    ]}
+  >
     <div class="impact-copy relative max-w-2xl lg:max-w-[56%]">
       {
         ghost && (
@@ -179,9 +191,14 @@ const vars = toStyle({ ...impactShiftVars(shift, align, wash), '--impact-focus':
           </p>
         )
       }
-      <Heading class="relative text-4xl leading-[0.92] text-bone sm:text-5xl xl:text-[4rem]">
-        {lines.map((line) => <span class="block">{line}</span>)}
-      </Heading>
+      {
+        title && (
+          <Heading class="relative text-4xl leading-[0.92] text-bone sm:text-5xl xl:text-[4rem]">
+            {lines.map((line) => <span class="block">{line}</span>)}
+          </Heading>
+        )
+      }
+      <slot />
       {body && <p class="impact-body relative mt-5 max-w-md text-base leading-relaxed sm:mt-6 sm:text-lg">{body}</p>}
       {
         stats.length > 0 && (

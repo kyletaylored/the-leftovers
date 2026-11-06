@@ -19,7 +19,7 @@
  * island here, and the fixed hero keeps it below the fold. No-JS behaviour is
  * whatever each component already does.
  */
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import Hero from '@/components/Hero.astro';
 import Section from '@/components/Section.astro';
 import TwoColumn from '@/components/TwoColumn.astro';
@@ -30,12 +30,15 @@ import FeatureRow from '@/components/marketing/FeatureRow.astro';
 import GallerySlideshow from '@/components/GallerySlideshow.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
 import FaqAccordion from '@/components/FaqAccordion.astro';
+import Callout from '@/components/Callout.astro';
+import ProfileCard from '@/components/ProfileCard.astro';
 import LogoStrip from '@/components/LogoStrip.astro';
 import ImagePlaceholder from '@/components/ImagePlaceholder.astro';
 import Button from '@/components/Button.astro';
 import BrandRule from '@/components/brand/BrandRule.astro';
 import { site } from '@/lib/settings';
 import { resolveImage } from '@/lib/images';
+import { memberLinks } from '@/lib/team';
 
 type Landing = CollectionEntry<'landing'>['data'];
 
@@ -59,6 +62,18 @@ const blocks = await Promise.all(
 
 const used = new Set(sections.map((block) => block.type));
 const galleries = used.has('gallery') ? await getCollection('galleries') : [];
+const members = used.has('team')
+  ? await Promise.all(
+      (await getCollection('team', ({ data }) => !data.hidden))
+        .sort((a, b) => a.data.order - b.data.order)
+        .map(async (entry) => ({
+          data: entry.data,
+          photo: await resolveImage(entry.data.photo),
+          Bio: (await render(entry)).Content,
+        }))
+    )
+  : [];
+
 const faqItems = used.has('faq')
   ? (await getCollection('faqs'))
       .sort((a, b) => a.data.order - b.data.order)
@@ -274,6 +289,52 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boole
         return (
           <Section tone={block.tone}>
             <NewsletterBlock eyebrow={block.eyebrow} title={block.title} body={block.body} />
+          </Section>
+        );
+
+      case 'team':
+        return (
+          <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
+            <div class="grid gap-6">
+              {members.map(({ data, photo, Bio }, index) => (
+                <ProfileCard
+                  layout="row"
+                  reverse={index % 2 === 1}
+                  name={data.name}
+                  role={data.role}
+                  image={photo}
+                  imageAlt={data.photoAlt}
+                  links={memberLinks(data)}
+                  as={block.title ? 'h3' : 'h2'}
+                >
+                  <Bio />
+                </ProfileCard>
+              ))}
+            </div>
+          </Section>
+        );
+
+      case 'quote':
+        return asset ? (
+          <ImpactBand
+            compact
+            image={asset}
+            imageAlt={block.imageAlt ?? ''}
+            align={block.align}
+            shift={block.shift ?? undefined}
+            focus={block.focus}
+            eyebrow={block.eyebrow}
+            title={block.title}
+          >
+            <Callout feature align="inherit" class="relative" cite={block.cite} source={block.source} href={block.sourceUrl}>
+              {block.quote}
+            </Callout>
+          </ImpactBand>
+        ) : (
+          <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
+            <Callout feature cite={block.cite} source={block.source} href={block.sourceUrl}>
+              {block.quote}
+            </Callout>
           </Section>
         );
 

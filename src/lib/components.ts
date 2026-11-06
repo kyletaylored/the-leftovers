@@ -109,8 +109,9 @@ export const catalog: CatalogEntry[] = [
   },
   {
     name: 'Callout', file: 'Callout.astro', kind: 'Astro', group: 'content', section: 'blocks',
-    use: 'Pull quote / emphasis inside a Section (slot = quote).',
-    options: 'cite',
+    use: 'Pull quote / emphasis inside a Section (slot = quote). Also the CMS quote block.',
+    options: 'cite · source (where or when; needs cite) · href (links source) · feature (large standalone quote in headline type) · align: center|inherit (inherit inside an ImpactBand)',
+    avoid: 'Quoting a real person without their OK.',
   },
   {
     name: 'FaqAccordion', file: 'FaqAccordion.astro', kind: 'Astro', group: 'content', section: 'blocks',
@@ -121,7 +122,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'BlockRenderer', file: 'BlockRenderer.astro', kind: 'Astro', group: 'layout', section: 'marketing',
     use: 'Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.',
-    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, faq',
+    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, team, quote, faq',
     data: 'landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.',
     avoid: 'Pages that need logic or computed data; hand-write those.',
     pairs: ['Hero', 'ImpactBand', 'TwoColumn'],
@@ -150,7 +151,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'ImpactBand', file: 'marketing/ImpactBand.astro', kind: 'Astro', group: 'marketing', section: 'marketing',
     use: 'Full-bleed action photo fading into big copy (manifesto, recruiting push). Buttons in slot="actions".',
-    options: 'image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus (object-position) · priority (LCP image) · as. Desktop only: shift -30..30 (% of band, negative = left; slide a centred player out from under the copy) · wash: fade|none (none = photo edge to edge, full colour or tinted) · backdrop: auto|none|scrim|panel (auto = scrim when wash=none). Try combinations in the /design#impactband-playground',
+    options: 'image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus (object-position) · priority (LCP image) · as · default slot (other copy in place of title, e.g. a feature Callout). Desktop only: compact (shorter band) · shift -30..30 (% of band, negative = left; slide a centred player out from under the copy) · wash: fade|none (none = photo edge to edge, full colour or tinted) · backdrop: auto|none|scrim|panel (auto = scrim when wash=none). Try combinations in the /design#impactband-playground',
     avoid: 'Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between. wash="none" with body text or stats but no backdrop="panel" (scrim alone can fail AA on a bright photo).',
     pairs: ['Hero', 'TwoColumn'],
   },
@@ -282,7 +283,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'ProfileCard', file: 'ProfileCard.astro', kind: 'Astro', group: 'events', section: 'components',
     use: 'Bio card for the people who run the team. Bio in the default slot.',
-    options: 'name · role · image+imageAlt · links[{icon, href, label}] · as',
+    options: 'name · role · image+imageAlt · links (memberLinks in lib/team.ts) · layout: compact|row (large, for an About page; placeholder when no photo) · reverse (row only; flip every other card) · as',
     data: 'team collection entry',
   },
   {

@@ -19,6 +19,8 @@
  * are compositor-only transforms and stop for prefers-reduced-motion.
  *
  * `image` and `video` put photography behind the copy; `text` is copy only.
+ * Their padding is equal top and bottom: the divider sits below it in normal
+ * flow, so that centres the copy in the space above the divider.
  *
  * The logo is the LCP element on the homepage, so it is eager, high-priority,
  * and width/height-locked. Everything decorative around it is SVG/CSS.
@@ -68,6 +70,9 @@ const isLogo = variant === 'brand' || variant === 'ornate';
 const ornate = variant === 'ornate';
 // "Play / Compete / Leftovers" → spaced segments with gold slashes.
 const taglineParts = tagline?.split('/').map((part) => part.trim()).filter(Boolean) ?? [];
+// Rendered up front because the page builder always passes a list, so slots.has
+// is true even with no buttons, and the empty row would push the copy up.
+const actions = Astro.slots.has('actions') ? (await Astro.slots.render('actions')).trim() : '';
 ---
 
 <section class:list={['bg-sand relative overflow-hidden', animate && 'bg-drift', className]}>
@@ -132,7 +137,9 @@ const taglineParts = tagline?.split('/').map((part) => part.trim()).filter(Boole
   <div
     class:list={[
       'relative mx-auto max-w-5xl px-4 text-center sm:px-6',
-      ornate ? 'pb-24 pt-20 sm:pb-36 sm:pt-20 lg:pb-44 lg:pt-20' : 'pb-24 pt-12 sm:pb-28 lg:pb-32 lg:pt-16',
+      ornate && 'pb-24 pt-20 sm:pb-36 sm:pt-20 lg:pb-44 lg:pt-20',
+      variant === 'brand' && 'pb-24 pt-12 sm:pb-28 lg:pb-32 lg:pt-16',
+      !isLogo && 'py-16 sm:py-20 lg:py-24',
     ]}
   >
     {
@@ -172,17 +179,28 @@ const taglineParts = tagline?.split('/').map((part) => part.trim()).filter(Boole
         </>
       ) : (
         <div class="mx-auto max-w-3xl">
-          <h1 class="text-4xl text-bone sm:text-5xl lg:text-6xl">{title}</h1>
+          <h1 class="text-3xl text-bone sm:text-4xl lg:text-5xl">{title}</h1>
           {tagline && (
-            <p class="mt-4 text-base leading-relaxed text-bone-muted sm:text-lg">{tagline}</p>
+            <p class="mt-4 flex flex-wrap items-center justify-center gap-x-3 text-lg leading-snug text-bone sm:text-xl lg:text-2xl">
+              {taglineParts.map((part, i) => (
+                <>
+                  {i > 0 && <span class="text-gold" aria-hidden="true">/</span>}
+                  <span>{part}</span>
+                </>
+              ))}
+            </p>
           )}
         </div>
       )
     }
 
-    <div class="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-4">
-      <slot name="actions" />
-    </div>
+    {
+      actions && (
+        <div class="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:justify-center sm:gap-4">
+          <Fragment set:html={actions} />
+        </div>
+      )
+    }
   </div>
 
   {

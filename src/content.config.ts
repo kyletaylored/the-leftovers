@@ -19,8 +19,10 @@ const imagePath = z.string().describe('Repo path, e.g. /src/assets/img/players/2
 const socials = z
   .object({
     instagram: z.url().optional(),
+    facebook: z.url().optional(),
     tiktok: z.url().optional(),
     youtube: z.url().optional(),
+    website: z.url().optional(),
     discord: z.string().optional(),
   })
   .prefault({});
@@ -46,9 +48,13 @@ const team = defineCollection({
     role: z.string().describe('e.g. "Organizer"'),
     photo: imagePath.optional(),
     photoAlt: z.string().optional(),
+    /** Public: it's shown on the site and sits in a public repo. */
+    email: z.email().optional(),
     socials,
     /** Lower sorts first. */
     order: z.number().default(100),
+    /** Keeps the entry, but leaves it off the site. */
+    hidden: z.boolean().default(false),
   }),
 });
 
@@ -462,6 +468,37 @@ const landingBlock = z.discriminatedUnion('type', [
     title: optText,
     body: optText,
   }),
+  z.object({
+    /** Every `team` entry as alternating cards. */
+    type: z.literal('team'),
+    tone: sectionTone,
+    eyebrow: optText,
+    title: optText,
+  }),
+  z
+    .object({
+      type: z.literal('quote'),
+      tone: sectionTone,
+      eyebrow: optText,
+      title: optText,
+      quote: z.string(),
+      /** Who said it. */
+      cite: z.string(),
+      /** Where or when, e.g. the event or publication. */
+      source: optText,
+      /** Link to the original. */
+      sourceUrl: optText,
+      /** Optional. With one it's an ImpactBand; without, it's centred. */
+      image: imagePath.nullish(),
+      imageAlt: optText,
+      /** Which side the quote sits on, with a photo. */
+      align: z.enum(['left', 'right']).default('left'),
+      shift: z.number().min(-30).max(30).nullish(),
+      focus: optText,
+    })
+    .refine((quote) => !quote.image || quote.imageAlt, {
+      message: 'A quote with a photo needs alt text.',
+    }),
   z.object({
     type: z.literal('faq'),
     tone: sectionTone,

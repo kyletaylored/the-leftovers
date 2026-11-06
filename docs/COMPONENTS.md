@@ -73,7 +73,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **ThreeColumn** (`ThreeColumn.astro`): Icon + title + body benefits row (3 items, stacks on phones).
   - Options: items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section) · iconStyle: tile|circle (gold ring, favicon badge) · as
 - **BlockRenderer** (`BlockRenderer.astro`): Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.
-  - Options: hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, faq
+  - Options: hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, team, quote, faq
   - Data: landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.
   - Avoid: Pages that need logic or computed data; hand-write those.
   - Pairs with: Hero, ImpactBand, TwoColumn
@@ -86,8 +86,9 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **Pill** (`ui/Pill.astro`): Status badge: Open Slot, Pre-Order, Sold Out, Active, Next Up.
   - Options: tone: outline|gold|crimson|forest|muted · size: md|sm
   - Avoid: As a button or link.
-- **Callout** (`Callout.astro`): Pull quote / emphasis inside a Section (slot = quote).
-  - Options: cite
+- **Callout** (`Callout.astro`): Pull quote / emphasis inside a Section (slot = quote). Also the CMS quote block.
+  - Options: cite · source (where or when; needs cite) · href (links source) · feature (large standalone quote in headline type) · align: center|inherit (inherit inside an ImpactBand)
+  - Avoid: Quoting a real person without their OK.
 - **FaqAccordion** (`FaqAccordion.astro`): FAQ list, native <details>, zero JS.
   - Options: items[{question, answer}]
   - Data: faqs collection (sort by order)
@@ -105,7 +106,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 ### Marketing & media
 
 - **ImpactBand** (`marketing/ImpactBand.astro`): Full-bleed action photo fading into big copy (manifesto, recruiting push). Buttons in slot="actions".
-  - Options: image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus (object-position) · priority (LCP image) · as. Desktop only: shift -30..30 (% of band, negative = left; slide a centred player out from under the copy) · wash: fade|none (none = photo edge to edge, full colour or tinted) · backdrop: auto|none|scrim|panel (auto = scrim when wash=none). Try combinations in the /design#impactband-playground
+  - Options: image+imageAlt · title · eyebrow · body · align: left|right · tone: ink|crimson|forest · treatment: fade|duotone · stats[] · ghost (big background word) · focus (object-position) · priority (LCP image) · as · default slot (other copy in place of title, e.g. a feature Callout). Desktop only: compact (shorter band) · shift -30..30 (% of band, negative = left; slide a centred player out from under the copy) · wash: fade|none (none = photo edge to edge, full colour or tinted) · backdrop: auto|none|scrim|panel (auto = scrim when wash=none). Try combinations in the /design#impactband-playground
   - Avoid: Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between. wash="none" with body text or stats but no backdrop="panel" (scrim alone can fail AA on a bright photo).
   - Pairs with: Hero, TwoColumn
 - **FeatureRow** (`marketing/FeatureRow.astro`): Alternating media + copy rows. Flip every other row with reverse.
@@ -169,7 +170,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **Countdown** (`Countdown.astro`, Astro + island): Live countdown to an event or drop deadline.
   - Options: target (Date) · passedLabel
 - **ProfileCard** (`ProfileCard.astro`): Bio card for the people who run the team. Bio in the default slot.
-  - Options: name · role · image+imageAlt · links[{icon, href, label}] · as
+  - Options: name · role · image+imageAlt · links (memberLinks in lib/team.ts) · layout: compact|row (large, for an About page; placeholder when no photo) · reverse (row only; flip every other card) · as
   - Data: team collection entry
 - **StatNumber** (`StatNumber.astro`): One big gold ribbed figure + label.
   - Options: value · label · size: md|sm|lg

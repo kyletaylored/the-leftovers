@@ -28,7 +28,7 @@ content:
   # -- Team members ---------------------------------------------------------
   - name: team
     label: Team Members
-    description: The people who run The Leftovers. Not shown on the site yet; they'll appear on the planned About page.
+    description: The people who run The Leftovers. They appear wherever a landing page has a Team members block.
     type: collection
     path: src/content/team
     filename: '{fields.name}.md'
@@ -48,14 +48,22 @@ content:
         description: >-
           Describe the photo for screen readers and image search. Required
           even before there's a photo; the person's name is fine until then.
+      - name: email
+        label: Contact email
+        type: string
+        pattern: { regex: '^[^@\s]+@[^@\s]+\.[^@\s]+$' }
+        description: Public. Anyone can see this on the site, so use an address that's fine to share.
       - name: socials
         label: Socials
         type: object
         fields:
           - { name: instagram, label: Instagram URL, type: string, pattern: { regex: '^https?://.+' } }
+          - { name: facebook, label: Facebook URL, type: string, pattern: { regex: '^https?://.+' } }
           - { name: tiktok, label: TikTok URL, type: string, pattern: { regex: '^https?://.+' } }
           - { name: youtube, label: YouTube URL, type: string, pattern: { regex: '^https?://.+' } }
+          - { name: website, label: Website URL, type: string, pattern: { regex: '^https?://.+' } }
       - { name: order, label: Sort order, type: number, default: 100, description: Lower sorts first. }
+      - { name: hidden, label: Hide from site, type: boolean, default: false, description: Keeps this person's details here but leaves them off the site. }
       - { name: body, label: Bio, type: rich-text }
 
   # -- Events ---------------------------------------------------------------
@@ -536,6 +544,32 @@ content:
               - { name: eyebrow, label: Kicker, type: string }
               - { name: title, label: Heading, type: string }
               - { name: body, label: Text, type: text }
+          - name: team
+            label: Team members
+            fields:
+              - *tone
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string }
+          - name: quote
+            label: Quote
+            fields:
+              - *tone
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string }
+              - { name: quote, label: Quote, type: text, required: true, description: Their exact words. Get their OK before quoting someone by name. }
+              - { name: cite, label: Who said it, type: string, required: true }
+              - { name: source, label: Where or when, type: string, description: 'e.g. "NXL World Cup, 2024"' }
+              - { name: sourceUrl, label: Link to the original, type: string, pattern: { regex: '^https?://.+' }, description: 'Turns "Where or when" into a link, so fill that in too.' }
+              - { name: image, label: Photo, type: image, options: { media: images }, description: Optional. With a photo the quote is a wide band; without one it's large and centred. }
+              - { name: imageAlt, label: Photo alt text, type: string, description: Required when a photo is set. }
+              - name: align
+                label: Quote side
+                type: select
+                default: left
+                options: { values: [left, right] }
+                description: Which side the quote sits on when there's a photo. Pick the side away from the person, and vary it between quotes.
+              - { name: shift, label: Slide photo sideways, type: number, description: 'Desktop only, -30 to 30. Negative moves the photo left. Use it when the person sits under the quote.' }
+              - { name: focus, label: Photo focus, type: string, description: 'Which part of the photo stays in view, e.g. "30% 20%" (across, then down).' }
           - name: faq
             label: FAQs
             fields:

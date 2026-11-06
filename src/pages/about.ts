@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro';
 import { redirectHtml } from '@/lib/redirect-page';
 
-// Nothing lives at /about yet (Nov 2026). Replace this stub when the page is built.
+// The About page is a hidden draft at /preview/about (src/content/landing/about.yml).
+// To publish it, delete this file and set that entry's status to published.
 export const GET: APIRoute = ({ site }) =>
   new Response(redirectHtml('/', 'Home', site!.href), {
     headers: { 'Content-Type': 'text/html; charset=utf-8' },

@@ -1,27 +1,76 @@
 ---
 /**
- * Callout — pull-quote / emphasis block (§7).
+ * Callout — pull-quote / emphasis block (§7), and the CMS `quote` block.
+ *
+ * `cite` says who, `source` says where or when, and `href` links `source` to the
+ * original.
+ *
+ * `feature` is the standalone version, in ImpactBand's headline type with a
+ * decorative quote mark (hidden from screen readers, as the <blockquote> already
+ * announces itself). It's centred; inside an ImpactBand, set `align="inherit"`
+ * to follow the band's side. The quote type is heavy, so keep these short.
  */
+import Icon from './brand/Icon.astro';
+
 interface Props {
   cite?: string;
+  /** Shown after `cite`, so it needs one. */
+  source?: string;
+  /** Links `source` to the original. */
+  href?: string;
+  feature?: boolean;
+  /** Feature only. */
+  align?: 'center' | 'inherit';
   class?: string;
 }
-const { cite, class: className = '' } = Astro.props;
+const { cite, source, href, feature = false, align = 'center', class: className = '' } = Astro.props;
 ---
 
 <figure
   class:list={[
-    'border-l-4 border-gold bg-ink-800/70 px-6 py-6 sm:px-8',
+    !feature && 'border-l-4 border-gold bg-ink-800/70 px-6 py-6 sm:px-8',
+    feature && align === 'center' && 'mx-auto max-w-4xl text-center',
     className,
   ]}
 >
-  <blockquote class="text-lg leading-relaxed text-bone sm:text-xl">
+  {
+    feature && (
+      <span aria-hidden="true" class="-mb-6 block font-display text-7xl leading-none text-gold sm:text-8xl">
+        “
+      </span>
+    )
+  }
+  <blockquote
+    class:list={[
+      'text-bone',
+      feature
+        ? 'font-display text-3xl uppercase leading-[1.02] sm:text-4xl xl:text-5xl'
+        : 'text-lg leading-relaxed sm:text-xl',
+    ]}
+  >
     <slot />
   </blockquote>
   {
     cite && (
-      <figcaption class="mt-4 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
+      <figcaption
+        class:list={[
+          'font-bold uppercase tracking-[0.2em] text-gold-300',
+          feature ? 'mt-5 text-xs' : 'mt-4 text-[0.65rem]',
+        ]}
+      >
         {cite}
+        {source && (
+          <span class="mt-1 block text-xs font-normal normal-case tracking-normal text-bone-muted">
+            {href ? (
+              <a href={href} rel="noopener" class="tap inline-flex items-center gap-1.5 underline hover:text-bone">
+                {source}
+                <Icon name="external" class="size-3.5" />
+              </a>
+            ) : (
+              source
+            )}
+          </span>
+        )}
       </figcaption>
     )
   }

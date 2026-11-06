@@ -157,7 +157,8 @@ export const GridLightbox: Story = {
     await userEvent.click(within(viewer).getByRole('button', { name: /close photo viewer/i }));
     await expect(canvas.queryByRole('dialog')).toBeNull();
     // Stays on the photo reached, and focus returns to where it started.
-    await expect(canvas.getByText(/photo 2 of 10/i)).toBeVisible();
+    // findBy: the closed viewer's own caption can linger for a tick.
+    await expect(await canvas.findByText(/photo 2 of 10/i)).toBeVisible();
     await expect(enlarge).toHaveFocus();
   },
 };

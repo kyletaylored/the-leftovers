@@ -1,7 +1,7 @@
 # Handoff: The Leftovers website
 
 **Start here** if you're picking this project up, whether you're a person or an
-agent. It covers what the site is, what state it's in (as of **5 Nov 2026**),
+agent. It covers what the site is, what state it's in (as of **6 Nov 2026**),
 how to work on it without breaking its rules, and what's left to do. Everything
 else in `docs/` goes deeper on one topic.
 
@@ -118,9 +118,10 @@ the other:
   (`icpl`, `infamous`, `kinetic`, `nxl-eu`, `nxl-us`) with no sponsor entries.
   The folder codes come from the photographers' filenames, not confirmed event
   names. Rename a folder if you know the real name, and fix any paths.
-- **Team members are placeholders in part.** Kyle's bio predates this list and
-  needs his review. Matt Engles has no bio or photo yet, and both roles are
-  a generic "Organizer".
+- **Team members need review.** Matt Engles created The Leftovers in 2022; Kyle
+  Taylor joined in 2026 and builds the site and its systems. Matt's bio comes from
+  the Planet Paintball Podcast (Ep 104) and needs Matt's OK. Kyle's entry is
+  hidden for now, at the owner's request.
 - **Events are real.** All 10 NXL US events from 2025–26 were copied from
   PBLeagues on 5 Nov 2026: venues, squads and final places. Check before
   trusting:
@@ -311,8 +312,7 @@ inline-styled HTML into the repo.
    Confirm the gallery titles: they come from folder codes. Player photos are still missing. It unblocks player photos,
    galleries, the mockup-B manifesto band, the `Hero` video variant, and real
    carousel slides on `/design`.
-2. **Finish the team members.** Add Matt's bio and photo, real roles, and
-   review Kyle's bio.
+2. **Finish the team members.** Get Matt's OK on the bio.
 3. **Close or extend the jersey pre-order** (its close date has passed).
 4. **Mailing list:** `mailingList.formAction` in `site.yml` is empty. Pick
    Buttondown or Mailchimp and paste in the form action.
@@ -324,11 +324,12 @@ inline-styled HTML into the repo.
 
 ### Ready to build (code)
 
-0. **Build `/about`.** List team members as cards alternating left and right,
-   each with image, name, bio and socials. The `team` collection is ready and
-   `ProfileCard` is the closest component. Replace the stub at
-   `src/pages/about.ts`. The FAQs and `TeamStatsWidget` have no public page right
-   now, so decide whether they belong there. pblidb is still backfilling, and most
+0. **Publish `/about`.** It's a hidden draft at `/preview/about`
+   (`src/content/landing/about.yml`). Before publishing, get Matt's OK on the copy
+   and stats and Amber's OK on the quote. Then delete
+   `src/pages/about.ts` and set the entry to `published`, or the build fails on
+   the clash. The FAQs and `TeamStatsWidget` have no public page right now, so
+   decide whether they belong there. pblidb is still backfilling, and most
    squads have no results yet; `OUR_TEAMS` in `src/lib/pblidb.ts` lists all four
    records for the main team until it's clear which are ours.
 0. **Decide whether the homepage moves to blocks.** `/preview/home` matches   `index.astro` from `src/content/landing/home.yml`. Moving would make the   homepage editable in Pages CMS and take its copy out of the template, but   `index.astro` also emits the `WebSite` schema, which would need a home.
