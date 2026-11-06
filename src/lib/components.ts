@@ -109,8 +109,9 @@ export const catalog: CatalogEntry[] = [
   },
   {
     name: 'Callout', file: 'Callout.astro', kind: 'Astro', group: 'content', section: 'blocks',
-    use: 'Pull quote / emphasis inside a Section (slot = quote).',
-    options: 'cite',
+    use: 'Pull quote / emphasis inside a Section (slot = quote). Also the CMS quote block.',
+    options: 'cite · source (where or when; needs cite) · href (links source) · mark (large quote mark)',
+    avoid: 'Quoting a real person without their OK.',
   },
   {
     name: 'FaqAccordion', file: 'FaqAccordion.astro', kind: 'Astro', group: 'content', section: 'blocks',
@@ -121,7 +122,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'BlockRenderer', file: 'BlockRenderer.astro', kind: 'Astro', group: 'layout', section: 'marketing',
     use: 'Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.',
-    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, faq',
+    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, quote, faq',
     data: 'landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.',
     avoid: 'Pages that need logic or computed data; hand-write those.',
     pairs: ['Hero', 'ImpactBand', 'TwoColumn'],

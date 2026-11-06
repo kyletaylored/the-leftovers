@@ -1,7 +1,8 @@
 ---
 /**
  * ProfileCard — the generic bio card (§7), for the people who run the team
- * (the `team` collection). The bio goes in the default slot.
+ * (the `team` collection). The bio goes in the default slot. `links` comes from
+ * `memberLinks` in lib/team.ts; each label is the link's full accessible name.
  */
 import { Image } from 'astro:assets';
 import Icon, { type IconName } from './brand/Icon.astro';
@@ -43,7 +44,7 @@ const { name, role, image, imageAlt, links = [], as: Heading = 'h3', class: clas
     </div>
     {
       links.length > 0 && (
-        <ul class="mt-3 flex gap-2">
+        <ul class="mt-3 flex flex-wrap gap-2">
           {links.map((link) => (
             <li>
               <a
@@ -51,7 +52,7 @@ const { name, role, image, imageAlt, links = [], as: Heading = 'h3', class: clas
                 rel="noopener"
                 class="tap inline-flex items-center justify-center text-gold transition-colors hover:text-gold-300"
               >
-                <Icon name={link.icon} class="size-5" label={`${name} on ${link.label}`} />
+                <Icon name={link.icon} class="size-5" label={link.label} />
               </a>
             </li>
           ))}

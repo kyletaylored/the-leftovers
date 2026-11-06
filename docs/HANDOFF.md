@@ -121,6 +121,8 @@ the other:
 - **Team members are placeholders in part.** Kyle's bio predates this list and
   needs his review. Matt Engles has no bio or photo yet, and both roles are
   a generic "Organizer".
+  Public sources credit Matt with creating the Leftovers free-agent program,
+  while Kyle's bio says Kyle founded the team in 2022. Settle that before `/about`.
 - **Events are real.** All 10 NXL US events from 2025–26 were copied from
   PBLeagues on 5 Nov 2026: venues, squads and final places. Check before
   trusting:
@@ -325,8 +327,8 @@ inline-styled HTML into the repo.
 ### Ready to build (code)
 
 0. **Build `/about`.** List team members as cards alternating left and right,
-   each with image, name, bio and socials. The `team` collection is ready and
-   `ProfileCard` is the closest component. Replace the stub at
+   each with image, name, bio and contact links. The `team` collection is ready,
+   `ProfileCard` is the closest component and `memberLinks` builds its links. Replace the stub at
    `src/pages/about.ts`. The FAQs and `TeamStatsWidget` have no public page right
    now, so decide whether they belong there. pblidb is still backfilling, and most
    squads have no results yet; `OUR_TEAMS` in `src/lib/pblidb.ts` lists all four

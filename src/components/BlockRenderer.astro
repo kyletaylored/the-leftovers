@@ -30,6 +30,7 @@ import FeatureRow from '@/components/marketing/FeatureRow.astro';
 import GallerySlideshow from '@/components/GallerySlideshow.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
 import FaqAccordion from '@/components/FaqAccordion.astro';
+import Callout from '@/components/Callout.astro';
 import LogoStrip from '@/components/LogoStrip.astro';
 import ImagePlaceholder from '@/components/ImagePlaceholder.astro';
 import Button from '@/components/Button.astro';
@@ -274,6 +275,15 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boole
         return (
           <Section tone={block.tone}>
             <NewsletterBlock eyebrow={block.eyebrow} title={block.title} body={block.body} />
+          </Section>
+        );
+
+      case 'quote':
+        return (
+          <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
+            <Callout mark cite={block.cite} source={block.source} href={block.sourceUrl} class="max-w-3xl">
+              {block.quote}
+            </Callout>
           </Section>
         );
 

@@ -1,12 +1,23 @@
 ---
 /**
- * Callout — pull-quote / emphasis block (§7).
+ * Callout — pull-quote / emphasis block (§7), and the CMS `quote` block.
+ *
+ * `cite` says who, `source` says where or when, and `href` links `source` to the
+ * original. `mark` adds a large decorative quote mark, hidden from screen
+ * readers because the <blockquote> already announces itself.
  */
+import Icon from './brand/Icon.astro';
+
 interface Props {
   cite?: string;
+  /** Shown after `cite`, so it needs one. */
+  source?: string;
+  /** Links `source` to the original. */
+  href?: string;
+  mark?: boolean;
   class?: string;
 }
-const { cite, class: className = '' } = Astro.props;
+const { cite, source, href, mark = false, class: className = '' } = Astro.props;
 ---
 
 <figure
@@ -15,6 +26,7 @@ const { cite, class: className = '' } = Astro.props;
     className,
   ]}
 >
+  {mark && <span aria-hidden="true" class="-mb-6 block font-display text-7xl leading-none text-gold">“</span>}
   <blockquote class="text-lg leading-relaxed text-bone sm:text-xl">
     <slot />
   </blockquote>
@@ -22,6 +34,18 @@ const { cite, class: className = '' } = Astro.props;
     cite && (
       <figcaption class="mt-4 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
         {cite}
+        {source && (
+          <span class="mt-1 block text-xs font-normal normal-case tracking-normal text-bone-muted">
+            {href ? (
+              <a href={href} rel="noopener" class="tap inline-flex items-center gap-1.5 underline hover:text-bone">
+                {source}
+                <Icon name="external" class="size-3.5" />
+              </a>
+            ) : (
+              source
+            )}
+          </span>
+        )}
       </figcaption>
     )
   }

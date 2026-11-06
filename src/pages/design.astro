@@ -48,6 +48,7 @@ import Pill from '@/components/ui/Pill.astro';
 import Toast from '@/components/Toast.astro';
 import CookieConsent from '@/components/CookieConsent.tsx';
 import ProfileCard from '@/components/ProfileCard.astro';
+import { memberLinks } from '@/lib/team';
 import SponsorBand from '@/components/SponsorBand.astro';
 import TeamStatsWidget from '@/components/TeamStatsWidget.astro';
 import { getTeamWidgets } from '@/lib/pblidb';
@@ -608,10 +609,19 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
       </div>
 
       <div class="mb-5 grid gap-5 lg:grid-cols-3">
-        <Specimen title="ProfileCard" file="src/components/ProfileCard.astro" note="A short bio with a role, optional photo and social links. Use it for the people who run the team (the team collection).">
+        <Specimen title="ProfileCard" file="src/components/ProfileCard.astro" note="A short bio with a role, optional photo and contact links. Use it for the people who run the team (the team collection), with memberLinks for the links. Every link is optional; these are samples.">
           {
             sampleMember && (
-              <ProfileCard name={sampleMember.data.name} role={sampleMember.data.role} as="h3">
+              <ProfileCard
+                name={sampleMember.data.name}
+                role={sampleMember.data.role}
+                links={memberLinks({
+                  name: sampleMember.data.name,
+                  email: 'name@example.com',
+                  socials: { instagram: '#', facebook: '#', tiktok: '#', youtube: '#', website: '#' },
+                })}
+                as="h3"
+              >
                 The bio goes in the default slot.
               </ProfileCard>
             )
@@ -697,6 +707,9 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
       <div class="grid gap-5 lg:grid-cols-2">
         <Specimen title="Callout" file="src/components/Callout.astro" note="A pull quote with optional cite.">
           <Callout cite="Every player on the roster">Paintball builds better people.</Callout>
+        </Specimen>
+        <Specimen title="Callout: attributed quote" file="src/components/Callout.astro" note="The CMS Quote block: mark adds the large quote mark, source says where or when, and href links it to the original. Use it for what someone actually said, with their OK. The text here is a sample.">
+          <Callout mark cite="Who said it" source="Where or when" href="#">Paintball builds better people.</Callout>
         </Specimen>
         <Specimen title="MascotCallout: empty state" file="src/components/MascotCallout.astro" note="The honest empty state. Use it instead of an empty grid. Slot takes action Buttons.">
           <MascotCallout as="h4" title="No photos up yet" body="Somebody always forgets to bring a camera.">

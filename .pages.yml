@@ -48,13 +48,20 @@ content:
         description: >-
           Describe the photo for screen readers and image search. Required
           even before there's a photo; the person's name is fine until then.
+      - name: email
+        label: Contact email
+        type: string
+        pattern: { regex: '^[^@\s]+@[^@\s]+\.[^@\s]+$' }
+        description: Public. Anyone can see this on the site, so use an address that's fine to share.
       - name: socials
         label: Socials
         type: object
         fields:
           - { name: instagram, label: Instagram URL, type: string, pattern: { regex: '^https?://.+' } }
+          - { name: facebook, label: Facebook URL, type: string, pattern: { regex: '^https?://.+' } }
           - { name: tiktok, label: TikTok URL, type: string, pattern: { regex: '^https?://.+' } }
           - { name: youtube, label: YouTube URL, type: string, pattern: { regex: '^https?://.+' } }
+          - { name: website, label: Website URL, type: string, pattern: { regex: '^https?://.+' } }
       - { name: order, label: Sort order, type: number, default: 100, description: Lower sorts first. }
       - { name: body, label: Bio, type: rich-text }
 
@@ -536,6 +543,16 @@ content:
               - { name: eyebrow, label: Kicker, type: string }
               - { name: title, label: Heading, type: string }
               - { name: body, label: Text, type: text }
+          - name: quote
+            label: Quote
+            fields:
+              - *tone
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string }
+              - { name: quote, label: Quote, type: text, required: true, description: Their exact words. Get their OK before quoting someone by name. }
+              - { name: cite, label: Who said it, type: string, required: true }
+              - { name: source, label: Where or when, type: string, description: 'e.g. "NXL World Cup, 2024"' }
+              - { name: sourceUrl, label: Link to the original, type: string, pattern: { regex: '^https?://.+' }, description: 'Turns "Where or when" into a link, so fill that in too.' }
           - name: faq
             label: FAQs
             fields:

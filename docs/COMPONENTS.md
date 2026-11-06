@@ -73,7 +73,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **ThreeColumn** (`ThreeColumn.astro`): Icon + title + body benefits row (3 items, stacks on phones).
   - Options: items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section) · iconStyle: tile|circle (gold ring, favicon badge) · as
 - **BlockRenderer** (`BlockRenderer.astro`): Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.
-  - Options: hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, faq
+  - Options: hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, quote, faq
   - Data: landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.
   - Avoid: Pages that need logic or computed data; hand-write those.
   - Pairs with: Hero, ImpactBand, TwoColumn
@@ -86,8 +86,9 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **Pill** (`ui/Pill.astro`): Status badge: Open Slot, Pre-Order, Sold Out, Active, Next Up.
   - Options: tone: outline|gold|crimson|forest|muted · size: md|sm
   - Avoid: As a button or link.
-- **Callout** (`Callout.astro`): Pull quote / emphasis inside a Section (slot = quote).
-  - Options: cite
+- **Callout** (`Callout.astro`): Pull quote / emphasis inside a Section (slot = quote). Also the CMS quote block.
+  - Options: cite · source (where or when; needs cite) · href (links source) · mark (large quote mark)
+  - Avoid: Quoting a real person without their OK.
 - **FaqAccordion** (`FaqAccordion.astro`): FAQ list, native <details>, zero JS.
   - Options: items[{question, answer}]
   - Data: faqs collection (sort by order)

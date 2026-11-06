@@ -20,6 +20,10 @@ separate deploy step — hitting Save is publishing.
 by event. They aren't shown on the site yet; they'll appear on the planned About
 page. **Add an entry** with a **Name** and **Role**. The **Bio** is free text.
 
+**Contact email** and everything under **Socials** (Instagram, Facebook, TikTok,
+YouTube, Website) are optional, and only the ones you fill in will show. Anything
+here is public, so use an email address that's fine to share.
+
 **Photo alt text** is required. Describe what's in the photo; until there's a
 photo, the person's name is fine. **Sort order** sets who comes first.
 
@@ -196,6 +200,7 @@ site handles the design, so a page always looks like the rest of the site.
 |---|---|
 | **Photo band** | A big action photo with bold copy. The strongest section |
 | **Big statement** | A few large lines of text, centred, with optional decorative rules |
+| **Quote** | Someone's exact words with their name, plus an optional line for where or when and a link to the original. Get their OK before quoting them by name |
 | **Divider** | A decorative rule between two sections on the same background |
 | **Photo gallery** | A slider of one of your Photo galleries |
 | **Photo and text** | A calm boxed section, with numbered steps if you need them |

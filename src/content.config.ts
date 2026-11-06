@@ -19,8 +19,10 @@ const imagePath = z.string().describe('Repo path, e.g. /src/assets/img/players/2
 const socials = z
   .object({
     instagram: z.url().optional(),
+    facebook: z.url().optional(),
     tiktok: z.url().optional(),
     youtube: z.url().optional(),
+    website: z.url().optional(),
     discord: z.string().optional(),
   })
   .prefault({});
@@ -46,6 +48,8 @@ const team = defineCollection({
     role: z.string().describe('e.g. "Organizer"'),
     photo: imagePath.optional(),
     photoAlt: z.string().optional(),
+    /** Public: it's shown on the site and sits in a public repo. */
+    email: z.email().optional(),
     socials,
     /** Lower sorts first. */
     order: z.number().default(100),
@@ -461,6 +465,19 @@ const landingBlock = z.discriminatedUnion('type', [
     eyebrow: optText,
     title: optText,
     body: optText,
+  }),
+  z.object({
+    type: z.literal('quote'),
+    tone: sectionTone,
+    eyebrow: optText,
+    title: optText,
+    quote: z.string(),
+    /** Who said it. */
+    cite: z.string(),
+    /** Where or when, e.g. the event or publication. */
+    source: optText,
+    /** Link to the original. */
+    sourceUrl: optText,
   }),
   z.object({
     type: z.literal('faq'),
