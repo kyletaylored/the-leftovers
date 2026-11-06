@@ -20,7 +20,7 @@ const settingsSchema = z.object({
   /** Homepage search-result title; falls back to "Title — Tagline". */
   homeTitle: z.string().optional(),
   description: z.string(),
-  established: z.number(),
+  established: z.number().nullish(),
   homeBase: z.string().default(''),
   nav: z.array(linkSchema).min(1),
   /** Extra links shown in the footer only, after `nav`. */

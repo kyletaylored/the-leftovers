@@ -753,7 +753,7 @@ content:
         type: text
         required: true
         description: 'Up to ~155 characters. Used by any page that has no description of its own.'
-      - { name: established, label: Established (year), type: number, required: true }
+      - { name: established, label: Established (year), type: number, description: Leave blank until the year is confirmed. It's hidden from the site while blank. }
       - { name: homeBase, label: Home base, type: string, required: true }
       - name: nav
         label: Navigation

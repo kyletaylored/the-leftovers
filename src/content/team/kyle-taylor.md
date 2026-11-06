@@ -2,9 +2,9 @@
 name: Kyle Taylor
 role: Organizer
 photoAlt: Kyle Taylor
-order: 1
+order: 2
 ---
 
-Founded the team out of a group chat and a half-serious "we should just enter
-one" in spring 2022, and is usually the one filling out the registration form
-at 11pm the night before.
+Found The Leftovers in 2026 while looking for a pickup team for a tournament.
+Loved the concept, and now builds this site and the systems behind it to help
+Matt standardize how the program runs.

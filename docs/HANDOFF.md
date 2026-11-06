@@ -1,7 +1,7 @@
 # Handoff: The Leftovers website
 
 **Start here** if you're picking this project up, whether you're a person or an
-agent. It covers what the site is, what state it's in (as of **5 Nov 2026**),
+agent. It covers what the site is, what state it's in (as of **6 Nov 2026**),
 how to work on it without breaking its rules, and what's left to do. Everything
 else in `docs/` goes deeper on one topic.
 
@@ -118,11 +118,12 @@ the other:
   (`icpl`, `infamous`, `kinetic`, `nxl-eu`, `nxl-us`) with no sponsor entries.
   The folder codes come from the photographers' filenames, not confirmed event
   names. Rename a folder if you know the real name, and fix any paths.
-- **Team members are placeholders in part.** Kyle's bio predates this list and
-  needs his review. Matt Engles has no bio or photo yet, and both roles are
-  a generic "Organizer".
-  Public sources credit Matt with creating the Leftovers free-agent program,
-  while Kyle's bio says Kyle founded the team in 2022. Settle that before `/about`.
+- **Team members need review.** Matt Engles created The Leftovers; Kyle Taylor
+  joined in 2026 and builds the site and its systems. Matt's bio is drawn from
+  public sources and needs Matt's OK. There are no photos yet, and Kyle's
+  "Organizer" role is still generic.
+- **The start year is unknown.** `established` is blank in `site.yml`, so the
+  footer, `llms.txt` and structured data leave it out. The old 2022 was wrong.
 - **Events are real.** All 10 NXL US events from 2025–26 were copied from
   PBLeagues on 5 Nov 2026: venues, squads and final places. Check before
   trusting:
@@ -313,8 +314,8 @@ inline-styled HTML into the repo.
    Confirm the gallery titles: they come from folder codes. Player photos are still missing. It unblocks player photos,
    galleries, the mockup-B manifesto band, the `Hero` video variant, and real
    carousel slides on `/design`.
-2. **Finish the team members.** Add Matt's bio and photo, real roles, and
-   review Kyle's bio.
+2. **Finish the team members.** Get Matt's OK on the bio, add photos and a real
+   role for Kyle, and fill in the year The Leftovers started.
 3. **Close or extend the jersey pre-order** (its close date has passed).
 4. **Mailing list:** `mailingList.formAction` in `site.yml` is empty. Pick
    Buttondown or Mailchimp and paste in the form action.
