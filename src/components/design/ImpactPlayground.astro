@@ -7,8 +7,13 @@
  * and CSS variables from the controls. That works because ImpactBand keeps a
  * fixed DOM and puts every option in CSS (see its doc comment), and the shift
  * maths is the same function the component uses (src/lib/impact.ts), so what
- * you see here is exactly what the component renders. The panel also prints
- * the matching <ImpactBand …> markup to copy.
+ * you see here is exactly what the component renders. It also prints the
+ * matching <ImpactBand …> markup to copy.
+ *
+ * From lg up the controls are a vertical toolbar on the left, short enough to
+ * see beside the band on a standard monitor, and every option is a dropdown to
+ * keep it that way. The toolbar collapses to a narrow rail for more room (the
+ * choice is remembered per browser); below lg it stacks above the band.
  *
  * Sample photos are real team shots chosen for where the subject sits
  * (centre, left, right, a wide group), which is what decides whether you need
@@ -32,8 +37,7 @@ const samples = [
 const photos = await Promise.all(
   samples.map(async (s) => {
     const img = await getImage({ src: s.src, widths: [640, 960, 1440, 1920, 2400], format: 'webp' });
-    const thumb = await getImage({ src: s.src, width: 160, format: 'webp' });
-    return { key: s.key, label: s.label, alt: s.alt, src: img.src, srcset: img.srcSet.attribute, thumb: thumb.src };
+    return { key: s.key, label: s.label, alt: s.alt, src: img.src, srcset: img.srcSet.attribute };
   })
 );
 
@@ -61,66 +65,69 @@ const presets = [
   { label: 'Full colour + panel', set: { photo: 'wide', align: 'left', tone: 'ink', treatment: 'fade', wash: 'none', backdrop: 'panel', shift: 0 } },
   { label: 'Tinted edge to edge', set: { photo: 'centred', align: 'right', tone: 'crimson', treatment: 'duotone', wash: 'none', backdrop: 'panel', shift: -8 } },
 ];
-const seg =
-  'cursor-pointer rounded-[2px] px-2.5 py-1.5 text-xs font-semibold text-bone-muted hover:text-bone has-[:checked]:bg-gold has-[:checked]:text-ink has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-gold';
+const labelText = 'mb-1 block font-mono text-[0.625rem] text-gold-300';
+const pick = 'field-input !min-h-9 cursor-pointer !px-2 !py-1.5 text-xs';
 ---
 
-<div class="impact-playground" data-playground data-photos={JSON.stringify(photos)} data-presets={JSON.stringify(presets)}>
-  <form class="pg-controls hidden border-b border-ink-600 p-5 sm:p-[22px]" aria-label="ImpactBand options" onsubmit="return false">
-    <fieldset class="mb-5">
-      <legend class="mb-2 text-[0.625rem] font-bold uppercase tracking-[0.16em] text-gold-300">Presets</legend>
-      <div class="flex flex-wrap gap-2">
-        {presets.map((p, i) => (
-          <button type="button" data-preset={i} class="min-h-9 cursor-pointer rounded-sm border border-ink-600 px-3 text-xs font-semibold text-bone hover:border-gold aria-pressed:border-gold aria-pressed:bg-gold/15" aria-pressed="false">
-            {p.label}
-          </button>
-        ))}
-      </div>
-    </fieldset>
+<div
+  class="impact-playground"
+  data-playground
+  data-photos={JSON.stringify(photos)}
+  data-presets={JSON.stringify(presets)}
+>
+  <form class="pg-controls hidden border-b border-ink-600 bg-ink-900 lg:border-b-0 lg:border-r" aria-label="ImpactBand options" onsubmit="return false">
+    <div class="pg-head flex items-center justify-between gap-2 border-b border-ink-600 p-1.5 pl-4">
+      <p class="pg-heading text-[0.625rem] font-bold uppercase tracking-[0.16em] text-gold-300">Controls</p>
+      <button type="button" class="pg-toggle tap grid size-11 shrink-0 cursor-pointer place-items-center text-gold-300 hover:text-bone" aria-expanded="true" aria-controls="pg-fields" aria-label="Hide controls">
+        <svg viewBox="0 0 24 24" class="pg-toggle-icon size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 6l-6 6 6 6" />
+        </svg>
+      </button>
+    </div>
 
-    <fieldset class="mb-5">
-      <legend class="mb-2 text-[0.625rem] font-bold uppercase tracking-[0.16em] text-gold-300">Sample photo</legend>
-      <div class="flex flex-wrap gap-3">
-        {photos.map((p, i) => (
-          <label class="group cursor-pointer text-center">
-            <input type="radio" name="photo" value={p.key} checked={i === 0} class="peer sr-only" />
-            <img src={p.thumb} alt="" width="96" height="64" class="h-16 w-24 rounded-sm object-cover opacity-60 ring-2 ring-transparent group-hover:opacity-100 peer-checked:opacity-100 peer-checked:ring-gold peer-focus-visible:ring-gold-300" />
-            <span class="mt-1 block text-[0.625rem] text-bone-muted peer-checked:text-bone">{p.label}</span>
+    <div id="pg-fields" class="space-y-4 p-4">
+      <label class="block">
+        <span class={labelText}>preset</span>
+        <select name="preset" class={pick}>
+          <option value="" disabled>Custom</option>
+          {presets.map((p, i) => <option value={i}>{p.label}</option>)}
+        </select>
+      </label>
+
+      <label class="block">
+        <span class={labelText}>sample photo</span>
+        <select name="photo" class={pick}>
+          {photos.map((p) => <option value={p.key}>{p.label}</option>)}
+        </select>
+      </label>
+
+      <div class="grid grid-cols-2 gap-3">
+        {choices.map((c) => (
+          <label class="block">
+            <span class={labelText}>{c.label}</span>
+            <select name={c.name} class={pick}>
+              {c.options.map((o) => <option value={o}>{o}</option>)}
+            </select>
           </label>
         ))}
       </div>
-    </fieldset>
 
-    <div class="grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
-      {choices.map((c) => (
-        <fieldset>
-          <legend class="mb-1.5 font-mono text-[0.625rem] text-gold-300">{c.label}</legend>
-          <div class="inline-flex flex-wrap gap-0.5 rounded-sm border border-ink-600 bg-ink-900 p-0.5">
-            {c.options.map((o, i) => (
-              <label class={seg}>
-                <input type="radio" name={c.name} value={o} checked={i === 0} class="sr-only" />
-                {o}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      ))}
       <label class="block">
-        <span class="mb-1.5 flex justify-between font-mono text-[0.625rem] text-gold-300">shift (desktop) <output name="shiftOut">0</output></span>
+        <span class:list={[labelText, 'flex justify-between']}>shift (desktop) <output name="shiftOut">0</output></span>
         <input type="range" name="shift" min="-30" max="30" step="1" value="0" class="w-full accent-gold" />
       </label>
       <label class="block">
-        <span class="mb-1.5 flex justify-between font-mono text-[0.625rem] text-gold-300">focus x · y <output name="focusOut">auto</output></span>
+        <span class:list={[labelText, 'flex justify-between']}>focus x · y <output name="focusOut">auto</output></span>
         <span class="flex gap-2">
           <input type="range" name="focusX" min="0" max="100" step="1" value="70" class="w-full accent-gold" aria-label="Focus x (%)" />
           <input type="range" name="focusY" min="0" max="100" step="1" value="35" class="w-full accent-gold" aria-label="Focus y (%)" />
         </span>
       </label>
       <fieldset>
-        <legend class="mb-1.5 font-mono text-[0.625rem] text-gold-300">content</legend>
-        <div class="flex flex-wrap gap-x-4 gap-y-1">
+        <legend class={labelText}>content</legend>
+        <div class="grid grid-cols-2 gap-x-3">
           {toggles.map((t) => (
-            <label class="inline-flex min-h-9 cursor-pointer items-center gap-1.5 text-xs text-bone">
+            <label class="inline-flex min-h-8 cursor-pointer items-center gap-1.5 text-xs text-bone">
               <input type="checkbox" name={t.name} checked={t.on} class="size-4 accent-gold" />
               {t.label}
             </label>
@@ -128,8 +135,22 @@ const seg =
         </div>
       </fieldset>
     </div>
+  </form>
 
-    <div class="mt-5">
+  <div class="min-w-0">
+    <ImpactBand
+      as="h3"
+      image={centred}
+      imageAlt={samples[0].alt}
+      eyebrow="Playground"
+      title={'Build your\nown band.'}
+      body="Change the options in the toolbar. Wash, backdrop and shift only change the desktop layout."
+      ghost="Leftovers"
+    >
+      <Button slot="actions" href="/join" variant="gold">Join a squad</Button>
+    </ImpactBand>
+
+    <div class="pg-output hidden border-t border-ink-600 p-4 sm:p-[22px]">
       <div class="mb-1.5 flex items-center justify-between">
         <span class="font-mono text-[0.625rem] text-gold-300">markup</span>
         <button type="button" class="pg-copy min-h-9 cursor-pointer rounded-sm border border-ink-600 px-3 text-xs font-semibold text-bone hover:border-gold">Copy</button>
@@ -137,20 +158,37 @@ const seg =
       <pre class="overflow-x-auto rounded-sm bg-ink-900 p-3 text-[0.6875rem] leading-relaxed text-bone"><code class="pg-code"></code></pre>
       <p class="pg-hint mt-2 text-[0.6875rem] text-bone-muted" aria-live="polite"></p>
     </div>
-  </form>
-
-  <ImpactBand
-    as="h3"
-    image={centred}
-    imageAlt={samples[0].alt}
-    eyebrow="Playground"
-    title={'Build your\nown band.'}
-    body="Switch the options above. Check at desktop width: wash, backdrop and shift only change the desktop layout."
-    ghost="Leftovers"
-  >
-    <Button slot="actions" href="/join" variant="gold">Join a squad</Button>
-  </ImpactBand>
+  </div>
 </div>
+
+<style>
+  /* Plain CSS, not Tailwind data-* variants: two of those on one property have
+     equal specificity, so the collapsed width could lose to the open one. */
+  @media (min-width: 1024px) {
+    .impact-playground[data-ready='true'] {
+      display: grid;
+      grid-template-columns: 19rem minmax(0, 1fr);
+    }
+    .impact-playground[data-collapsed='true'] {
+      grid-template-columns: 3.5rem minmax(0, 1fr);
+    }
+    [data-collapsed='true'] .pg-head {
+      justify-content: center;
+      padding-left: 0.375rem;
+    }
+  }
+  [data-collapsed='true'] .pg-toggle-icon {
+    transform: rotate(180deg);
+  }
+  @media (max-width: 1023.98px) {
+    .pg-toggle-icon {
+      transform: rotate(90deg);
+    }
+    [data-collapsed='true'] .pg-toggle-icon {
+      transform: rotate(-90deg);
+    }
+  }
+</style>
 
 <script>
   import { impactShiftVars } from '@/lib/impact';
@@ -160,6 +198,10 @@ const seg =
 
   for (const root of document.querySelectorAll<HTMLElement>('[data-playground]')) {
     const form = root.querySelector<HTMLFormElement>('.pg-controls')!;
+    const output = root.querySelector<HTMLElement>('.pg-output')!;
+    const fields = root.querySelector<HTMLElement>('#pg-fields')!;
+    const heading = root.querySelector<HTMLElement>('.pg-heading')!;
+    const toggle = root.querySelector<HTMLButtonElement>('.pg-toggle')!;
     const band = root.querySelector<HTMLElement>('section.impact')!;
     const img = band.querySelector<HTMLImageElement>('img.impact-photo')!;
     const code = root.querySelector<HTMLElement>('.pg-code')!;
@@ -173,16 +215,38 @@ const seg =
       ghost: band.querySelector<HTMLElement>('.impact-ghost'),
     };
     form.classList.remove('hidden');
+    output.classList.remove('hidden');
+    root.dataset.ready = 'true';
+
+    const COLLAPSED_KEY = 'impact-playground-collapsed';
+    const setCollapsed = (collapsed: boolean) => {
+      root.dataset.collapsed = String(collapsed);
+      fields.hidden = collapsed;
+      heading.hidden = collapsed;
+      toggle.setAttribute('aria-expanded', String(!collapsed));
+      toggle.setAttribute('aria-label', collapsed ? 'Show controls' : 'Hide controls');
+    };
+    try {
+      setCollapsed(localStorage.getItem(COLLAPSED_KEY) === 'true');
+    } catch {
+      setCollapsed(false);
+    }
+    toggle.addEventListener('click', () => {
+      const collapsed = root.dataset.collapsed !== 'true';
+      setCollapsed(collapsed);
+      try {
+        localStorage.setItem(COLLAPSED_KEY, String(collapsed));
+      } catch {
+        // Private mode: it just won't be remembered.
+      }
+    });
     img.loading = 'eager'; // swapping photos shouldn't wait on lazy-loading
     let focusTouched = false;
 
-    const val = (name: string) => (form.elements.namedItem(name) as RadioNodeList | HTMLInputElement).value;
+    const val = (name: string) => (form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement).value;
     const checked = (name: string) => (form.elements.namedItem(name) as HTMLInputElement).checked;
     const setVal = (name: string, v: string | number) => {
-      const el = form.elements.namedItem(name);
-      if (el instanceof RadioNodeList) {
-        for (const r of el) (r as HTMLInputElement).checked = (r as HTMLInputElement).value === String(v);
-      } else if (el instanceof HTMLInputElement) el.value = String(v);
+      (form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement).value = String(v);
     };
 
     function render() {
@@ -241,27 +305,22 @@ const seg =
           ? 'Body text over a full photo: use backdrop="panel" so it passes AA.'
           : '';
 
-      // Highlight a preset only while the options still match it.
-      root.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((b) => {
-        const p = presets[Number(b.dataset.preset)].set;
-        const match = Object.entries(p).every(([k, v]) => String((o as Record<string, unknown>)[k]) === String(v));
-        b.setAttribute('aria-pressed', String(match));
-      });
+      // Name a preset only while the options still match it.
+      const match = presets.findIndex((preset) =>
+        Object.entries(preset.set).every(([k, v]) => String((o as Record<string, unknown>)[k]) === String(v))
+      );
+      setVal('preset', match < 0 ? '' : match);
     }
 
     form.addEventListener('input', (e) => {
       const name = (e.target as HTMLInputElement).name;
       if (name === 'focusX' || name === 'focusY') focusTouched = true;
+      if (name === 'preset') {
+        for (const [k, v] of Object.entries(presets[Number(val('preset'))].set)) setVal(k, v);
+        focusTouched = false;
+      }
       render();
     });
-    root.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((b) =>
-      b.addEventListener('click', () => {
-        const p = presets[Number(b.dataset.preset)].set;
-        for (const [k, v] of Object.entries(p)) setVal(k, v);
-        focusTouched = false;
-        render();
-      })
-    );
     root.querySelector('.pg-copy')!.addEventListener('click', async (e) => {
       const btn = e.currentTarget as HTMLButtonElement;
       try {

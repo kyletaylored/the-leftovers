@@ -749,6 +749,9 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
 
     {/* ======================================================== MARKETING */}
     <DocSection id="marketing" number={num('marketing')} title="Marketing organisms" kicker="Feature rows, pricing, galleries, sliders, product grid">
+      {/* One column on purpose. Don't add col-span to a specimen in here: with
+          no grid-cols set, it creates a second column and squeezes every other
+          specimen into half the width. */}
       <div class="grid gap-5">
         <Specimen title="FeatureRow: alternating media/copy" file="src/components/marketing/FeatureRow.astro" note="Alternate reverse on every row so a stacked page never reads as a repeated template. Without an image it falls back to the topo texture; use ImagePlaceholder-labelled slots in mockups.">
           <div class="space-y-10">
@@ -916,7 +919,7 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
           </div>
         </Specimen>
 
-        <Specimen title="TeamStatsWidget" class="lg:col-span-2" file={['src/components/TeamStatsWidget.astro', 'src/lib/pblidb.ts']} note="A squad's record from pblidb.org, fetched at build time. Shown here with live data, so it's empty if pblidb is unreachable. Only squads with known results qualify. Not on a public page yet.">
+        <Specimen title="TeamStatsWidget" file={['src/components/TeamStatsWidget.astro', 'src/lib/pblidb.ts']} note="A squad's record from pblidb.org, fetched at build time. Shown here with live data, so it's empty if pblidb is unreachable. Only squads with known results qualify. Not on a public page yet.">
           {
             teamWidgets.length > 0 ? (
               <div class="grid gap-4 sm:grid-cols-3">
@@ -928,7 +931,7 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
           }
         </Specimen>
 
-        <Specimen title="SponsorBand: above the footer" class="overflow-hidden lg:col-span-2" flush file="src/components/SponsorBand.astro" note="The sponsors row on every page, rendered by BaseLayout. Logos wrap onto new lines as sponsors are added, title tier first. Don't add it to a page yourself.">
+        <Specimen title="SponsorBand: above the footer" class="overflow-hidden" flush file="src/components/SponsorBand.astro" note="The sponsors row on every page, rendered by BaseLayout. Logos wrap onto new lines as sponsors are added, title tier first. Don't add it to a page yourself.">
           <SponsorBand />
         </Specimen>
 
@@ -1017,7 +1020,7 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
             )
           }
         </Specimen>
-        <Specimen title="BlockRenderer: CMS page builder" class="overflow-hidden lg:col-span-2" flush file={['src/components/BlockRenderer.astro', 'src/content/landing/home.yml']} note="Renders a landing entry: a fixed hero, then the sections the team stacked in Pages CMS. Sections here are the home.yml draft's last two. See the full page at /preview/home. Use it for any page the team should be able to compose themselves; hand-write a page only when it needs logic blocks can't express.">
+        <Specimen title="BlockRenderer: CMS page builder" class="overflow-hidden" flush file={['src/components/BlockRenderer.astro', 'src/content/landing/home.yml']} note="Renders a landing entry: a fixed hero, then the sections the team stacked in Pages CMS. Sections here are the home.yml draft's last two. See the full page at /preview/home. Use it for any page the team should be able to compose themselves; hand-write a page only when it needs logic blocks can't express.">
           <BlockRenderer sections={blockSpecimen} />
         </Specimen>
       </div>
@@ -1115,17 +1118,17 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
     {/* ========================================================= CALENDAR */}
     <DocSection id="calendar" number={num('calendar')} title="Calendar" kicker="Month grid + compact agenda">
       <div class="grid items-start gap-5 lg:grid-cols-2">
-        <Specimen title="SeasonStrip" file="src/components/SeasonStrip.astro" note="A whole season on one line, each event in the month it starts. The default for the team's schedule: with about one event a month, a year view says more than a month grid. Links go to the matching EventCard.">
+        <Specimen title="SeasonStrip" class="lg:col-span-2" file="src/components/SeasonStrip.astro" note="A whole season on one line, each event in the month it starts. The default for the team's schedule: with about one event a month, a year view says more than a month grid. Links go to the matching EventCard.">
           <SeasonStrip events={allEvents} year={(next ?? sampleEvent)?.data.startDate.getUTCFullYear() ?? 2026} />
         </Specimen>
-        <Specimen title="ProcessSteps" file="src/components/ProcessSteps.astro" note={'Numbered how-it-works steps. layout="row" spans a full section; layout="stack" suits a side column. Steps come from eventProcess in site.yml.'}>
+        <Specimen title="ProcessSteps" class="lg:col-span-2" file="src/components/ProcessSteps.astro" note={'Numbered how-it-works steps. layout="row" spans a full section; layout="stack" suits a side column. Steps come from eventProcess in site.yml.'}>
           <ProcessSteps steps={site.eventProcess.steps} as="h4" />
           <div class="mt-8 max-w-md"><ProcessSteps steps={site.eventProcess.steps} layout="stack" as="h4" /></div>
         </Specimen>
-        <Specimen title="EventFees" file="src/components/EventFees.astro" note="The league's per-team fees as format × division × deadline. Copy only the divisions we enter, and never turn them into a per-player number here.">
+        <Specimen title="EventFees" class="lg:col-span-2" file="src/components/EventFees.astro" note="The league's per-team fees as format × division × deadline. Copy only the divisions we enter, and never turn them into a per-player number here.">
           {feeEvent ? <EventFees event={feeEvent} note={site.eventProcess.feeNote} /> : <p class="text-sm text-bone-muted">No event has fees yet.</p>}
         </Specimen>
-        <Specimen title="EventSquads" file="src/components/EventSquads.astro" note="Every squad at an event, grouped by division, with final places once results are in. columns={2} suits a wide panel; EventCard uses one column.">
+        <Specimen title="EventSquads" class="lg:col-span-2" file="src/components/EventSquads.astro" note="Every squad at an event, grouped by division, with final places once results are in. columns={2} suits a wide panel; EventCard uses one column.">
           {squadEvent && <EventSquads squads={squadEvent.data.squads} columns={2} />}
         </Specimen>
         <Specimen title="Month grid" tag="React island" file={['src/components/EventsCalendar.astro', 'src/components/Calendar.tsx']} note="Marked days are real #slug links to the matching EventCard, so it works with zero JS; only month navigation is the island. Opens on the next event's month, never a blank January. Not used on /events any more: prefer SeasonStrip unless a season gets busy.">
