@@ -120,7 +120,7 @@ the other:
   names. Rename a folder if you know the real name, and fix any paths.
 - **Team members need review.** Matt Engles created The Leftovers in 2022; Kyle
   Taylor joined in 2026 and builds the site and its systems. Matt's bio comes from
-  the Planet Paintball Podcast (Ep 104) and needs Matt's OK. There are no photos
+  the Planet Paintball Podcast (Ep 104) and needs Matt's OK. Kyle has no photo
   yet, and Kyle's "Organizer" role is still generic.
 - **Events are real.** All 10 NXL US events from 2025–26 were copied from
   PBLeagues on 5 Nov 2026: venues, squads and final places. Check before
@@ -312,7 +312,7 @@ inline-styled HTML into the repo.
    Confirm the gallery titles: they come from folder codes. Player photos are still missing. It unblocks player photos,
    galleries, the mockup-B manifesto band, the `Hero` video variant, and real
    carousel slides on `/design`.
-2. **Finish the team members.** Get Matt's OK on the bio, and add photos and a
+2. **Finish the team members.** Get Matt's OK on the bio, and add a photo and a
    real role for Kyle.
 3. **Close or extend the jersey pre-order** (its close date has passed).
 4. **Mailing list:** `mailingList.formAction` in `site.yml` is empty. Pick
@@ -327,7 +327,7 @@ inline-styled HTML into the repo.
 
 0. **Publish `/about`.** It's a hidden draft at `/preview/about`
    (`src/content/landing/about.yml`). Before publishing, get Matt's OK on the copy
-   and stats and Amber's OK on the quote, and add photos. Then delete
+   and stats and Amber's OK on the quote and photo, and add Kyle's photo. Then delete
    `src/pages/about.ts` and set the entry to `published`, or the build fails on
    the clash. The FAQs and `TeamStatsWidget` have no public page right now, so
    decide whether they belong there. pblidb is still backfilling, and most

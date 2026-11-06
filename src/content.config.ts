@@ -473,19 +473,26 @@ const landingBlock = z.discriminatedUnion('type', [
     eyebrow: optText,
     title: optText,
   }),
-  z.object({
-    type: z.literal('quote'),
-    tone: sectionTone,
-    eyebrow: optText,
-    title: optText,
-    quote: z.string(),
-    /** Who said it. */
-    cite: z.string(),
-    /** Where or when, e.g. the event or publication. */
-    source: optText,
-    /** Link to the original. */
-    sourceUrl: optText,
-  }),
+  z
+    .object({
+      type: z.literal('quote'),
+      tone: sectionTone,
+      eyebrow: optText,
+      title: optText,
+      quote: z.string(),
+      /** Who said it. */
+      cite: z.string(),
+      /** Where or when, e.g. the event or publication. */
+      source: optText,
+      /** Link to the original. */
+      sourceUrl: optText,
+      /** Optional. Without one the quote is centred. */
+      image: imagePath.nullish(),
+      imageAlt: optText,
+    })
+    .refine((quote) => !quote.image || quote.imageAlt, {
+      message: 'A quote with a photo needs alt text.',
+    }),
   z.object({
     type: z.literal('faq'),
     tone: sectionTone,

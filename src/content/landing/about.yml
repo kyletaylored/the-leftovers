@@ -24,6 +24,8 @@ sections:
     cite: Matt Engles
     source: Planet Paintball Podcast, Ep 104
     sourceUrl: https://open.spotify.com/episode/3Ag1mlyud2KpMB9fl8SM2T
+    image: /src/assets/img/players/matt-engles.webp
+    imageAlt: Matt Engles in a green cap and sunglasses, seen in profile.
   - type: impactBand
     image: /src/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp
     imageAlt: A Leftovers player in a mask and team jersey aims a paintball marker across a field.
@@ -47,6 +49,8 @@ sections:
     cite: Amber Wong
     source: Leftovers II, NXL World Cup 2024
     sourceUrl: https://www.facebook.com/amberwong.pb/posts/joining-the-leftovers-program-that-matt-engles-created-was-a-whole-experience-yo/10164404255734498/
+    image: /src/assets/img/players/amber-wong.webp
+    imageAlt: Amber Wong aims a marker around a green inflatable bunker, with a teammate crouched behind.
   - type: team
     tone: base
     eyebrow: Who runs it

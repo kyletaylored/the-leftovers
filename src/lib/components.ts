@@ -110,7 +110,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'Callout', file: 'Callout.astro', kind: 'Astro', group: 'content', section: 'blocks',
     use: 'Pull quote / emphasis inside a Section (slot = quote). Also the CMS quote block.',
-    options: 'cite · source (where or when; needs cite) · href (links source) · mark (large quote mark)',
+    options: 'cite · source (where or when; needs cite) · href (links source) · feature (large standalone quote: centred, or beside a portrait image+imageAlt)',
     avoid: 'Quoting a real person without their OK.',
   },
   {

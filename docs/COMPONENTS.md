@@ -87,7 +87,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Options: tone: outline|gold|crimson|forest|muted · size: md|sm
   - Avoid: As a button or link.
 - **Callout** (`Callout.astro`): Pull quote / emphasis inside a Section (slot = quote). Also the CMS quote block.
-  - Options: cite · source (where or when; needs cite) · href (links source) · mark (large quote mark)
+  - Options: cite · source (where or when; needs cite) · href (links source) · feature (large standalone quote: centred, or beside a portrait image+imageAlt)
   - Avoid: Quoting a real person without their OK.
 - **FaqAccordion** (`FaqAccordion.astro`): FAQ list, native <details>, zero JS.
   - Options: items[{question, answer}]

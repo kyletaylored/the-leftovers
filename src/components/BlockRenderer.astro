@@ -317,7 +317,7 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boole
       case 'quote':
         return (
           <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
-            <Callout mark cite={block.cite} source={block.source} href={block.sourceUrl} class="max-w-3xl">
+            <Callout feature cite={block.cite} source={block.source} href={block.sourceUrl} image={asset} imageAlt={block.imageAlt}>
               {block.quote}
             </Callout>
           </Section>

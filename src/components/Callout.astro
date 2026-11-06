@@ -3,9 +3,14 @@
  * Callout — pull-quote / emphasis block (§7), and the CMS `quote` block.
  *
  * `cite` says who, `source` says where or when, and `href` links `source` to the
- * original. `mark` adds a large decorative quote mark, hidden from screen
- * readers because the <blockquote> already announces itself.
+ * original.
+ *
+ * `feature` is the standalone version, with a large quote and a decorative quote
+ * mark (hidden from screen readers, as the <blockquote> already announces
+ * itself). With an `image` it sits beside the photo; without one it's centred.
+ * The grid keeps <figcaption> a direct last child of <figure>, as HTML requires.
  */
+import { Image } from 'astro:assets';
 import Icon from './brand/Icon.astro';
 
 interface Props {
@@ -14,25 +19,62 @@ interface Props {
   source?: string;
   /** Links `source` to the original. */
   href?: string;
-  mark?: boolean;
+  feature?: boolean;
+  /** Feature only. Use a portrait crop. */
+  image?: ImageMetadata;
+  imageAlt?: string;
   class?: string;
 }
-const { cite, source, href, mark = false, class: className = '' } = Astro.props;
+const { cite, source, href, feature = false, image, imageAlt = '', class: className = '' } = Astro.props;
+const photo = feature && image;
 ---
 
 <figure
   class:list={[
-    'border-l-4 border-gold bg-ink-800/70 px-6 py-6 sm:px-8',
+    !feature && 'border-l-4 border-gold bg-ink-800/70 px-6 py-6 sm:px-8',
+    feature && !photo && 'mx-auto max-w-4xl text-center',
+    photo && 'md:grid md:grid-cols-[2fr_3fr] md:grid-rows-[1fr_auto_auto_auto_1fr] md:gap-x-10 lg:gap-x-14',
     className,
   ]}
 >
-  {mark && <span aria-hidden="true" class="-mb-6 block font-display text-7xl leading-none text-gold">“</span>}
-  <blockquote class="text-lg leading-relaxed text-bone sm:text-xl">
+  {
+    photo && (
+      <Image
+        src={image}
+        alt={imageAlt}
+        widths={[320, 480, 640]}
+        sizes="(min-width: 768px) 40vw, 92vw"
+        loading="lazy"
+        decoding="async"
+        class="mb-6 aspect-[4/5] w-full rounded-sm border border-ink-600 object-cover md:col-start-1 md:row-span-5 md:row-start-1 md:mb-0"
+      />
+    )
+  }
+  {
+    feature && (
+      <span aria-hidden="true" class="-mb-6 block font-display text-7xl leading-none text-gold md:col-start-2 md:row-start-2 sm:text-8xl">
+        “
+      </span>
+    )
+  }
+  <blockquote
+    class:list={[
+      'text-bone',
+      feature
+        ? 'text-2xl font-semibold leading-snug sm:text-3xl md:col-start-2 md:row-start-3 lg:text-4xl'
+        : 'text-lg leading-relaxed sm:text-xl',
+    ]}
+  >
     <slot />
   </blockquote>
   {
     cite && (
-      <figcaption class="mt-4 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-gold-300">
+      <figcaption
+        class:list={[
+          'font-bold uppercase tracking-[0.2em] text-gold-300',
+          feature ? 'mt-5 text-xs md:col-start-2 md:row-start-4' : 'mt-4 text-[0.65rem]',
+        ]}
+      >
         {cite}
         {source && (
           <span class="mt-1 block text-xs font-normal normal-case tracking-normal text-bone-muted">

@@ -1,7 +1,8 @@
 ---
 name: Matt Engles
 role: Founder
-photoAlt: Matt Engles
+photo: /src/assets/img/players/matt-engles.webp
+photoAlt: Matt Engles in a green cap and sunglasses, seen in profile.
 order: 1
 ---
 

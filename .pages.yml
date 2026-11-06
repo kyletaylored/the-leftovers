@@ -559,6 +559,8 @@ content:
               - { name: cite, label: Who said it, type: string, required: true }
               - { name: source, label: Where or when, type: string, description: 'e.g. "NXL World Cup, 2024"' }
               - { name: sourceUrl, label: Link to the original, type: string, pattern: { regex: '^https?://.+' }, description: 'Turns "Where or when" into a link, so fill that in too.' }
+              - { name: image, label: Photo, type: image, options: { media: images }, description: Optional. A tall photo works best. Without one the quote is centred. }
+              - { name: imageAlt, label: Photo alt text, type: string, description: Required when a photo is set. }
           - name: faq
             label: FAQs
             fields:

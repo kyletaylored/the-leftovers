@@ -723,8 +723,11 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
         <Specimen title="Callout" file="src/components/Callout.astro" note="A pull quote with optional cite.">
           <Callout cite="Every player on the roster">Paintball builds better people.</Callout>
         </Specimen>
-        <Specimen title="Callout: attributed quote" file="src/components/Callout.astro" note="The CMS Quote block: mark adds the large quote mark, source says where or when, and href links it to the original. Use it for what someone actually said, with their OK. The text here is a sample.">
-          <Callout mark cite="Who said it" source="Where or when" href="#">Paintball builds better people.</Callout>
+        <Specimen title="Callout: feature quote" class="lg:col-span-2" file="src/components/Callout.astro" note="The CMS Quote block without a photo: large and centred, so it can stand as its own section. source says where or when, and href links it to the original. Use it for what someone actually said, with their OK. The text here is a sample.">
+          <Callout feature cite="Who said it" source="Where or when" href="#">Paintball builds better people.</Callout>
+        </Specimen>
+        <Specimen title="Callout: feature quote with a photo" class="lg:col-span-2" file="src/components/Callout.astro" note="The CMS Quote block with a photo beside the quote, stacking on phones. Use a portrait crop of the person quoted. The text here is a sample.">
+          <Callout feature cite="Who said it" source="Where or when" href="#" image={shooterImg} imageAlt="A sample photo.">Paintball builds better people.</Callout>
         </Specimen>
         <Specimen title="MascotCallout: empty state" file="src/components/MascotCallout.astro" note="The honest empty state. Use it instead of an empty grid. Slot takes action Buttons.">
           <MascotCallout as="h4" title="No photos up yet" body="Somebody always forgets to bring a camera.">
