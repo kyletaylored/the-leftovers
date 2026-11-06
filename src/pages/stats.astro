@@ -1,0 +1,10 @@
+---
+/**
+ * Hand-entered stats were removed (Nov 2026); the record lives on /events.
+ * An .astro page, not a .ts endpoint: an endpoint builds to a file with no
+ * extension, which GitHub Pages serves as a download instead of a web page.
+ */
+import { redirectHtml } from '@/lib/redirect-page';
+---
+
+<Fragment set:html={redirectHtml('/events', 'Events', Astro.site!.href)} />

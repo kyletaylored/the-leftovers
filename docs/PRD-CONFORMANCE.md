@@ -617,6 +617,9 @@ from earlier decisions here.
   `landing` entry at `/preview/about` rather than the hand-built page in §5, so
   the team can edit it in Pages CMS. `/about` still redirects home until it's
   published.
+- **Redirect stubs are `.astro` pages (6 Nov 2026).** `/about`, `/roster` and
+  `/stats` were `.ts` endpoints, which build to files with no extension. GitHub
+  Pages served those as downloads, so the redirects never ran.
 - **`/gallery` added (5 Nov 2026).** Not in §5's site map. A footer-only photo
   page, using a new `grid` indicator on `Slideshow` that loads photos as
   they're reached rather than all at once.

@@ -1,6 +1,6 @@
 # The About page. Hidden while it's a draft: it builds at /preview/about, with
 # no nav link, a noindex tag and no sitemap entry. To publish it, delete
-# src/pages/about.ts (the redirect to home) and set status to published.
+# src/pages/about.astro (the redirect to home) and set status to published.
 title: About
 status: draft
 hero:
