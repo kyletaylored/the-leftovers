@@ -63,6 +63,7 @@ content:
           - { name: youtube, label: YouTube URL, type: string, pattern: { regex: '^https?://.+' } }
           - { name: website, label: Website URL, type: string, pattern: { regex: '^https?://.+' } }
       - { name: order, label: Sort order, type: number, default: 100, description: Lower sorts first. }
+      - { name: hidden, label: Hide from site, type: boolean, default: false, description: Keeps this person's details here but leaves them off the site. }
       - { name: body, label: Bio, type: rich-text }
 
   # -- Events ---------------------------------------------------------------

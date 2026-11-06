@@ -25,7 +25,8 @@ YouTube, Website) are optional, and only the ones you fill in will show. Anythin
 here is public, so use an email address that's fine to share.
 
 **Photo alt text** is required. Describe what's in the photo; until there's a
-photo, the person's name is fine. **Sort order** sets who comes first.
+photo, the person's name is fine. **Sort order** sets who comes first. Turn on
+**Hide from site** to keep someone's details here without showing them.
 
 ---
 

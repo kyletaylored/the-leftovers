@@ -3,6 +3,7 @@ name: Kyle Taylor
 role: Organizer
 photoAlt: Kyle Taylor
 order: 2
+hidden: true
 ---
 
 Found The Leftovers in 2026 while looking for a pickup team for a tournament.

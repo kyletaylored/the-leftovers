@@ -64,7 +64,7 @@ const used = new Set(sections.map((block) => block.type));
 const galleries = used.has('gallery') ? await getCollection('galleries') : [];
 const members = used.has('team')
   ? await Promise.all(
-      (await getCollection('team'))
+      (await getCollection('team', ({ data }) => !data.hidden))
         .sort((a, b) => a.data.order - b.data.order)
         .map(async (entry) => ({
           data: entry.data,

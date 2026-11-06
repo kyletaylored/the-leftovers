@@ -18,6 +18,7 @@ sections:
       Matt Engles spent years as a free agent for hire, jumping onto squads around the country and getting to know players from all over. Some of Matt's best friends came from teams thrown together at the last minute.
 
       By 2022 Matt was the NXL's marketing and media director, and kept hearing the same thing from players: they couldn't make an event because they didn't have a squad. So Matt posted that a free-agent D5 X-ball team was forming. The players loved it, and the program has kept growing ever since.
+  - { type: divider, ornament: cloud, spacing: sm }
   - type: quote
     quote: I'll keep making teams as long as people keep wanting to play.
     cite: Matt Engles
@@ -34,6 +35,7 @@ sections:
     body: That first team was joking around in the group chat about feeling like leftover scraps, and the name stuck. It fits, too. These are the players who didn't get picked for dodgeball, banding together anyway. The takeout box came later, because Chinese food is always good again the next day.
     image: /src/assets/img/events/nxl-lsm25/satnxllsm25ls-1901-x5.webp
     imageAlt: A group of Leftovers teammates in mud-spotted black and red jerseys pose in two rows in front of a tent.
+  - { type: divider, ornament: cloud, spacing: sm }
   - type: impactBand
     image: /src/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp
     imageAlt: A Leftovers player in a mask and team jersey aims a paintball marker across a field.
@@ -48,7 +50,8 @@ sections:
   - type: team
     tone: base
     eyebrow: Who runs it
-    title: The people behind it
+    title: Behind the program
+  - { type: divider, ornament: cloud, spacing: sm }
   - type: quote
     quote: Would I say it's worth it? My experience says hell, yes.
     cite: Amber Wong

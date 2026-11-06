@@ -53,6 +53,8 @@ const team = defineCollection({
     socials,
     /** Lower sorts first. */
     order: z.number().default(100),
+    /** Keeps the entry, but leaves it off the site. */
+    hidden: z.boolean().default(false),
   }),
 });
 
