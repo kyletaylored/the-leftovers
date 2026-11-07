@@ -4,6 +4,7 @@
  * Single-column on mobile; the second column appears at `lg` (§10.1).
  */
 import { Image } from 'astro:assets';
+import { PHOTO_QUALITY } from '@/lib/layout';
 
 interface Props {
   title?: string;
@@ -45,6 +46,7 @@ const {
           alt={imageAlt}
           widths={[480, 720, 1080]}
           sizes="(min-width: 1024px) 560px, 92vw"
+          quality={PHOTO_QUALITY}
           loading="lazy"
           decoding="async"
           class="w-full rounded-sm border border-ink-600 object-cover"

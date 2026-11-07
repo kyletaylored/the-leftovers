@@ -2,10 +2,8 @@
 /**
  * BaseLayout — the single HTML shell every page renders inside.
  *
- * Head order is deliberate: preconnects and fonts first (fonts are the only
- * blocking external resource on the site), then metadata. Astro's font API
- * self-hosts the files, emits `font-display: swap`, and preloads only the
- * faces used above the fold — the launch requirement in §10.2.
+ * Head order is deliberate: preconnects and fonts first, then metadata.
+ * Astro's font API self-hosts the files and emits `font-display: swap`.
  */
 import { Font } from 'astro:assets';
 import '@/styles/global.css';
@@ -80,14 +78,14 @@ const organizationSchema = {
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <Font cssVariable="--font-headline" preload />
-    <Font cssVariable="--font-body" preload />
-    {/* Deliberately NOT preloaded. Be aware this helps less than it seems:
-        the nav wordmark is above the fold, so the browser still fetches this
-        face at VeryHigh priority while building first paint (measured in
-        Lighthouse's network log). Not preloading avoids adding a second
-        competing high-priority hint alongside the hero logo, but it does not
-        move the font off the critical path. See ATTRIBUTIONS.md. */}
+    {/* No font is preloaded, on purpose. A preload goes ahead of the stylesheet
+        and the hero logo, and on a phone connection that only delays them:
+        dropping the three that remained took homepage LCP from ~1.0s to ~0.7s
+        on throttled mobile. Everything is `font-display: swap` with
+        metric-matched fallbacks, so text paints at once and CLS stayed 0.
+        Measure before adding one back. */}
+    <Font cssVariable="--font-headline" />
+    <Font cssVariable="--font-body" />
     <Font cssVariable="--font-brush" />
 
     <Seo {...seo} schema={[organizationSchema, ...(seo.schema ?? [])]} />

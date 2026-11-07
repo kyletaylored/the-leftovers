@@ -62,7 +62,7 @@
  * The default slot takes other copy in place of a title (the CMS quote block
  * puts a Callout there), and `compact` makes the band shorter to suit it.
  */
-import { FULL_BLEED_SIZES } from '@/lib/layout';
+import { FULL_BLEED_SIZES, PHOTO_QUALITY } from '@/lib/layout';
 import { Image } from 'astro:assets';
 import { impactShiftVars, toStyle } from '@/lib/impact';
 
@@ -150,6 +150,7 @@ const vars = toStyle({ ...impactShiftVars(shift, align, wash), '--impact-focus':
       alt={imageAlt}
       widths={[640, 960, 1440, 1920, 2400]}
       sizes={FULL_BLEED_SIZES}
+      quality={PHOTO_QUALITY}
       loading={priority ? 'eager' : 'lazy'}
       fetchpriority={priority ? 'high' : undefined}
       decoding="async"

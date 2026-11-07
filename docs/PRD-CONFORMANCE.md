@@ -629,3 +629,13 @@ from earlier decisions here.
   don't scale to the number of squads per event. This site stays static, and
   §4's no-backend non-goals still hold for it. Discord, dropped in Oct 2026, is
   being reconsidered for squad chat and isn't decided.
+- **Fonts are no longer preloaded (6 Nov 2026).** The §10.2 note above says
+  "preloaded", which stopped being true here. Gasoek One came from Google as
+  ~90 Korean unicode-range slices, and every one was preloaded: 504KB of font
+  ahead of the hero logo, and a 5.0s mobile LCP in PageSpeed Insights. Gasoek
+  now ships as local Latin files from `@fontsource/gasoek-one`, and no face is
+  preloaded, because on throttled mobile even the remaining three delayed the
+  logo (LCP ~1.0s with them, ~0.7s without; CLS 0 either way). The stylesheet
+  also stays external despite the "render-blocking" warning: inlining it made
+  FCP faster but LCP slower (~1.2s), because the fonts and textures it names
+  are then discovered at once and compete with the logo.
