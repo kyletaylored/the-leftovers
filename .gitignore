@@ -22,3 +22,7 @@ storybook-static
 .worktrees/
 .mcp.json
 GEMINI.md
+
+# Player platform: a separate private repo, nested here so it can share the
+# design system. See "Player platform" in AGENTS.md.
+platform/

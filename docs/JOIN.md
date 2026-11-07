@@ -109,6 +109,12 @@ Add, remove, or edit handles there — no code change needed.
 
 ## A real admin interface (researched, not built)
 
+> **Superseded (6 Nov 2026).** This became the player platform, a separate app
+> rather than a tool on this site. See the Player platform section of
+> [`AGENTS.md`](../AGENTS.md). The notes below are kept for history. Until
+> the team moves to it, the form and Sheet described above stay in use. Don't add the
+> Private ID Tag to the form.
+
 The ask that prompted this doc: "on the backend we can build our own
 confirmation system on that same data... there is a name and a date for who
 approved payment and when." Shipped for now as the three manual Sheet
