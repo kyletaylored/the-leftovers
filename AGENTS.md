@@ -41,7 +41,8 @@ https://theleftoverspb.com. The repo is **public**.
 
 Don't break these without the owner explicitly deciding to:
 
-- **No backend, database, accounts or self-hosted checkout.** Dynamic needs go
+- **No backend, database, accounts or self-hosted checkout on this site.** (The
+  player platform is a separate app: see below.) Dynamic needs go
   to a free third party: forms go to Google Forms, the mailing list goes to its
   provider, and the store is an external link.
 - **Analytics is opt-in (EU / GDPR compliant).** Google Tag Manager (`site.gtmId`)
@@ -70,6 +71,24 @@ Don't break these without the owner explicitly deciding to:
   are `client:visible` and never above the fold.
 - **WCAG AA.** One `h1` per page (owned by `PageHeader`/`Hero`), touch targets
   of at least 44px, and visible focus rings.
+
+## Player platform
+
+Player accounts, squad placement, payments and rosters live in a separate private
+app at `app.theleftoverspb.com`. Locally it sits at `platform/`, its own
+git repo, ignored here so it can share this design system. Its design doc is
+`platform/docs/DESIGN.md`. This repo doesn't depend on it, and a clone without
+it builds normally.
+
+- This site stays static. The hard constraints above still apply here.
+- The app imports tokens, `src/lib/` data files and React components from this
+  repo. Astro components can't render in it.
+- New reusable React components come back here and follow the normal component
+  rules below. Only presentation comes back, because this repo is public: no
+  auth, business logic or player data.
+- Never collect a player's Private ID Tag (the 4-digit half of their APPA ID) in
+  the Google Form or anything in this repo. Google keeps form responses and
+  Sheet version history. Only the platform stores it, encrypted.
 
 ## Content vs code
 

@@ -355,13 +355,17 @@ inline-styled HTML into the repo.
      event is the obvious candidate, but not in the same view as the
      animated homepage hero. (`<Hero animate>`, drifting sand + swaying
      terraces, is live on the homepage since 5 Nov 2026.)
-6. **Admin view for join requests and payments.** Researched, not built. See
-   [JOIN.md](JOIN.md#a-real-admin-interface-researched-not-built).
+6. **Player platform.** Decided 6 Nov 2026: join requests, squad placement,
+   payments and rosters move to a separate private app, not this site. It's live
+   at `app.theleftoverspb.com` and being set up for the first 2027 event. See the Player platform
+   section of [`AGENTS.md`](../AGENTS.md).
 
 ### Don't do
 
-- Don't add a server, database, login or checkout. That would break the core
-  constraint. Use a third party instead.
+- Don't add a server, database, login or checkout to this site. That would break
+  the core constraint. Use a third party, or the separate player platform.
+- Don't add a player's Private ID Tag to the Google Form. Only the player
+  platform stores it, encrypted.
 - Don't add a tracking or cookie-setting script without gating it behind
   `CookieConsent` (EU / GDPR opt-in) and disclosing it on `/privacy`. The
   Facebook Page plugin stays off unless gated the same way.

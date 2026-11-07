@@ -623,3 +623,9 @@ from earlier decisions here.
 - **`/gallery` added (5 Nov 2026).** Not in §5's site map. A footer-only photo
   page, using a new `grid` indicator on `Slideshow` that loads photos as
   they're reached rather than all at once.
+- **Player platform decided (6 Nov 2026).** The owner lifted the no-accounts rule
+  for player management only. Requests, squad placement, payments and rosters
+  move to a separate private app, because the Google Form and hand-kept Sheet
+  don't scale to the number of squads per event. This site stays static, and
+  §4's no-backend non-goals still hold for it. Discord, dropped in Oct 2026, is
+  being reconsidered for squad chat and isn't decided.
