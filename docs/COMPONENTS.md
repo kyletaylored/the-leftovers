@@ -90,7 +90,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Options: cite · source (where or when; needs cite) · href (links source) · feature (large standalone quote in headline type) · align: center|inherit (inherit inside an ImpactBand)
   - Avoid: Quoting a real person without their OK.
 - **FaqAccordion** (`FaqAccordion.astro`): FAQ list, native <details>, zero JS.
-  - Options: items[{question, answer}]
+  - Options: items[{id?, question, answer}]: id makes an answer linkable, like /join#why-18
   - Data: faqs collection (sort by order)
 - **CtaStrip** (`CtaStrip.astro`): Full-width call-to-action band near the end of a page. Buttons in slot="actions".
   - Options: title · eyebrow · body · tone: crimson|forest · as

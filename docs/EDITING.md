@@ -212,7 +212,7 @@ site handles the design, so a page always looks like the rest of the site.
 | **Text** | Plain paragraphs. Leave a blank line between them |
 | **Call to action strip** | A full-width band asking people to do one thing |
 | **Newsletter signup** | The mailing-list form |
-| **FAQs** | The questions from the FAQs section |
+| **FAQs** | The questions from the FAQs section. They also show on the Join page |
 
 Two rules keep pages looking right:
 
