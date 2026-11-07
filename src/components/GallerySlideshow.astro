@@ -72,10 +72,12 @@ const resolved = await Promise.all(
         format: 'webp',
       });
 
+      // Keep all three at one quality. A size that matches the srcset then
+      // reuses its file; different qualities added 14MB of near-duplicates.
       // The grid shows many at once, so it gets its own small files.
-      const thumb = indicators === 'grid' ? await getImage({ src: asset, width: 320, format: 'webp' }) : undefined;
+      const thumb = indicators === 'grid' ? await getImage({ src: asset, width: 320, quality: PHOTO_QUALITY, format: 'webp' }) : undefined;
       // Only downloaded when someone magnifies in the lightbox.
-      const zoom = indicators === 'grid' ? await getImage({ src: asset, width: asset.width, format: 'webp' }) : undefined;
+      const zoom = indicators === 'grid' ? await getImage({ src: asset, width: asset.width, quality: PHOTO_QUALITY, format: 'webp' }) : undefined;
 
       const slide: Slide = {
         src: optimized.src,
