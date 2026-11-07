@@ -25,7 +25,7 @@
  * The logo is the LCP element on the homepage, so it is eager, high-priority,
  * and width/height-locked. Everything decorative around it is SVG/CSS.
  */
-import { FULL_BLEED_SIZES } from '@/lib/layout';
+import { FULL_BLEED_SIZES, PHOTO_QUALITY } from '@/lib/layout';
 import { Image } from 'astro:assets';
 import logo from '@/assets/img/brand/logo.png';
 import RuyiCloud from './brand/RuyiCloud.astro';
@@ -84,6 +84,7 @@ const actions = Astro.slots.has('actions') ? (await Astro.slots.render('actions'
           alt={imageAlt}
           widths={[640, 960, 1440, 1920]}
           sizes={FULL_BLEED_SIZES}
+          quality={PHOTO_QUALITY}
           loading="eager"
           fetchpriority="high"
           class="absolute inset-0 size-full object-cover opacity-40"
@@ -151,7 +152,7 @@ const actions = Astro.slots.has('actions') ? (await Astro.slots.render('actions'
           <Image
             src={logo}
             alt={`${site.title} logo`}
-            widths={[224, 288, 320, 448, 640]}
+            widths={[224, 288, 320, 400, 448, 640]}
             sizes="(min-width: 1024px) 320px, (min-width: 640px) 288px, 224px"
             quality={68}
             loading="eager"

@@ -25,7 +25,7 @@ attribution reachable, so it must stay.
 | Font | Use | Source / licence |
 |---|---|---|
 | **CC Monster Mash** (**Worn**) | The "THE LEFTOVERS" wordmark, matching the distressed lettering in the official logo art | Comic Book Fonts LLC — **commercial web licence purchased.** Source download kept in the (gitignored) `_reference/` folder |
-| **Gasoek One** | Headlines | Google Fonts, SIL Open Font License 1.1 |
+| **Gasoek One** | Headlines | Google Fonts (Latin files via `@fontsource/gasoek-one`), SIL Open Font License 1.1 |
 | **Inter** | Body and UI text | Google Fonts, SIL Open Font License 1.1 |
 
 ### CC Monster Mash — licence terms that affect the code
@@ -39,10 +39,9 @@ Read these before "optimising" the font. The licence is specific.
   the roughed-up edges of the logo lettering. The download also includes
   Regular, Outline, Color and Legacy files; none are used, so none are
   committed. `Worn` costs ~89KB against ~48KB for `Regular` — a knowing trade
-  for brand fidelity, worth ~0.3s of homepage LCP (2.1s against a 2.5s
-  budget). It is not preloaded, but measurement shows that doesn't make it
-  free: the nav wordmark is above the fold, so the browser fetches the face at
-  VeryHigh priority anyway.
+  for brand fidelity. It is not preloaded, and the nav wordmark being above
+  the fold means the browser still fetches it early, but it now finishes after
+  the hero logo and doesn't hold up LCP (measured Nov 2026).
 - **Do NOT subset, re-encode or convert it.** The licence forbids derivative
   works and reverse-engineering, and subsetting or transcoding the file is
   arguably both. This is why the font ships at its full ~48KB rather than

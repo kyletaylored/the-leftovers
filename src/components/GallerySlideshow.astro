@@ -21,6 +21,7 @@ import Slideshow, {
 } from './Slideshow.tsx';
 import MascotCallout from './MascotCallout.astro';
 import { resolveImage } from '@/lib/images';
+import { PHOTO_QUALITY } from '@/lib/layout';
 
 interface Props {
   galleries: CollectionEntry<'galleries'>[];
@@ -67,6 +68,7 @@ const resolved = await Promise.all(
         src: asset,
         // Full-bleed layouts need a desktop-width source; boxed ones don't.
         widths: layout === 'showcase' || layout === 'hero' ? [640, 960, 1440, 1920] : [480, 768, 1200],
+        quality: PHOTO_QUALITY,
         format: 'webp',
       });
 

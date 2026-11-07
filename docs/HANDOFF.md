@@ -336,6 +336,10 @@ inline-styled HTML into the repo.
 1. **Move hosting to Cloudflare Pages.** This turns on the CSP and security
    headers, real `_redirects` and preview deploys. Everything needed is
    committed; the steps are in [DEPLOY.md](DEPLOY.md#moving-to-cloudflare-pages).
+   Until then `_headers` does nothing, so `/_astro/*` gets Cloudflare's 4-hour
+   browser cache instead of the year it asks for. A Cloudflare Cache Rule fixes
+   that without moving: when the URI path starts with `/_astro/`, set Browser
+   TTL to 1 year. Those filenames are hashed, so it's safe.
 2. **Phase 2 (PRD §12): `/news` recap posts.** For now `/news` redirects to
    `/events`.
 3. **Phase 3: a CSV importer** that turns a PBLI results export into the

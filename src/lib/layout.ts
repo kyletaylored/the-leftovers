@@ -12,3 +12,10 @@ export const FRAME_MAX = 1600;
 
 /** `sizes` for a full-bleed image: the frame width, never wider. */
 export const FULL_BLEED_SIZES = `(min-width: ${FRAME_MAX}px) ${FRAME_MAX}px, 100vw`;
+
+/**
+ * WebP quality for large photos, a little under the encoder default (80).
+ * Don't go much lower: at 65 the red jersey lettering and artwork visibly
+ * smear, because WebP stores colour detail at half resolution.
+ */
+export const PHOTO_QUALITY = 75;

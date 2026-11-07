@@ -18,7 +18,7 @@
  * control: an editor adds/reorders `heroImages` and the loop picks it up on
  * the next build.
  */
-import { FULL_BLEED_SIZES } from '@/lib/layout';
+import { FULL_BLEED_SIZES, PHOTO_QUALITY } from '@/lib/layout';
 import { Image } from 'astro:assets';
 import RuyiCloud from './brand/RuyiCloud.astro';
 
@@ -69,6 +69,7 @@ const crossfadeCss = `
             alt={img.alt ?? ''}
             widths={[640, 960, 1440, 1920]}
             sizes={FULL_BLEED_SIZES}
+            quality={PHOTO_QUALITY}
             loading={i === 0 ? 'eager' : 'lazy'}
             decoding="async"
             class="hero-photo absolute inset-0 size-full object-cover"
