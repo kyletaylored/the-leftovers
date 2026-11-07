@@ -116,7 +116,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'FaqAccordion', file: 'FaqAccordion.astro', kind: 'Astro', group: 'content', section: 'blocks',
     use: 'FAQ list, native <details>, zero JS.',
-    options: 'items[{question, answer}]',
+    options: 'items[{id?, question, answer}]: id makes an answer linkable, like /join#why-18',
     data: 'faqs collection (sort by order)',
   },
   {

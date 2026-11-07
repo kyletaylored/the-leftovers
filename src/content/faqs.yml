@@ -41,3 +41,11 @@
     want. The event captain sorts requests into squads, confirms your spot and
     your fee, and registers the team once you've paid.
   order: 6
+- id: why-18
+  question: Why do I have to be 18 to make an account?
+  answer: >-
+    Your account holds your details and is where you agree to our terms and pay
+    your entry fee, so it needs to belong to an adult. Under 18? A parent or
+    guardian makes the account and adds you to it, and you don't need a login of
+    your own.
+  order: 7

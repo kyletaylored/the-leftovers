@@ -5,9 +5,13 @@
  * Deliberately zero JavaScript: the browser already gives us keyboard
  * operation, screen-reader semantics and open/close state for free, which is
  * more than a hand-rolled accordion island would, for 0 KB.
+ *
+ * Pass `id` on an item to make it linkable, like /join#why-18. The player
+ * platform links to one. The id sits on the answer, not the <details>, because
+ * browsers only open a closed <details> when the link target is inside it.
  */
 interface Props {
-  items: Array<{ question: string; answer: string }>;
+  items: Array<{ id?: string; question: string; answer: string }>;
   class?: string;
 }
 const { items, class: className = '' } = Astro.props;
@@ -26,7 +30,7 @@ const { items, class: className = '' } = Astro.props;
             aria-hidden="true">+</span
           >
         </summary>
-        <div class="px-5 pb-5 text-sm leading-relaxed text-bone-muted">{item.answer}</div>
+        <div id={item.id} class="scroll-mt-40 px-5 pb-5 text-sm leading-relaxed text-bone-muted">{item.answer}</div>
       </details>
     ))
   }
