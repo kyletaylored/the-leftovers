@@ -111,6 +111,31 @@ Signing up is optional, and you agree to a short notice when you do.
   each squad's money still adds up. If you have a spot in an upcoming event,
   withdraw from it first.
 
+## Deleting your data
+
+**To delete your Player Portal account and everything in it:**
+
+1. Log in at [app.theleftoverspb.com](https://app.theleftoverspb.com).
+2. Open **Profile**.
+3. Choose **Delete account**, type `DELETE`, and confirm.
+
+This removes your account, your player profiles, your ID Tags, your photos and
+any Google, Facebook or Discord sign-in connected to it, straight away. Payment
+records stay, without your name, so each squad's money still adds up. If you
+have a spot in an upcoming event, withdraw from it first.
+
+**Can't log in?** Email [info@theleftoverspb.com](mailto:info@theleftoverspb.com)
+from the address on your account, and we'll delete it within 30 days.
+
+**Signed in with Facebook?** Deleting your account as above removes everything
+we received from Facebook. To also stop Facebook sharing anything new with us,
+remove The Leftovers under **Apps and websites** in your Facebook settings. To
+keep your account but disconnect Facebook, choose **Disconnect** next to
+Facebook on your Profile.
+
+**Join requests and pre-orders** are deleted on request: see
+[Your rights](#your-rights-including-eea--uk-visitors) below.
+
 ## How we use and share information
 
 We only use the information you submit to:
