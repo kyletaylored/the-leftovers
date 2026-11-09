@@ -2,16 +2,17 @@
 title: Terms & Conditions
 eyebrow: Legal & Terms
 intro: >-
-  Plain-language ground rules for using theleftoverspb.com, requesting a spot
-  on a tournament squad, and participating in community jersey drops.
+  Plain-language ground rules for using theleftoverspb.com and the Player
+  Portal, requesting a spot on a tournament squad, and participating in
+  community jersey drops.
 seo:
   title: Terms & Conditions — The Leftovers Paintball
   description: >-
-    Terms of use for The Leftovers community paintball website, squad join
-    requests, and team gear pre-orders.
+    Terms of use for The Leftovers community paintball website, Player Portal,
+    squad join requests, and team gear pre-orders.
 ---
 
-**Last updated:** November 4, 2026
+**Last updated:** November 9, 2026
 
 ## Community-run group
 
@@ -35,6 +36,27 @@ organizer.
   as arranged directly with the squad organizer. Full payment for your share
   must be received by the stated event deadline for each event in order to be
   assigned to the active roster.
+
+## Player Portal accounts
+
+The Player Portal at `app.theleftoverspb.com` is where confirmed players
+manage their profile, event requests and payments.
+
+- **One account per person.** You can log in with an email link, or with
+  Google, Facebook or Discord. Keep your email and connected accounts secure,
+  because anyone who can use them can use your account.
+- **Accurate details.** Use your real name and your own APPA player ID. A
+  player ID can belong to only one profile. If yours is already taken, email us
+  rather than creating another.
+- **Under 18s.** Players under 18 don't get their own login. A parent or
+  guardian manages their profile, and agrees to these terms for them.
+- **Payments.** You pay your share off-site, using the methods shown for each
+  event, with your reference code, and an organizer confirms it. Deadlines and
+  refunds follow what's set out for each event.
+- **Conduct.** Don't misuse another person's details or try to access what
+  isn't yours. We may remove or block an account that does.
+- **Leaving.** You can delete your account from your Profile at any time. See
+  the [Privacy Policy](/privacy#player-portal) for what's kept.
 
 ## Jersey pre-orders and merchandise
 

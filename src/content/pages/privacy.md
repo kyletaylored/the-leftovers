@@ -3,16 +3,16 @@ title: Privacy Policy
 eyebrow: Legal & Privacy
 intro: >-
   The Leftovers is an informal, community-run paintball group — not a corporate
-  entity. Here is what little data this site touches, how analytics consent
-  works in the US and Europe, and how to reach us.
+  entity. Here is what this site and the Player Portal collect, who sees it, how
+  analytics consent works in the US and Europe, and how to reach us.
 seo:
   title: Privacy Policy — The Leftovers Paintball
   description: >-
     How The Leftovers community paintball group handles analytics cookies,
-    Google Forms submissions, and EU/US privacy rights.
+    Google Forms submissions, Player Portal accounts, and EU/US privacy rights.
 ---
 
-**Last updated:** November 4, 2026
+**Last updated:** November 9, 2026
 
 ## Who we are
 
@@ -20,6 +20,10 @@ seo:
 built around rotating free-agent tournament squads. We are not a registered
 corporation or commercial storefront; we run this website so players can find
 upcoming events, request to join a squad, and coordinate batch team jerseys.
+
+Players who join a squad use our **Player Portal** at
+`app.theleftoverspb.com` to manage their profile, event requests and payments.
+It's covered [below](#player-portal).
 
 For any privacy questions or data requests, email us directly at
 [info@theleftoverspb.com](mailto:info@theleftoverspb.com).
@@ -50,9 +54,13 @@ recorded. Datadog processes this data for us in the United States.
   using the **Cookie settings** link in the site footer (or the button below).
   Doing so stops Google Analytics and Datadog and clears their cookies.
 
+The Player Portal runs no analytics or advertising and sets no analytics
+cookies, so the cookie banner doesn't apply there. See
+[Player Portal](#player-portal).
+
 ## Join requests and jersey pre-orders
 
-This website has no backend database and no user accounts. When you submit a
+This website itself has no backend database and no user accounts. When you submit a
 [join request](/join) or a jersey pre-order:
 
 - **What you provide:** Your name, contact details (email, phone, optional
@@ -65,18 +73,82 @@ This website has no backend database and no user accounts. When you submit a
   bank details on this site. Any tournament entry share or jersey payment is
   arranged directly off-site after your spot or order is confirmed.
 
+## Player Portal
+
+The Player Portal (`app.theleftoverspb.com`) is a separate app with accounts.
+Signing up is optional, and you agree to a short notice when you do.
+
+- **What you provide:** your email address, which is how you log in, and a
+  player profile: name, country, phone, ranking, positions, and your APPA player
+  ID. That ID has a public player number and a private ID Tag. You can add a
+  photo (your own, or a copy of your PBLeagues photo if you ask for one) and
+  links to your social profiles. A birth year and month are asked for only for
+  a player under 18 or an event with an age limit.
+- **What the portal records:** the events and squads you request and play,
+  payments you tell us you've made and the ones organizers confirm (amounts,
+  method and a reference code, never card or bank numbers), the devices you turn
+  notifications on for, when you agreed to the sign-up notice, and a log of
+  changes made by organizers.
+- **Who sees it:** organizers see your profile and contact details for the
+  events they run. Squadmates see your name, photo, position and country. Your
+  player card stays private unless you make it public. Your private ID Tag is
+  shown only to an admin, or to your squad's captain while they add you to the
+  league roster, and each time it's shown is recorded.
+- **Who receives it:** the event league, for rosters. **Cloudflare** hosts the
+  portal and stores its data in the United States, and sends its emails.
+  **Google**, **Facebook** or **Discord** handle sign-in only if you choose
+  them, and you can disconnect them at any time from your Profile. If you turn
+  on notifications, they go through your device's push service (such as Apple,
+  Google or Mozilla).
+- **Cookies:** only the ones that keep you signed in. If something
+  breaks, the portal reports the error and which screen it was on to our own
+  server, never what you typed.
+- **Under 18s:** players under 18 don't get their own login. A parent or
+  guardian's account manages their profile.
+- **Your data, yourself:** your Profile lets you correct your details, download
+  everything we hold about you, and delete your account. Deleting removes your
+  profiles, ID Tags and photos. Payment records stay, without your name, so
+  each squad's money still adds up. If you have a spot in an upcoming event,
+  withdraw from it first.
+
+## Deleting your data
+
+**To delete your Player Portal account and everything in it:**
+
+1. Log in at [app.theleftoverspb.com](https://app.theleftoverspb.com).
+2. Open **Profile**.
+3. Choose **Delete account**, type `DELETE`, and confirm.
+
+This removes your account, your player profiles, your ID Tags, your photos and
+any Google, Facebook or Discord sign-in connected to it, straight away. Payment
+records stay, without your name, so each squad's money still adds up. If you
+have a spot in an upcoming event, withdraw from it first.
+
+**Can't log in?** Email [info@theleftoverspb.com](mailto:info@theleftoverspb.com)
+from the address on your account, and we'll delete it within 30 days.
+
+**Signed in with Facebook?** Deleting your account as above removes everything
+we received from Facebook. To also stop Facebook sharing anything new with us,
+remove The Leftovers under **Apps and websites** in your Facebook settings. To
+keep your account but disconnect Facebook, choose **Disconnect** next to
+Facebook on your Profile.
+
+**Join requests and pre-orders** are deleted on request: see
+[Your rights](#your-rights-including-eea--uk-visitors) below.
+
 ## How we use and share information
 
 We only use the information you submit to:
 
 1. Coordinate tournament rosters and contact you about events you asked to play.
-2. Fulfil custom team jersey drops with our gear partners.
-3. Reply to messages you send us.
+2. Keep track of who has paid their share of each squad's entry.
+3. Fulfil custom team jersey drops with our gear partners.
+4. Reply to messages you send us.
 
 We **never** sell, rent, or trade your personal information. Where needed to
 register a tournament roster or print a custom jersey, basic details (such as
-player name/classification or jersey size/name/number) are shared only with the
-event league (such as the NXL or ICPL) or our jersey manufacturer.
+player name, classification, player ID, or jersey size/name/number) are shared
+only with the event league (such as the NXL or ICPL) or our jersey manufacturer.
 
 ## Your rights (including EEA / UK visitors)
 
@@ -88,4 +160,7 @@ honour rights under the EU/UK GDPR and applicable US state privacy laws:
 - **Access, correction, or deletion:** If you submitted a join request or
   pre-order form and want to see, update, or delete your entry from our Google
   Sheet, email [info@theleftoverspb.com](mailto:info@theleftoverspb.com) and we
-  will remove it promptly.
+  will remove it promptly. If you have a Player Portal account, you can download,
+  correct or delete your data yourself from your Profile, or email us.
+- **Where it's stored:** Player Portal data is stored in the United States. If
+  you're in the EEA or UK, your data is transferred there when you use it.
