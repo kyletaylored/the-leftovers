@@ -1,0 +1,192 @@
+---
+/**
+ * PostLayout — the page for one blog post, published (/blog/<slug>) or a
+ * draft preview (/preview/blog/<slug>). The post body arrives in the slot.
+ *
+ * Order: PageHeader (owns the h1; the category is the eyebrow, the summary
+ * the standfirst) → byline, a quiet "Updated" line, cover → Prose body →
+ * category and tag links (to their /blog archives), recap link, back to the
+ * blog → "More from the team" (LatestPosts, the current post left out).
+ *
+ * Site search files the post under "Blog posts" with category, tag and year
+ * filters and a date to sort by. "More from the team" is data-pagefind-ignore
+ * so other posts' titles don't make this one match.
+ *
+ * SEO: BlogPosting + BreadcrumbList JSON-LD, og:type article with
+ * article:published_time / modified_time / tag, and the cover cropped to a
+ * 1200×630 share card when the post has no social image of its own. A
+ * preview is always noindex and carries a visible "Draft" banner.
+ */
+import { Image, getImage } from 'astro:assets';
+import BaseLayout from './BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import Prose from '@/components/Prose.astro';
+import Button from '@/components/Button.astro';
+import Pill from '@/components/ui/Pill.astro';
+import PostMeta from '@/components/blog/PostMeta.astro';
+import LatestPosts from '@/components/blog/LatestPosts.astro';
+import { resolveImage } from '@/lib/images';
+import { dateRange, isoDate } from '@/lib/format';
+import { fullTitle } from '@/lib/events';
+import { categoryHref, eventOf, postHref, tagHref, type PostEntry, type PostSummary } from '@/lib/posts';
+import { BLOG_TYPE } from '@/lib/search';
+import { site } from '@/lib/settings';
+
+interface Props {
+  post: PostEntry;
+  summary: PostSummary;
+  /** A draft preview: noindex, a Draft banner, no "More posts". */
+  preview?: boolean;
+}
+
+const { post, summary, preview = false } = Astro.props;
+const { title, seo, tags } = post.data;
+const event = await eventOf(post);
+const canonical = new URL(postHref(post.id), Astro.site).href;
+
+// Share card: the post's own social image, else its cover, cropped to 1200×630.
+const shareAsset = (await resolveImage(seo.ogImage)) ?? summary.cover;
+const share = shareAsset
+  ? await getImage({ src: shareAsset, width: 1200, height: 630, fit: 'cover', format: 'jpg' })
+  : undefined;
+const ogImageAlt = seo.ogImage ? seo.ogImageAlt :summary.cover ? summary.coverAlt : undefined;
+const { updatedDate, publishDate, category } = summary;
+const updated = updatedDate && updatedDate.getTime() > publishDate.getTime() ? updatedDate : undefined;
+const thumb = summary.cover
+  ? await getImage({ src: summary.cover, width: 320, height: 180, fit: 'cover', format: 'webp' })
+  : undefined;
+const search = {
+  type: BLOG_TYPE,
+  filters: { category: category.label, tag: tags, year: String(publishDate.getUTCFullYear()) },
+  meta: { date: dateRange(publishDate), ...(thumb ? { thumb: thumb.src } : {}) },
+  sort: { date: isoDate(publishDate) },
+};
+
+const teamRef = { '@id': new URL('/#team', Astro.site).href };
+const schema = [
+  {
+    '@type': 'BlogPosting',
+    headline: title,
+    description: seo.description ?? summary.summary,
+    url: canonical,
+    mainEntityOfPage: canonical,
+    datePublished: isoDate(summary.publishDate),
+    dateModified: isoDate(summary.updatedDate ?? summary.publishDate),
+    ...(share ? { image: new URL(share.src, Astro.site).href } : {}),
+    author: summary.author ? { '@type': 'Person', name: summary.author.name } : teamRef,
+    publisher: teamRef,
+    ...(tags.length ? { keywords: tags.join(', ') } : {}),
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: new URL('/blog', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: title, item: canonical },
+    ],
+  },
+];
+---
+
+<BaseLayout
+  title={seo.title ?? title}
+  description={seo.description ?? summary.summary}
+  ogType="article"
+  ogImage={share?.src}
+  ogImageAlt={ogImageAlt}
+  ogImageWidth={share ? 1200 : undefined}
+  ogImageHeight={share ? 630 : undefined}
+  noindex={preview || seo.noindex}
+  schema={schema}
+  search={search}
+>
+  <Fragment slot="head">
+    <link rel="alternate" type="application/rss+xml" title={`${site.title} blog`} href="/blog/rss.xml" />
+    <meta property="article:published_time" content={isoDate(summary.publishDate)} />
+    {summary.updatedDate && <meta property="article:modified_time" content={isoDate(summary.updatedDate)} />}
+    {tags.map((tag) => <meta property="article:tag" content={tag} />)}
+  </Fragment>
+
+  {
+    preview && (
+      <p class="bg-gold px-4 py-2.5 text-center text-sm font-bold text-ink">
+        Draft preview. Only people with this link can see it, and search engines are told to skip it.
+      </p>
+    )
+  }
+
+  <PageHeader eyebrow={category.label} title={title} intro={summary.summary} />
+
+  <Section tone="base">
+    <article class="mx-auto max-w-3xl">
+      <div data-pagefind-ignore>
+        <PostMeta post={summary} showAuthor size="lg" />
+        {
+          updated && (
+            <p class="mt-1 text-xs text-bone-muted/80">
+              Updated <time datetime={isoDate(updated)}>{dateRange(updated)}</time>
+            </p>
+          )
+        }
+      </div>
+
+      {
+        summary.cover && (
+          <figure class="mt-6 overflow-hidden rounded-sm border border-ink-600 bg-ink-900">
+            <Image
+              src={summary.cover}
+              alt={summary.coverAlt}
+              widths={[640, 960, 1440]}
+              sizes="(min-width: 768px) 768px, 92vw"
+              loading="eager"
+              decoding="async"
+              class="aspect-[16/9] w-full object-cover"
+            />
+          </figure>
+        )
+      }
+
+      <Prose class="mt-10">
+        <slot />
+      </Prose>
+
+      <div class="mt-10 flex flex-wrap items-center gap-x-2 gap-y-1" data-pagefind-ignore>
+        <span class="eyebrow mr-1">Filed under</span>
+        <ul class="flex flex-wrap items-center gap-x-1" aria-label="Category and tags">
+          <li>
+            <a href={categoryHref(category.id)} class="tap inline-flex items-center rounded-full focus-visible:outline-2 focus-visible:outline-gold">
+              <Pill tone="gold" size="sm">{category.label}</Pill>
+            </a>
+          </li>
+          {tags.map((tag) => (
+            <li>
+              <a href={tagHref(tag)} class="tap group inline-flex items-center rounded-full focus-visible:outline-2 focus-visible:outline-gold">
+                <Pill tone="outline" size="sm" class="transition-colors group-hover:bg-gold group-hover:text-ink">{tag}</Pill>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="mt-8 flex flex-wrap gap-3">
+        {
+          event && (
+            <Button href={`/events#${event.id}`} variant="outline" size="sm">
+              {`See ${fullTitle(event)}`}
+            </Button>
+          )
+        }
+        <Button href="/blog" variant="ghost" size="sm">All posts</Button>
+      </div>
+    </article>
+  </Section>
+
+  {
+    !preview && (
+      <div data-pagefind-ignore>
+        <LatestPosts tone="alt" title="More from the team" exclude={post.id} />
+      </div>
+    )
+  }
+</BaseLayout>

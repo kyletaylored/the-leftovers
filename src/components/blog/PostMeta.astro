@@ -1,0 +1,48 @@
+---
+/**
+ * PostMeta — a post's byline row: date, reading time, and optionally the
+ * author. Shared by PostCard, PostTeaser and the post page so the order and
+ * wording never drift between them. An "Updated" date is deliberately not
+ * here: it only appears, quietly, on the post page itself (PostLayout).
+ *
+ * Dates are <time datetime> and formatted in UTC (lib/format.ts). The dots
+ * between items are aria-hidden, so a screen reader hears a clean list.
+ */
+import { dateRange, isoDate } from '@/lib/format';
+import type { PostSummary } from '@/lib/posts';
+
+interface Props {
+  post: Pick<PostSummary, 'publishDate' | 'readingMinutes' | 'author'>;
+  /** Show the author's name (and role, on `lg`). */
+  showAuthor?: boolean;
+  /** `lg` is the post page header; `sm` sits on cards. */
+  size?: 'sm' | 'lg';
+  class?: string;
+}
+
+const { post, showAuthor = false, size = 'sm', class: className = '' } = Astro.props;
+const { publishDate, readingMinutes, author } = post;
+---
+
+<p
+  class:list={[
+    'flex flex-wrap items-center gap-x-2 gap-y-1',
+    size === 'lg' ? 'text-sm text-bone-muted sm:text-base' : 'text-xs text-bone-muted',
+    className,
+  ]}
+>
+  {
+    showAuthor && author && (
+      <>
+        <span class="font-bold text-bone">
+          {author.name}
+          {size === 'lg' && <span class="font-normal text-bone-muted">, {author.role}</span>}
+        </span>
+        <span aria-hidden="true">·</span>
+      </>
+    )
+  }
+  <time datetime={isoDate(publishDate)}>{dateRange(publishDate)}</time>
+  <span aria-hidden="true">·</span>
+  <span>{readingMinutes} min read</span>
+</p>

@@ -81,6 +81,13 @@ import RadioGroup from '@/components/form/RadioGroup.astro';
 import CheckboxGroup from '@/components/form/CheckboxGroup.astro';
 import CountryCombobox from '@/components/form/CountryCombobox.tsx';
 import ChecklistDropdown from '@/components/form/ChecklistDropdown.tsx';
+import PostCard from '@/components/blog/PostCard.astro';
+import PostTeaser from '@/components/blog/PostTeaser.astro';
+import PostMeta from '@/components/blog/PostMeta.astro';
+import LatestPosts from '@/components/blog/LatestPosts.astro';
+import BlogFilters from '@/components/blog/BlogFilters.astro';
+import SiteSearch from '@/components/SiteSearch.tsx';
+import { latestPosts, type PostSummary } from '@/lib/posts';
 
 import { getEvents } from '@/lib/events';
 import { site } from '@/lib/settings';
@@ -170,6 +177,33 @@ const slides: Slide[] = await Promise.all(
   })
 );
 
+// Blog specimens use the real published posts once there are three; until
+// then, clearly labelled specimen posts on real event photos. Links point
+// back at this section, so nothing here leads to a page that doesn't exist.
+const realPosts = await latestPosts(3);
+const specimenPosts: PostSummary[] = [
+  {
+    id: 'specimen-1', href: '#blog', title: 'Specimen post: a featured recap',
+    summary: 'The summary field: one or two sentences, shown on cards and as the meta description.',
+    publishDate: new Date('2026-11-16'), updatedDate: new Date('2026-11-18'),
+    author: { name: 'Author Name', role: 'Role' }, category: { id: 'recap', label: 'Recap' },
+    tags: ['Bushball', 'Specimen'], cover: shooterImg, coverAlt: 'A Leftovers player aims a paintball marker across a field.',
+    readingMinutes: 4, featured: true,
+  },
+  {
+    id: 'specimen-2', href: '#blog', title: 'Specimen post: an announcement',
+    summary: 'A second specimen with a cover photo, for the grid card.',
+    publishDate: new Date('2026-10-02'), category: { id: 'news', label: 'News' }, tags: ['Specimen'], cover: sprintImg,
+    coverAlt: 'Three Leftovers players sprint out from behind a red inflatable bunker.', readingMinutes: 2, featured: false,
+  },
+  {
+    id: 'specimen-3', href: '#blog', title: 'Specimen post: no cover photo',
+    summary: 'Without a cover, the card falls back to the topo texture and the mascot.',
+    publishDate: new Date('2026-09-14'), category: { id: 'gear', label: 'Gear' }, tags: [], coverAlt: 'Specimen post: no cover photo', readingMinutes: 1, featured: false,
+  },
+];
+const blogSamples = realPosts.length >= 3 ? realPosts : specimenPosts;
+
 // ------------------------------------------------------------- catalog --
 
 const cloudVariants: CloudVariant[] = [1, 2, 3, 4, 5, 6];
@@ -209,6 +243,7 @@ const navGroups = [
       { id: 'marketing', label: 'Marketing' },
       { id: 'forms', label: 'Forms' },
       { id: 'calendar', label: 'Calendar' },
+      { id: 'blog', label: 'Blog' },
       { id: 'imagery', label: 'Imagery' },
     ],
   },
@@ -1172,6 +1207,39 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
         </Specimen>
         <Specimen title="Agenda list: compact" tag="NEW" file="src/components/AgendaList.astro" note="The lighter alternative when there are only 1–2 events. Flags next as Next Up; the TBD row keeps a short schedule from reading as 'season over'. linkToCards turns rows into #slug jumps.">
           <AgendaList events={upcoming} next={next} as="h4" />
+        </Specimen>
+      </div>
+    </DocSection>
+
+    {/* ============================================================= BLOG */}
+    <DocSection id="blog" number={num('blog')} title="Blog" kicker="Post cards, teasers, bylines, filters, site search" intro={realPosts.length >= 3 ? 'Rendered from the newest published posts.' : 'Rendered from labelled specimen data until three posts are published. The post page itself is src/layouts/PostLayout.astro; preview it with a draft at /preview/blog/<slug>.'}>
+      <div class="grid items-start gap-5 lg:grid-cols-2">
+        <Specimen title="PostCard: feature" class="lg:col-span-2" file="src/components/blog/PostCard.astro" note={'Leads /blog: the newest featured post, else the newest. Photo beside the copy from lg, the category as a badge on the photo, author in the byline. Once per page; pass eager when it is the first image.'}>
+          <PostCard post={blogSamples[0]} layout="feature" as="h4" />
+        </Specimen>
+        <Specimen title="PostCard: card" class="lg:col-span-2" file="src/components/blog/PostCard.astro" note="The grid card on /blog, its archives and LatestPosts. The whole card is one link (the title), with the focus ring on the card. The category badge sits on the photo so titles line up across a row; tags are only listed on the post page. No cover: topo texture and the mascot, never an empty box.">
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {blogSamples.map((post) => <PostCard post={post} as="h4" />)}
+          </div>
+        </Specimen>
+        <Specimen title="PostTeaser" file="src/components/blog/PostTeaser.astro" note={'Compact, photo-free row for short lists: "More posts", a landing-page list, a sidebar. Each one is an <li>, so wrap them in a <ul>. showSummary={false} for the tightest list.'}>
+          <ul class="grid gap-3">
+            <PostTeaser post={blogSamples[0]} as="h4" />
+            <PostTeaser post={blogSamples[1]} as="h4" showSummary={false} />
+          </ul>
+        </Specimen>
+        <Specimen title="PostMeta" file="src/components/blog/PostMeta.astro" note="The byline row: date, reading time (worked out from the body), and the author when showAuthor. size lg on the post page, sm on cards. No Updated date: PostLayout shows that on its own, quietly, under the byline.">
+          <PostMeta post={blogSamples[0]} showAuthor size="lg" />
+          <PostMeta post={blogSamples[1]} class="mt-4" />
+        </Specimen>
+        <Specimen title="LatestPosts" class="lg:col-span-2" flush file="src/components/blog/LatestPosts.astro" note={'A whole Section of the newest posts plus "All posts". Under an article (exclude the current post) or on a landing page (the CMS "Latest blog posts" block). Renders nothing until a post is published. layout="list" uses PostTeasers.'}>
+          <LatestPosts posts={blogSamples} tone="alt" layout="list" as="h3" />
+        </Specimen>
+        <Specimen title="BlogFilters" class="lg:col-span-2" file="src/components/blog/BlogFilters.astro" note={'The browse bar at the top of /blog and its archives: category chips (to /blog/category/<id>), the most-used tags (to /blog/tag/<slug>) and a search box (to /search, Blog posts). All links and a GET form, so no JS. Only categories and tags with posts appear; pass current on an archive. These chips link to the real archive pages, which exist once a post is in them.'}>
+          <BlogFilters posts={blogSamples} current={{ category: 'recap' }} />
+        </Specimen>
+        <Specimen title="SiteSearch" class="lg:col-span-2" file="src/components/SiteSearch.tsx" note={'React island: the /search page, on the Pagefind index the build writes. Type chips for every page; category, tag and year selects once Blog posts is picked, and with no words it lists posts newest first. State lives in the URL. This specimen runs on a small labelled demo index (demo prop), since there is no index under npm run dev. Try "practice", or pick Blog posts.'}>
+          <SiteSearch client:visible demo />
         </Specimen>
       </div>
     </DocSection>

@@ -1,7 +1,7 @@
 # Handoff: The Leftovers website
 
 **Start here** if you're picking this project up, whether you're a person or an
-agent. It covers what the site is, what state it's in (as of **7 Nov 2026**),
+agent. It covers what the site is, what state it's in (as of **10 Nov 2026**),
 how to work on it without breaking its rules, and what's left to do. Everything
 else in `docs/` goes deeper on one topic.
 
@@ -69,6 +69,9 @@ team deciding to:
 | `/events` | Next event with countdown and squads, how it works and fees, then each season's `SeasonStrip` and results | Unhidden 5 Nov 2026, in the nav and sitemap |
 | `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | **Hidden.** Products collection is empty on purpose |
 | `/preorder/[slug]` | One page per jersey drop, with an on-site order form | `PreorderForm` island → Google Form |
+| `/blog`, `/blog/[slug]`, `/preview/blog/[slug]` | Blog (the PRD's `/news`): `BlogFilters`, lead `PostCard`, a grid of the rest, `PostLayout` per post, drafts at `/preview/blog`, RSS at `/blog/rss.xml` | Added 10 Nov 2026. **No posts yet**, so `/blog` shows a `MascotCallout` and is noindex. Not in the nav; `/news` redirects here |
+| `/blog/category/[id]`, `/blog/tag/[slug]` | Archives: one page per category (`src/lib/post-categories.ts`) or tag that has posts | Built only once a post exists. Tag pages are noindex |
+| `/search` | Site search (`SiteSearch` island on the Pagefind index `npm run build` writes to `dist/pagefind/`): type chips, blog category/tag/year filters | noindex. Search icon in the nav. Empty under `npm run dev`; use `npm run build && npm run preview` |
 | `/join` | "Request to play" form | `JoinRequestForm` island → Google Form ([JOIN.md](JOIN.md)) |
 | `/community` | Social links, optional Instagram/Facebook embeds, newsletter | **Hidden.** No Discord right now (see below) |
 | `/contact` | Contact, with the partner logos (Infamous, Kinetic) | |
@@ -340,8 +343,12 @@ inline-styled HTML into the repo.
    browser cache instead of the year it asks for. A Cloudflare Cache Rule fixes
    that without moving: when the URI path starts with `/_astro/`, set Browser
    TTL to 1 year. Those filenames are hashed, so it's safe.
-2. **Phase 2 (PRD §12): `/news` recap posts.** For now `/news` redirects to
-   `/events`.
+2. **Write the first blog post.** The blog is built (10 Nov 2026): the `posts`
+   collection, `/blog`, post pages, drafts at `/preview/blog/<slug>`, RSS, and
+   a "Latest blog posts" landing block ([EDITING.md](EDITING.md#writing-a-blog-post)).
+   Once a post is published, add Blog to `nav` in `site.yml`, and consider a
+   `LatestPosts` band on the homepage. Photos in a post body ship as one
+   optimised file without a `srcset`; add one if posts get photo-heavy.
 3. **Phase 3: a CSV importer** that turns a PBLI results export into the
    squad places on each `events` entry.
 4. **More texture on real pages.** The homepage `Hero` now uses `.bg-sand`.

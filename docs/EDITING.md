@@ -213,12 +213,58 @@ site handles the design, so a page always looks like the rest of the site.
 | **Call to action strip** | A full-width band asking people to do one thing |
 | **Newsletter signup** | The mailing-list form |
 | **FAQs** | The questions from the FAQs section. They also show on the Join page |
+| **Latest blog posts** | The newest blog posts, as photo cards or a compact list. Hidden until a post is published |
 
 Two rules keep pages looking right:
 
 - **Don't put two full-width photo sections in a row** (Photo band, Photo
   gallery). Put something calmer between them, like Photo and text.
 - **Every photo needs alt text** describing what's in it.
+
+---
+
+## Writing a blog post
+
+**Blog posts** are event recaps, announcements and team news. They live at
+`/blog`.
+
+1. Open **Blog posts** and click **Add an entry**. The **Title** sets the
+   post's address, so pick it carefully.
+2. Leave **Status** on **Draft**.
+3. Fill in the **Publish date** and a **Summary**: one or two sentences, under
+   200 characters. The summary shows on the post's card and in Google.
+4. Pick a **Category**: News, Recap, Gear or Training. It's the badge on the
+   post's card and a filter on the blog page. Then pick yourself as **Author**. For a recap, pick the **Event** too: the post
+   links to the event, and the event's card on the Events page gets a "Read the
+   recap" button.
+5. Add a **Cover photo** (landscape works best) and its **alt text**. Without a
+   photo the card shows the mascot, which is fine.
+6. Tags are optional. Add a couple of short ones, like "Bushball" or
+   "Fundraiser", and reuse the same ones so they stay tidy. Each tag gets its
+   own page listing its posts, linked from the bottom of the post. (Don't
+   repeat the category as a tag.)
+7. Write the post. You can add headings, lists, links and photos. Every photo
+   needs a description, for the same reason as alt text.
+8. Save, wait about two minutes, then open `/preview/blog/your-post-title` to
+   check it. Search engines can't see drafts, but anyone with the link can.
+9. When it looks right, set **Status** to **Published** and save. The post moves
+   to `/blog/your-post-title` and goes to the top of the blog.
+
+Tick **Feature at the top of the blog** to show a post in the large slot at the
+top of `/blog` even after newer posts arrive. Reading time is worked out for
+you.
+
+If you correct a post later, set **Updated date**. It shows in small print
+under the byline on the post itself, not on the cards.
+
+The blog page has a filter row: a chip for each category with posts, the most
+used tags, and a search box. Every page and post on the site can also be
+searched at `/search` (the magnifying glass in the navigation). Search picks up
+changes with each publish; hidden pages and drafts never appear in it.
+
+The blog page stays hidden from Google until the first post is published.
+It's not in the navigation yet: add **Blog** (`/blog`) under **Navigation** in
+**Site settings** when you're ready for people to find it.
 
 ---
 

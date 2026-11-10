@@ -1,0 +1,73 @@
+---
+/**
+ * LatestPosts — a Section of the newest blog posts with an "All posts"
+ * button: under an article, on a landing page (the CMS "Latest blog posts"
+ * block), or anywhere a page should point at recent news.
+ *
+ * Renders NOTHING when there are no posts to show, so it can sit on a page
+ * before the first post is published without leaving an empty band. Pass
+ * `posts` to render a given list (the /design specimen does); otherwise it
+ * loads the newest `count` published posts itself.
+ */
+import Section from '@/components/Section.astro';
+import Button from '@/components/Button.astro';
+import PostCard from './PostCard.astro';
+import PostTeaser from './PostTeaser.astro';
+import { latestPosts, type PostSummary } from '@/lib/posts';
+
+interface Props {
+  title?: string;
+  eyebrow?: string;
+  tone?: 'base' | 'alt' | 'topo' | 'sand' | 'seigaiha';
+  count?: number;
+  layout?: 'cards' | 'list';
+  /** A post id to leave out, e.g. the post being read. */
+  exclude?: string;
+  posts?: PostSummary[];
+  /** Hide the "All posts" button (on /blog itself). */
+  showAll?: boolean;
+  as?: 'h2' | 'h3';
+}
+
+const {
+  title = 'Latest from the team',
+  eyebrow,
+  tone = 'base',
+  count = 3,
+  layout = 'cards',
+  exclude,
+  posts: given,
+  showAll = true,
+  as = 'h2',
+} = Astro.props;
+
+const posts = (given ?? (await latestPosts(count, exclude))).slice(0, count);
+const cardHeading = as === 'h2' ? 'h3' : 'h4';
+---
+
+{
+  posts.length > 0 && (
+    <Section tone={tone} eyebrow={eyebrow} title={title} as={as}>
+      {layout === 'cards' ? (
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => (
+            <PostCard post={post} as={cardHeading} />
+          ))}
+        </div>
+      ) : (
+        <ul class="grid max-w-3xl gap-3">
+          {posts.map((post) => (
+            <PostTeaser post={post} as={cardHeading} />
+          ))}
+        </ul>
+      )}
+      {showAll && (
+        <div class="mt-8">
+          <Button href="/blog" variant="outline" size="sm">
+            All posts
+          </Button>
+        </div>
+      )}
+    </Section>
+  )
+}

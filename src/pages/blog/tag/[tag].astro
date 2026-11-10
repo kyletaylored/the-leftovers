@@ -1,0 +1,46 @@
+---
+/**
+ * /blog/tag/<slug>: every published post with one tag, newest first. One
+ * page per tag in use; tags that differ only in case or punctuation
+ * ("Bush ball", "bush-ball") share a page (tagSlug in post-categories.ts).
+ *
+ * Tag pages are thin and multiply quickly, so they are noindex (and so out
+ * of the sitemap and site search). They exist for visitors, not Google.
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import Button from '@/components/Button.astro';
+import PostCard from '@/components/blog/PostCard.astro';
+import BlogFilters from '@/components/blog/BlogFilters.astro';
+import { getPosts, summarize, tagSlug, tagsInUse, type PostSummary } from '@/lib/posts';
+import { site } from '@/lib/settings';
+
+export const getStaticPaths = (async () => {
+  const all = await Promise.all((await getPosts()).map((post) => summarize(post)));
+  return tagsInUse(all).map((tag) => ({ params: { tag: tag.slug }, props: { tag, all } }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  tag: { slug: string; label: string; count: number };
+  all: PostSummary[];
+}
+
+const { tag, all } = Astro.props;
+const posts = all.filter((p) => p.tags.some((t) => tagSlug(t) === tag.slug));
+---
+
+<BaseLayout title={`#${tag.label} | Blog`} description={`Posts tagged “${tag.label}” on the ${site.title} blog.`} noindex>
+  <PageHeader eyebrow="Tagged" title={`#${tag.label}`} />
+
+  <Section tone="base">
+    <BlogFilters posts={all} current={{ tag: tag.slug }} class="mb-8" />
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {posts.map((post, i) => <PostCard post={post} as="h2" eager={i === 0} />)}
+    </div>
+    <div class="mt-10">
+      <Button href="/blog" variant="ghost" size="sm">All posts</Button>
+    </div>
+  </Section>
+</BaseLayout>

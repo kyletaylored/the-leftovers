@@ -1,0 +1,33 @@
+---
+/**
+ * /search: site-wide search (SiteSearch island, Pagefind). Copy comes from
+ * src/content/pages/search.md. Always noindex: a search page has nothing of
+ * its own for Google, and it is left out of its own index.
+ *
+ * The island is the one above-the-fold island on the site (PRD-CONFORMANCE,
+ * Nov 2026): the search box is the whole page. It still hydrates
+ * client:visible, and its server-rendered form is a plain GET to this page,
+ * so the layout doesn't shift and submitting before hydration still works.
+ */
+import { getEntry } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import SiteSearch from '@/components/SiteSearch.tsx';
+
+const page = await getEntry('pages', 'search');
+if (!page) throw new Error('Missing content file: src/content/pages/search.md');
+---
+
+<BaseLayout
+  noindex
+  title={page.data.seo.title ?? page.data.title}
+  description={page.data.seo.description ?? page.data.intro}
+>
+  <PageHeader eyebrow={page.data.eyebrow} title={page.data.title} intro={page.data.intro} />
+  <Section tone="base">
+    <div class="mx-auto max-w-3xl">
+      <SiteSearch client:visible />
+    </div>
+  </Section>
+</BaseLayout>

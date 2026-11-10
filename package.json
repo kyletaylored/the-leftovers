@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "node scripts/components-doc.ts --check && astro check && astro build",
+    "build": "node scripts/components-doc.ts --check && astro check && astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro",
@@ -49,6 +49,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitest/browser-playwright": "latest",
     "@vitest/coverage-v8": "latest",
+    "pagefind": "^1.6.0",
     "playwright": "latest",
     "storybook": "^10.6.0",
     "typescript": "^6.0.3",

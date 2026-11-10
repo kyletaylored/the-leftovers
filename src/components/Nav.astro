@@ -5,7 +5,8 @@
  * Mobile: a hamburger panel behind ~30 lines of vanilla JS, not a nav
  * framework. The primary CTA stays OUTSIDE the collapsed menu so "Join the
  * Team" is always one tap away, which §10.1 calls for explicitly.
- * Desktop (lg+): the full inline link row.
+ * Desktop (lg+): the full inline link row. A search icon (→ /search) sits
+ * before the CTA at every width.
  */
 import { site } from '@/lib/settings';
 import Wordmark from './brand/Wordmark.astro';
@@ -55,10 +56,22 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWi
       }
     </ul>
 
+    <!-- Site search (/search): an icon link, so it costs no JS here -->
+    <a
+      href="/search"
+      aria-current={isCurrent('/search') ? 'page' : undefined}
+      class:list={[
+        'tap ml-auto inline-flex items-center justify-center rounded-sm transition-colors lg:ml-0',
+        isCurrent('/search') ? 'text-gold-300' : 'text-bone hover:text-gold-300',
+      ]}
+    >
+      <Icon name="search" class="size-5" label="Search" />
+    </a>
+
     <!-- Primary CTA: always visible, never behind the hamburger -->
     <a
       href={site.primaryCta.href}
-      class="tap ml-auto inline-flex items-center gap-2 rounded-sm bg-crimson px-3.5 py-2.5 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-bone transition-colors hover:bg-crimson-600 sm:px-5 sm:text-xs lg:ml-0"
+      class="tap inline-flex items-center gap-2 rounded-sm bg-crimson px-3.5 py-2.5 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-bone transition-colors hover:bg-crimson-600 sm:px-5 sm:text-xs lg:ml-0"
     >
       <span class="hidden sm:inline">{site.primaryCta.label}</span>
       <span class="sm:hidden">Join</span>

@@ -11,9 +11,11 @@
   # Google Tag Manager / Google Analytics origins are allowlisted for visitors
   # who opt in via CookieConsent, and so is Datadog RUM's intake (US1; change
   # the host if datadogRum.site changes region). worker-src blob: is Session
-  # Replay's compression worker. Any social-widget script added per §8.3 has
+  # Replay's compression worker.
+  # 'wasm-unsafe-eval' lets site search (Pagefind, /search) run its
+  # WebAssembly; it does not allow eval() of JavaScript. Any social-widget script added per §8.3 has
   # to be allowlisted here explicitly rather than silently loading.
-  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; font-src 'self'; frame-src https://discord.com https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://browser-intake-datadoghq.com https://sdk-configuration.browser-intake-datadoghq.com; worker-src blob:; form-action 'self' https://buttondown.com https://*.list-manage.com https://docs.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.googletagmanager.com; font-src 'self'; frame-src https://discord.com https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://browser-intake-datadoghq.com https://sdk-configuration.browser-intake-datadoghq.com; worker-src blob:; form-action 'self' https://buttondown.com https://*.list-manage.com https://docs.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'
 
 # /design (noindex doc page) frames ITSELF for its phone preview, so it may be
 # framed by the same origin, and may frame 'self'. "!" detaches the stricter
@@ -22,7 +24,7 @@
   ! X-Frame-Options
   ! Content-Security-Policy
   X-Frame-Options: SAMEORIGIN
-  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; font-src 'self'; frame-src 'self' https://discord.com https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://browser-intake-datadoghq.com https://sdk-configuration.browser-intake-datadoghq.com; worker-src blob:; form-action 'self' https://buttondown.com https://*.list-manage.com https://docs.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'self'
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: https://www.googletagmanager.com https://*.google-analytics.com; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.googletagmanager.com; font-src 'self'; frame-src 'self' https://discord.com https://www.googletagmanager.com; connect-src 'self' https://www.googletagmanager.com https://*.google-analytics.com https://*.analytics.google.com https://browser-intake-datadoghq.com https://sdk-configuration.browser-intake-datadoghq.com; worker-src blob:; form-action 'self' https://buttondown.com https://*.list-manage.com https://docs.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'self'
 
 # Fonts and hashed build assets are immutable — cache them hard.
 /_astro/*

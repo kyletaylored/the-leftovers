@@ -18,9 +18,11 @@
 /stats        /events      301
 /stats/*      /events      301
 
-# The PRD's phase-2 news section isn't built yet; point early links at events.
-/news         /events      302
-/news/*       /events      302
+# The PRD's phase-2 news section is built as /blog (Nov 2026). On GitHub
+# Pages the redirect is the src/pages/news.astro stub.
+/news         /blog        301
+/news/*       /blog        301
+/blog/        /blog        301
 
 # BCA-only "Pink Jersey Drop" renamed to the general "Leftovers Jersey"
 # pre-order (Sept 2026).
