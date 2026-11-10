@@ -2,30 +2,48 @@
 /**
  * Countdown — server half of the countdown island.
  *
- * Its whole job is to compute `initialRemaining` at build time and hand it to
- * the React island, so the island's first client render matches the server
- * HTML byte for byte. Without this, React throws a hydration mismatch
- * (#418) on every page with a countdown, because SSR happens at build time
- * and hydration happens whenever someone loads the page.
+ * Event dates and order deadlines are CALENDAR DAYS in the content
+ * ("startDate: 2026-11-11"), which Astro parses as midnight UTC. Counting to
+ * that instant was wrong for every visitor west of Greenwich: in Florida the
+ * clock hit zero at 7pm the evening before. So this passes the island the
+ * day itself (YYYY-MM-DD, read in UTC like every other date on the site,
+ * lib/format.ts), and the island counts to midnight of that day in the
+ * VISITOR'S time zone: the start of the day for an event, the end of it for
+ * a deadline (`endOfDay`), matching how preorders stay open through their
+ * closing day.
+ *
+ * It also computes `initialRemaining` at build time and hands it to the
+ * island, so the island's first client render matches the server HTML byte
+ * for byte. Without this, React throws a hydration mismatch (#418) on every
+ * page with a countdown, because SSR happens at build time and hydration
+ * happens whenever someone loads the page. The island corrects it to the
+ * visitor's clock and time zone on its first tick.
  *
  * `client:visible` rather than `client:load`: a countdown nobody has scrolled
  * to yet doesn't need React on the critical path.
  */
 import CountdownIsland from './CountdownIsland.tsx';
+import { isoDate } from '@/lib/format';
 
 interface Props {
-  /** The target instant. */
+  /** The day to count to: an event's startDate or a drop's closing date. */
   target: Date;
+  /** Count to the END of that day (a deadline that's open all day) rather than its start. */
+  endOfDay?: boolean;
   passedLabel?: string;
 }
 
-const { target, passedLabel } = Astro.props;
-const initialRemaining = Math.max(0, target.getTime() - Date.now());
+const { target, endOfDay = false, passedLabel } = Astro.props;
+const day = isoDate(target);
+// Build time has no visitor, so assume UTC here; the island fixes it on load.
+const buildTarget = Date.parse(`${day}T00:00:00Z`) + (endOfDay ? 86_400_000 : 0);
+const initialRemaining = Math.max(0, buildTarget - Date.now());
 ---
 
 <CountdownIsland
   client:visible
-  target={target.toISOString()}
+  day={day}
+  endOfDay={endOfDay}
   initialRemaining={initialRemaining}
   passedLabel={passedLabel}
 />
