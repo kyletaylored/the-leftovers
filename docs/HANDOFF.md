@@ -69,7 +69,9 @@ team deciding to:
 | `/events` | Next event with countdown and squads, how it works and fees, then each season's `SeasonStrip` and results | Unhidden 5 Nov 2026, in the nav and sitemap |
 | `/shop` | Pre-order drops + evergreen products (`ProductGrid`) | **Hidden.** Products collection is empty on purpose |
 | `/preorder/[slug]` | One page per jersey drop, with an on-site order form | `PreorderForm` island → Google Form |
-| `/blog`, `/blog/[slug]`, `/preview/blog/[slug]` | Blog (the PRD's `/news`): lead `PostCard`, a grid of the rest, `PostLayout` per post, drafts at `/preview/blog`, RSS at `/blog/rss.xml` | Added 10 Nov 2026. **No posts yet**, so `/blog` shows a `MascotCallout` and is noindex. Not in the nav; `/news` redirects here |
+| `/blog`, `/blog/[slug]`, `/preview/blog/[slug]` | Blog (the PRD's `/news`): `BlogFilters`, lead `PostCard`, a grid of the rest, `PostLayout` per post, drafts at `/preview/blog`, RSS at `/blog/rss.xml` | Added 10 Nov 2026. **No posts yet**, so `/blog` shows a `MascotCallout` and is noindex. Not in the nav; `/news` redirects here |
+| `/blog/category/[id]`, `/blog/tag/[slug]` | Archives: one page per category (`src/lib/post-categories.ts`) or tag that has posts | Built only once a post exists. Tag pages are noindex |
+| `/search` | Site search (`SiteSearch` island on the Pagefind index `npm run build` writes to `dist/pagefind/`): type chips, blog category/tag/year filters | noindex. Search icon in the nav. Empty under `npm run dev`; use `npm run build && npm run preview` |
 | `/join` | "Request to play" form | `JoinRequestForm` island → Google Form ([JOIN.md](JOIN.md)) |
 | `/community` | Social links, optional Instagram/Facebook embeds, newsletter | **Hidden.** No Discord right now (see below) |
 | `/contact` | Contact, with the partner logos (Infamous, Kinetic) | |

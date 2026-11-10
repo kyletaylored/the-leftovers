@@ -11,6 +11,9 @@
  * ---------------------------------------------------------------------- */
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { resolveImage } from './images';
+import { categoryById, tagSlug, POST_CATEGORIES as POST_CATEGORIES_ORDER, type PostCategory } from './post-categories';
+
+export { categoryById, categoryHref, tagHref, tagSlug, POST_CATEGORIES } from './post-categories';
 
 export type PostEntry = CollectionEntry<'posts'>;
 
@@ -23,6 +26,7 @@ export interface PostSummary {
   updatedDate?: Date;
   /** The author's name and role, from the `team` entry. */
   author?: { name: string; role: string };
+  category: Pick<PostCategory, 'id' | 'label'>;
   tags: string[];
   cover?: ImageMetadata;
   coverAlt: string;
@@ -86,7 +90,8 @@ export async function eventOf(post: PostEntry) {
 }
 
 export async function summarize(post: PostEntry, href = postHref(post.id)): Promise<PostSummary> {
-  const { title, summary, publishDate, updatedDate, tags, cover, coverAlt, featured } = post.data;
+  const { title, summary, publishDate, updatedDate, category, tags, cover, coverAlt, featured } = post.data;
+  const { id: categoryId, label } = categoryById(category);
   return {
     id: post.id,
     href,
@@ -95,6 +100,7 @@ export async function summarize(post: PostEntry, href = postHref(post.id)): Prom
     publishDate,
     updatedDate,
     author: await authorOf(post),
+    category: { id: categoryId, label },
     tags,
     cover: await resolveImage(cover ?? undefined),
     coverAlt,
@@ -117,4 +123,26 @@ export async function recapsByEvent(): Promise<Map<string, string>> {
 export async function latestPosts(count = 3, exclude?: string): Promise<PostSummary[]> {
   const posts = (await getPosts()).filter((p) => p.id !== exclude).slice(0, count);
   return Promise.all(posts.map((p) => summarize(p)));
+}
+
+/** Categories that have at least one post, in POST_CATEGORIES order, with counts. */
+export function categoriesInUse<T extends { category: { id: string } }>(posts: T[]) {
+  return POST_CATEGORIES_ORDER.map((c) => ({ ...c, count: posts.filter((p) => p.category.id === c.id).length })).filter(
+    (c) => c.count > 0
+  );
+}
+
+/** Every tag in use, by slug, keeping the first spelling seen; most-used first. */
+export function tagsInUse<T extends { tags: string[] }>(posts: T[]) {
+  const tags = new Map<string, { slug: string; label: string; count: number }>();
+  for (const post of posts) {
+    for (const label of new Set(post.tags)) {
+      const slug = tagSlug(label);
+      if (!slug) continue;
+      const tag = tags.get(slug) ?? { slug, label, count: 0 };
+      tag.count += 1;
+      tags.set(slug, tag);
+    }
+  }
+  return [...tags.values()].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 }

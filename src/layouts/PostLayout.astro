@@ -3,9 +3,14 @@
  * PostLayout — the page for one blog post, published (/blog/<slug>) or a
  * draft preview (/preview/blog/<slug>). The post body arrives in the slot.
  *
- * Order: PageHeader (owns the h1; the summary is the standfirst) → byline
- * and cover → Prose body → tags, recap link, back to the blog → "More from
- * the team" (LatestPosts, the current post left out).
+ * Order: PageHeader (owns the h1; the category is the eyebrow, the summary
+ * the standfirst) → byline, a quiet "Updated" line, cover → Prose body →
+ * category and tag links (to their /blog archives), recap link, back to the
+ * blog → "More from the team" (LatestPosts, the current post left out).
+ *
+ * Site search files the post under "Blog posts" with category, tag and year
+ * filters and a date to sort by. "More from the team" is data-pagefind-ignore
+ * so other posts' titles don't make this one match.
  *
  * SEO: BlogPosting + BreadcrumbList JSON-LD, og:type article with
  * article:published_time / modified_time / tag, and the cover cropped to a
@@ -22,9 +27,10 @@ import Pill from '@/components/ui/Pill.astro';
 import PostMeta from '@/components/blog/PostMeta.astro';
 import LatestPosts from '@/components/blog/LatestPosts.astro';
 import { resolveImage } from '@/lib/images';
-import { isoDate } from '@/lib/format';
+import { dateRange, isoDate } from '@/lib/format';
 import { fullTitle } from '@/lib/events';
-import { eventOf, postHref, type PostEntry, type PostSummary } from '@/lib/posts';
+import { categoryHref, eventOf, postHref, tagHref, type PostEntry, type PostSummary } from '@/lib/posts';
+import { BLOG_TYPE } from '@/lib/search';
 import { site } from '@/lib/settings';
 
 interface Props {
@@ -44,7 +50,18 @@ const shareAsset = (await resolveImage(seo.ogImage)) ?? summary.cover;
 const share = shareAsset
   ? await getImage({ src: shareAsset, width: 1200, height: 630, fit: 'cover', format: 'jpg' })
   : undefined;
-const ogImageAlt = seo.ogImage ? seo.ogImageAlt : summary.cover ? summary.coverAlt : undefined;
+const ogImageAlt = seo.ogImage ? seo.ogImageAlt :summary.cover ? summary.coverAlt : undefined;
+const { updatedDate, publishDate, category } = summary;
+const updated = updatedDate && updatedDate.getTime() > publishDate.getTime() ? updatedDate : undefined;
+const thumb = summary.cover
+  ? await getImage({ src: summary.cover, width: 320, height: 180, fit: 'cover', format: 'webp' })
+  : undefined;
+const search = {
+  type: BLOG_TYPE,
+  filters: { category: category.label, tag: tags, year: String(publishDate.getUTCFullYear()) },
+  meta: { date: dateRange(publishDate), ...(thumb ? { thumb: thumb.src } : {}) },
+  sort: { date: isoDate(publishDate) },
+};
 
 const teamRef = { '@id': new URL('/#team', Astro.site).href };
 const schema = [
@@ -82,6 +99,7 @@ const schema = [
   ogImageHeight={share ? 630 : undefined}
   noindex={preview || seo.noindex}
   schema={schema}
+  search={search}
 >
   <Fragment slot="head">
     <link rel="alternate" type="application/rss+xml" title={`${site.title} blog`} href="/blog/rss.xml" />
@@ -98,11 +116,20 @@ const schema = [
     )
   }
 
-  <PageHeader eyebrow={tags[0] ?? 'Blog'} title={title} intro={summary.summary} />
+  <PageHeader eyebrow={category.label} title={title} intro={summary.summary} />
 
   <Section tone="base">
     <article class="mx-auto max-w-3xl">
-      <PostMeta post={summary} showAuthor size="lg" />
+      <div data-pagefind-ignore>
+        <PostMeta post={summary} showAuthor size="lg" />
+        {
+          updated && (
+            <p class="mt-1 text-xs text-bone-muted/80">
+              Updated <time datetime={isoDate(updated)}>{dateRange(updated)}</time>
+            </p>
+          )
+        }
+      </div>
 
       {
         summary.cover && (
@@ -124,17 +151,23 @@ const schema = [
         <slot />
       </Prose>
 
-      {
-        tags.length > 0 && (
-          <ul class="mt-10 flex flex-wrap gap-2" aria-label="Tags">
-            {tags.map((tag) => (
-              <li>
-                <Pill tone="outline" size="sm">{tag}</Pill>
-              </li>
-            ))}
-          </ul>
-        )
-      }
+      <div class="mt-10 flex flex-wrap items-center gap-x-2 gap-y-1" data-pagefind-ignore>
+        <span class="eyebrow mr-1">Filed under</span>
+        <ul class="flex flex-wrap items-center gap-x-1" aria-label="Category and tags">
+          <li>
+            <a href={categoryHref(category.id)} class="tap inline-flex items-center rounded-full focus-visible:outline-2 focus-visible:outline-gold">
+              <Pill tone="gold" size="sm">{category.label}</Pill>
+            </a>
+          </li>
+          {tags.map((tag) => (
+            <li>
+              <a href={tagHref(tag)} class="tap group inline-flex items-center rounded-full focus-visible:outline-2 focus-visible:outline-gold">
+                <Pill tone="outline" size="sm" class="transition-colors group-hover:bg-gold group-hover:text-ink">{tag}</Pill>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       <div class="mt-8 flex flex-wrap gap-3">
         {
@@ -149,5 +182,11 @@ const schema = [
     </article>
   </Section>
 
-  {!preview && <LatestPosts tone="alt" title="More from the team" exclude={post.id} />}
+  {
+    !preview && (
+      <div data-pagefind-ignore>
+        <LatestPosts tone="alt" title="More from the team" exclude={post.id} />
+      </div>
+    )
+  }
 </BaseLayout>

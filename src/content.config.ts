@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import * as z from 'astro/zod';
 import { glob, file } from 'astro/loaders';
+import { POST_CATEGORY_IDS } from './lib/post-categories';
 
 /* -------------------------------------------------------------------------
  * Content collections (PRD §6).
@@ -558,10 +559,12 @@ const posts = defineCollection({
     title: z.string(),
     status: z.enum(['draft', 'published']).default('draft'),
     publishDate: z.coerce.date(),
-    /** Only for a real correction or update; shown as "Updated". */
+    /** Only for a real correction or update; shown, quietly, on the post page. */
     updatedDate: z.coerce.date().optional(),
     /** One or two sentences: the card teaser and the default meta description. */
     summary: z.string().max(200),
+    /** The kind of post (src/lib/post-categories.ts): the card badge and the /blog filter. */
+    category: z.enum(POST_CATEGORY_IDS).default('news'),
     /** A `team` entry id. */
     author: optText,
     /** An `events` entry id, for recaps. Links the post to the event card. */

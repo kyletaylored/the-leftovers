@@ -648,3 +648,15 @@ from earlier decisions here.
   event's card links back with "Read the recap". Drafts preview at
   `/preview/blog/<slug>`, like landing pages. `/blog` is noindex until the
   first post is published, so Google never indexes an empty page.
+- **Site search with Pagefind (10 Nov 2026).** The PRD has no search. The owner
+  asked for one like Astro Starlight's, so `npm run build` now runs Pagefind
+  over `dist/` and `/search` queries the static index in the browser. There's
+  still no backend and nothing third-party: the index is files on this site.
+  Two knock-ons: `script-src` gains `'wasm-unsafe-eval'` (Pagefind's
+  WebAssembly; it doesn't allow JS `eval`), and `SiteSearch` is the one island
+  that sits above the fold, because on `/search` the box is the page. It still
+  hydrates `client:visible` over a server-rendered GET form, and `/search` is
+  noindex, so it doesn't affect any page Lighthouse scores for search.
+  Indexed: every page that isn't noindex, `<main>` only. Blog posts carry
+  category, tag and year filters. Posts also gained a fixed `category` (one
+  per post) alongside free-form tags, with static archive pages for both.

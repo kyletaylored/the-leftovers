@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { getPosts, postHref } from '@/lib/posts';
+import { categoryById, getPosts, postHref } from '@/lib/posts';
 import { site } from '@/lib/settings';
 
 /**
@@ -25,6 +25,7 @@ export const GET: APIRoute = async ({ site: origin }) => {
       `      <guid isPermaLink="true">${link}</guid>`,
       `      <pubDate>${post.data.publishDate.toUTCString()}</pubDate>`,
       `      <description>${escape(post.data.summary)}</description>`,
+      `      <category>${escape(categoryById(post.data.category).label)}</category>`,
       ...post.data.tags.map((tag) => `      <category>${escape(tag)}</category>`),
       '    </item>',
     ].join('\n');

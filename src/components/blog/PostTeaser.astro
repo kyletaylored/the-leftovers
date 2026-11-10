@@ -1,7 +1,7 @@
 ---
 /**
  * PostTeaser — a compact, photo-free post row: a date chip, the title and an
- * optional summary. For lists where cards would be too heavy: "More posts"
+ * optional summary, under a small category label. For lists where cards would be too heavy: "More posts"
  * under an article, a short list on a landing page, a sidebar.
  *
  * Like PostCard, the row is one link: the title's <a> is stretched over the
@@ -37,6 +37,9 @@ const { post, as: Heading = 'h3', showSummary = true, class: className = '' } = 
     <span class="numeral text-2xl leading-none">{dayNum(post.publishDate)}</span>
   </div>
   <div class="min-w-0 flex-1">
+    <p class="mb-1 text-[0.625rem] font-bold uppercase tracking-[0.16em] text-gold-300">
+      <span class="sr-only">Category: </span>{post.category.label}
+    </p>
     <Heading class="title-sm text-lg text-bone">
       <a
         href={post.href}

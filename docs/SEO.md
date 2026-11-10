@@ -13,13 +13,20 @@ below is generated at build time from the content.
 | `/llms.txt` | A Markdown map of the site for AI assistants ([llmstxt.org](https://llmstxt.org)) | `src/pages/llms.txt.ts` |
 | `<meta name="robots">` | `noindex, follow` on hidden pages | `src/components/Seo.astro` |
 | `/blog/rss.xml` | RSS feed of published blog posts (titles and summaries) | `src/pages/blog/rss.xml.ts` |
+| `/pagefind/` | The on-site search index `/search` reads (not for crawlers) | `pagefind --site dist`, after `astro build` |
 
 Every page also carries a canonical URL, Open Graph and Twitter tags, a
 `<link rel="sitemap">`, and JSON-LD (`SportsTeam` on every page, `WebSite` on
 the homepage). See `Seo.astro` and `BaseLayout.astro`. Blog posts add
 `BlogPosting` + `BreadcrumbList`, `og:type article` with `article:*` times and
 tags, and the cover cropped to a 1200×630 share card (`PostLayout.astro`).
-`/blog` itself is noindex until the first post is published.
+`/blog` itself is noindex until the first post is published. Category
+archives (`/blog/category/…`) are indexable; tag archives are noindex, since
+they're thin and multiply. `/search` is noindex.
+
+Site search follows the same switch: a noindex page is also left out of the
+on-site search index (BaseLayout only marks `<main>` as searchable when the
+page is indexable).
 
 ## Hiding a page from search
 

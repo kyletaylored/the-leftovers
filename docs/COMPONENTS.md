@@ -25,7 +25,7 @@ Read this before building or changing a page. It replaces reading `src/pages/des
 - **Interior page (default)** (`src/pages/contact.astro`): PageHeader (pattern sand) → Section tone=base → Section tone=alt → … alternate → CtaStrip or a closing Section with Buttons
 - **Homepage / landing** (`src/pages/index.astro`): Hero variant=ornate animate (+RiceTerraces) → ImpactBand → GallerySlideshow layout=showcase → TwoColumn (boxed break) → ImpactBand tone=crimson → Section tone=seigaiha + LogoStrip → NewsletterBlock
 - **Long-form / legal (Markdown body)** (`src/pages/privacy.astro`): PageHeader → Section tone=base > Prose > <Content /> → Buttons (outline + ghost)
-- **Blog list / post** (`src/pages/blog/index.astro, src/layouts/PostLayout.astro`): List: PageHeader → Section tone=base: PostCard layout=feature (lead) → Section tone=alt: PostCard grid, or MascotCallout (and noindex) when there are no posts. Post: PostLayout = PageHeader (summary as intro) → Section: PostMeta lg + cover + Prose → tags + Buttons → LatestPosts tone=alt exclude=current
+- **Blog list / post** (`src/pages/blog/index.astro, src/layouts/PostLayout.astro`): List: PageHeader → Section tone=base: BlogFilters + PostCard layout=feature (lead) → Section tone=alt: PostCard grid, or MascotCallout (and noindex) when there are no posts. Archives (/blog/category, /blog/tag): PageHeader → Section: BlogFilters current + PostCard grid. Post: PostLayout = PageHeader (category eyebrow, summary as intro) → Section: PostMeta lg + quiet Updated + cover + Prose → category/tag links + Buttons → LatestPosts tone=alt exclude=current. List pages pass search={false}
 - **Schedule** (`src/pages/events.astro`): PageHeader → Section tone=alt: Countdown + EventCard layout=feature + EventSquads (next), or MascotCallout when empty → Section: ProcessSteps + BrandRule + EventFees → Section tone=alt: per year, SeasonStrip + past EventCards (older years in <details>)
 - **Shop / product** (`src/pages/shop.astro, src/pages/preorder/[slug].astro`): PageHeader → featured ProductCard → ProductGrid → ThreeColumn (how ordering works) → Prose. Drop page: PageHeader → Countdown + Prose → ProductGallery → PreorderForm
 - **Form page** (`src/pages/join.astro`): PageHeader → Section tone=base: Prose intro + the form island (client:visible) → Toast for the result
@@ -182,16 +182,16 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 
 ### Blog
 
-- **PostCard** (`blog/PostCard.astro`): Blog post teaser with its cover photo; the whole card is one link. feature leads /blog.
+- **PostCard** (`blog/PostCard.astro`): Blog post teaser with its cover photo and a category badge on it; the whole card is one link. feature leads /blog.
   - Options: post (PostSummary) · layout: card|feature (once per page) · eager (first image on the page) · as
   - Data: posts collection via summarize() / latestPosts() in src/lib/posts.ts
-  - Avoid: Extra "Read more" links inside it: the stretched title link already covers the card.
+  - Avoid: Extra "Read more" links or tag chips inside it: the stretched title link covers the card, and tags belong on the post page.
   - Pairs with: LatestPosts
-- **PostTeaser** (`blog/PostTeaser.astro`): Compact photo-free post row (date chip, title, summary) for short lists. It is an <li>: wrap in a <ul>.
+- **PostTeaser** (`blog/PostTeaser.astro`): Compact photo-free post row (date chip, category, title, summary) for short lists. It is an <li>: wrap in a <ul>.
   - Options: post · showSummary · as
   - Data: PostSummary from src/lib/posts.ts
   - Avoid: The /blog grid (use PostCard).
-- **PostMeta** (`blog/PostMeta.astro`): Byline row: date, reading time, optional author and Updated date. Inside PostCard/PostTeaser and the post page.
+- **PostMeta** (`blog/PostMeta.astro`): Byline row: date, reading time, optional author. Inside PostCard/PostTeaser and the post page (which adds Updated on its own).
   - Options: post · showAuthor · size: sm|lg
   - Data: Reading time is derived from the body (readingMinutes), never stored
 - **LatestPosts** (`blog/LatestPosts.astro`): A Section of the newest posts + "All posts". Renders nothing until a post exists. Also the CMS posts block.
@@ -199,6 +199,15 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Data: latestPosts() in src/lib/posts.ts
   - Avoid: Inside another Section: it is one.
   - Pairs with: PostCard, PostTeaser
+- **BlogFilters** (`blog/BlogFilters.astro`): Browse bar on /blog and its archives: category chips, top tags, a search box. All links / GET form, no JS.
+  - Options: posts (every published PostSummary) · current: { category?, tag? (slug) } · tagCount (8; 0 hides tags)
+  - Data: categoriesInUse() / tagsInUse() in src/lib/posts.ts; categories in src/lib/post-categories.ts
+  - Avoid: Hand-rolled filter chips on blog pages; client-side filtering of the grid (archives are real pages).
+  - Pairs with: PostCard
+- **SiteSearch** (`SiteSearch.tsx`, React island): Site-wide search island (Pagefind) for /search: type chips, blog category/tag/year filters, URL state.
+  - Options: bundlePath (/pagefind/) · pageSize (10) · demo (specimen index, /design only) · loadPagefind (stories)
+  - Data: The Pagefind index `npm run build` writes; pages opt in via BaseLayout (indexed unless noindex) and its search prop
+  - Avoid: A second search page or island: link to /search?q=…&type=… instead (BlogFilters does).
 
 ### Forms
 

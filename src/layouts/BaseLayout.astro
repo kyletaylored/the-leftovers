@@ -13,6 +13,7 @@ import Footer from '@/components/Footer.astro';
 import SponsorBand from '@/components/SponsorBand.astro';
 import Seo from '@/components/Seo.astro';
 import CookieConsent from '@/components/CookieConsent.tsx';
+import { searchTypeFor, searchValue, type SearchType } from '@/lib/search';
 
 interface Props {
   title: string;
@@ -27,9 +28,37 @@ interface Props {
   schema?: Array<Record<string, unknown>>;
   /** Drop the nav's sticky offset padding for full-bleed hero pages. */
   bodyClass?: string;
+  /**
+   * Site search (Pagefind, src/lib/search.ts). Every page that isn't
+   * noindex is indexed, filed under a `type` worked out from its path.
+   * Pass extra filters/meta/sort (blog posts do), or `false` to leave an
+   * indexable page out (list pages that only repeat other pages).
+   */
+  search?: false | SearchFields;
 }
 
-const { bodyClass = '', ...seo } = Astro.props;
+interface SearchFields {
+  type?: SearchType;
+  filters?: Record<string, string | string[]>;
+  meta?: Record<string, string>;
+  sort?: Record<string, string>;
+}
+
+const { bodyClass = '', search, ...seo } = Astro.props;
+
+// What site search gets from this page. Only <main> is indexed, so the nav,
+// sponsor band and footer never turn up as matches.
+const searchable = search !== false && !seo.noindex;
+const searchFields = searchable ? (search ?? {}) : undefined;
+const searchAttrs = searchFields
+  ? [
+      ...Object.entries({ type: searchFields.type ?? searchTypeFor(Astro.url.pathname), ...searchFields.filters }).flatMap(
+        ([key, values]) => [values].flat().map((v) => ({ 'data-pagefind-filter': `${key}:${searchValue(v)}` }))
+      ),
+      ...Object.entries(searchFields.meta ?? {}).map(([key, v]) => ({ 'data-pagefind-meta': `${key}:${searchValue(v)}` })),
+      ...Object.entries(searchFields.sort ?? {}).map(([key, v]) => ({ 'data-pagefind-sort': `${key}:${searchValue(v)}` })),
+    ]
+  : [];
 
 // Datadog RUM is on only when both public IDs are set (see datadog-rum.ts).
 const rum = site.datadogRum;
@@ -141,7 +170,8 @@ const organizationSchema = {
   <body class:list={['site-surround', bodyClass]}>
     <div class="site-frame flex min-h-dvh flex-col">
       <Nav />
-      <main id="main" class="flex-1">
+      <main id="main" class="flex-1" data-pagefind-body={searchable ? '' : undefined}>
+        {searchAttrs.map((attrs) => <span hidden {...attrs} />)}
         <slot />
       </main>
       <SponsorBand />

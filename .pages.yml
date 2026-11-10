@@ -629,7 +629,7 @@ content:
     filename: '{year}-{month}-{day}-{fields.title}.md'
     format: yaml-frontmatter
     view:
-      fields: [title, status, publishDate]
+      fields: [title, status, category, publishDate]
       primary: title
       sort: [publishDate, title]
     fields:
@@ -654,6 +654,18 @@ content:
         type: text
         required: true
         description: One or two sentences, under 200 characters. Shown on the post's card and in Google.
+      - name: category
+        label: Category
+        type: select
+        default: news
+        required: true
+        description: The kind of post. Shown as the badge on its card, and as a filter on /blog. (To add one, ask a developer; see src/lib/post-categories.ts.)
+        options:
+          values:
+            - { value: news, label: News }
+            - { value: recap, label: Recap }
+            - { value: gear, label: Gear }
+            - { value: training, label: Training }
       - name: author
         label: Author
         type: reference
@@ -671,7 +683,7 @@ content:
         description: >-
           Describe the photo for screen readers and image search. Required even
           before there's a photo; the post title is fine until then.
-      - { name: tags, label: Tags, type: string, list: true, description: 'Short and reused, e.g. "Recap", "Announcement".' }
+      - { name: tags, label: Tags, type: string, list: true, description: 'Optional topics, short and reused, e.g. "Bushball", "Fundraiser". Each tag gets its own page at /blog/tag/…, listed on the post.' }
       - { name: featured, label: Feature at the top of the blog, type: boolean, default: false }
       - name: seo
         label: SEO

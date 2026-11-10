@@ -1,0 +1,105 @@
+---
+/**
+ * BlogFilters — the browse bar at the top of /blog and its category and tag
+ * archives: category chips, the most-used tags, and a search box.
+ *
+ * Every control is a plain link or a GET form, so it all works without
+ * JavaScript and every filtered view has a real, shareable URL:
+ *   - a category chip → /blog/category/<id> (a static page)
+ *   - a tag chip      → /blog/tag/<slug>     (a static page)
+ *   - the search box  → /search?q=…&type=Blog posts (SiteSearch, which can
+ *     also filter by category, tag and year)
+ * Only categories and tags that have posts are offered. The current one is
+ * aria-current="page" and drawn solid gold.
+ */
+import Icon from '@/components/brand/Icon.astro';
+import { BLOG_TYPE } from '@/lib/search';
+import { categoriesInUse, categoryHref, tagHref, tagsInUse } from '@/lib/posts';
+
+interface Props {
+  /** The posts the chips are counted from: every published post, not just this page's. */
+  posts: { category: { id: string }; tags: string[] }[];
+  /** The archive being shown: a category id, a tag (its slug), or nothing on /blog. */
+  current?: { category?: string; tag?: string };
+  /** How many tags to offer (most-used first); 0 hides the row. */
+  tagCount?: number;
+  class?: string;
+}
+
+const { posts, current = {}, tagCount = 8, class: className = '' } = Astro.props;
+const categories = categoriesInUse(posts);
+const allTags = tagsInUse(posts);
+const tags = allTags.slice(0, tagCount);
+// A tag archive for a tag outside the top N still shows its own chip.
+const own = current.tag ? allTags.find((t) => t.slug === current.tag) : undefined;
+if (own && !tags.includes(own)) tags.push(own);
+const onAll = !current.category && !current.tag;
+
+const chip = 'tap inline-flex items-center gap-1.5 rounded-full px-3.5 text-[0.6875rem] font-bold uppercase tracking-[0.1em] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold';
+const on = 'bg-gold text-ink';
+const off = 'border border-ink-600 text-bone-muted hover:border-gold hover:text-gold-300';
+---
+
+<div class:list={['flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between', className]}>
+  <div class="flex min-w-0 flex-col gap-3">
+    <nav aria-label="Blog categories">
+      <ul class="flex flex-wrap gap-2">
+        <li>
+          <a href="/blog" class:list={[chip, onAll ? on : off]} aria-current={onAll ? 'page' : undefined}>All posts</a>
+        </li>
+        {
+          categories.map((c) => {
+            const active = current.category === c.id;
+            return (
+              <li>
+                <a href={categoryHref(c.id)} class:list={[chip, active ? on : off]} aria-current={active ? 'page' : undefined}>
+                  {c.title}
+                  <span class:list={['text-xs font-semibold tabular-nums tracking-normal', active ? 'text-ink/70' : 'text-bone-muted/70']}>{c.count}</span>
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+    {
+      tags.length > 0 && (
+        <nav aria-label="Blog tags" class="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span class="eyebrow mr-1">Tags</span>
+          <ul class="flex flex-wrap gap-x-1">
+            {tags.map((t) => {
+              const active = current.tag === t.slug;
+              return (
+                <li>
+                  <a
+                    href={tagHref(t.label)}
+                    aria-current={active ? 'page' : undefined}
+                    class:list={[
+                      'tap inline-flex items-center px-2 text-sm underline-offset-4 transition-colors focus-visible:outline-2 focus-visible:outline-gold',
+                      active ? 'font-bold text-gold-300 underline decoration-gold decoration-2' : 'text-bone-muted hover:text-gold-300 hover:underline',
+                    ]}
+                  >
+                    #{t.label}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      )
+    }
+  </div>
+
+  <form action="/search" method="get" role="search" aria-label="Search the blog" class="flex w-full shrink-0 gap-2 lg:w-80">
+    <input type="hidden" name="type" value={BLOG_TYPE} />
+    <label for="blog-search" class="sr-only">Search posts</label>
+    <input id="blog-search" name="q" type="search" placeholder="Search posts" autocomplete="off" class="field-input" />
+    <button
+      type="submit"
+      class="tap inline-flex shrink-0 items-center justify-center rounded-sm border border-gold px-3 text-gold-300 transition-colors hover:bg-gold hover:text-ink"
+    >
+      <Icon name="search" class="size-5" label="Search" />
+    </button>
+  </form>
+</div>
+

@@ -8,6 +8,9 @@
  * noindex, so Google never indexes an empty blog. That also keeps it out of
  * the sitemap and llms.txt. No pagination yet: add it once there are more
  * than a couple of dozen posts.
+ *
+ * BlogFilters (category and tag archives, a search box) sits above the lead
+ * card. The page itself is left out of site search: it only repeats posts.
  */
 import { getEntry } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -16,6 +19,7 @@ import Section from '@/components/Section.astro';
 import Button from '@/components/Button.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
 import PostCard from '@/components/blog/PostCard.astro';
+import BlogFilters from '@/components/blog/BlogFilters.astro';
 import { resolveHeroImages } from '@/lib/images';
 import { getPosts, leadPost, postHref, summarize } from '@/lib/posts';
 import { site } from '@/lib/settings';
@@ -51,6 +55,7 @@ const schema = posts.length
   title={page.data.seo.title ?? page.data.title}
   description={page.data.seo.description ?? page.data.intro}
   schema={schema}
+  search={false}
 >
   <link slot="head" rel="alternate" type="application/rss+xml" title={`${site.title} blog`} href="/blog/rss.xml" />
 
@@ -60,6 +65,7 @@ const schema = posts.length
     lead ? (
       <>
         <Section tone="base">
+          <BlogFilters posts={posts} class="mb-8" />
           <PostCard post={lead} layout="feature" as="h2" eager />
         </Section>
         {rest.length > 0 && (

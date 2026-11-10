@@ -1,0 +1,64 @@
+---
+/**
+ * /blog/category/<id>: every published post in one category, newest first.
+ * One page per category that has posts (src/lib/post-categories.ts); an
+ * empty category has no page, so BlogFilters never links to a dead end.
+ *
+ * Indexable (a category is a real topic page) but left out of site search,
+ * like /blog, because it only repeats the posts.
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import Button from '@/components/Button.astro';
+import PostCard from '@/components/blog/PostCard.astro';
+import BlogFilters from '@/components/blog/BlogFilters.astro';
+import { POST_CATEGORIES, categoryHref, getPosts, summarize, type PostSummary } from '@/lib/posts';
+import { site } from '@/lib/settings';
+
+export const getStaticPaths = (async () => {
+  const all = await Promise.all((await getPosts()).map((post) => summarize(post)));
+  return POST_CATEGORIES.filter((c) => all.some((p) => p.category.id === c.id)).map((category) => ({
+    params: { category: category.id },
+    props: { category, all },
+  }));
+}) satisfies GetStaticPaths;
+
+interface Props {
+  category: (typeof POST_CATEGORIES)[number];
+  all: PostSummary[];
+}
+
+const { category, all } = Astro.props;
+const posts = all.filter((p) => p.category.id === category.id);
+const description = `${category.title} from ${site.title}: ${posts.length} post${posts.length === 1 ? '' : 's'}.`;
+---
+
+<BaseLayout
+  title={`${category.title} | Blog`}
+  description={description}
+  search={false}
+  schema={[
+    {
+      '@type': 'CollectionPage',
+      name: `${category.title} | ${site.title} blog`,
+      url: new URL(categoryHref(category.id), Astro.site).href,
+      isPartOf: { '@type': 'Blog', url: new URL('/blog', Astro.site).href },
+    },
+  ]}
+>
+  <link slot="head" rel="alternate" type="application/rss+xml" title={`${site.title} blog`} href="/blog/rss.xml" />
+
+  <PageHeader eyebrow="Blog" title={category.title} />
+
+  <Section tone="base">
+    <BlogFilters posts={all} current={{ category: category.id }} class="mb-8" />
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {posts.map((post, i) => <PostCard post={post} as="h2" eager={i === 0} />)}
+    </div>
+    <div class="mt-10">
+      <Button href="/blog" variant="ghost" size="sm">All posts</Button>
+    </div>
+  </Section>
+</BaseLayout>

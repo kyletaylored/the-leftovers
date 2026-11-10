@@ -8,8 +8,11 @@
  * accessible name, rather than a photo link, a title link and a "Read more"
  * link all going to the same place. The focus ring is drawn on the card.
  *
- * A post without a cover gets the topo texture and a dim mascot, never an
- * empty box or a stock photo.
+ * The category sits as a badge on the photo, like the Slideshow's kicker,
+ * so every card's title starts at the same height whether or not the post
+ * has tags (tags are only listed on the post page). A post without a cover
+ * gets the topo texture and a dim mascot, never an empty box or a stock
+ * photo.
  */
 import { Image } from 'astro:assets';
 import Pill from '@/components/ui/Pill.astro';
@@ -59,20 +62,12 @@ const sizes = feature ? '(min-width: 1024px) 720px, 92vw' : '(min-width: 1024px)
         </div>
       )
     }
+    <Pill tone="gold" size={feature ? 'md' : 'sm'} class="absolute left-3 top-3 shadow-[0_2px_8px_rgba(0,0,0,0.45)]">
+      <span class="sr-only">Category: </span>{post.category.label}
+    </Pill>
   </div>
 
   <div class:list={['flex flex-1 flex-col', feature ? 'p-6 sm:p-8' : 'p-5']}>
-    {
-      post.tags.length > 0 && (
-        <ul class="mb-3 flex flex-wrap gap-1.5" aria-label="Tags">
-          {post.tags.slice(0, 3).map((tag) => (
-            <li>
-              <Pill tone={feature ? 'gold' : 'muted'} size="sm">{tag}</Pill>
-            </li>
-          ))}
-        </ul>
-      )
-    }
     <Heading class:list={['text-bone', feature ? 'text-3xl sm:text-4xl' : 'text-xl']}>
       <a
         href={post.href}

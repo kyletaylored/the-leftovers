@@ -164,7 +164,7 @@ crimson resolves to a foreground token — the locked crimson fails AA as text
 ```bash
 npm install
 npm run dev        # http://localhost:4321
-npm run build      # astro check && astro build -> dist/
+npm run build      # astro check && astro build && pagefind -> dist/ (+ dist/pagefind search index)
 npm run preview    # serve dist/ locally
 npm run og         # after npm run build: re-shoot public/og-default.png from /design/og-card
 npm run storybook  # http://localhost:6006 — foundations + React islands
@@ -246,7 +246,7 @@ Day to day: a save in Pages CMS is a commit to `main`, which triggers
 `.github/workflows/deploy.yml` and is live in a couple of minutes. There is no
 manual deploy step.
 
-The workflow runs `npm run build`, which is `astro check && astro build` — a
+The workflow runs `npm run build`, which is `astro check && astro build && pagefind` — a
 type error or a content file that doesn't match its schema fails the build
 rather than deploying a broken page, and a failed build leaves the live site
 serving the last good version.

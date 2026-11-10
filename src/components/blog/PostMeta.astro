@@ -1,8 +1,9 @@
 ---
 /**
  * PostMeta — a post's byline row: date, reading time, and optionally the
- * author and an "Updated" date. Shared by PostCard, PostTeaser and the post
- * page so the order and wording never drift between them.
+ * author. Shared by PostCard, PostTeaser and the post page so the order and
+ * wording never drift between them. An "Updated" date is deliberately not
+ * here: it only appears, quietly, on the post page itself (PostLayout).
  *
  * Dates are <time datetime> and formatted in UTC (lib/format.ts). The dots
  * between items are aria-hidden, so a screen reader hears a clean list.
@@ -11,7 +12,7 @@ import { dateRange, isoDate } from '@/lib/format';
 import type { PostSummary } from '@/lib/posts';
 
 interface Props {
-  post: Pick<PostSummary, 'publishDate' | 'updatedDate' | 'readingMinutes' | 'author'>;
+  post: Pick<PostSummary, 'publishDate' | 'readingMinutes' | 'author'>;
   /** Show the author's name (and role, on `lg`). */
   showAuthor?: boolean;
   /** `lg` is the post page header; `sm` sits on cards. */
@@ -20,8 +21,7 @@ interface Props {
 }
 
 const { post, showAuthor = false, size = 'sm', class: className = '' } = Astro.props;
-const { publishDate, updatedDate, readingMinutes, author } = post;
-const updated = updatedDate && updatedDate.getTime() > publishDate.getTime() ? updatedDate : undefined;
+const { publishDate, readingMinutes, author } = post;
 ---
 
 <p
@@ -45,14 +45,4 @@ const updated = updatedDate && updatedDate.getTime() > publishDate.getTime() ? u
   <time datetime={isoDate(publishDate)}>{dateRange(publishDate)}</time>
   <span aria-hidden="true">·</span>
   <span>{readingMinutes} min read</span>
-  {
-    updated && (
-      <>
-        <span aria-hidden="true">·</span>
-        <span>
-          Updated <time datetime={isoDate(updated)}>{dateRange(updated)}</time>
-        </span>
-      </>
-    )
-  }
 </p>
