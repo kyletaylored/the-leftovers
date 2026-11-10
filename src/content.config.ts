@@ -505,6 +505,15 @@ const landingBlock = z.discriminatedUnion('type', [
     eyebrow: optText,
     title: optText,
   }),
+  z.object({
+    /** The newest published blog posts. Renders nothing until there's one. */
+    type: z.literal('posts'),
+    tone: sectionTone,
+    eyebrow: optText,
+    title: optText,
+    count: z.number().int().min(1).max(6).default(3),
+    layout: z.enum(['cards', 'list']).default('cards'),
+  }),
 ]);
 
 const landing = defineCollection({
@@ -531,8 +540,45 @@ const landing = defineCollection({
   }),
 });
 
+/**
+ * Blog posts (Nov 2026): event recaps, announcements, team news. This is the
+ * PRD's phase-2 `/news` section (§12), built as /blog; /news redirects here.
+ *
+ * Drafts build at /preview/blog/<slug>, noindexed, so an editor can check a
+ * post before publishing. Published posts live at /blog/<slug>. Reading
+ * time is DERIVED from the body (lib/posts.ts), never typed in.
+ *
+ * `author` and `event` hold entry ids (Pages CMS reference fields), so a
+ * byline or a recap link can't be misspelt. An id that doesn't match an
+ * entry is ignored rather than failing the build.
+ */
+const posts = defineCollection({
+  loader: glob({ base: './src/content/posts', pattern: '**/*.md' }),
+  schema: z.object({
+    title: z.string(),
+    status: z.enum(['draft', 'published']).default('draft'),
+    publishDate: z.coerce.date(),
+    /** Only for a real correction or update; shown as "Updated". */
+    updatedDate: z.coerce.date().optional(),
+    /** One or two sentences: the card teaser and the default meta description. */
+    summary: z.string().max(200),
+    /** A `team` entry id. */
+    author: optText,
+    /** An `events` entry id, for recaps. Links the post to the event card. */
+    event: optText,
+    cover: imagePath.nullish(),
+    /** Required, as everywhere else an image appears (§6). */
+    coverAlt: z.string(),
+    tags: optList(z.string()),
+    /** Leads the /blog page in the large layout. The newest featured post wins. */
+    featured: z.boolean().default(false),
+    seo,
+  }),
+});
+
 export const collections = {
   landing,
+  posts,
   team,
   events,
   sponsors,

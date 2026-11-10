@@ -246,8 +246,9 @@ per-page SEO metadata and structured data).
 **Ahead of schedule:** `/stats` with the manual entry workflow is listed as
 Phase 2 and is fully built — the content model made it nearly free.
 
-**Not built (correctly):** `/news` recap posts, CSV import tooling, Snipcart
-evaluation, PBLI data partnership.
+**Not built (correctly):** CSV import tooling, Snipcart evaluation, PBLI data
+partnership. The `/news` recap posts were built in Nov 2026 as `/blog` (see the
+note at the end of this file).
 
 ## §13 Risks & open questions
 
@@ -639,3 +640,11 @@ from earlier decisions here.
   also stays external despite the "render-blocking" warning: inlining it made
   FCP faster but LCP slower (~1.2s), because the fonts and textures it names
   are then discovered at once and compete with the logo.
+- **`/news` built as `/blog` (10 Nov 2026).** §5 and §12 call the phase-2
+  recap section `/news`. It's built as a `posts` collection at `/blog`,
+  because the owner asked for a blog: recaps are one kind of post alongside
+  announcements and news. `/news` redirects to `/blog` (a meta-refresh stub,
+  plus `public/_redirects` for Cloudflare). A post can name its event, and that
+  event's card links back with "Read the recap". Drafts preview at
+  `/preview/blog/<slug>`, like landing pages. `/blog` is noindex until the
+  first post is published, so Google never indexes an empty page.

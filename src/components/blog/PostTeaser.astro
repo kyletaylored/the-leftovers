@@ -1,0 +1,51 @@
+---
+/**
+ * PostTeaser — a compact, photo-free post row: a date chip, the title and an
+ * optional summary. For lists where cards would be too heavy: "More posts"
+ * under an article, a short list on a landing page, a sidebar.
+ *
+ * Like PostCard, the row is one link: the title's <a> is stretched over the
+ * row, and the focus ring is drawn on the row. Render several inside a <ul>
+ * (LatestPosts layout="list" does), since each teaser is an <li>.
+ */
+import { dayNum, monthShort } from '@/lib/format';
+import PostMeta from './PostMeta.astro';
+import type { PostSummary } from '@/lib/posts';
+
+interface Props {
+  post: PostSummary;
+  as?: 'h2' | 'h3' | 'h4';
+  showSummary?: boolean;
+  class?: string;
+}
+
+const { post, as: Heading = 'h3', showSummary = true, class: className = '' } = Astro.props;
+---
+
+<li
+  class:list={[
+    'group relative flex gap-4 rounded-sm border border-ink-600 bg-ink-800 p-4 transition-colors hover:border-gold/50 sm:p-5',
+    'has-[a:focus-visible]:border-gold has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-gold/60',
+    className,
+  ]}
+>
+  <div
+    class="flex w-14 shrink-0 flex-col items-center self-start rounded-sm border border-gold/50 bg-ink-900 px-2 py-2"
+    aria-hidden="true"
+  >
+    <span class="text-[0.6rem] font-bold uppercase tracking-[0.16em] text-gold-300">{monthShort(post.publishDate)}</span>
+    <span class="numeral text-2xl leading-none">{dayNum(post.publishDate)}</span>
+  </div>
+  <div class="min-w-0 flex-1">
+    <Heading class="title-sm text-lg text-bone">
+      <a
+        href={post.href}
+        class="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none group-hover:text-gold-300"
+      >
+        {post.title}
+      </a>
+    </Heading>
+    {showSummary && <p class="mt-1.5 text-sm leading-relaxed text-bone-muted">{post.summary}</p>}
+    <PostMeta post={post} class="mt-2" />
+  </div>
+</li>

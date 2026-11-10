@@ -81,6 +81,43 @@ const { class: className = '' } = Astro.props;
     color: var(--color-bone);
     font-size: 1.125rem;
   }
+  /* Photos and code, for blog posts. No other body uses them yet. */
+  .prose-brand :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 2rem 0;
+    border: 1px solid var(--color-ink-600);
+    border-radius: 0.125rem;
+  }
+  .prose-brand :global(h4) {
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-bone);
+    /* Inter bold, like .title-sm: the headline face fills in when this small. */
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    font-weight: 700;
+  }
+  .prose-brand :global(code) {
+    padding: 0.1em 0.35em;
+    border-radius: 0.125rem;
+    background: var(--color-ink-800);
+    color: var(--color-bone);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+  }
+  .prose-brand :global(pre) {
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    overflow-x: auto;
+    border: 1px solid var(--color-ink-600);
+    background: var(--color-ink-900);
+  }
+  .prose-brand :global(pre code) {
+    padding: 0;
+    background: none;
+  }
   .prose-brand :global(hr) {
     margin: 2.5rem 0;
     border: 0;

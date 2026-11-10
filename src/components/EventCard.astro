@@ -24,10 +24,12 @@ interface Props {
   as?: 'h2' | 'h3' | 'h4';
   /** `feature` is the larger "NEXT UP" treatment on the homepage. */
   layout?: 'card' | 'feature';
+  /** A blog post about this event (lib/posts recapsByEvent). Adds "Read the recap". */
+  recapHref?: string;
   class?: string;
 }
 
-const { event, as: Heading = 'h3', layout = 'card', class: className = '' } = Astro.props;
+const { event, as: Heading = 'h3', layout = 'card', recapHref, class: className = '' } = Astro.props;
 // Lets the Calendar's day links (#slug) jump straight to this card.
 const anchorId = event.id;
 const { league, startDate, endDate, location, eventUrl, squads, cover, coverAlt, resultSummary, placement } =
@@ -159,6 +161,13 @@ const squadCount = `${squads.length} ${squads.length === 1 ? 'squad' : 'squads'}
         eventUrl && (
           <Button href={eventUrl} external variant="ghost" size="sm" aria-label={`${upcoming ? 'Details' : 'Results'} for ${name} on PBLeagues`}>
             {upcoming ? 'Event details' : 'Full results'}
+          </Button>
+        )
+      }
+      {
+        recapHref && (
+          <Button href={recapHref} variant="ghost" size="sm" aria-label={`Read the recap of ${name}`}>
+            Read the recap
           </Button>
         )
       }

@@ -25,6 +25,7 @@ Read this before building or changing a page. It replaces reading `src/pages/des
 - **Interior page (default)** (`src/pages/contact.astro`): PageHeader (pattern sand) → Section tone=base → Section tone=alt → … alternate → CtaStrip or a closing Section with Buttons
 - **Homepage / landing** (`src/pages/index.astro`): Hero variant=ornate animate (+RiceTerraces) → ImpactBand → GallerySlideshow layout=showcase → TwoColumn (boxed break) → ImpactBand tone=crimson → Section tone=seigaiha + LogoStrip → NewsletterBlock
 - **Long-form / legal (Markdown body)** (`src/pages/privacy.astro`): PageHeader → Section tone=base > Prose > <Content /> → Buttons (outline + ghost)
+- **Blog list / post** (`src/pages/blog/index.astro, src/layouts/PostLayout.astro`): List: PageHeader → Section tone=base: PostCard layout=feature (lead) → Section tone=alt: PostCard grid, or MascotCallout (and noindex) when there are no posts. Post: PostLayout = PageHeader (summary as intro) → Section: PostMeta lg + cover + Prose → tags + Buttons → LatestPosts tone=alt exclude=current
 - **Schedule** (`src/pages/events.astro`): PageHeader → Section tone=alt: Countdown + EventCard layout=feature + EventSquads (next), or MascotCallout when empty → Section: ProcessSteps + BrandRule + EventFees → Section tone=alt: per year, SeasonStrip + past EventCards (older years in <details>)
 - **Shop / product** (`src/pages/shop.astro, src/pages/preorder/[slug].astro`): PageHeader → featured ProductCard → ProductGrid → ThreeColumn (how ordering works) → Prose. Drop page: PageHeader → Countdown + Prose → ProductGallery → PreorderForm
 - **Form page** (`src/pages/join.astro`): PageHeader → Section tone=base: Prose intro + the form island (client:visible) → Toast for the result
@@ -73,7 +74,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **ThreeColumn** (`ThreeColumn.astro`): Icon + title + body benefits row (3 items, stacks on phones).
   - Options: items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section) · iconStyle: tile|circle (gold ring, favicon badge) · as
 - **BlockRenderer** (`BlockRenderer.astro`): Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.
-  - Options: hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, team, quote, faq
+  - Options: hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, team, quote, faq, posts
   - Data: landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.
   - Avoid: Pages that need logic or computed data; hand-write those.
   - Pairs with: Hero, ImpactBand, TwoColumn
@@ -143,8 +144,8 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 ### Events, team & stats
 
 - **EventCard** (`EventCard.astro`): An event with date chip and venue. Upcoming: Request a spot (to /join) until the event ends or closedToRequests is ticked. Past: best finish and all squads. Article id = slug (#slug links).
-  - Options: event · layout: card|feature (big NEXT UP, full address) · as
-  - Data: events collection entry; getEvents() gives upcoming/past/next
+  - Options: event · layout: card|feature (big NEXT UP, full address) · recapHref ("Read the recap") · as
+  - Data: events collection entry; getEvents() gives upcoming/past/next; recapsByEvent() in lib/posts.ts
 - **SeasonStrip** (`SeasonStrip.astro`): A whole season on one line: 12 months, events linked to their #slug cards. The default schedule view.
   - Options: events · year
   - Data: getEvents().all
@@ -178,6 +179,26 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **TeamStatsWidget** (`TeamStatsWidget.astro`): A squad record from pblidb.org (build-time fetch, fails soft). Show ATTRIBUTION with it.
   - Options: widget · as
   - Data: getTeamWidgets() in src/lib/pblidb.ts
+
+### Blog
+
+- **PostCard** (`blog/PostCard.astro`): Blog post teaser with its cover photo; the whole card is one link. feature leads /blog.
+  - Options: post (PostSummary) · layout: card|feature (once per page) · eager (first image on the page) · as
+  - Data: posts collection via summarize() / latestPosts() in src/lib/posts.ts
+  - Avoid: Extra "Read more" links inside it: the stretched title link already covers the card.
+  - Pairs with: LatestPosts
+- **PostTeaser** (`blog/PostTeaser.astro`): Compact photo-free post row (date chip, title, summary) for short lists. It is an <li>: wrap in a <ul>.
+  - Options: post · showSummary · as
+  - Data: PostSummary from src/lib/posts.ts
+  - Avoid: The /blog grid (use PostCard).
+- **PostMeta** (`blog/PostMeta.astro`): Byline row: date, reading time, optional author and Updated date. Inside PostCard/PostTeaser and the post page.
+  - Options: post · showAuthor · size: sm|lg
+  - Data: Reading time is derived from the body (readingMinutes), never stored
+- **LatestPosts** (`blog/LatestPosts.astro`): A Section of the newest posts + "All posts". Renders nothing until a post exists. Also the CMS posts block.
+  - Options: title · eyebrow · tone · count (3) · layout: cards|list · exclude (post id) · posts (override) · showAll · as
+  - Data: latestPosts() in src/lib/posts.ts
+  - Avoid: Inside another Section: it is one.
+  - Pairs with: PostCard, PostTeaser
 
 ### Forms
 

@@ -12,10 +12,14 @@ below is generated at build time from the content.
 | `/robots.txt` | Crawl rules, AI-crawler policy, sitemap location | `src/pages/robots.txt.ts` |
 | `/llms.txt` | A Markdown map of the site for AI assistants ([llmstxt.org](https://llmstxt.org)) | `src/pages/llms.txt.ts` |
 | `<meta name="robots">` | `noindex, follow` on hidden pages | `src/components/Seo.astro` |
+| `/blog/rss.xml` | RSS feed of published blog posts (titles and summaries) | `src/pages/blog/rss.xml.ts` |
 
 Every page also carries a canonical URL, Open Graph and Twitter tags, a
 `<link rel="sitemap">`, and JSON-LD (`SportsTeam` on every page, `WebSite` on
-the homepage). See `Seo.astro` and `BaseLayout.astro`.
+the homepage). See `Seo.astro` and `BaseLayout.astro`. Blog posts add
+`BlogPosting` + `BreadcrumbList`, `og:type article` with `article:*` times and
+tags, and the cover cropped to a 1200×630 share card (`PostLayout.astro`).
+`/blog` itself is noindex until the first post is published.
 
 ## Hiding a page from search
 

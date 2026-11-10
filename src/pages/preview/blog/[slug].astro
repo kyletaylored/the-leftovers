@@ -1,0 +1,22 @@
+---
+/**
+ * /preview/blog/<slug>: a draft post, so an editor can check it before
+ * publishing. Noindexed (and so out of the sitemap), with a Draft banner.
+ * Publishing moves the post to /blog/<slug> and this page stops building.
+ */
+import type { GetStaticPaths } from 'astro';
+import { render } from 'astro:content';
+import PostLayout from '@/layouts/PostLayout.astro';
+import { getDraftPosts, previewHref, summarize } from '@/lib/posts';
+
+export const getStaticPaths = (async () =>
+  (await getDraftPosts()).map((post) => ({ params: { slug: post.id }, props: { post } }))) satisfies GetStaticPaths;
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const summary = await summarize(post, previewHref(post.id));
+---
+
+<PostLayout post={post} summary={summary} preview>
+  <Content />
+</PostLayout>

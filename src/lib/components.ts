@@ -22,6 +22,7 @@ export const groups = {
   content: 'Content blocks',
   marketing: 'Marketing & media',
   events: 'Events, team & stats',
+  blog: 'Blog',
   forms: 'Forms',
   feedback: 'Status & feedback',
   brand: 'Brand & motifs',
@@ -122,7 +123,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'BlockRenderer', file: 'BlockRenderer.astro', kind: 'Astro', group: 'layout', section: 'marketing',
     use: 'Renders a landing entry: fixed Hero, then the blocks the team stacked in Pages CMS. Used by src/pages/[slug].astro and preview/[slug].astro.',
-    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, team, quote, faq',
+    options: 'hero (omit only on /design) · sections[]. Blocks: impactBand, statement, divider, gallery, twoColumn, announcement, threeColumn, featureRow, prose, ctaStrip, newsletter, team, quote, faq, posts',
     data: 'landing collection (src/content/landing/*.yml). A new block needs src/content.config.ts, .pages.yml and a case here.',
     avoid: 'Pages that need logic or computed data; hand-write those.',
     pairs: ['Hero', 'ImpactBand', 'TwoColumn'],
@@ -229,8 +230,8 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'EventCard', file: 'EventCard.astro', kind: 'Astro', group: 'events', section: 'components',
     use: 'An event with date chip and venue. Upcoming: Request a spot (to /join) until the event ends or closedToRequests is ticked. Past: best finish and all squads. Article id = slug (#slug links).',
-    options: 'event · layout: card|feature (big NEXT UP, full address) · as',
-    data: 'events collection entry; getEvents() gives upcoming/past/next',
+    options: 'event · layout: card|feature (big NEXT UP, full address) · recapHref ("Read the recap") · as',
+    data: 'events collection entry; getEvents() gives upcoming/past/next; recapsByEvent() in lib/posts.ts',
   },
   {
     name: 'SeasonStrip', file: 'SeasonStrip.astro', kind: 'Astro', group: 'events', section: 'calendar',
@@ -296,6 +297,37 @@ export const catalog: CatalogEntry[] = [
     name: 'TeamStatsWidget', file: 'TeamStatsWidget.astro', kind: 'Astro', group: 'events', section: 'marketing',
     use: 'A squad record from pblidb.org (build-time fetch, fails soft). Show ATTRIBUTION with it.',
     options: 'widget · as', data: 'getTeamWidgets() in src/lib/pblidb.ts',
+  },
+
+  // ------------------------------------------------------------------ blog
+  {
+    name: 'PostCard', file: 'blog/PostCard.astro', kind: 'Astro', group: 'blog', section: 'blog',
+    use: 'Blog post teaser with its cover photo; the whole card is one link. feature leads /blog.',
+    options: 'post (PostSummary) · layout: card|feature (once per page) · eager (first image on the page) · as',
+    data: 'posts collection via summarize() / latestPosts() in src/lib/posts.ts',
+    avoid: 'Extra "Read more" links inside it: the stretched title link already covers the card.',
+    pairs: ['LatestPosts'],
+  },
+  {
+    name: 'PostTeaser', file: 'blog/PostTeaser.astro', kind: 'Astro', group: 'blog', section: 'blog',
+    use: 'Compact photo-free post row (date chip, title, summary) for short lists. It is an <li>: wrap in a <ul>.',
+    options: 'post · showSummary · as',
+    data: 'PostSummary from src/lib/posts.ts',
+    avoid: 'The /blog grid (use PostCard).',
+  },
+  {
+    name: 'PostMeta', file: 'blog/PostMeta.astro', kind: 'Astro', group: 'blog', section: 'blog',
+    use: 'Byline row: date, reading time, optional author and Updated date. Inside PostCard/PostTeaser and the post page.',
+    options: 'post · showAuthor · size: sm|lg',
+    data: 'Reading time is derived from the body (readingMinutes), never stored',
+  },
+  {
+    name: 'LatestPosts', file: 'blog/LatestPosts.astro', kind: 'Astro', group: 'blog', section: 'blog',
+    use: 'A Section of the newest posts + "All posts". Renders nothing until a post exists. Also the CMS posts block.',
+    options: 'title · eyebrow · tone · count (3) · layout: cards|list · exclude (post id) · posts (override) · showAll · as',
+    data: 'latestPosts() in src/lib/posts.ts',
+    avoid: 'Inside another Section: it is one.',
+    pairs: ['PostCard', 'PostTeaser'],
   },
 
   // ----------------------------------------------------------------- forms
@@ -445,6 +477,11 @@ export const recipes: { name: string; example: string; steps: string }[] = [
     name: 'Long-form / legal (Markdown body)',
     example: 'src/pages/privacy.astro',
     steps: 'PageHeader → Section tone=base > Prose > <Content /> → Buttons (outline + ghost)',
+  },
+  {
+    name: 'Blog list / post',
+    example: 'src/pages/blog/index.astro, src/layouts/PostLayout.astro',
+    steps: 'List: PageHeader → Section tone=base: PostCard layout=feature (lead) → Section tone=alt: PostCard grid, or MascotCallout (and noindex) when there are no posts. Post: PostLayout = PageHeader (summary as intro) → Section: PostMeta lg + cover + Prose → tags + Buttons → LatestPosts tone=alt exclude=current',
   },
   {
     name: 'Schedule',

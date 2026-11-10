@@ -213,12 +213,47 @@ site handles the design, so a page always looks like the rest of the site.
 | **Call to action strip** | A full-width band asking people to do one thing |
 | **Newsletter signup** | The mailing-list form |
 | **FAQs** | The questions from the FAQs section. They also show on the Join page |
+| **Latest blog posts** | The newest blog posts, as photo cards or a compact list. Hidden until a post is published |
 
 Two rules keep pages looking right:
 
 - **Don't put two full-width photo sections in a row** (Photo band, Photo
   gallery). Put something calmer between them, like Photo and text.
 - **Every photo needs alt text** describing what's in it.
+
+---
+
+## Writing a blog post
+
+**Blog posts** are event recaps, announcements and team news. They live at
+`/blog`.
+
+1. Open **Blog posts** and click **Add an entry**. The **Title** sets the
+   post's address, so pick it carefully.
+2. Leave **Status** on **Draft**.
+3. Fill in the **Publish date** and a **Summary**: one or two sentences, under
+   200 characters. The summary shows on the post's card and in Google.
+4. Pick yourself as **Author**. For a recap, pick the **Event** too: the post
+   links to the event, and the event's card on the Events page gets a "Read the
+   recap" button.
+5. Add a **Cover photo** (landscape works best) and its **alt text**. Without a
+   photo the card shows the mascot, which is fine.
+6. Add a couple of short **Tags**, like "Recap" or "Announcement". Reuse the
+   same ones so they stay tidy.
+7. Write the post. You can add headings, lists, links and photos. Every photo
+   needs a description, for the same reason as alt text.
+8. Save, wait about two minutes, then open `/preview/blog/your-post-title` to
+   check it. Search engines can't see drafts, but anyone with the link can.
+9. When it looks right, set **Status** to **Published** and save. The post moves
+   to `/blog/your-post-title` and goes to the top of the blog.
+
+Tick **Feature at the top of the blog** to show a post in the large slot at the
+top of `/blog` even after newer posts arrive. Reading time is worked out for
+you.
+
+The blog page stays hidden from Google until the first post is published.
+It's not in the navigation yet: add **Blog** (`/blog`) under **Navigation** in
+**Site settings** when you're ready for people to find it.
 
 ---
 

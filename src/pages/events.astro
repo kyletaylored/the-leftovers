@@ -29,12 +29,15 @@ import Icon from '@/components/brand/Icon.astro';
 import { fullTitle, getEvents, seasonOf } from '@/lib/events';
 import { isoDate } from '@/lib/format';
 import { site } from '@/lib/settings';
+import { recapsByEvent } from '@/lib/posts';
 
 const page = await getEntry('pages', 'events');
 if (!page) throw new Error('Missing content file: src/content/pages/events.md');
 const heroImages = await resolveHeroImages(page.data.heroImages);
 
 const { all, upcoming, past, next } = await getEvents();
+// Event id → its recap post, so past EventCards can link to it.
+const recaps = await recapsByEvent();
 const later = upcoming.slice(1);
 const feeEvent = [...upcoming, ...past].find((event) => event.data.fees.length > 0);
 const seasons = [...new Set(all.map(seasonOf))].sort((a, b) => b - a);
@@ -113,7 +116,7 @@ const schema = upcoming.flatMap((event) => {
             <ul class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {later.map((event) => (
                 <li class="flex">
-                  <EventCard event={event} class="w-full" />
+                  <EventCard event={event} class="w-full" recapHref={recaps.get(event.id)} />
                 </li>
               ))}
             </ul>
@@ -161,7 +164,7 @@ const schema = upcoming.flatMap((event) => {
               <ul class="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {played.map((event) => (
                   <li>
-                    <EventCard event={event} as="h4" />
+                    <EventCard event={event} as="h4" recapHref={recaps.get(event.id)} />
                   </li>
                 ))}
               </ul>

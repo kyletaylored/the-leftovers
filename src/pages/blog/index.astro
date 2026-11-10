@@ -1,0 +1,88 @@
+---
+/**
+ * /blog: every published post, newest first. The lead post (the newest one
+ * marked "featured", else the newest) gets the large PostCard; the rest sit
+ * in a grid. Copy and SEO come from src/content/pages/blog.md.
+ *
+ * Until the first post is published the page shows a MascotCallout and is
+ * noindex, so Google never indexes an empty blog. That also keeps it out of
+ * the sitemap and llms.txt. No pagination yet: add it once there are more
+ * than a couple of dozen posts.
+ */
+import { getEntry } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageHeader from '@/components/PageHeader.astro';
+import Section from '@/components/Section.astro';
+import Button from '@/components/Button.astro';
+import MascotCallout from '@/components/MascotCallout.astro';
+import PostCard from '@/components/blog/PostCard.astro';
+import { resolveHeroImages } from '@/lib/images';
+import { getPosts, leadPost, postHref, summarize } from '@/lib/posts';
+import { site } from '@/lib/settings';
+
+const page = await getEntry('pages', 'blog');
+if (!page) throw new Error('Missing content file: src/content/pages/blog.md');
+const heroImages = await resolveHeroImages(page.data.heroImages);
+
+const posts = await Promise.all((await getPosts()).map((post) => summarize(post)));
+const lead = leadPost(posts);
+const rest = posts.filter((post) => post !== lead);
+
+const schema = posts.length
+  ? [
+      {
+        '@type': 'Blog',
+        name: `${site.title} blog`,
+        url: new URL('/blog', Astro.site).href,
+        publisher: { '@id': new URL('/#team', Astro.site).href },
+        blogPost: posts.slice(0, 20).map((post) => ({
+          '@type': 'BlogPosting',
+          headline: post.title,
+          url: new URL(postHref(post.id), Astro.site).href,
+          datePublished: post.publishDate.toISOString().slice(0, 10),
+        })),
+      },
+    ]
+  : [];
+---
+
+<BaseLayout
+  noindex={page.data.seo.noindex || posts.length === 0}
+  title={page.data.seo.title ?? page.data.title}
+  description={page.data.seo.description ?? page.data.intro}
+  schema={schema}
+>
+  <link slot="head" rel="alternate" type="application/rss+xml" title={`${site.title} blog`} href="/blog/rss.xml" />
+
+  <PageHeader eyebrow={page.data.eyebrow} title={page.data.title} intro={page.data.intro} images={heroImages} />
+
+  {
+    lead ? (
+      <>
+        <Section tone="base">
+          <PostCard post={lead} layout="feature" as="h2" eager />
+        </Section>
+        {rest.length > 0 && (
+          <Section tone="alt" title="More posts">
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {rest.map((post) => (
+                <PostCard post={post} as="h3" />
+              ))}
+            </div>
+          </Section>
+        )}
+      </>
+    ) : (
+      <Section tone="base">
+        <MascotCallout
+          title="Nothing posted yet"
+          body="Event recaps and team news will show up here. Until then, the schedule and the gallery are the best way to see what we're up to."
+          as="h2"
+        >
+          <Button href="/events">See the schedule</Button>
+          <Button href="/gallery" variant="ghost">Browse the gallery</Button>
+        </MascotCallout>
+      </Section>
+    )
+  }
+</BaseLayout>

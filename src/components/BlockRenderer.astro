@@ -36,6 +36,7 @@ import LogoStrip from '@/components/LogoStrip.astro';
 import ImagePlaceholder from '@/components/ImagePlaceholder.astro';
 import Button from '@/components/Button.astro';
 import BrandRule from '@/components/brand/BrandRule.astro';
+import LatestPosts from '@/components/blog/LatestPosts.astro';
 import { site } from '@/lib/settings';
 import { resolveImage } from '@/lib/images';
 import { memberLinks } from '@/lib/team';
@@ -343,6 +344,17 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boole
           <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
             <FaqAccordion items={faqItems} class="max-w-3xl" />
           </Section>
+        );
+      case 'posts':
+        // Renders nothing until a post is published.
+        return (
+          <LatestPosts
+            tone={block.tone}
+            eyebrow={block.eyebrow}
+            title={block.title}
+            count={block.count}
+            layout={block.layout}
+          />
         );
     }
   })

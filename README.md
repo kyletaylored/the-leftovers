@@ -325,6 +325,6 @@ These are decisions for the team, not code gaps:
 
 ### Not built (phase 2/3 per PRD §12)
 
-`/news` recap posts, the CSV importer for stat entry, and any Snipcart-style
-in-brand checkout. `/news` currently 302s to `/events` via `public/_redirects`
-so early links don't 404.
+The CSV importer for stat entry, and any Snipcart-style in-brand checkout. The
+`/news` recap posts are built as `/blog` (Nov 2026), and `/news` redirects
+there.

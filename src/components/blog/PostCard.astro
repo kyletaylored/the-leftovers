@@ -1,0 +1,92 @@
+---
+/**
+ * PostCard — a blog post teaser with its cover photo: the grid card on /blog
+ * and in LatestPosts, or the large `feature` card that leads /blog.
+ *
+ * The whole card is one link. The title's <a> is stretched over the card
+ * (after:inset-0), so there is a single tab stop with the post title as its
+ * accessible name, rather than a photo link, a title link and a "Read more"
+ * link all going to the same place. The focus ring is drawn on the card.
+ *
+ * A post without a cover gets the topo texture and a dim mascot, never an
+ * empty box or a stock photo.
+ */
+import { Image } from 'astro:assets';
+import Pill from '@/components/ui/Pill.astro';
+import MascotMark from '@/components/brand/MascotMark.astro';
+import BrandRule from '@/components/brand/BrandRule.astro';
+import PostMeta from './PostMeta.astro';
+import type { PostSummary } from '@/lib/posts';
+
+interface Props {
+  post: PostSummary;
+  /** `feature`: image beside the copy from lg, bigger title. Once per page. */
+  layout?: 'card' | 'feature';
+  as?: 'h2' | 'h3' | 'h4';
+  /** The first card on a page loads its photo eagerly. */
+  eager?: boolean;
+  class?: string;
+}
+
+const { post, layout = 'card', as: Heading = 'h3', eager = false, class: className = '' } = Astro.props;
+const feature = layout === 'feature';
+const sizes = feature ? '(min-width: 1024px) 720px, 92vw' : '(min-width: 1024px) 400px, (min-width: 640px) 46vw, 92vw';
+---
+
+<article
+  class:list={[
+    'group relative flex flex-col overflow-hidden rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/50',
+    'has-[a:focus-visible]:border-gold has-[a:focus-visible]:ring-2 has-[a:focus-visible]:ring-gold/60',
+    feature && 'lg:grid lg:grid-cols-[1.25fr_1fr]',
+    className,
+  ]}
+>
+  <div class:list={['relative overflow-hidden bg-ink-900', feature ? 'aspect-[16/9] lg:aspect-auto lg:min-h-80' : 'aspect-[16/9]']}>
+    {
+      post.cover ? (
+        <Image
+          src={post.cover}
+          alt={post.coverAlt}
+          widths={feature ? [640, 960, 1440] : [400, 640, 960]}
+          sizes={sizes}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+          class="size-full object-cover transition-transform duration-700 motion-safe:group-hover:scale-[1.03] lg:absolute lg:inset-0"
+        />
+      ) : (
+        <div class="bg-topo flex size-full items-center justify-center lg:absolute lg:inset-0">
+          <MascotMark class="w-1/4" width={128} dim />
+        </div>
+      )
+    }
+  </div>
+
+  <div class:list={['flex flex-1 flex-col', feature ? 'p-6 sm:p-8' : 'p-5']}>
+    {
+      post.tags.length > 0 && (
+        <ul class="mb-3 flex flex-wrap gap-1.5" aria-label="Tags">
+          {post.tags.slice(0, 3).map((tag) => (
+            <li>
+              <Pill tone={feature ? 'gold' : 'muted'} size="sm">{tag}</Pill>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+    <Heading class:list={['text-bone', feature ? 'text-3xl sm:text-4xl' : 'text-xl']}>
+      <a
+        href={post.href}
+        class="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none group-hover:text-gold-300"
+      >
+        {post.title}
+      </a>
+    </Heading>
+    <p class:list={['mt-3 leading-relaxed text-bone-muted', feature ? 'text-base sm:text-lg' : 'text-sm']}>
+      {post.summary}
+    </p>
+    <div class="mt-auto pt-5">
+      <PostMeta post={post} showAuthor={feature} />
+      <BrandRule spacing="none" class="mt-4 opacity-70" />
+    </div>
+  </div>
+</article>

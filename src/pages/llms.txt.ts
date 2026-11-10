@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 import { site } from '@/lib/settings';
+import { getPosts, postHref } from '@/lib/posts';
 
 /**
  * /llms.txt (llmstxt.org): a plain-Markdown map of the site for AI assistants
@@ -27,7 +28,9 @@ export const GET: APIRoute = async ({ site: origin }) => {
   const line = (title: string, path: string, about?: string) =>
     `- [${title}](${url(path)})${about ? `: ${about.replace(/\s+/g, ' ').trim()}` : ''}`;
 
-  const core = pages.filter((p) => !SECONDARY.has(p.id));
+  // The blog index is noindex until its first post, so it's listed only then.
+  const posts = (await getPosts()).filter((p) => !p.data.seo.noindex);
+  const core = pages.filter((p) => !SECONDARY.has(p.id) && (p.id !== 'blog' || posts.length > 0));
   const secondary = pages.filter((p) => SECONDARY.has(p.id));
 
   const preorders = await getCollection(
@@ -54,6 +57,9 @@ export const GET: APIRoute = async ({ site: origin }) => {
     ...core.map((p) => line(p.data.title, `/${p.id}`, p.data.seo.description ?? p.data.intro)),
     ...(preorders.length
       ? ['', '## Pre-orders', '', ...preorders.map((p) => line(p.data.title, `/preorder/${p.id}`, p.data.seo.description ?? p.data.eyebrow))]
+      : []),
+    ...(posts.length
+      ? ['', '## Blog', '', ...posts.slice(0, 20).map((p) => line(p.data.title, postHref(p.id), p.data.seo.description ?? p.data.summary))]
       : []),
     ...(faqs.length
       ? ['', '## FAQ', '', ...faqs.flatMap((f) => [`### ${f.data.question}`, '', f.data.answer.replace(/\s+/g, ' ').trim(), ''])]

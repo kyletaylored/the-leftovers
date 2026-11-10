@@ -23,6 +23,17 @@ media:
     output: /src/assets/img
     extensions: [jpg, jpeg, png, webp, avif, svg]
     categories: [image]
+  # Same folder, for photos inserted INTO a Markdown body (blog posts). A
+  # body image is resolved by Astro's Markdown pipeline, not lib/images.ts,
+  # and that pipeline reads "/src/…" as a public/ file (a 404). The "@/"
+  # alias (tsconfig) resolves from any folder and is optimised like any
+  # other local image.
+  - name: body-images
+    label: Images in post text
+    input: src/assets/img
+    output: '@/assets/img'
+    extensions: [jpg, jpeg, png, webp, avif]
+    categories: [image]
 
 content:
   # -- Team members ---------------------------------------------------------
@@ -576,6 +587,21 @@ content:
               - *tone
               - { name: eyebrow, label: Kicker, type: string }
               - { name: title, label: Heading, type: string }
+          - name: posts
+            label: Latest blog posts
+            fields:
+              - *tone
+              - { name: eyebrow, label: Kicker, type: string }
+              - { name: title, label: Heading, type: string }
+              - { name: count, label: How many posts, type: number, default: 3, description: 1 to 6. The section stays hidden until a post is published. }
+              - name: layout
+                label: Layout
+                type: select
+                default: cards
+                options:
+                  values:
+                    - { value: cards, label: 'Cards with photos' }
+                    - { value: list, label: 'Compact list' }
       - name: seo
         label: SEO
         type: object
@@ -588,6 +614,79 @@ content:
           - { name: ogImage, label: Social share image, type: image, options: { media: images } }
           - { name: ogImageAlt, label: Social share image alt text, type: string }
           - { name: noindex, label: Hide from search engines, type: boolean, default: false }
+
+  # -- Blog posts -----------------------------------------------------------
+  # Mirrors `posts` in src/content.config.ts.
+  - name: posts
+    label: Blog posts
+    description: >-
+      Event recaps, announcements and team news. Keep Status on "Draft" while
+      you write: a draft shows at /preview/blog/your-post-title about two
+      minutes after you save, hidden from search engines. Publish it and it
+      moves to /blog/your-post-title. See docs/EDITING.md.
+    type: collection
+    path: src/content/posts
+    filename: '{year}-{month}-{day}-{fields.title}.md'
+    format: yaml-frontmatter
+    view:
+      fields: [title, status, publishDate]
+      primary: title
+      sort: [publishDate, title]
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+        description: Also sets the post's address when you first create it.
+      - name: status
+        label: Status
+        type: select
+        default: draft
+        required: true
+        options:
+          values:
+            - { value: draft, label: 'Draft (preview only)' }
+            - { value: published, label: Published }
+      - { name: publishDate, label: Publish date, type: date, required: true, description: Shown on the post. Newest posts come first. }
+      - { name: updatedDate, label: Updated date, type: date, description: Only for a real correction or update. Leave empty otherwise. }
+      - name: summary
+        label: Summary
+        type: text
+        required: true
+        description: One or two sentences, under 200 characters. Shown on the post's card and in Google.
+      - name: author
+        label: Author
+        type: reference
+        options: { collection: team, value: '{name}', label: '{fields.name}' }
+      - name: event
+        label: Event (for recaps)
+        type: reference
+        description: Links the post to the event, and the event back to the post.
+        options: { collection: events, value: '{name}', label: '{fields.title}' }
+      - { name: cover, label: Cover photo, type: image, options: { media: images }, description: 'Landscape works best. Without one, the card shows the mascot.' }
+      - name: coverAlt
+        label: Cover photo alt text
+        type: string
+        required: true
+        description: >-
+          Describe the photo for screen readers and image search. Required even
+          before there's a photo; the post title is fine until then.
+      - { name: tags, label: Tags, type: string, list: true, description: 'Short and reused, e.g. "Recap", "Announcement".' }
+      - { name: featured, label: Feature at the top of the blog, type: boolean, default: false }
+      - name: seo
+        label: SEO
+        type: object
+        fields:
+          - { name: title, label: Search-result title, type: string, description: Up to ~60 characters. Falls back to the post title. }
+          - { name: description, label: Meta description, type: text, description: Up to ~155 characters. Falls back to the summary. }
+          - { name: ogImage, label: Social share image, type: image, options: { media: images }, description: Falls back to the cover photo. }
+          - { name: ogImageAlt, label: Social share image alt text, type: string }
+          - { name: noindex, label: Hide from search engines, type: boolean, default: false }
+      - name: body
+        label: Post
+        type: rich-text
+        description: Photos added here need alt text too (the image's description box).
+        options: { media: body-images }
 
   # -- Pre-order drops ------------------------------------------------------
   - name: preorders

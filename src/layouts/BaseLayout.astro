@@ -19,6 +19,9 @@ interface Props {
   description?: string;
   ogImage?: string;
   ogImageAlt?: string;
+  /** Pixel size of `ogImage`, for og:image:width/height. */
+  ogImageWidth?: number;
+  ogImageHeight?: number;
   ogType?: 'website' | 'article';
   noindex?: boolean;
   schema?: Array<Record<string, unknown>>;
@@ -89,6 +92,8 @@ const organizationSchema = {
     <Font cssVariable="--font-brush" />
 
     <Seo {...seo} schema={[organizationSchema, ...(seo.schema ?? [])]} />
+    {/* Page-specific head tags (the blog's RSS link, article:* meta). */}
+    <slot name="head" />
 
     {
       site.gtmId && (
