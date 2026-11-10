@@ -96,12 +96,23 @@ const raised = d.cause ? d.cause.unitsSold * d.cause.donationPerUnit : 0;
 const goal = d.cause ? d.cause.goalUnits * d.cause.donationPerUnit : 0;
 const pct = goal > 0 ? Math.min(100, Math.round((raised / goal) * 100)) : 0;
 
+/**
+ * Google's merchant-listing check requires `image` and wants `brand` to be a
+ * Brand object: a bare `@id` pointing at the SportsTeam node is flagged as
+ * the wrong type. Real variant photos come first; the OG card stands in
+ * when no variant has a photo yet.
+ */
+const productImages = galleryImages
+  .filter((img) => !img.isPlaceholder)
+  .map((img) => new URL(img.src, Astro.site).href);
+
 const schema = [
   {
     '@type': 'Product',
     name: `${site.title} — ${d.title}`,
     description: d.seo.description,
-    brand: { '@id': new URL('/#team', Astro.site).href },
+    image: productImages.length ? productImages : [new URL('/og-default.png', Astro.site).href],
+    brand: { '@type': 'Brand', name: site.title },
     offers: {
       '@type': 'Offer',
       price: d.price,

@@ -40,7 +40,9 @@ const schema = products.map((product) => ({
   '@type': 'Product',
   name: product.data.name,
   ...(product.data.blurb ? { description: product.data.blurb } : {}),
-  brand: { '@id': new URL('/#team', Astro.site).href },
+  // A Brand object, not an @id to the SportsTeam node: Google's merchant
+  // check flags the reference as the wrong type for `brand`.
+  brand: { '@type': 'Brand', name: site.title },
   offers: {
     '@type': 'Offer',
     price: product.data.price,
