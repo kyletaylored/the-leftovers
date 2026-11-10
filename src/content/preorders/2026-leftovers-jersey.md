@@ -48,6 +48,7 @@ paymentMethods:
   - label: Zelle
   - label: Cash in person
 seo:
+  noindex: true
   title: Leftovers Jersey Pre-Order
   description: Pre-order The Leftovers jersey — V1, V2, or the pink Breast
     Cancer Awareness colourway. $25 from every BCA jersey goes to the
