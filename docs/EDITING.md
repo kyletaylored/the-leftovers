@@ -107,6 +107,30 @@ homepage slider, in list order.
 
 ---
 
+## Videos
+
+**Videos** holds the team's videos. The one with **Show on the home page**
+ticked plays on the homepage, just under the first band. Untick it and that
+section disappears.
+
+- **Video file** is an MP4 under 50 MB. Phone and camera files are usually
+  bigger, so send the original to whoever maintains the site. They run one
+  command that shrinks it, grabs a poster still and drafts the captions.
+- **Poster image** is the still shown before it plays. Its **alt text** is
+  required, like every other image.
+- **Captions (.vtt)** are the words on screen while it plays. They also become
+  the **Transcript** under the video, so there's only one place to fix a typo.
+  Drafts come from automatic transcription, which mishears names and
+  paintball slang. **Read them before you publish.** Open the `.vtt` and change
+  only the words; leave the timing lines (`00:00:04.120 --> 00:00:07.900`)
+  alone. A video with no talking can leave captions empty.
+- **Captions on at the start**: untick it when the video already has
+  subtitles in the picture, or the two sets of words stack up. Viewers can
+  still switch captions on with the player's CC button.
+- **Published** is the date it first went up. Google shows it in video results.
+
+---
+
 ## Site settings
 
 **Site settings** holds the things that aren't content: nav labels, social

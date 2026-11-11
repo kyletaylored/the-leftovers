@@ -127,6 +127,11 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Options: layout: peek|single|hero|showcase · indicators: dashes|thumbnails|grid (paged, lazy, opens a lightbox; with single) · pageSize (grid, default 8) · captionStyle: below|flag · tone: ink|crimson|forest · autoplayMs · emptyTitle/emptyBody
   - Data: galleries collection
   - Avoid: hero/showcase inside a Section (they are full-bleed).
+- **VideoPlayer** (`VideoPlayer.astro`): A team video: native player, captions on, expandable transcript built from its .vtt. Zero JS to play; a small script makes timestamps seek.
+  - Options: video (videos entry) · as: h3|h2|h4|false (false when a Section title already names it) · description: true|false · transcriptOpen · captionsOn (default: the entry’s)
+  - Data: videos collection; homeVideo() and videoSchema() in lib/video.ts
+  - Avoid: YouTube/Vimeo iframes (CSP, cookies); autoplay; typing a transcript into content (fix the .vtt instead).
+  - Pairs with: Section
 - **Gallery** (`Gallery.astro`): Masonry photo grid, zero JS.
   - Options: images[{src, alt, caption?}]
 - **LogoStrip** (`LogoStrip.astro`): Static centred row of 2–6 logos (leagues, partners).

@@ -1,0 +1,142 @@
+---
+/**
+ * VideoPlayer — one entry from the videos collection: the browser's own
+ * player, its title and description, and a transcript you can expand.
+ *
+ * Why native <video controls>: keyboard, screen-reader, fullscreen,
+ * picture-in-picture and caption controls all come with it, for no
+ * JavaScript. preload="none" plus a resized poster means the page downloads
+ * nothing of the video until someone presses play, so it costs Lighthouse
+ * nothing even near the top of a page.
+ *
+ * Captions are a WebVTT <track>, on from the start (most people watch muted
+ * on a phone) unless the entry's captionsOn is off because the picture
+ * already has subtitles; the CC button still turns them on. The transcript under the player is built from that same file
+ * (lib/video.ts), so the two can't disagree. It's a <details>, so it opens
+ * without JavaScript and search engines read it. With JavaScript each
+ * timestamp becomes a button that jumps the video there, and the line being
+ * spoken is marked as playback moves.
+ *
+ * Files are served from public/video (fixed URL, same origin), which the
+ * site's CSP already allows through default-src 'self'.
+ */
+import { getImage } from 'astro:assets';
+import Icon from '@/components/brand/Icon.astro';
+import { resolveImage } from '@/lib/images';
+import { clock, readCaptions, type VideoEntry } from '@/lib/video';
+
+interface Props {
+  video: VideoEntry;
+  /** The title's heading level. Pass `false` when the section above already names the video. */
+  as?: 'h2' | 'h3' | 'h4' | false;
+  /** Show the description under the title. */
+  description?: boolean;
+  /** Start with the transcript expanded. */
+  transcriptOpen?: boolean;
+  /** Captions showing when playback starts. Defaults to the entry's captionsOn. */
+  captionsOn?: boolean;
+  class?: string;
+}
+
+const { video } = Astro.props;
+const {
+  as: Heading = 'h3',
+  description = true,
+  transcriptOpen = false,
+  captionsOn = video.data.captionsOn,
+  class: className = '',
+} = Astro.props;
+const { title, file, posterAlt, captions, captionsLang } = video.data;
+const id = `video-${video.id}`;
+
+const posterAsset = await resolveImage(video.data.poster);
+const poster = posterAsset ? await getImage({ src: posterAsset, width: 1280, format: 'webp' }) : undefined;
+const cues = readCaptions(captions);
+const type = file.endsWith('.webm') ? 'video/webm' : 'video/mp4';
+const langLabel = new Intl.DisplayNames(['en'], { type: 'language' }).of(captionsLang) ?? captionsLang;
+---
+
+<figure class:list={['flex flex-col', className]} data-video-player>
+  <div class="overflow-hidden rounded-sm border border-ink-600 bg-ink-900">
+    <video
+      id={id}
+      class="aspect-video w-full bg-ink-900"
+      controls
+      preload="none"
+      playsinline
+      poster={poster?.src}
+      aria-label={title}
+      aria-describedby={posterAlt ? `${id}-poster` : undefined}
+    >
+      <source src={file} type={type} />
+      {captions && <track kind="captions" src={captions} srclang={captionsLang} label={langLabel} default={captionsOn} />}
+      <p class="p-4 text-sm text-bone-muted">
+        Your browser can't play this video. <a href={file} class="text-gold-300 underline">Download it</a> instead.
+      </p>
+    </video>
+    {posterAlt && <span id={`${id}-poster`} class="sr-only">{`Poster: ${posterAlt}`}</span>}
+  </div>
+
+  {
+    (Heading || description) && (
+      <figcaption class="mt-4">
+        {Heading && <Heading class="title-sm text-bone">{title}</Heading>}
+        {description && <p class:list={['max-w-2xl text-sm leading-relaxed text-bone-muted', Heading && 'mt-1']}>{video.data.description}</p>}
+      </figcaption>
+    )
+  }
+
+  {
+    cues.length > 0 && (
+      <details class="group mt-4 rounded-sm border border-ink-600 bg-ink-800" open={transcriptOpen}>
+        <summary class="tap flex cursor-pointer list-none items-center justify-between gap-3 px-4 text-sm font-bold uppercase tracking-[0.1em] text-bone transition-colors hover:text-gold-300 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-gold [&::-webkit-details-marker]:hidden">
+          <span>Transcript</span>
+          <Icon name="chevron" class="size-5 shrink-0 text-gold-300 transition-transform group-open:rotate-180" />
+        </summary>
+        <ol class="max-h-80 overflow-y-auto border-t border-ink-600 px-2 py-2 text-sm leading-relaxed" aria-label={`Transcript of ${title}`}>
+          {cues.map((cue) => (
+            <li class="flex gap-3 rounded-sm px-2 py-1 data-[active]:bg-ink-700" data-start={cue.start} data-end={cue.end}>
+              <button
+                type="button"
+                data-seek={cue.start}
+                aria-controls={id}
+                disabled
+                class="tap -my-2 shrink-0 text-xs font-semibold tabular-nums text-gold-300 enabled:hover:underline focus-visible:outline-2 focus-visible:outline-gold disabled:cursor-default"
+              >
+                <span class="sr-only">Play from </span>{clock(cue.start)}
+              </button>
+              <span class="text-bone-muted">{cue.text}</span>
+            </li>
+          ))}
+        </ol>
+      </details>
+    )
+  }
+</figure>
+
+<script>
+  // Progressive: timestamps seek, and the spoken line is highlighted.
+  for (const root of document.querySelectorAll<HTMLElement>('[data-video-player]')) {
+    const video = root.querySelector('video');
+    const lines = [...root.querySelectorAll<HTMLLIElement>('li[data-start]')];
+    if (!video || !lines.length) continue;
+
+    for (const button of root.querySelectorAll<HTMLButtonElement>('button[data-seek]')) {
+      button.disabled = false;
+      button.addEventListener('click', () => {
+        video.currentTime = Number(button.dataset.seek);
+        void video.play().catch(() => {});
+      });
+    }
+
+    let current: HTMLLIElement | undefined;
+    video.addEventListener('timeupdate', () => {
+      const t = video.currentTime;
+      const next = lines.find((li) => t >= Number(li.dataset.start) && t < Number(li.dataset.end));
+      if (next === current) return;
+      current?.removeAttribute('data-active');
+      next?.setAttribute('data-active', '');
+      current = next;
+    });
+  }
+</script>

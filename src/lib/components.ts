@@ -202,6 +202,14 @@ export const catalog: CatalogEntry[] = [
     use: 'shadcn/Embla primitive behind Slideshow.',
   },
   {
+    name: 'VideoPlayer', file: 'VideoPlayer.astro', kind: 'Astro', group: 'marketing', section: 'marketing',
+    use: 'A team video: native player, captions on, expandable transcript built from its .vtt. Zero JS to play; a small script makes timestamps seek.',
+    options: 'video (videos entry) · as: h3|h2|h4|false (false when a Section title already names it) · description: true|false · transcriptOpen · captionsOn (default: the entry’s)',
+    data: 'videos collection; homeVideo() and videoSchema() in lib/video.ts',
+    avoid: 'YouTube/Vimeo iframes (CSP, cookies); autoplay; typing a transcript into content (fix the .vtt instead).',
+    pairs: ['Section'],
+  },
+  {
     name: 'Gallery', file: 'Gallery.astro', kind: 'Astro', group: 'marketing', section: 'marketing',
     use: 'Masonry photo grid, zero JS.',
     options: 'images[{src, alt, caption?}]',

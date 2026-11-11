@@ -97,10 +97,16 @@ linked from anywhere either, but its closed state still points at `/shop` and
   squads (`src/lib/events.ts`). `TeamStatsWidget` can show live team stats from
   **pblidb.org** (an unofficial public API, fetched at build time, fails soft;
   see `src/lib/pblidb.ts`).
+- Videos: the `videos` collection, `VideoPlayer` (native player, captions, a
+  transcript built from the same `.vtt`) and VideoObject JSON-LD. The home
+  page shows the entry marked "Show on the home page". Files live in
+  `public/video/`; `uv run scripts/prepare-video.py <file> <slug>` compresses
+  a video, grabs a poster and drafts captions with Whisper, offline.
 - Upcoming vs past is computed from dates (`src/lib/events.ts`). Nobody flips a
   status flag.
 - SEO: sitemap, robots, canonical URLs, per-page OG and Twitter tags, and
-  JSON-LD (`SportsTeam`, `Person`, `SportsEvent`, `Product`, `FAQPage`).
+  JSON-LD (`SportsTeam`, `Person`, `SportsEvent`, `Product`, `FAQPage`,
+  `VideoObject`).
 - Design system: the `/design` page, Storybook with play tests, and shared
   token and texture data. See §4.
 - Wide screens: past 1600px the whole site sits in a centred page frame over

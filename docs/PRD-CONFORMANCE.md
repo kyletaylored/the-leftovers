@@ -660,3 +660,14 @@ from earlier decisions here.
   Indexed: every page that isn't noindex, `<main>` only. Blog posts carry
   category, tag and year filters. Posts also gained a fixed `category` (one
   per post) alongside free-form tags, with static archive pages for both.
+- **Self-hosted video with captions (10 Nov 2026).** The PRD has no video.
+  The owner asked for a promo video on the home page, with transcripts. It's
+  served from `public/video/` (same origin), not YouTube or Vimeo, so the
+  CSP and the consent-gated analytics rule need no exceptions: an embed
+  would set cookies before consent and need `frame-src`. Video can't go
+  through `<Image>`, so it's the second kind of media in `public/` (after the
+  fixed-URL tiles), with a 50 MB per-file ceiling from GitHub. Captions are
+  WebVTT next to the video, and the on-page transcript is derived from them
+  at build time rather than stored. Drafts come from
+  `scripts/prepare-video.py`, which runs Whisper locally, so footage never
+  goes to a transcription service.

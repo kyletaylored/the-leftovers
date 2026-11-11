@@ -64,6 +64,7 @@ import ImagePlaceholder from '@/components/ImagePlaceholder.astro';
 import StatNumber from '@/components/StatNumber.astro';
 import Callout from '@/components/Callout.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
+import VideoPlayer from '@/components/VideoPlayer.astro';
 import CtaStrip from '@/components/CtaStrip.astro';
 import ThreeColumn from '@/components/ThreeColumn.astro';
 import FaqAccordion from '@/components/FaqAccordion.astro';
@@ -264,6 +265,8 @@ const threeColItems: { icon: 'jersey' | 'calendar' | 'trophy'; title: string; bo
 ];
 
 const positions = ['Wherever you need me', 'Front', 'Mid', 'Back', 'Snake', 'Insert'];
+
+const specimenVideo = (await getCollection('videos')).sort((a, b) => a.data.order - b.data.order)[0];
 
 const landingHome = (await getCollection('landing')).find((page) => page.id === 'home');
 const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
@@ -1029,6 +1032,20 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
               ]}
             />
           </div>
+        </Specimen>
+
+        <Specimen
+          title="VideoPlayer"
+          file={['src/components/VideoPlayer.astro', 'src/lib/video.ts', 'scripts/prepare-video.py']}
+          note={'One videos entry: the native player (captions on from the start unless the entry turns them off), then a Transcript you can expand, built from the same .vtt. Nothing downloads until play is pressed. With JS, timestamps jump the video and the spoken line is highlighted. as={false} drops the title when the Section above already names the video, as on the home page. Make the files with scripts/prepare-video.py.'}
+        >
+          {
+            specimenVideo ? (
+              <VideoPlayer video={specimenVideo} as="h4" transcriptOpen class="mx-auto max-w-3xl" />
+            ) : (
+              <MascotCallout as="h4" title="No videos yet" body="Add one in Pages CMS → Videos, and it shows here." />
+            )
+          }
         </Specimen>
 
         <div class="grid gap-5 lg:grid-cols-2">
