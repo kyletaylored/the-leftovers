@@ -2,6 +2,7 @@
 /**
  * ThreeColumn — the icon/feature grid (§7). Mobile stacks; columns are added
  * going up, never removed going down.
+ * Exactly four items sit two by two instead of leaving one alone on a row.
  *
  * Three options, all combinable with iconStyle (defaults render the original compact cards):
  *  - `layout="centered"`: icon, title and body centred, everything larger.
@@ -26,9 +27,10 @@ const { items, as: Heading = 'h3', layout = 'card', iconStyle = 'tile', class: c
 const centered = layout === 'centered';
 const inline = layout === 'inline';
 const circle = iconStyle === 'circle';
+const four = items.length === 4;
 ---
 
-<ul class:list={['grid gap-5 sm:grid-cols-2 lg:grid-cols-3', className]}>
+<ul class:list={['grid gap-5 sm:grid-cols-2', !four && 'lg:grid-cols-3', className]}>
   {
     items.map((item) => {
       const icon = item.icon && (

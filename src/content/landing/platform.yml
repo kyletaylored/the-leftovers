@@ -124,6 +124,9 @@ sections:
       - icon: lock
         title: Encrypted
         body: All sensitive data is encrypted, both stored and on its way to you.
+      - icon: key
+        title: Passwordless by design
+        body: Sign in with an email link, Google or Discord. There's no password to leak, reuse or forget.
       - icon: check
         title: Built to privacy standards
         body: The app follows privacy framework standards and only keeps what running the team needs.
