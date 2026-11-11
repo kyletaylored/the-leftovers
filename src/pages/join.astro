@@ -1,9 +1,12 @@
 ---
 /**
- * /join — request-to-play form (name, contact, division, player class,
- * event, payment method). Added when the team stopped running a Discord:
- * this is now the actual mechanism for "how do I get on the roster for an
- * upcoming event," replacing "ask in the event channel."
+ * /join — how to get on a squad. Since Nov 2026 it sends people to sign up on
+ * the player app (`join.appUrl` in site.yml), where requests, squads and
+ * payments live. The site still holds no accounts: it's a link out.
+ *
+ * With `appUrl` empty it falls back to the request-to-play form (name,
+ * contact, division, player class, event, payment method) posting to a
+ * Google Form, which replaced "ask in the Discord" in Oct 2026.
  */
 import { getCollection, getEntry, render } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -13,6 +16,8 @@ import Prose from '@/components/Prose.astro';
 import ProcessSteps from '@/components/ProcessSteps.astro';
 import FaqAccordion from '@/components/FaqAccordion.astro';
 import JoinRequestForm from '@/components/JoinRequestForm.tsx';
+import CtaStrip from '@/components/CtaStrip.astro';
+import Button from '@/components/Button.astro';
 import { resolveHeroImages } from '@/lib/images';
 import { site } from '@/lib/settings';
 
@@ -33,6 +38,22 @@ const faqs = (await getCollection('faqs'))
 <BaseLayout noindex={page.data.seo.noindex} title={page.data.seo.title ?? page.data.title} description={page.data.seo.description}>
   <PageHeader eyebrow={page.data.eyebrow} title={page.data.title} intro={page.data.intro} images={heroImages} />
 
+  {site.join.appUrl ? (
+    <Section tone="base">
+      <CtaStrip title={site.join.appTitle} body={site.join.appBody} as="h2">
+        <Button slot="actions" href={site.join.appUrl} variant="gold" size="lg">{site.join.appButton}</Button>
+      </CtaStrip>
+      <div class="mt-12 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
+        <div>
+          <h2 class="mb-6 text-2xl text-bone sm:text-3xl">How it works</h2>
+          <ProcessSteps steps={site.eventProcess.steps} layout="stack" />
+        </div>
+        <Prose class="lg:pt-16">
+          <Content />
+        </Prose>
+      </div>
+    </Section>
+  ) : (
   <Section tone="base">
     <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-16">
       <div>
@@ -56,6 +77,7 @@ const faqs = (await getCollection('faqs'))
       </div>
     </div>
   </Section>
+  )}
 
   <Section tone="sand">
     <h2 class="mb-6 text-2xl text-bone sm:text-3xl">Questions</h2>

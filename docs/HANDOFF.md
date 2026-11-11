@@ -72,7 +72,7 @@ team deciding to:
 | `/blog`, `/blog/[slug]`, `/preview/blog/[slug]` | Blog (the PRD's `/news`): `BlogFilters`, lead `PostCard`, a grid of the rest, `PostLayout` per post, drafts at `/preview/blog`, RSS at `/blog/rss.xml` | Added 10 Nov 2026. **No posts yet**, so `/blog` shows a `MascotCallout` and is noindex. Not in the nav; `/news` redirects here |
 | `/blog/category/[id]`, `/blog/tag/[slug]` | Archives: one page per category (`src/lib/post-categories.ts`) or tag that has posts | Built only once a post exists. Tag pages are noindex |
 | `/search` | Site search (`SiteSearch` island on the Pagefind index `npm run build` writes to `dist/pagefind/`): type chips, blog category/tag/year filters | noindex. Search icon in the nav. Empty under `npm run dev`; use `npm run build && npm run preview` |
-| `/join` | "Request to play" form | `JoinRequestForm` island → Google Form ([JOIN.md](JOIN.md)) |
+| `/join` | How to get on a squad, with a **Sign up** button to the player app | Since 10 Nov 2026 it links out to `join.appUrl` in `site.yml`. Clear that to bring back the `JoinRequestForm` → Google Form ([JOIN.md](JOIN.md)) |
 | `/community` | Social links, optional Instagram/Facebook embeds, newsletter | **Hidden.** No Discord right now (see below) |
 | `/contact` | Contact, with the partner logos (Infamous, Kinetic) | |
 | `/privacy` · `/terms` | Privacy Policy & Terms and Conditions | Linked in the footer alongside Cookie settings |
@@ -377,7 +377,9 @@ inline-styled HTML into the repo.
 6. **Player platform.** Decided 6 Nov 2026: join requests, squad placement,
    payments and rosters move to a separate private app, not this site. It's live
    at `app.theleftoverspb.com` and being set up for the first 2027 event. See the Player platform
-   section of [`AGENTS.md`](../AGENTS.md).
+   section of [`AGENTS.md`](../AGENTS.md). Since 10 Nov 2026 `/join` sends people
+   there to sign up, and new accounts wait for the team to let them in while it's
+   tested.
 
 ### Don't do
 

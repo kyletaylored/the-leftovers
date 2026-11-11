@@ -670,3 +670,9 @@ from earlier decisions here.
   WebVTT next to the video. Drafts come from
   `scripts/prepare-video.py`, which runs Whisper locally, so footage never
   goes to a transcription service.
+- **`/join` signs people up on the player app (10 Nov 2026).** The owner chose
+  to stop taking join requests through the Google Form while the player app is
+  tested. `/join` keeps its steps and FAQs, and its **Sign up** button links
+  to `app.theleftoverspb.com`, where new accounts wait for the team to let them
+  in. This site still holds no accounts: it's a link out, so no CSP change.
+  `join.appUrl` in `site.yml` controls it, and clearing it brings the form back.

@@ -40,8 +40,9 @@ it can show the event in search, so an event without one is left out.
 same event apart across seasons in this list.
 
 Players never sign up through the league link. *League event page* is for details
-and results; the card's **Request a spot** button goes to the join form, and
-the event captain registers each squad. Requests close the day after the
+and results; the card's **Request a spot** button goes to the Join page, which
+sends players to sign up on the player app, and the event captain registers each
+squad. Requests close the day after the
 *Late through* date in **Fee deadlines**.
 
 **Fees:** copy the rows from the league's fee table into **League fees (per

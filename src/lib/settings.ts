@@ -126,6 +126,15 @@ const settingsSchema = z.object({
   // `fieldMap` mapping our field names to its `entry.NNN` ids.
   join: z
     .object({
+      /**
+       * The player app's address. When set, /join sends people there to sign
+       * up instead of showing the form, and the form settings below go unused.
+       * Empty brings the form back.
+       */
+      appUrl: z.string().default(''),
+      appTitle: z.string().default(''),
+      appBody: z.string().default(''),
+      appButton: z.string().default('Sign up'),
       provider: z.string().default(''),
       endpoint: z.string().default(''),
       fieldMap: z.record(z.string(), z.string()).default({}),

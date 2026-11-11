@@ -1,5 +1,10 @@
 # Join requests: how the /join form works
 
+> **Not in use since 10 Nov 2026.** `/join` now sends people to sign up on the
+> player app (`join.appUrl` in `src/data/site.yml`), where new accounts wait for
+> the team to let them in. This form and its Google Form are kept as a fallback:
+> clear `appUrl` and `/join` shows the form again.
+
 Replaces asking "who's in for the next event" in a Discord channel the team
 doesn't currently run. The site can't hold a roster spot or verify a
 payment — the form's actual job is to turn "I want to play" into one
