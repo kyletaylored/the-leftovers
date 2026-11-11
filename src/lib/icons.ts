@@ -41,6 +41,13 @@ export const STROKED_ICONS = {
   fullscreen: 'M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5',
   'fullscreen-exit': 'M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5',
   'sold-out': 'M11 4h2v9h-2ZM12 17.2a1.3 1.3 0 1 0 0 2.6 1.3 1.3 0 0 0 0-2.6Z M4.8 19 19.2 5',
+  // App features, for the player platform's pages.
+  bell: 'M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15ZM10 20.5a2 2 0 0 0 4 0M12 3v2',
+  phone: 'M7 4.5A1.5 1.5 0 0 1 8.5 3h7A1.5 1.5 0 0 1 17 4.5v15a1.5 1.5 0 0 1-1.5 1.5h-7A1.5 1.5 0 0 1 7 19.5ZM10.5 18h3',
+  wallet:
+    'M4 7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5ZM20 10h-4a2.5 2.5 0 0 0 0 5h4M16 12.5h.5',
+  users: 'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3 20a6 6 0 0 1 12 0M16 4.3a3.5 3.5 0 0 1 0 6.4M18 14.3a6 6 0 0 1 3 5.7',
+  lock: 'M6 11.5A1.5 1.5 0 0 1 7.5 10h9a1.5 1.5 0 0 1 1.5 1.5v7a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 18.5ZM8.5 10V7.5a3.5 3.5 0 0 1 7 0V10M12 14v2.5',
 } as const;
 
 export const FILLED_ICONS = {

@@ -111,7 +111,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Avoid: Two ImpactBands back to back; put a boxed block (TwoColumn, Section) between. wash="none" with body text or stats but no backdrop="panel" (scrim alone can fail AA on a bright photo).
   - Pairs with: Hero, TwoColumn
 - **FeatureRow** (`marketing/FeatureRow.astro`): Alternating media + copy rows. Flip every other row with reverse.
-  - Options: title · body · eyebrow · ctaLabel+ctaHref · image+imageAlt (topo fallback) · reverse
+  - Options: title · body · eyebrow · ctaLabel+ctaHref · image+imageAlt (topo fallback) · reverse · frame: none|phone|browser (app screenshot, uncropped) · frameLabel (browser bar address)
 - **PricingCard** (`marketing/PricingCard.astro`): Tier card in a grid (sm:grid-cols-3).
   - Options: tierName · price · unit · bullets[] · ctaLabel+ctaHref · featured (max one per row)
 - **ProductGrid** (`marketing/ProductGrid.astro`): Shop grid of ProductCards with optional filter chips.

@@ -159,7 +159,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'FeatureRow', file: 'marketing/FeatureRow.astro', kind: 'Astro', group: 'marketing', section: 'marketing',
     use: 'Alternating media + copy rows. Flip every other row with reverse.',
-    options: 'title · body · eyebrow · ctaLabel+ctaHref · image+imageAlt (topo fallback) · reverse',
+    options: 'title · body · eyebrow · ctaLabel+ctaHref · image+imageAlt (topo fallback) · reverse · frame: none|phone|browser (app screenshot, uncropped) · frameLabel (browser bar address)',
   },
   {
     name: 'PricingCard', file: 'marketing/PricingCard.astro', kind: 'Astro', group: 'marketing', section: 'marketing',

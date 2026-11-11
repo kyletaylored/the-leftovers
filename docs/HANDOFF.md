@@ -1,7 +1,7 @@
 # Handoff: The Leftovers website
 
 **Start here** if you're picking this project up, whether you're a person or an
-agent. It covers what the site is, what state it's in (as of **10 Nov 2026**),
+agent. It covers what the site is, what state it's in (as of **11 Nov 2026**),
 how to work on it without breaking its rules, and what's left to do. Everything
 else in `docs/` goes deeper on one topic.
 
@@ -62,7 +62,7 @@ team deciding to:
 
 | Route | What it is | Notes |
 |---|---|---|
-| `/[slug]`, `/preview/[slug]` | `landing` pages composed in Pages CMS: published, and drafts (noindex) | `BlockRenderer`. `/preview/home` is the homepage rebuilt as blocks; `index.astro` is still what's live |
+| `/[slug]`, `/preview/[slug]` | `landing` pages composed in Pages CMS: published, and drafts (noindex) | `BlockRenderer`. `/preview/home` is the homepage rebuilt as blocks and `/preview/platform` is the player app's page; `index.astro` is still what's live |
 | `/` | Home ("direction B"): ornate sand hero, `ImpactBand` manifesto, full-width showcase slider, "How it works" `TwoColumn` CTA, crimson free-agents `ImpactBand`, "2027 Season Loading…" + league logos, newsletter | Direction B promoted Nov 2026 |
 | `/gallery` | All 61 event photos: large photo, paged thumbnail grid, lightbox with magnifier, lazy loaded | Footer link only (`footerNav` in `site.yml`) |
 | `/about`, `/roster`, `/stats` | Redirect stubs: the first two go home, `/stats` goes to `/events` | `/team` was removed Nov 2026; see §7 for the planned `/about` |
@@ -343,6 +343,12 @@ inline-styled HTML into the repo.
    right now, so decide whether it belongs there. pblidb is still backfilling, and most
    squads have no results yet; `OUR_TEAMS` in `src/lib/pblidb.ts` lists all four
    records for the main team until it's clear which are ours.
+0. **Publish the player app page when the app opens.** It's a hidden draft at
+   `/preview/platform` (`src/content/landing/platform.yml`), a landing page for
+   players and staff that links to `app.theleftoverspb.com`. Its app screenshots
+   (`src/assets/img/app/`) come from the app's demo build, so they show sample
+   data only; retake them when those screens change. Check the copy with Matt,
+   then set it to `published` for `/platform` and link it from the nav or `/join`.
 0. **Decide whether the homepage moves to blocks.** `/preview/home` matches   `index.astro` from `src/content/landing/home.yml`. Moving would make the   homepage editable in Pages CMS and take its copy out of the template, but   `index.astro` also emits the `WebSite` schema, which would need a home.
 1. **Move hosting to Cloudflare Pages.** This turns on the CSP and security
    headers, real `_redirects` and preview deploys. Everything needed is

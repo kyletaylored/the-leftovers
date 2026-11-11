@@ -526,6 +526,12 @@ content:
                 list: true
                 required: true
                 fields:
+                  # Any name in STROKED_ICONS (src/lib/icons.ts); these are the ones that suit a feature grid.
+                  - name: icon
+                    label: Icon
+                    type: select
+                    options:
+                      values: [calendar, jersey, check, chat, bell, phone, wallet, users, lock, mail, pin, globe, trophy, leaderboard, search, camera, lantern, chopsticks, sponsor]
                   - { name: title, label: Title, type: string, required: true }
                   - { name: body, label: Text, type: text, required: true }
           - name: featureRow
@@ -537,6 +543,8 @@ content:
               - { name: image, label: Photo, type: image, options: { media: images } }
               - { name: imageAlt, label: Photo alt text, type: string, required: true }
               - { name: reverse, label: Photo on the other side, type: boolean, default: false }
+              - { name: frame, label: Show as, type: select, default: none, options: { values: [{ value: none, label: Photo }, { value: phone, label: Phone screenshot }, { value: browser, label: Browser screenshot }] } }
+              - { name: frameLabel, label: Address in the browser bar, type: string }
               - { name: ctaLabel, label: Button text, type: string }
               - { name: ctaHref, label: Button link, type: string }
           - name: prose
