@@ -186,7 +186,7 @@ footerNote: >-
 eventProcess:
   steps:
     - title: Request a spot
-      body: Send a join request with the event, division, format and position you want. No tryout.
+      body: Sign up on the player app, then ask for a spot with the event, division, format and position you want. No tryout.
     - title: Get placed on a squad
       body: Your event captain sorts every request into squads by division, format and position preference.
     - title: Pay your event fee
@@ -207,6 +207,16 @@ eventProcess:
 # `endpoint` to its `formResponse` URL, and `fieldMap` to its `entry.NNN`
 # ids — see docs/PREORDERS.md for how to read those ids off a form.
 join:
+  # Players sign up on the player app now (Nov 2026). New accounts wait for
+  # the team to let them in while the app is being tested. Clear `appUrl` to
+  # bring back the form below.
+  appUrl: https://app.theleftoverspb.com
+  appTitle: Sign up on the player app
+  appBody: >-
+    Make an account and fill in your profile once. We're letting people in a
+    few at a time while we test it, and we'll email you when you're in. Then
+    ask for a spot at any event.
+  appButton: Sign up
   provider: google-form
   endpoint: https://docs.google.com/forms/d/e/1FAIpQLScXBRfpLmXtatUdaNnr0ZoZVjsj37KAlhDHCFx7g8sBRC6XJQ/formResponse
   # Our field name -> the form's entry id. Read off the live form's own
