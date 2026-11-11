@@ -863,8 +863,7 @@ content:
     label: Videos
     description: >-
       Team videos with captions. Tick "Show on the home page" on the one the
-      home page should play. The transcript under the player is made from the
-      captions file, so fix a misheard word there and both update.
+      home page should play.
     type: collection
     path: src/content/videos
     filename: '{fields.title}.yml'
@@ -897,9 +896,8 @@ content:
         type: file
         options: { media: videos, extensions: [vtt] }
         description: >-
-          WebVTT captions. They show on the video and become the transcript
-          under it. Read them before publishing: auto-transcription mishears
-          names. Leave empty for a video with no speech.
+          WebVTT captions, shown on the video while it plays. Read them before
+          publishing: auto-transcription mishears names. Leave empty for a video with no speech.
       - { name: captionsLang, label: Captions language, type: string, default: en, description: 'e.g. "en" or "es".' }
       - name: captionsOn
         label: Captions on at the start

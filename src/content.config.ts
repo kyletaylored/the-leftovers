@@ -322,9 +322,7 @@ const galleries = defineCollection({
 /**
  * Videos: one YAML file each. The video and its captions live in
  * public/video/ (a fixed URL, served as-is; Astro doesn't process video) and
- * the poster in src/assets/img/videos/ like any photo. The transcript shown
- * under the player is built from the captions file (lib/video.ts), so it is
- * never stored here. Make all three with `uv run scripts/prepare-video.py`.
+ * the poster in src/assets/img/videos/ like any photo. Make all three with `uv run scripts/prepare-video.py`.
  */
 const videos = defineCollection({
   loader: glob({ base: './src/content/videos', pattern: '**/*.{yml,yaml}' }),

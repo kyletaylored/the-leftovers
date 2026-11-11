@@ -97,8 +97,9 @@ linked from anywhere either, but its closed state still points at `/shop` and
   squads (`src/lib/events.ts`). `TeamStatsWidget` can show live team stats from
   **pblidb.org** (an unofficial public API, fetched at build time, fails soft;
   see `src/lib/pblidb.ts`).
-- Videos: the `videos` collection, `VideoPlayer` (native player, captions, a
-  transcript built from the same `.vtt`) and VideoObject JSON-LD. The home
+- Videos: the `videos` collection, `VideoPlayer` (an on-brand player island
+  with its own captions; the browser's player without JS) and VideoObject
+  JSON-LD. The home
   page shows the entry marked "Show on the home page". Files live in
   `public/video/`; `uv run scripts/prepare-video.py <file> <slug>` compresses
   a video, grabs a poster and drafts captions with Whisper, offline.

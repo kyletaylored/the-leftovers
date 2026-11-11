@@ -202,12 +202,16 @@ export const catalog: CatalogEntry[] = [
     use: 'shadcn/Embla primitive behind Slideshow.',
   },
   {
-    name: 'VideoPlayer', file: 'VideoPlayer.astro', kind: 'Astro', group: 'marketing', section: 'marketing',
-    use: 'A team video: native player, captions on, expandable transcript built from its .vtt. Zero JS to play; a small script makes timestamps seek.',
-    options: 'video (videos entry) · as: h3|h2|h4|false (false when a Section title already names it) · description: true|false · transcriptOpen · captionsOn (default: the entry’s)',
+    name: 'VideoPlayer', file: 'VideoPlayer.astro', kind: 'Astro + island', group: 'marketing', section: 'marketing', story: true,
+    use: 'A team video in the on-brand player: crimson play button, gold progress bar, captions in the site type. The browser player without JS; nothing downloads until play.',
+    options: 'video (videos entry) · as: h3|h2|h4|false (false when a Section title already names it) · description: true|false · captionsOn (default: the entry’s)',
     data: 'videos collection; homeVideo() and videoSchema() in lib/video.ts',
-    avoid: 'YouTube/Vimeo iframes (CSP, cookies); autoplay; typing a transcript into content (fix the .vtt instead).',
+    avoid: 'YouTube/Vimeo iframes (CSP, cookies); autoplay; VideoPlayerIsland directly.',
     pairs: ['Section'],
+  },
+  {
+    name: 'VideoPlayerIsland', file: 'VideoPlayerIsland.tsx', kind: 'React island', group: 'marketing', section: 'marketing', story: true, internal: true,
+    use: 'The themed controls and caption overlay behind VideoPlayer.',
   },
   {
     name: 'Gallery', file: 'Gallery.astro', kind: 'Astro', group: 'marketing', section: 'marketing',

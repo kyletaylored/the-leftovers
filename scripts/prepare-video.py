@@ -19,8 +19,8 @@ Writes, ready to commit:
 Then add an entry under src/content/videos/ (or in Pages CMS → Videos)
 pointing at the three files. READ THE CAPTIONS BEFORE PUBLISHING: Whisper
 mishears names, team slang and anything shouted over a loud field. Fix the
-text in the .vtt (keep the timestamps); the transcript on the page is built
-from that same file, so one fix covers both.
+text in the .vtt and keep the timestamps. Drop any lines the picture already
+shows as burned-in subtitles, or they appear twice.
 
 Why local: the site has no backend, and a free, offline transcriber keeps team
 footage off third-party services. uv installs ffmpeg (imageio-ffmpeg) and

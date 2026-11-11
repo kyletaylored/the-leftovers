@@ -118,9 +118,7 @@ section disappears.
   command that shrinks it, grabs a poster still and drafts the captions.
 - **Poster image** is the still shown before it plays. Its **alt text** is
   required, like every other image.
-- **Captions (.vtt)** are the words on screen while it plays. They also become
-  the **Transcript** under the video, so there's only one place to fix a typo.
-  Drafts come from automatic transcription, which mishears names and
+- **Captions (.vtt)** are the words on screen while it plays. Drafts come from automatic transcription, which mishears names and
   paintball slang. **Read them before you publish.** Open the `.vtt` and change
   only the words; leave the timing lines (`00:00:04.120 --> 00:00:07.900`)
   alone. A video with no talking can leave captions empty.

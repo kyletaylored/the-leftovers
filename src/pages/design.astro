@@ -1036,12 +1036,13 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
 
         <Specimen
           title="VideoPlayer"
-          file={['src/components/VideoPlayer.astro', 'src/lib/video.ts', 'scripts/prepare-video.py']}
-          note={'One videos entry: the native player (captions on from the start unless the entry turns them off), then a Transcript you can expand, built from the same .vtt. Nothing downloads until play is pressed. With JS, timestamps jump the video and the spoken line is highlighted. as={false} drops the title when the Section above already names the video, as on the home page. Make the files with scripts/prepare-video.py.'}
+          file={['src/components/VideoPlayer.astro', 'src/components/VideoPlayerIsland.tsx', 'scripts/prepare-video.py']}
+          tag="Astro + island"
+          note={'One videos entry in the on-brand player: crimson play button, then a bar with play, time, a gold progress bar, mute, captions and full screen that fades while it plays. Captions are drawn in the site type, lifted above the bar, and on from the start unless the entry turns them off. Keys: Space/K, M, C, F. Without JS it is the browser player. Nothing downloads until play is pressed. as={false} drops the title when the Section above already names the video, as on the home page. Make the files with scripts/prepare-video.py.'}
         >
           {
             specimenVideo ? (
-              <VideoPlayer video={specimenVideo} as="h4" transcriptOpen class="mx-auto max-w-3xl" />
+              <VideoPlayer video={specimenVideo} as="h4" class="mx-auto max-w-3xl" />
             ) : (
               <MascotCallout as="h4" title="No videos yet" body="Add one in Pages CMS → Videos, and it shows here." />
             )
