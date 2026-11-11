@@ -237,7 +237,11 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boole
       case 'threeColumn':
         return (
           <Section tone={block.tone} eyebrow={block.eyebrow} title={block.title}>
-            <ThreeColumn items={block.items} layout={block.layout} as={block.title ? 'h3' : 'h2'} />
+            <ThreeColumn
+              items={block.items.map((item) => ({ ...item, icon: item.icon ?? undefined }))}
+              layout={block.layout}
+              as={block.title ? 'h3' : 'h2'}
+            />
           </Section>
         );
 

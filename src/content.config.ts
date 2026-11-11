@@ -2,6 +2,9 @@ import { defineCollection } from 'astro:content';
 import * as z from 'astro/zod';
 import { glob, file } from 'astro/loaders';
 import { POST_CATEGORY_IDS } from './lib/post-categories';
+import { strokedIconNames } from './lib/icons';
+
+type StrokedIcon = (typeof strokedIconNames)[number];
 
 /* -------------------------------------------------------------------------
  * Content collections (PRD §6).
@@ -469,7 +472,16 @@ const landingBlock = z.discriminatedUnion('type', [
     eyebrow: optText,
     title: optText,
     layout: z.enum(['card', 'centered']).default('card'),
-    items: z.array(z.object({ title: z.string(), body: z.string() })).min(1),
+    items: z
+      .array(
+        z.object({
+          /** Optional. Any stroked glyph in src/lib/icons.ts; .pages.yml lists them. */
+          icon: z.enum(strokedIconNames as [StrokedIcon, ...StrokedIcon[]]).nullish(),
+          title: z.string(),
+          body: z.string(),
+        })
+      )
+      .min(1),
   }),
   z.object({
     type: z.literal('featureRow'),

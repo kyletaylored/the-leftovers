@@ -526,6 +526,12 @@ content:
                 list: true
                 required: true
                 fields:
+                  # Any name in STROKED_ICONS (src/lib/icons.ts); these are the ones that suit a feature grid.
+                  - name: icon
+                    label: Icon
+                    type: select
+                    options:
+                      values: [calendar, jersey, check, chat, bell, phone, wallet, users, lock, mail, pin, globe, trophy, leaderboard, search, camera, lantern, chopsticks, sponsor]
                   - { name: title, label: Title, type: string, required: true }
                   - { name: body, label: Text, type: text, required: true }
           - name: featureRow

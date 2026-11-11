@@ -1,0 +1,109 @@
+# The player app's landing page. Hidden while it's a draft: it builds at
+# /preview/platform, with no nav link, a noindex tag and no sitemap entry.
+# To publish it at /platform, set status to published.
+title: Player app
+status: draft
+hero:
+  variant: image
+  title: The Leftovers app
+  tagline: Sign up once / Play all season
+  image: /src/assets/img/events/nxl-lso26/lo2nxllso26-160-x5.webp
+  imageAlt: Leftovers players in team jerseys pose under a tent, some crouching in front and one holding a clipboard.
+  ctas:
+    - { label: Request access, href: 'https://app.theleftoverspb.com', variant: gold }
+    - { label: How joining works, href: /join, variant: outline }
+sections:
+  - type: statement
+    framed: true
+    eyebrow: One place for every event
+    lines:
+      - No more forms.
+      - No more spreadsheets.
+      - No chasing who paid.
+  - type: threeColumn
+    tone: alt
+    eyebrow: For players
+    title: Your season in one place
+    items:
+      - icon: calendar
+        title: Request a spot
+        body: Pick an open event and the divisions you'd play. Staff place you on a squad.
+      - icon: check
+        title: See where you stand
+        body: Each squad has a tracker, from requested to on a squad, paid and on the roster.
+      - icon: wallet
+        title: Pay your share
+        body: Pay by Zelle, Venmo and more with your own reference code. Staff confirm it, and it shows in your history.
+      - icon: bell
+        title: Hear it first
+        body: Get a notification when you're offered a spot, your payment lands or a notice goes out.
+      - icon: jersey
+        title: Your player card
+        body: Your APPA ID, positions, ranking and links in one profile. Share a public card if you want to.
+      - icon: users
+        title: Bring the family
+        body: Parents can sign up their kids and manage every profile from one account.
+  - type: featureRow
+    eyebrow: Made for your phone
+    title: Install it like an app
+    body: Add it to your Home Screen and turn on notifications. You sign in with an email link, so there's no password to remember.
+    image: /src/assets/img/events/unsorted/dsc_9631-2.webp
+    imageAlt: Two Leftovers players with masks pushed up on their heads talk in the shade.
+  - type: threeColumn
+    tone: alt
+    eyebrow: For captains and staff
+    title: Run an event from your phone
+    items:
+      - icon: calendar
+        title: Import from PBLeagues
+        body: Pick the event and its dates, venue and divisions fill in. Change anything before you save.
+      - icon: jersey
+        title: Build squads
+        body: Place players by division and position, then send offers when the squad looks right.
+      - icon: wallet
+        title: Track every dollar
+        body: Set each squad's share with the calculator, confirm payments by reference code and see who's short before the league deadline.
+      - icon: check
+        title: Rosters ready
+        body: Names and player IDs for every squad in one place when it's time to send the roster.
+      - icon: chat
+        title: Post notices
+        body: Write to everyone, one event or one squad. Players see it in the app and on their phone.
+      - icon: users
+        title: Staff and approvals
+        body: Add staff and captains by email. Captains only see their own squads, and you let new sign-ups in.
+  - type: twoColumn
+    tone: base
+    eyebrow: How an event comes together
+    title: From request to roster
+    image: /src/assets/img/events/nxl-lso26/lo2nxllso26-132-x5.webp
+    imageAlt: A black and white shot of a coach in a cap and sunglasses talking Leftovers players through a clipboard.
+    steps:
+      - { lead: Request., text: Players ask for a spot at an event and pick the divisions they'd play. }
+      - { lead: Place., text: Staff build the squads and send offers. }
+      - { lead: Pay., text: Players pay their share with their reference code, and staff confirm it. }
+      - { lead: Roster., text: Paid-up squads go on the league roster, ready to play. }
+  - type: threeColumn
+    tone: alt
+    eyebrow: Private by default
+    title: Your details stay yours
+    layout: centered
+    items:
+      - icon: lock
+        title: Your ID tag is locked
+        body: Your Private ID Tag is encrypted. Staff only see it when they need it for a roster.
+      - icon: phone
+        title: Your number stays put
+        body: Only you, admins and your captains can see your phone number.
+      - icon: check
+        title: Yours to take
+        body: Download everything we hold, or delete your account, at any time.
+  - type: ctaStrip
+    tone: crimson
+    eyebrow: Letting players in a few at a time
+    title: Get on the list
+    body: Sign up now and we'll email you when you're in.
+    ctas:
+      - { label: Request access, href: 'https://app.theleftoverspb.com', variant: gold }
+seo:
+  description: The Leftovers player app. Request a spot, pay your share and follow your squad, and run an event's squads, payments and rosters from your phone.
