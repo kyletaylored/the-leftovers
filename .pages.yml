@@ -519,7 +519,8 @@ content:
               - *tone
               - { name: eyebrow, label: Kicker, type: string }
               - { name: title, label: Heading, type: string }
-              - { name: layout, label: Layout, type: select, default: card, options: { values: [card, centered] } }
+              - { name: layout, label: Layout, type: select, default: card, options: { values: [{ value: card, label: Cards }, { value: inline, label: Cards with the icon beside the title }, { value: centered, label: Centred and larger }] } }
+              - { name: iconStyle, label: Icon style, type: select, default: tile, options: { values: [{ value: tile, label: Square }, { value: circle, label: Circle }] } }
               - name: items
                 label: Columns
                 type: object

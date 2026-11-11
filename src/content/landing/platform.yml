@@ -26,6 +26,8 @@ sections:
     tone: alt
     eyebrow: For players
     title: Your season in one place
+    layout: inline
+    iconStyle: circle
     items:
       - icon: calendar
         title: Request a spot
@@ -64,6 +66,8 @@ sections:
     tone: alt
     eyebrow: For captains and staff
     title: Run an event from your phone
+    layout: inline
+    iconStyle: circle
     items:
       - icon: calendar
         title: Import from PBLeagues
@@ -112,19 +116,20 @@ sections:
       - { lead: Roster., text: Paid-up squads go on the league roster, ready to play. }
   - type: threeColumn
     tone: base
-    eyebrow: Private by default
+    eyebrow: Security and privacy
     title: Your details stay yours
     layout: centered
+    iconStyle: circle
     items:
       - icon: lock
-        title: Your ID tag is locked
-        body: Your Private ID Tag is encrypted. Staff only see it when they need it for a roster.
-      - icon: phone
-        title: Your number stays put
-        body: Only you, admins and your captains can see your phone number.
+        title: Encrypted
+        body: All sensitive data is encrypted, both stored and on its way to you.
       - icon: check
-        title: Yours to take
-        body: Download everything we hold, or delete your account, at any time.
+        title: Built to privacy standards
+        body: The app follows privacy framework standards and only keeps what running the team needs.
+      - icon: jersey
+        title: Your account, your call
+        body: Manage your details, download your data or delete your account at any time.
   - type: ctaStrip
     tone: crimson
     eyebrow: Letting players in a few at a time
