@@ -471,7 +471,8 @@ const landingBlock = z.discriminatedUnion('type', [
     tone: sectionTone,
     eyebrow: optText,
     title: optText,
-    layout: z.enum(['card', 'centered']).default('card'),
+    layout: z.enum(['card', 'centered', 'inline']).default('card'),
+    iconStyle: z.enum(['tile', 'circle']).default('tile'),
     items: z
       .array(
         z.object({

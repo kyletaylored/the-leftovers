@@ -794,18 +794,20 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
           title="ThreeColumn"
           class="lg:col-span-2"
           file="src/components/ThreeColumn.astro"
-          note={'Icon + title + body benefits row. Default: compact left-aligned cards for a supporting list. layout="centered": bigger and centred, for a short row that is the point of the section (how it works, values). iconStyle="circle": a gold ring on ink, like the favicon badge. The two combine.'}
+          note={'Icon + title + body benefits row. Default: compact left-aligned cards for a supporting list. layout="centered": bigger and centred, for a short row that is the point of the section (how it works, values). layout="inline": the icon beside the title, for a longer grid where stacked icons make every card tall. iconStyle="circle": a gold ring on ink, like the favicon badge. The two combine.'}
         >
           <div class="grid gap-8">
             {[
               { layout: 'card', iconStyle: 'tile', label: 'default (layout="card" iconStyle="tile")' },
               { layout: 'card', iconStyle: 'circle', label: 'iconStyle="circle"' },
+              { layout: 'inline', iconStyle: 'tile', label: 'layout="inline"' },
+              { layout: 'inline', iconStyle: 'circle', label: 'layout="inline" iconStyle="circle"' },
               { layout: 'centered', iconStyle: 'tile', label: 'layout="centered"' },
               { layout: 'centered', iconStyle: 'circle', label: 'layout="centered" iconStyle="circle"' },
             ].map((v) => (
               <div>
                 <code class="mb-2 block font-mono text-[0.625rem] text-gold-300">{v.label}</code>
-                <ThreeColumn as="h4" items={threeColItems} layout={v.layout as 'card' | 'centered'} iconStyle={v.iconStyle as 'tile' | 'circle'} />
+                <ThreeColumn as="h4" items={threeColItems} layout={v.layout as 'card' | 'centered' | 'inline'} iconStyle={v.iconStyle as 'tile' | 'circle'} />
               </div>
             ))}
           </div>

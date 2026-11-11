@@ -240,6 +240,7 @@ const paragraphs = (text?: string) => (text ?? '').split(/\n\s*\n/).filter(Boole
             <ThreeColumn
               items={block.items.map((item) => ({ ...item, icon: item.icon ?? undefined }))}
               layout={block.layout}
+              iconStyle={block.iconStyle}
               as={block.title ? 'h3' : 'h2'}
             />
           </Section>

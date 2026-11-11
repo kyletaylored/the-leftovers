@@ -2,11 +2,15 @@
 /**
  * ThreeColumn — the icon/feature grid (§7). Mobile stacks; columns are added
  * going up, never removed going down.
+ * Exactly four items sit two by two instead of leaving one alone on a row.
  *
- * Two independent options (defaults render the original compact cards):
+ * Three options, all combinable with iconStyle (defaults render the original compact cards):
  *  - `layout="centered"`: icon, title and body centred, everything larger.
  *    For a short "how it works" / values row that should read as a feature,
  *    not a list. Keep the body to one or two sentences.
+ *  - `layout="inline"`: compact cards with the icon beside the title instead
+ *    of above it. For a longer grid (six or more items) where stacked icons
+ *    would make every card tall.
  *  - `iconStyle="circle"`: the icon sits in a gold ring on ink, the favicon's
  *    badge shape, instead of the square tile.
  */
@@ -15,38 +19,66 @@ import Icon, { type IconName } from './brand/Icon.astro';
 interface Props {
   items: Array<{ icon?: IconName; title: string; body: string }>;
   as?: 'h2' | 'h3' | 'h4';
-  layout?: 'card' | 'centered';
+  layout?: 'card' | 'centered' | 'inline';
   iconStyle?: 'tile' | 'circle';
   class?: string;
 }
 const { items, as: Heading = 'h3', layout = 'card', iconStyle = 'tile', class: className = '' } = Astro.props;
 const centered = layout === 'centered';
+const inline = layout === 'inline';
 const circle = iconStyle === 'circle';
+const four = items.length === 4;
 ---
 
-<ul class:list={['grid gap-5 sm:grid-cols-2 lg:grid-cols-3', className]}>
+<ul class:list={['grid gap-5 sm:grid-cols-2', !four && 'lg:grid-cols-3', className]}>
   {
-    items.map((item) => (
-      <li
-        class:list={[
-          'rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/50',
-          centered ? 'flex flex-col items-center px-6 py-9 text-center sm:px-8 sm:py-10' : 'p-6',
-        ]}
-      >
-        {item.icon && (
-          <span
+    items.map((item) => {
+      const icon = item.icon && (
+        <span
+          class:list={[
+            'inline-flex shrink-0 items-center justify-center text-gold',
+            circle ? 'rounded-full border-2 border-gold bg-ink' : 'rounded-sm bg-ink-900',
+            centered ? 'mb-6 size-20' : inline ? 'size-11' : 'mb-4 size-12',
+          ]}
+        >
+          <Icon
+            name={item.icon}
+            class={centered ? 'size-9' : inline ? 'size-5' : 'size-6'}
+            strokeWidth={centered ? 1.6 : 1.8}
+          />
+        </span>
+      );
+      const heading = (
+        <Heading class:list={['text-bone', centered ? 'text-2xl sm:text-[1.75rem]' : 'title-sm']}>{item.title}</Heading>
+      );
+      return (
+        <li
+          class:list={[
+            'rounded-sm border border-ink-600 bg-ink-800 transition-colors hover:border-gold/50',
+            centered ? 'flex flex-col items-center px-6 py-9 text-center sm:px-8 sm:py-10' : 'p-6',
+          ]}
+        >
+          {inline ? (
+            <div class="mb-3 flex items-center gap-4">
+              {icon}
+              {heading}
+            </div>
+          ) : (
+            <>
+              {icon}
+              {heading}
+            </>
+          )}
+          <p
             class:list={[
-              'inline-flex items-center justify-center text-gold',
-              circle ? 'rounded-full border-2 border-gold bg-ink' : 'rounded-sm bg-ink-900',
-              centered ? 'mb-6 size-20' : 'mb-4 size-12',
+              'leading-relaxed text-bone-muted',
+              centered ? 'mt-3 max-w-xs text-base' : inline ? 'text-sm' : 'mt-2 text-sm',
             ]}
           >
-            <Icon name={item.icon} class={centered ? 'size-9' : 'size-6'} strokeWidth={centered ? 1.6 : 1.8} />
-          </span>
-        )}
-        <Heading class:list={['text-bone', centered ? 'text-2xl sm:text-[1.75rem]' : 'title-sm']}>{item.title}</Heading>
-        <p class:list={['leading-relaxed text-bone-muted', centered ? 'mt-3 max-w-xs text-base' : 'mt-2 text-sm']}>{item.body}</p>
-      </li>
-    ))
+            {item.body}
+          </p>
+        </li>
+      );
+    })
   }
 </ul>

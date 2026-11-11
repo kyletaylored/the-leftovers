@@ -92,7 +92,7 @@ export const catalog: CatalogEntry[] = [
   {
     name: 'ThreeColumn', file: 'ThreeColumn.astro', kind: 'Astro', group: 'layout', section: 'blocks',
     use: 'Icon + title + body benefits row (3 items, stacks on phones).',
-    options: 'items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section) · iconStyle: tile|circle (gold ring, favicon badge) · as',
+    options: 'items[{icon?, title, body}] · layout: card|centered (bigger, centred; for a row that IS the section)|inline (icon beside the title; for a grid of six or more) · iconStyle: tile|circle (gold ring, favicon badge) · as · four items sit 2×2',
   },
 
   // --------------------------------------------------------------- content

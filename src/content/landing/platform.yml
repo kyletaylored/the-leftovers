@@ -26,19 +26,21 @@ sections:
     tone: alt
     eyebrow: For players
     title: Your season in one place
+    layout: inline
+    iconStyle: circle
     items:
       - icon: calendar
         title: Request a spot
-        body: Pick an open event and the divisions you'd play. Staff place you on a squad.
-      - icon: check
-        title: See where you stand
-        body: Each squad has a tracker, from requested to on a squad, paid and on the roster.
+        body: Pick an open event and the divisions you'd play, then follow your squad from requested to paid and on the roster.
       - icon: wallet
         title: Pay your share
         body: Pay by Zelle, Venmo and more with your own reference code. Staff confirm it, and it shows in your history.
       - icon: bell
-        title: Hear it first
-        body: Get a notification when you're offered a spot, your payment lands or a notice goes out.
+        title: Push notifications
+        body: Your phone tells you when you're offered a spot, your payment lands or a notice goes out.
+      - icon: phone
+        title: No app to download
+        body: It runs in your browser. Add it to your Home Screen and it opens like any other app.
       - icon: jersey
         title: Your player card
         body: Your APPA ID, positions, ranking and links in one profile. Share a public card if you want to.
@@ -64,6 +66,8 @@ sections:
     tone: alt
     eyebrow: For captains and staff
     title: Run an event from your phone
+    layout: inline
+    iconStyle: circle
     items:
       - icon: calendar
         title: Import from PBLeagues
@@ -112,19 +116,23 @@ sections:
       - { lead: Roster., text: Paid-up squads go on the league roster, ready to play. }
   - type: threeColumn
     tone: base
-    eyebrow: Private by default
+    eyebrow: Security and privacy
     title: Your details stay yours
     layout: centered
+    iconStyle: circle
     items:
       - icon: lock
-        title: Your ID tag is locked
-        body: Your Private ID Tag is encrypted. Staff only see it when they need it for a roster.
-      - icon: phone
-        title: Your number stays put
-        body: Only you, admins and your captains can see your phone number.
+        title: Encrypted
+        body: All sensitive data is encrypted, both stored and on its way to you.
+      - icon: key
+        title: Passwordless by design
+        body: Sign in with an email link, Google or Discord. There's no password to leak, reuse or forget.
       - icon: check
-        title: Yours to take
-        body: Download everything we hold, or delete your account, at any time.
+        title: Built to privacy standards
+        body: The app follows privacy framework standards and only keeps what running the team needs.
+      - icon: jersey
+        title: Your account, your call
+        body: Manage your details, download your data or delete your account at any time.
   - type: ctaStrip
     tone: crimson
     eyebrow: Letting players in a few at a time
