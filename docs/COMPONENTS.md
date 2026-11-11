@@ -178,8 +178,8 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Data: getEvents()
   - Avoid: The team's schedule: about one event a month leaves it mostly empty. Use SeasonStrip.
   - Pairs with: EventCard
-- **Countdown** (`Countdown.astro`, Astro + island): Live countdown to an event or drop deadline.
-  - Options: target (Date) · passedLabel
+- **Countdown** (`Countdown.astro`, Astro + island): Live countdown to an event or drop deadline, to midnight in the visitor’s own time zone.
+  - Options: target (a content date: the calendar day) · endOfDay (deadlines open all day) · passedLabel
 - **ProfileCard** (`ProfileCard.astro`): Bio card for the people who run the team. Bio in the default slot.
   - Options: name · role · image+imageAlt · links (memberLinks in lib/team.ts) · layout: compact|row (large, for an About page; placeholder when no photo) · reverse (row only; flip every other card) · as
   - Data: team collection entry

@@ -294,8 +294,8 @@ export const catalog: CatalogEntry[] = [
   },
   {
     name: 'Countdown', file: 'Countdown.astro', kind: 'Astro + island', group: 'events', section: 'components',
-    use: 'Live countdown to an event or drop deadline.',
-    options: 'target (Date) · passedLabel',
+    use: 'Live countdown to an event or drop deadline, to midnight in the visitor’s own time zone.',
+    options: 'target (a content date: the calendar day) · endOfDay (deadlines open all day) · passedLabel',
   },
   {
     name: 'CountdownIsland', file: 'CountdownIsland.tsx', kind: 'React island', group: 'events', section: 'components', internal: true,

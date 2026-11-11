@@ -155,7 +155,7 @@ const schema = [
           }
         </p>
 
-        {isOpen && <div class="mt-6"><Countdown target={d.closesAt} passedLabel="Orders have closed" /></div>}
+        {isOpen && <div class="mt-6"><Countdown target={d.closesAt} endOfDay passedLabel="Orders have closed" /></div>}
 
         <Prose class="mt-8">
           <Content />

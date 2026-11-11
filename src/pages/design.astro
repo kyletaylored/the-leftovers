@@ -53,6 +53,7 @@ import SponsorBand from '@/components/SponsorBand.astro';
 import TeamStatsWidget from '@/components/TeamStatsWidget.astro';
 import { getTeamWidgets } from '@/lib/pblidb';
 import EventCard from '@/components/EventCard.astro';
+import Countdown from '@/components/Countdown.astro';
 import EventFees from '@/components/EventFees.astro';
 import EventSquads from '@/components/EventSquads.astro';
 import ProcessSteps from '@/components/ProcessSteps.astro';
@@ -122,6 +123,9 @@ const teamWidgets = (await getTeamWidgets()).slice(0, 3);
 const sampleMember = members.sort((a, b) => a.data.order - b.data.order)[0];
 const allEvents = [...upcoming, ...past];
 const sampleEvent = next ?? upcoming[0] ?? past[0];
+// Countdown specimen: a calendar day 30 days after the build, like a content date.
+const countdownSample = new Date(new Date().toISOString().slice(0, 10) + 'T00:00:00Z');
+countdownSample.setUTCDate(countdownSample.getUTCDate() + 30);
 const samplePast = past[0];
 const feeEvent = allEvents.find((event) => event.data.fees.length > 0);
 const squadEvent = samplePast ?? sampleEvent;
@@ -693,6 +697,12 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
               <p class="text-sm text-bone-muted">No events in src/content/events.</p>
             )
           }
+        </Specimen>
+        <Specimen title="Countdown" class="lg:col-span-2" file="src/components/Countdown.astro" note={'Ticks down to a content date: midnight at the start of that day in the visitor’s own time zone, or the end of it with endOfDay (order deadlines, open all day). The next event here, else a date 30 days out. Server-rendered digits, so no blank box or layout shift.'}>
+          <div class="flex flex-wrap gap-8">
+            <Countdown target={next?.data.startDate ?? countdownSample} />
+            <Countdown target={countdownSample} endOfDay passedLabel="Orders have closed" />
+          </div>
         </Specimen>
       </div>
 
