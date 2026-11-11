@@ -5,10 +5,15 @@
  * "why join us" section. Reuses `Button.astro` for the CTA rather than
  * building its own link styling.
  *
- * `reverse` flips the visual order by swapping `flex-wrap` between `wrap`
- * and `wrap-reverse` (the trick used in the handoff's own markup) rather
- * than reordering the DOM, so the media/copy reading order stays consistent
- * for screen readers regardless of which side the image lands on.
+ * `reverse` flips the visual order with CSS (`wrap-reverse` when stacked,
+ * `row-reverse` side by side) rather than reordering the DOM, so the
+ * media/copy reading order stays consistent for screen readers regardless of
+ * which side the image lands on. Before Nov 2026 it only changed the stacked
+ * order, so reversed rows sat on the same side as the rest on desktop.
+ *
+ * `frame` shows an app screenshot uncropped, at its own shape: `phone` in a
+ * rounded handset outline, `browser` under a window bar with `frameLabel` (an
+ * address) in it. The default, `none`, is the cropped 16:9 photo it always was.
  */
 import { Image } from 'astro:assets';
 import Button from '@/components/Button.astro';
@@ -22,6 +27,9 @@ interface Props {
   image?: ImageMetadata;
   imageAlt?: string;
   reverse?: boolean;
+  frame?: 'none' | 'phone' | 'browser';
+  /** Shown in the browser frame's bar, e.g. app.theleftoverspb.com. */
+  frameLabel?: string;
   class?: string;
 }
 
@@ -34,6 +42,8 @@ const {
   image,
   imageAlt = '',
   reverse = false,
+  frame = 'none',
+  frameLabel,
   class: className = '',
 } = Astro.props;
 ---
@@ -41,13 +51,49 @@ const {
 <div
   class:list={[
     'flex items-center gap-8 sm:gap-10',
-    reverse ? 'flex-wrap-reverse' : 'flex-wrap',
+    // Side by side (md+), row-reverse puts the media on the right; stacked,
+    // wrap-reverse puts the copy first.
+    reverse ? 'flex-wrap-reverse md:flex-row-reverse' : 'flex-wrap',
     className,
   ]}
 >
   <div class="min-w-[280px] flex-1">
     {
-      image ? (
+      image && frame === 'phone' ? (
+        <div class="mx-auto w-full max-w-[17rem] rounded-[2.25rem] border border-ink-600 bg-ink-800 p-2 shadow-2xl shadow-black/50">
+          <Image
+            src={image}
+            alt={imageAlt}
+            widths={[300, 560, 780]}
+            sizes="17rem"
+            loading="lazy"
+            decoding="async"
+            class="h-auto w-full rounded-[1.75rem]"
+          />
+        </div>
+      ) : image && frame === 'browser' ? (
+        <div class="overflow-hidden rounded-md border border-ink-600 bg-ink-800 shadow-2xl shadow-black/50">
+          <div class="flex items-center gap-1.5 border-b border-ink-600 px-3 py-2" aria-hidden="true">
+            <span class="size-2.5 rounded-full bg-ink-600" />
+            <span class="size-2.5 rounded-full bg-ink-600" />
+            <span class="size-2.5 rounded-full bg-ink-600" />
+            {frameLabel && (
+              <span class="ml-2 flex-1 truncate rounded-sm bg-ink-900 px-2 py-0.5 text-center text-xs text-bone-muted">
+                {frameLabel}
+              </span>
+            )}
+          </div>
+          <Image
+            src={image}
+            alt={imageAlt}
+            widths={[640, 960, 1440, 1920]}
+            sizes="(min-width: 1024px) 45vw, 92vw"
+            loading="lazy"
+            decoding="async"
+            class="block h-auto w-full"
+          />
+        </div>
+      ) : image ? (
         <Image
           src={image}
           alt={imageAlt}

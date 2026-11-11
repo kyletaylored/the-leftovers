@@ -100,6 +100,8 @@ import type { CloudVariant } from '@/lib/clouds';
 import type { TerracedStyle } from '@/components/brand/TerracedDivider.astro';
 
 import jerseyImg from '@/assets/img/leftovers-v1-v2.png';
+import appHomeImg from '@/assets/img/app/player-home.webp';
+import appSquadsImg from '@/assets/img/app/admin-squads.webp';
 import bcaImg from '@/assets/img/bca-leftover.jpg';
 import logoImg from '@/assets/img/brand/logo.png';
 import shooterImg from '@/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp';
@@ -856,6 +858,29 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
               ctaHref="/join"
               image={jerseyImg}
               imageAlt="V1 and V2 Leftovers jerseys"
+              reverse
+            />
+          </div>
+        </Specimen>
+
+        <Specimen title="FeatureRow: app screenshots" file="src/components/marketing/FeatureRow.astro" note={'For screenshots of the player app. frame="phone" puts a phone-size shot in a handset outline; frame="browser" puts a desktop shot under a window bar with frameLabel as its address. Both show the whole shot uncropped. Take them from the demo build of the app so no real player shows up.'}>
+          <div class="space-y-10">
+            <FeatureRow
+              eyebrow="For players"
+              title="Know where you stand"
+              body="The next event, your balance and each squad's progress on one screen."
+              image={appHomeImg}
+              imageAlt="The app's Home screen with sample data: a welcome, a deposit to pay, and a squad's progress from registered to rostered."
+              frame="phone"
+            />
+            <FeatureRow
+              eyebrow="For staff"
+              title="Every event in five steps"
+              body="Entries, requests, squads, payments and rosters, each with what's left to do."
+              image={appSquadsImg}
+              imageAlt="The app's Squads step for a sample event, listing five squads with how full and how funded each one is."
+              frame="browser"
+              frameLabel="app.theleftoverspb.com"
               reverse
             />
           </div>

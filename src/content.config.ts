@@ -491,6 +491,9 @@ const landingBlock = z.discriminatedUnion('type', [
     image: imagePath.nullish(),
     imageAlt: z.string().min(1),
     reverse: z.boolean().default(false),
+    /** An app screenshot in a phone or browser outline, shown uncropped. */
+    frame: z.enum(['none', 'phone', 'browser']).default('none'),
+    frameLabel: optText,
     ctaLabel: optText,
     ctaHref: optText,
   }),

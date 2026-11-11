@@ -232,7 +232,7 @@ site handles the design, so a page always looks like the rest of the site.
 | **Photo and text** | A calm boxed section, with numbered steps if you need them |
 | **Announcement panel** | A boxed notice, with league logos if you want them |
 | **Three columns** | Short points side by side, three to a row. Each can have an icon |
-| **Feature row** | One photo beside a short pitch |
+| **Feature row** | One photo beside a short pitch. **Show as** can frame an app screenshot in a phone or a browser window instead, uncropped |
 | **Text** | Plain paragraphs. Leave a blank line between them |
 | **Call to action strip** | A full-width band asking people to do one thing |
 | **Newsletter signup** | The mailing-list form |

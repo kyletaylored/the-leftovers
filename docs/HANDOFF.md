@@ -345,9 +345,10 @@ inline-styled HTML into the repo.
    records for the main team until it's clear which are ours.
 0. **Publish the player app page when the app opens.** It's a hidden draft at
    `/preview/platform` (`src/content/landing/platform.yml`), a landing page for
-   players and staff that links to `app.theleftoverspb.com`. Check the copy with
-   Matt, add app screenshots if wanted, then set it to `published` for
-   `/platform` and link it from the nav or `/join`.
+   players and staff that links to `app.theleftoverspb.com`. Its app screenshots
+   (`src/assets/img/app/`) come from the app's demo build, so they show sample
+   data only; retake them when those screens change. Check the copy with Matt,
+   then set it to `published` for `/platform` and link it from the nav or `/join`.
 0. **Decide whether the homepage moves to blocks.** `/preview/home` matches   `index.astro` from `src/content/landing/home.yml`. Moving would make the   homepage editable in Pages CMS and take its copy out of the template, but   `index.astro` also emits the `WebSite` schema, which would need a home.
 1. **Move hosting to Cloudflare Pages.** This turns on the CSP and security
    headers, real `_redirects` and preview deploys. Everything needed is
