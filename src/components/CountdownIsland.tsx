@@ -15,12 +15,18 @@ import { useEffect, useMemo, useState } from 'react';
  * serialized prop makes the first client render byte-identical to the server
  * output; the effect below then corrects it to real time on the next tick.
  *
+ * The target is a calendar day, turned into an instant HERE, in the
+ * browser: midnight in the visitor's own time zone (see Countdown.astro for
+ * why not UTC). `localTarget` is exported for the Storybook test.
+ *
  * Use the Countdown.astro wrapper, which computes that prop — don't render
  * this directly.
  */
 interface CountdownProps {
-  /** ISO string for the target instant. */
-  target: string;
+  /** The day to count to, YYYY-MM-DD. */
+  day: string;
+  /** Count to the end of the day (midnight after it) rather than its start. */
+  endOfDay?: boolean;
   /** Milliseconds remaining as of BUILD time, from Countdown.astro. */
   initialRemaining: number;
   /** Rendered once the target has passed. */
@@ -36,12 +42,20 @@ const split = (remaining: number) => ({
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+/** Local midnight at the start (or end) of a YYYY-MM-DD day, in ms. */
+export function localTarget(day: string, endOfDay = false): number {
+  const [y, m, d] = day.split('-').map(Number);
+  // new Date(y, m, d) is local time; d + 1 rolls over months and DST correctly.
+  return new Date(y, m - 1, d + (endOfDay ? 1 : 0)).getTime();
+}
+
 export default function CountdownIsland({
-  target,
+  day,
+  endOfDay = false,
   initialRemaining,
   passedLabel = "It's game day",
 }: CountdownProps) {
-  const targetMs = useMemo(() => new Date(target).getTime(), [target]);
+  const targetMs = useMemo(() => localTarget(day, endOfDay), [day, endOfDay]);
 
   // Matches the server HTML exactly, so hydration is clean.
   const [remaining, setRemaining] = useState(initialRemaining);
