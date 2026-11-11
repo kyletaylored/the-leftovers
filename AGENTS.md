@@ -55,7 +55,7 @@ Don't break these without the owner explicitly deciding to:
   embed needs its origin allowlisted there.
 - **Images live in `src/assets/img/`** and go through `<Image>`/`getImage`.
   `public/` is for files that must keep a fixed URL (texture tiles, OG card,
-  CNAME).
+  CNAME) and for video (`public/video/`: `<video>` can't go through Astro).
 - **Every image field in a collection has a required `alt`** in both
   `src/content.config.ts` and `.pages.yml`. Keep the two in sync whenever you
   add or change a field.

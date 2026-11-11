@@ -35,6 +35,16 @@ media:
     extensions: [jpg, jpeg, png, webp, avif]
     categories: [image]
 
+  # Videos and their captions. Astro doesn't process video, so these go to
+  # public/video and keep a fixed URL (/video/<name>.mp4). Keep each video
+  # under 50 MB (GitHub refuses 100): scripts/prepare-video.py compresses one
+  # and drafts its .vtt captions.
+  - name: videos
+    label: Videos and captions
+    input: public/video
+    output: /video
+    extensions: [mp4, webm, vtt]
+
 content:
   # -- Team members ---------------------------------------------------------
   - name: team
@@ -847,6 +857,58 @@ content:
             description: >-
               The small gold line above the headline, e.g. the event and year.
               Left empty, it uses the gallery title.
+
+  # -- Videos ---------------------------------------------------------------
+  - name: videos
+    label: Videos
+    description: >-
+      Team videos with captions. Tick "Show on the home page" on the one the
+      home page should play.
+    type: collection
+    path: src/content/videos
+    filename: '{fields.title}.yml'
+    format: yaml
+    view:
+      fields: [title, showOnHome, uploadDate]
+      primary: title
+      sort: [order, title]
+    fields:
+      - { name: title, label: Title, type: string, required: true }
+      - name: description
+        label: Description
+        type: text
+        required: true
+        description: One or two sentences on what's in it. Shown under the title and in search results.
+      - name: file
+        label: Video file
+        type: file
+        required: true
+        options: { media: videos, extensions: [mp4, webm] }
+        description: An MP4 under 50 MB. Ask the site maintainer to compress a bigger one.
+      - { name: poster, label: Poster image, type: image, required: true, options: { media: images }, description: The still shown before the video plays. }
+      - name: posterAlt
+        label: Poster alt text
+        type: string
+        required: true
+        description: Describe the still for screen readers.
+      - name: captions
+        label: Captions (.vtt)
+        type: file
+        options: { media: videos, extensions: [vtt] }
+        description: >-
+          WebVTT captions, shown on the video while it plays. Read them before
+          publishing: auto-transcription mishears names. Leave empty for a video with no speech.
+      - { name: captionsLang, label: Captions language, type: string, default: en, description: 'e.g. "en" or "es".' }
+      - name: captionsOn
+        label: Captions on at the start
+        type: boolean
+        default: true
+        description: >-
+          Untick when the video already has subtitles in the picture, so the
+          two don't stack. Viewers can still turn captions on with the CC button.
+      - { name: uploadDate, label: Published, type: date, required: true }
+      - { name: showOnHome, label: Show on the home page, type: boolean, default: false }
+      - { name: order, label: Sort order, type: number, default: 100, description: 'If several are on the home page, the lowest number wins.' }
 
   # -- FAQs -----------------------------------------------------------------
   - name: faqs

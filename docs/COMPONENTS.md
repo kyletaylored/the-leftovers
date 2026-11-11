@@ -127,6 +127,16 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Options: layout: peek|single|hero|showcase · indicators: dashes|thumbnails|grid (paged, lazy, opens a lightbox; with single) · pageSize (grid, default 8) · captionStyle: below|flag · tone: ink|crimson|forest · autoplayMs · emptyTitle/emptyBody
   - Data: galleries collection
   - Avoid: hero/showcase inside a Section (they are full-bleed).
+- **VideoPlayer** (`VideoPlayer.astro`, Astro + island): A team video in the on-brand player: crimson play button, gold progress bar, captions in the site type. The browser player without JS; nothing downloads until play.
+  - Options: video (videos entry) · as: h3|h2|h4|false (false when a Section title already names it) · description: true|false · captionsOn (default: the entry’s)
+  - Data: videos collection; homeVideo() and videoSchema() in lib/video.ts
+  - Avoid: YouTube/Vimeo iframes (CSP, cookies); autoplay; VideoPlayerIsland directly.
+  - Pairs with: Section
+- **VideoModal** (`VideoModal.astro`): A video in a pop-up player, opened by a trigger with data-video-open="<entry id>" (an outline Button in a Hero). Plays on open, pauses on close.
+  - Options: video (videos entry) · id (defaults to the entry id)
+  - Data: videos collection
+  - Avoid: a trigger without href={video.data.file} (no-JS fallback); two modals for the same entry on one page.
+  - Pairs with: Button, Hero, VideoPlayer
 - **Gallery** (`Gallery.astro`): Masonry photo grid, zero JS.
   - Options: images[{src, alt, caption?}]
 - **LogoStrip** (`LogoStrip.astro`): Static centred row of 2–6 logos (leagues, partners).
@@ -275,4 +285,4 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 
 ### Internal (never import directly on a page)
 
-`Slideshow.tsx`: The carousel island behind GallerySlideshow. · `Lightbox.tsx`: Full-screen viewer with magnifier, opened from Slideshow indicators="grid". · `ui/carousel.tsx`: shadcn/Embla primitive behind Slideshow. · `Calendar.tsx`: The month-grid island behind EventsCalendar. · `CountdownIsland.tsx`: The ticking island behind Countdown.
+`Slideshow.tsx`: The carousel island behind GallerySlideshow. · `Lightbox.tsx`: Full-screen viewer with magnifier, opened from Slideshow indicators="grid". · `ui/carousel.tsx`: shadcn/Embla primitive behind Slideshow. · `VideoPlayerIsland.tsx`: The themed controls and caption overlay behind VideoPlayer. · `Calendar.tsx`: The month-grid island behind EventsCalendar. · `CountdownIsland.tsx`: The ticking island behind Countdown.

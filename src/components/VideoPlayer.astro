@@ -1,0 +1,62 @@
+---
+/**
+ * VideoPlayer — one entry from the videos collection: the on-brand player
+ * (VideoPlayerIsland), its title and description.
+ *
+ * This server half resolves the entry: the poster is resized to a 1280px
+ * WebP, and the captions file and its language name are passed down. The
+ * island server-renders a plain <video controls>, so the video plays with
+ * the browser's own controls before hydration or without JavaScript, then
+ * swaps in the themed controls and captions (see VideoPlayerIsland.tsx).
+ *
+ * preload="none" plus the resized poster means nothing of the video
+ * downloads until someone presses play, so it costs Lighthouse nothing.
+ * Files are served from public/video (same origin), which the CSP already
+ * allows through default-src 'self'.
+ */
+import { getImage } from 'astro:assets';
+import VideoPlayerIsland from './VideoPlayerIsland';
+import { resolveImage } from '@/lib/images';
+import type { VideoEntry } from '@/lib/video';
+
+interface Props {
+  video: VideoEntry;
+  /** The title's heading level. Pass `false` when the section above already names the video. */
+  as?: 'h2' | 'h3' | 'h4' | false;
+  /** Show the description under the title. */
+  description?: boolean;
+  /** Captions showing when playback starts. Defaults to the entry's captionsOn. */
+  captionsOn?: boolean;
+  class?: string;
+}
+
+const { video } = Astro.props;
+const { as: Heading = 'h3', description = true, captionsOn = video.data.captionsOn, class: className = '' } = Astro.props;
+const { title, file, captions, captionsLang } = video.data;
+
+const posterAsset = await resolveImage(video.data.poster);
+const poster = posterAsset ? await getImage({ src: posterAsset, width: 1280, format: 'webp' }) : undefined;
+const captionsLabel = new Intl.DisplayNames(['en'], { type: 'language' }).of(captionsLang) ?? captionsLang;
+---
+
+<figure class:list={['flex flex-col', className]}>
+  <VideoPlayerIsland
+    client:visible
+    src={file}
+    type={file.endsWith('.webm') ? 'video/webm' : 'video/mp4'}
+    poster={poster?.src}
+    title={title}
+    captions={captions}
+    captionsLang={captionsLang}
+    captionsLabel={captionsLabel}
+    captionsOn={captionsOn}
+  />
+  {
+    (Heading || description) && (
+      <figcaption class="mt-4">
+        {Heading && <Heading class="title-sm text-bone">{title}</Heading>}
+        {description && <p class:list={['max-w-2xl text-sm leading-relaxed text-bone-muted', Heading && 'mt-1']}>{video.data.description}</p>}
+      </figcaption>
+    )
+  }
+</figure>

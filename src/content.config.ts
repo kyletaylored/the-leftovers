@@ -319,6 +319,42 @@ const galleries = defineCollection({
   }),
 });
 
+/**
+ * Videos: one YAML file each. The video and its captions live in
+ * public/video/ (a fixed URL, served as-is; Astro doesn't process video) and
+ * the poster in src/assets/img/videos/ like any photo. Make all three with `uv run scripts/prepare-video.py`.
+ */
+const videos = defineCollection({
+  loader: glob({ base: './src/content/videos', pattern: '**/*.{yml,yaml}' }),
+  schema: z.object({
+    title: z.string(),
+    /** One or two sentences: what's in it. Shown under the title and in search results. */
+    description: z.string(),
+    /** e.g. "/video/nxl-world-cup-promo.mp4". MP4 (H.264) plays everywhere. */
+    file: z.string().regex(/^\/video\/[^/]+\.(mp4|webm)$/, 'A file in public/video, e.g. /video/promo.mp4'),
+    /** The still shown before it plays. Required: without it the player is a black box. */
+    poster: imagePath,
+    posterAlt: z.string(),
+    /** WebVTT captions, e.g. "/video/nxl-world-cup-promo.vtt". Leave empty for a music-only video. */
+    captions: z
+      .string()
+      .regex(/^\/video\/[^/]+\.vtt$/, 'A .vtt file in public/video')
+      .optional(),
+    /** BCP 47 language of the captions. */
+    captionsLang: z.string().default('en'),
+    /**
+     * Captions showing when it starts. Turn off when the video already has
+     * subtitles in the picture, or the two sets of text stack up.
+     */
+    captionsOn: z.boolean().default(true),
+    /** When it was first published (Google's VideoObject requires it). */
+    uploadDate: z.coerce.date(),
+    showOnHome: z.boolean().default(false),
+    /** Lower sorts first. */
+    order: z.number().default(100),
+  }),
+});
+
 const faqs = defineCollection({
   loader: file('./src/content/faqs.yml'),
   schema: z.object({
@@ -589,5 +625,6 @@ export const collections = {
   preorders,
   pages: pagesCollection,
   galleries,
+  videos,
   faqs,
 };

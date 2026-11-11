@@ -18,6 +18,10 @@
  * open-slots and "From the Field" blocks were removed because the pages they
  * pointed at (Team, Community) are hidden. Events drive nothing here, so
  * there is no SportsEvent structured data on this page.
+ *
+ * "Watch promo" in the hero opens the videos entry with "Show on the home
+ * page" ticked in a VideoModal, with VideoObject structured data. Untick it
+ * in the CMS and the button disappears.
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -26,16 +30,19 @@ import Section from '@/components/Section.astro';
 import TwoColumn from '@/components/TwoColumn.astro';
 import ImpactBand from '@/components/marketing/ImpactBand.astro';
 import GallerySlideshow from '@/components/GallerySlideshow.astro';
+import VideoModal from '@/components/VideoModal.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
 import LogoStrip from '@/components/LogoStrip.astro';
 import Button from '@/components/Button.astro';
 import BrandRule from '@/components/brand/BrandRule.astro';
 import { site } from '@/lib/settings';
 import { resolveImage } from '@/lib/images';
+import { homeVideo, videoSchema } from '@/lib/video';
 import shooter from '@/assets/img/events/nxl-wc25/lo2nxlwc25-94-x5.webp';
 import aiming from '@/assets/img/events/nxl-lso26/lo2nxllso26-219-x5.webp';
 import huddle from '@/assets/img/events/nxl-lsm25/frinxllsm25ls-1427-x5.webp';
 
+const video = await homeVideo();
 const galleries = await getCollection('galleries');
 const sliderGalleries = galleries.filter((gallery) => gallery.id === 'game-day');
 
@@ -60,10 +67,18 @@ const leagues = await Promise.all(
 );
 ---
 
-<BaseLayout title={site.title} description={site.description} schema={[websiteSchema]}>
+<BaseLayout title={site.title} description={site.description} schema={[websiteSchema, ...(video ? [await videoSchema(video, Astro.site!)] : [])]}>
   <Hero variant="ornate" animate tagline={`Paintball team / ${site.tagline}`}>
     <Button slot="actions" href="/join" size="lg">Join a squad</Button>
+    {
+      video && (
+        <Button slot="actions" href={video.data.file} variant="outline" size="lg" icon="play" data-video-open={video.id}>
+          Watch promo
+        </Button>
+      )
+    }
   </Hero>
+  {video && <VideoModal video={video} />}
 
   <ImpactBand
     image={shooter}
