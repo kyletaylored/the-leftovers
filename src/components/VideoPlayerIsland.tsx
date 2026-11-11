@@ -128,7 +128,20 @@ export default function VideoPlayerIsland({
   const [fullscreen, setFullscreen] = useState(false);
 
   // Swap the native controls for ours only once JS is running.
-  useEffect(() => setEnhanced(true), []);
+  // Also catch up on playback that began before hydration (VideoModal starts
+  // the video the moment it opens, before this island has loaded).
+  useEffect(() => {
+    setEnhanced(true);
+    const el = video.current;
+    if (!el) return;
+    setMuted(el.muted);
+    if (el.duration) setDuration(el.duration);
+    if (!el.paused || el.currentTime > 0) {
+      setStarted(true);
+      setPlaying(!el.paused);
+      setTime(el.currentTime);
+    }
+  }, []);
 
   // Captions: keep the track "hidden" (loaded, firing cuechange) and draw the cue ourselves.
   useEffect(() => {

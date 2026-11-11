@@ -210,6 +210,14 @@ export const catalog: CatalogEntry[] = [
     pairs: ['Section'],
   },
   {
+    name: 'VideoModal', file: 'VideoModal.astro', kind: 'Astro', group: 'marketing', section: 'marketing',
+    use: 'A video in a pop-up player, opened by a trigger with data-video-open="<entry id>" (an outline Button in a Hero). Plays on open, pauses on close.',
+    options: 'video (videos entry) · id (defaults to the entry id)',
+    data: 'videos collection',
+    avoid: 'a trigger without href={video.data.file} (no-JS fallback); two modals for the same entry on one page.',
+    pairs: ['Button', 'Hero', 'VideoPlayer'],
+  },
+  {
     name: 'VideoPlayerIsland', file: 'VideoPlayerIsland.tsx', kind: 'React island', group: 'marketing', section: 'marketing', story: true, internal: true,
     use: 'The themed controls and caption overlay behind VideoPlayer.',
   },

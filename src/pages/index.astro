@@ -19,9 +19,9 @@
  * pointed at (Team, Community) are hidden. Events drive nothing here, so
  * there is no SportsEvent structured data on this page.
  *
- * The video section (after the first ImpactBand) shows the videos entry
- * with "Show on the home page" ticked, with VideoObject structured data.
- * Untick it in the CMS and the section disappears.
+ * "Watch promo" in the hero opens the videos entry with "Show on the home
+ * page" ticked in a VideoModal, with VideoObject structured data. Untick it
+ * in the CMS and the button disappears.
  */
 import { getCollection } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
@@ -30,7 +30,7 @@ import Section from '@/components/Section.astro';
 import TwoColumn from '@/components/TwoColumn.astro';
 import ImpactBand from '@/components/marketing/ImpactBand.astro';
 import GallerySlideshow from '@/components/GallerySlideshow.astro';
-import VideoPlayer from '@/components/VideoPlayer.astro';
+import VideoModal from '@/components/VideoModal.astro';
 import NewsletterBlock from '@/components/NewsletterBlock.astro';
 import LogoStrip from '@/components/LogoStrip.astro';
 import Button from '@/components/Button.astro';
@@ -70,7 +70,15 @@ const leagues = await Promise.all(
 <BaseLayout title={site.title} description={site.description} schema={[websiteSchema, ...(video ? [await videoSchema(video, Astro.site!)] : [])]}>
   <Hero variant="ornate" animate tagline={`Paintball team / ${site.tagline}`}>
     <Button slot="actions" href="/join" size="lg">Join a squad</Button>
+    {
+      video && (
+        <Button slot="actions" href={video.data.file} variant="outline" size="lg" icon="play" data-video-open={video.id}>
+          Watch promo
+        </Button>
+      )
+    }
   </Hero>
+  {video && <VideoModal video={video} />}
 
   <ImpactBand
     image={shooter}
@@ -87,14 +95,6 @@ const leagues = await Promise.all(
   >
     <Button slot="actions" href="/join" size="lg">Join a squad</Button>
   </ImpactBand>
-
-  {
-    video && (
-      <Section tone="base" eyebrow="Watch" title={video.data.title}>
-        <VideoPlayer video={video} as={false} />
-      </Section>
-    )
-  }
 
   <section class="bg-ink">
     <div class="mx-auto max-w-5xl px-4 pb-10 pt-16 text-center sm:px-6 lg:pt-24">

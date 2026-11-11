@@ -132,6 +132,11 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
   - Data: videos collection; homeVideo() and videoSchema() in lib/video.ts
   - Avoid: YouTube/Vimeo iframes (CSP, cookies); autoplay; VideoPlayerIsland directly.
   - Pairs with: Section
+- **VideoModal** (`VideoModal.astro`): A video in a pop-up player, opened by a trigger with data-video-open="<entry id>" (an outline Button in a Hero). Plays on open, pauses on close.
+  - Options: video (videos entry) · id (defaults to the entry id)
+  - Data: videos collection
+  - Avoid: a trigger without href={video.data.file} (no-JS fallback); two modals for the same entry on one page.
+  - Pairs with: Button, Hero, VideoPlayer
 - **Gallery** (`Gallery.astro`): Masonry photo grid, zero JS.
   - Options: images[{src, alt, caption?}]
 - **LogoStrip** (`LogoStrip.astro`): Static centred row of 2–6 logos (leagues, partners).

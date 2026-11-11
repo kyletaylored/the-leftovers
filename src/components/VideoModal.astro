@@ -1,0 +1,76 @@
+---
+/**
+ * VideoModal — a videos entry in a pop-up player, opened by any element with
+ * data-video-open="<id>" (usually a Button in a Hero's actions slot).
+ *
+ * Why a native <dialog>: showModal() gives the focus trap, Esc to close and
+ * the backdrop, and puts focus back on the trigger when it closes. Opening
+ * starts the video (the click counts as the user's go-ahead, so it plays
+ * with sound); closing pauses it. A click on the dimmed backdrop closes it.
+ *
+ * The player inside is the normal VideoPlayer island, hydrated client:visible,
+ * so nothing loads until the dialog opens. That keeps it safe to sit in the
+ * hero above the fold.
+ *
+ * No JavaScript: give the trigger href={video.data.file}, and it opens the
+ * video file itself in the browser's player.
+ */
+import VideoPlayer from './VideoPlayer.astro';
+import Icon from './brand/Icon.astro';
+import type { VideoEntry } from '@/lib/video';
+
+interface Props {
+  video: VideoEntry;
+  /** Matches data-video-open on the trigger. Defaults to the entry id. */
+  id?: string;
+}
+
+const { video, id = video.id } = Astro.props;
+const titleId = `video-modal-${id}-title`;
+---
+
+<dialog
+  data-video-modal={id}
+  aria-labelledby={titleId}
+  class="m-auto w-[min(100vw-2rem,72rem,(100dvh-7rem)*16/9)] max-w-none overflow-visible bg-transparent p-0 text-bone backdrop:bg-ink/90 backdrop:backdrop-blur-sm"
+>
+  <div class="mb-3 flex items-center justify-between gap-4">
+    <h2 id={titleId} class="title-sm text-bone">{video.data.title}</h2>
+    <button
+      type="button"
+      data-video-close
+      class="tap grid size-11 shrink-0 place-items-center rounded-sm border border-ink-600 bg-ink-800 text-bone transition-colors hover:border-gold hover:text-gold-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold"
+    >
+      <Icon name="close" class="size-5" label="Close video" />
+    </button>
+  </div>
+  <VideoPlayer video={video} as={false} description={false} />
+</dialog>
+
+<script>
+  for (const dialog of document.querySelectorAll<HTMLDialogElement>('dialog[data-video-modal]')) {
+    const id = dialog.dataset.videoModal;
+    const video = () => dialog.querySelector('video');
+    let overflow = '';
+
+    for (const trigger of document.querySelectorAll<HTMLElement>(`[data-video-open="${id}"]`)) {
+      trigger.addEventListener('click', (event) => {
+        event.preventDefault();
+        overflow = document.documentElement.style.overflow;
+        document.documentElement.style.overflow = 'hidden';
+        dialog.showModal();
+        void video()?.play().catch(() => {});
+      });
+    }
+
+    dialog.querySelector('[data-video-close]')?.addEventListener('click', () => dialog.close());
+    // The dialog box is the backdrop's hit area: a click on the dialog itself, not its content, closes it.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('close', () => {
+      video()?.pause();
+      document.documentElement.style.overflow = overflow;
+    });
+  }
+</script>

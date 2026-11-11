@@ -100,7 +100,8 @@ linked from anywhere either, but its closed state still points at `/shop` and
 - Videos: the `videos` collection, `VideoPlayer` (an on-brand player island
   with its own captions; the browser's player without JS) and VideoObject
   JSON-LD. The home
-  page shows the entry marked "Show on the home page". Files live in
+  page's "Watch promo" hero button opens the entry marked "Show on the home
+  page" in a `VideoModal`. Files live in
   `public/video/`; `uv run scripts/prepare-video.py <file> <slug>` compresses
   a video, grabs a poster and drafts captions with Whisper, offline.
 - Upcoming vs past is computed from dates (`src/lib/events.ts`). Nobody flips a

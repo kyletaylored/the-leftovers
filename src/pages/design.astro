@@ -65,6 +65,7 @@ import StatNumber from '@/components/StatNumber.astro';
 import Callout from '@/components/Callout.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
 import VideoPlayer from '@/components/VideoPlayer.astro';
+import VideoModal from '@/components/VideoModal.astro';
 import CtaStrip from '@/components/CtaStrip.astro';
 import ThreeColumn from '@/components/ThreeColumn.astro';
 import FaqAccordion from '@/components/FaqAccordion.astro';
@@ -1038,7 +1039,7 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
           title="VideoPlayer"
           file={['src/components/VideoPlayer.astro', 'src/components/VideoPlayerIsland.tsx', 'scripts/prepare-video.py']}
           tag="Astro + island"
-          note={'One videos entry in the on-brand player: crimson play button, then a bar with play, time, a gold progress bar, mute, captions and full screen that fades while it plays. Captions are drawn in the site type, lifted above the bar, and on from the start unless the entry turns them off. Keys: Space/K, M, C, F. Without JS it is the browser player. Nothing downloads until play is pressed. as={false} drops the title when the Section above already names the video, as on the home page. Make the files with scripts/prepare-video.py.'}
+          note={'One videos entry in the on-brand player: crimson play button, then a bar with play, time, a gold progress bar, mute, captions and full screen that fades while it plays. Captions are drawn in the site type, lifted above the bar, and on from the start unless the entry turns them off. Keys: Space/K, M, C, F. Without JS it is the browser player. Nothing downloads until play is pressed. as={false} drops the title when the Section above already names the video, as VideoModal does. Make the files with scripts/prepare-video.py.'}
         >
           {
             specimenVideo ? (
@@ -1048,6 +1049,22 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
             )
           }
         </Specimen>
+
+        {
+          specimenVideo && (
+            <Specimen
+              title="VideoModal: pop-up player"
+              file="src/components/VideoModal.astro"
+              note={'The same player in a native dialog, opened by any element with data-video-open set to the entry id; on the home page it’s an outline Button beside the primary one in the Hero. Opening plays it, closing (×, Esc or the backdrop) pauses it. Give the trigger href={video.data.file} so it still opens the video without JS. Nothing loads until it opens, so it’s safe above the fold.'}
+            >
+              <div class="flex flex-wrap gap-3">
+                <Button href="/join">Join a squad</Button>
+                <Button href={specimenVideo.data.file} variant="outline" icon="play" data-video-open={specimenVideo.id}>Watch promo</Button>
+              </div>
+              <VideoModal video={specimenVideo} />
+            </Specimen>
+          )
+        }
 
         <div class="grid gap-5 lg:grid-cols-2">
           <Specimen title="Gallery: masonry" file="src/components/Gallery.astro" note="CSS columns, no JS; width/height on every image so nothing shifts as photos load.">

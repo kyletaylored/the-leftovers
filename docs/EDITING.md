@@ -110,8 +110,9 @@ homepage slider, in list order.
 ## Videos
 
 **Videos** holds the team's videos. The one with **Show on the home page**
-ticked plays on the homepage, just under the first band. Untick it and that
-section disappears.
+ticked is the **Watch promo** button next to "Join a squad" at the top of the
+homepage: it opens the video in a pop-up player. Untick it and the button
+disappears.
 
 - **Video file** is an MP4 under 50 MB. Phone and camera files are usually
   bigger, so send the original to whoever maintains the site. They run one
