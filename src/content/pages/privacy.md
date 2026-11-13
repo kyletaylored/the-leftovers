@@ -14,7 +14,7 @@ summary:
   - We collect what we need to run squads and events, like your name, contact details, player ID and what you've paid.
   - We never sell your data. Your name and player ID go to the league for rosters, and that's it.
   - Your Private ID Tag is encrypted, and only an admin or your captain can see it, when it's needed for a roster.
-  - Analytics on this website only run if you say yes. The player app has no analytics or ads.
+  - Analytics on this website, and performance monitoring in the player app, only run if you say yes. Neither has ads.
   - Players under 18 are managed by a parent or guardian, and we keep the parent's contact details with the profile.
   - You can download or delete your data from the app at any time, or email info@theleftoverspb.com.
 ---
@@ -61,9 +61,9 @@ recorded. Datadog processes this data for us in the United States.
   using the **Cookie settings** link in the site footer (or the button below).
   Doing so stops Google Analytics and Datadog and clears their cookies.
 
-The Player Portal runs no analytics or advertising and sets no analytics
-cookies, so the cookie banner doesn't apply there. See
-[Player Portal](#player-portal).
+The Player Portal runs no analytics or advertising. It asks separately before
+turning on performance monitoring, and the banner on this site doesn't apply
+there. See [Player Portal](#player-portal).
 
 ## Join requests and jersey pre-orders
 
@@ -110,9 +110,18 @@ when you do.
   them, and you can disconnect them at any time from your Account. If you turn
   on notifications, they go through your device's push service (such as Apple,
   Google or Mozilla).
-- **Cookies:** only the ones that keep you signed in. If something
-  breaks, the portal reports the error and which screen it was on to our own
-  server, never what you typed.
+- **Cookies:** only the ones that keep you signed in, plus Datadog's if you
+  allow performance monitoring. If something breaks, the portal reports the
+  error and which screen it was on to our own server, never what you typed.
+- **Performance monitoring (opt-in):** the portal asks once whether it may
+  measure page speed and errors on your device. If you allow it,
+  **Datadog** receives, in the United States: the screens you open and how
+  long they take, errors, the buttons you tap (without their text), and your
+  browser, device type and rough location (from your IP address). Nothing you
+  type or see on screen is recorded, there's no session replay, and it isn't
+  linked to your account. It sets one cookie, `_dd_s_v2`, a session ID that
+  expires after 15 minutes of inactivity. Turn it off at any time under
+  **Performance monitoring** on your Account page.
 - **Under 18s:** players under 18 don't get their own login. A parent or
   guardian's account manages their profile, and we keep the parent's name,
   email and phone with it so organizers can reach them.
