@@ -34,8 +34,15 @@ export function dateRange(start: Date, end?: Date) {
   return `${left}–${right}`;
 }
 
-/** Machine-readable date for <time datetime> and JSON-LD. */
+/** Machine-readable date for <time datetime> and JSON-LD dates (Event). */
 export const isoDate = (d: Date) => d.toISOString().slice(0, 10);
+
+/**
+ * Full date-time in UTC, for JSON-LD and meta properties Google reads as a
+ * DateTime (VideoObject `uploadDate`, Article `datePublished`). A bare date
+ * there is flagged in Search Console as "missing a timezone".
+ */
+export const isoDateTime = (d: Date) => d.toISOString().replace(/\.\d{3}Z$/, '+00:00');
 
 export const money = (amount: number, currency = 'USD') =>
   new Intl.NumberFormat('en-US', {
