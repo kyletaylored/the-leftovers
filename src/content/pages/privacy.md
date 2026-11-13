@@ -121,10 +121,10 @@ when you do.
 - **Performance monitoring (opt-in):** the portal asks once whether it may
   measure page speed and errors on your device. If you allow it,
   **Datadog** receives, in the United States: the screens you open and how
-  long they take, errors, the buttons you tap (without their text), and your
-  browser, device type and rough location (from your IP address). Nothing you
-  type or see on screen is recorded, there's no session replay, and it isn't
-  linked to your account. It sets one cookie, `_dd_s_v2`, a session ID that
+  long they take, errors, what you tap, named by its label (which can include
+  what's written on it, such as a player's name on a list), and your browser,
+  device type and rough location (from your IP address). Nothing you type is
+  recorded, there's no session replay, and it isn't linked to your account. It sets one cookie, `_dd_s_v2`, a session ID that
   expires after 15 minutes of inactivity. Turn it off at any time under
   **Performance monitoring** on your Account page.
 - **Under 18s:** players under 18 don't get their own login. A parent or
