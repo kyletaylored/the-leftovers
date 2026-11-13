@@ -8,7 +8,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { getImage } from 'astro:assets';
 import { resolveImage } from './images';
-import { isoDate } from './format';
+import { isoDateTime } from './format';
 
 export type VideoEntry = CollectionEntry<'videos'>;
 
@@ -30,7 +30,7 @@ export async function videoSchema(video: VideoEntry, site: URL) {
     '@type': 'VideoObject',
     name: title,
     description,
-    uploadDate: isoDate(uploadDate),
+    uploadDate: isoDateTime(uploadDate),
     contentUrl: new URL(file, site).href,
     ...(thumb ? { thumbnailUrl: new URL(thumb.src, site).href } : {}),
     publisher: { '@id': new URL('/#team', site).href },
