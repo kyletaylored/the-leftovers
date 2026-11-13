@@ -10,9 +10,16 @@ seo:
   description: >-
     Terms of use for The Leftovers community paintball website, Player Portal,
     squad join requests, and team gear pre-orders.
+summary:
+  - We're volunteers running a community team, not a business.
+  - A join request isn't a spot until an organizer confirms it.
+  - Paintball has risks. Your safety, gear, travel and league memberships are up to you.
+  - Pay your share by each event's deadline to make the roster. Payments happen off-site.
+  - One account per person, with your real name and your own player ID. Parents manage players under 18.
+  - Custom jerseys can't be changed or refunded once they're sent to be made.
 ---
 
-**Last updated:** November 9, 2026
+**Last updated:** November 12, 2026
 
 ## Community-run group
 
@@ -55,7 +62,7 @@ manage their profile, event requests and payments.
   refunds follow what's set out for each event.
 - **Conduct.** Don't misuse another person's details or try to access what
   isn't yours. We may remove or block an account that does.
-- **Leaving.** You can delete your account from your Profile at any time. See
+- **Leaving.** You can delete your account from your Account page at any time. See
   the [Privacy Policy](/privacy#player-portal) for what's kept.
 
 ## Jersey pre-orders and merchandise

@@ -300,6 +300,14 @@ content:
               Leave blank for a purely decorative background (the page
               title already says what the page is about). Fill in only if
               the photo shows something the heading doesn't say.
+      - name: summary
+        label: Short version
+        type: string
+        list: true
+        description: >-
+          Optional. A few plain-language points shown in a card above the
+          page text. Used on the Terms and Privacy Policy. Keep each to one
+          sentence, and keep them true to the full text.
       - name: seo
         label: SEO
         type: object
