@@ -70,19 +70,17 @@ manage their profile, event requests and payments.
 From time to time we coordinate batch pre-orders for custom team jerseys or
 apparel:
 
-- **Off-site payment:** Pre-order forms on this site only record your sizing
-  and customisation details (name/number). Payment is arranged off-site after
-  you submit your request.
-- **Custom items:** Because custom jerseys are made to order with your chosen
-  name, number, and size, orders cannot be changed or refunded once the batch
-  has been sent to production with the manufacturer.
+- **Off-site payment:** Payment is arranged off-site after you submit your
+  pre-order.
+- **Custom items:** Custom jerseys are made to order, so orders can't be
+  changed or refunded once the batch has gone to the manufacturer.
 
 ## Website content and external links
 
 All logos, mascot artwork, and custom motifs on this site belong to The
 Leftovers or their respective licensed creators (see our [Credits](/credits) page).
-Event dates, league schedules, and third-party stats (such as public tournament
-records from `pblidb.org`) are provided as-is and may change without notice.
+Event dates, league schedules and third-party stats are provided as-is and
+may change without notice.
 
 Links to third-party sites (such as Instagram, Facebook, Google Forms, NXL, or
 partner websites) are provided for convenience; we do not control their content
