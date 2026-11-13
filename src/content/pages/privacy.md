@@ -98,6 +98,11 @@ when you do.
   method and a reference code, never card or bank numbers), the devices you turn
   notifications on for, when you agreed to these policies, and a log of
   changes made by organizers.
+- **Feedback you send:** if you use **Send feedback**, we keep your message,
+  the kind (a bug, an idea or something else) and any rating you give. A bug
+  report also includes the screen you were on and your browser and device, to
+  help us find the problem. Only admins read it, and they may email you about
+  it. It's deleted with your account.
 - **Who sees it:** organizers see your profile and contact details for the
   events they run, and for a child's profile, the parent's name, email and
   phone. Squadmates see your name, photo, position and country. Your
