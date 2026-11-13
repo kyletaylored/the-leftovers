@@ -21,6 +21,13 @@
  * - Every page is a full page load on this site (it's static Astro, not a
  *   single-page app), so RUM's automatic view tracking is exactly one view
  *   per page. No router integration is needed.
+ * - The player app at app.theleftoverspb.com reports to the same RUM
+ *   application (service `leftovers-app`). Both set
+ *   `trackSessionAcrossSubdomains`, so the session cookie lives on
+ *   theleftoverspb.com and a visitor who allowed monitoring on both keeps one
+ *   session from the site into the app. Each side still asks for its own
+ *   consent, and only deletes the cookie when someone declines there, so
+ *   undecided visitors here don't end a session the app started.
  */
 import { CONSENT_EVENT, DEFAULT_CONSENT_STORAGE_KEY } from '@/lib/consent';
 
@@ -79,6 +86,7 @@ function start(cfg: RumConfig) {
       trackUserInteractions: true,
       trackResources: true,
       trackLongTasks: true,
+      trackSessionAcrossSubdomains: true,
       trackingConsent: 'granted',
     });
     return datadogRum;
@@ -89,13 +97,15 @@ function start(cfg: RumConfig) {
 
 if (config) {
   if (storedConsent() === 'accepted') start(config);
-  // No consent on this page load: remove any Datadog cookie left behind by
-  // an earlier, withdrawn session.
-  else clearDatadogCookies();
+  // Declined: remove any Datadog cookie left behind by an earlier, withdrawn
+  // session. Undecided visitors are left alone, since the cookie is shared
+  // with the app and may belong to a session they allowed there.
+  else if (storedConsent() === 'declined') clearDatadogCookies();
 
   window.addEventListener(CONSENT_EVENT, (event) => {
     const choice = (event as CustomEvent<string>).detail;
     if (choice === 'accepted') start(config);
+    else if (!rum) clearDatadogCookies();
     else
       rum
         ?.then((r) => {
@@ -109,12 +119,18 @@ if (config) {
   });
 }
 
-/** Datadog's session cookie: `_dd_s` before SDK v7, `_dd_s_v2` since. */
+/**
+ * Datadog's session cookie: `_dd_s` before SDK v7, `_dd_s_v2` since. Shared
+ * across subdomains, it sits on the parent domain, so delete it on this host
+ * and on every parent.
+ */
 function clearDatadogCookies() {
+  const parts = location.hostname.split('.');
+  const domains = parts.slice(0, -1).map((_, i) => parts.slice(i).join('.'));
   for (const raw of document.cookie.split(';')) {
     const name = raw.split('=')[0]?.trim();
     if (!name?.startsWith('_dd_s')) continue;
     document.cookie = `${name}=; Max-Age=0; path=/; SameSite=Lax`;
-    document.cookie = `${name}=; Max-Age=0; path=/; domain=${location.hostname}; SameSite=Lax`;
+    for (const domain of domains) document.cookie = `${name}=; Max-Age=0; path=/; domain=${domain}; SameSite=Lax`;
   }
 }
