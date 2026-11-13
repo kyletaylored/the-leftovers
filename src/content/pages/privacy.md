@@ -41,19 +41,14 @@ We use **Google Tag Manager** (`GTM-KPXD7QD6`) and **Google Analytics** to
 understand basic site traffic — such as which pages and event listings people
 visit.
 
-We also use **Datadog Real User Monitoring** to see how fast pages load and
-whether anything breaks for visitors: page load timings, errors, the pages you
-view and the buttons you click, plus your browser, device type and rough
-location (from your IP address). For a share of visits it also records a
-**session replay**, a reconstruction of how the page looked and responded
-during your visit. Anything you type into a form is masked and never
-recorded. Datadog processes this data for us in the United States.
+We also use **Datadog Real User Monitoring** to measure performance, catch
+errors and understand how the site is used. Datadog processes this data for us
+in the United States.
 
 - **Opt-in by default:** Analytics storage is set to `denied` by default.
   Google Tag Manager, Google Analytics and Datadog are **only** loaded if you
   click **Accept analytics** in the cookie banner, and only then can they set
-  their cookies: `_ga`, `_ga_*` and `_gid` (Google), and `_dd_s_v2` (Datadog,
-  a session ID that expires after 15 minutes of inactivity).
+  their cookies: `_ga`, `_ga_*` and `_gid` (Google), and `_dd_s_v2` (Datadog).
 - **Essential storage:** We store a single preference key
   (`leftovers_cookie_consent`) in your browser's `localStorage` so we remember
   whether you accepted or declined analytics.
@@ -61,9 +56,8 @@ recorded. Datadog processes this data for us in the United States.
   using the **Cookie settings** link in the site footer (or the button below).
   Doing so stops Google Analytics and Datadog and clears their cookies.
 
-The Player Portal runs no analytics or advertising. It asks separately before
-turning on performance monitoring, and the banner on this site doesn't apply
-there. See [Player Portal](#player-portal).
+The Player Portal has no advertising. It asks separately before turning on
+performance monitoring, and the banner on this site doesn't apply there. See [Player Portal](#player-portal).
 
 ## Join requests and jersey pre-orders
 
@@ -116,17 +110,11 @@ when you do.
   on notifications, they go through your device's push service (such as Apple,
   Google or Mozilla).
 - **Cookies:** only the ones that keep you signed in, plus Datadog's if you
-  allow performance monitoring. If something breaks, the portal reports the
-  error and which screen it was on to our own server, never what you typed.
-- **Performance monitoring (opt-in):** the portal asks once whether it may
-  measure page speed and errors on your device. If you allow it,
-  **Datadog** receives, in the United States: the screens you open and how
-  long they take, errors, what you tap, named by its label (which can include
-  what's written on it, such as a player's name on a list), and your browser,
-  device type and rough location (from your IP address). Nothing you type is
-  recorded, there's no session replay, and it isn't linked to your account. It sets one cookie, `_dd_s_v2`, a session ID that
-  expires after 15 minutes of inactivity. Turn it off at any time under
-  **Performance monitoring** on your Account page.
+  allow performance monitoring.
+- **Performance monitoring (opt-in):** if you allow it, the portal uses
+  **Datadog Real User Monitoring** to measure performance, catch errors and
+  understand how the app is used. Datadog processes this data for us in the
+  United States. You can turn it off at any time on your Account page.
 - **Under 18s:** players under 18 don't get their own login. A parent or
   guardian's account manages their profile, and we keep the parent's name,
   email and phone with it so organizers can reach them.
