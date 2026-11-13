@@ -1,0 +1,48 @@
+---
+/**
+ * SummaryCard: the short version of a long page, in plain language, above the
+ * full text. Made for the Terms and Privacy Policy, where most people want the
+ * gist and a few want every clause.
+ *
+ * It's a summary, not a substitute: the note under the points says the full
+ * text is what counts. Points come from the page's `summary` in the `pages`
+ * collection, so the team edits them in Pages CMS next to the policy itself.
+ * Plain HTML, no JS. The list is a real <ul>, so screen readers count it.
+ */
+import Icon from './brand/Icon.astro';
+
+interface Props {
+  points: string[];
+  /** Small heading above the points. */
+  title?: string;
+  /** The line under the points. */
+  note?: string;
+  as?: 'h2' | 'h3';
+  class?: string;
+}
+
+const {
+  points,
+  title = 'The short version',
+  note = 'This is a summary. The full text below is what applies.',
+  as: Heading = 'h2',
+  class: className = '',
+} = Astro.props;
+---
+
+<aside class:list={['rounded-sm border border-gold/40 bg-ink-800 p-6 sm:p-8', className]} aria-label={title}>
+  <Heading class="eyebrow mb-5">{title}</Heading>
+  <ul class="grid gap-4 sm:grid-cols-2 sm:gap-x-8">
+    {
+      points.map((point) => (
+        <li class="flex gap-3 leading-relaxed text-bone">
+          <span class="mt-0.5 inline-flex size-6 shrink-0 items-center justify-center rounded-full border border-gold text-gold" aria-hidden="true">
+            <Icon name="check" class="size-3.5" strokeWidth={2.2} />
+          </span>
+          <span>{point}</span>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-6 border-t border-ink-600 pt-4 text-sm text-bone-muted">{note}</p>
+</aside>

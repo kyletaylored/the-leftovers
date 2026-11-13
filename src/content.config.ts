@@ -291,6 +291,8 @@ const pagesCollection = defineCollection({
         })
       )
       .default([]),
+    /** Plain-language points shown in a SummaryCard above the body (Terms, Privacy). */
+    summary: z.array(z.string()).default([]),
     seo,
   }),
 });

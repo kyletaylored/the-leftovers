@@ -115,6 +115,13 @@ export const catalog: CatalogEntry[] = [
     avoid: 'Quoting a real person without their OK.',
   },
   {
+    name: 'SummaryCard', file: 'SummaryCard.astro', kind: 'Astro', group: 'content', section: 'blocks',
+    use: 'Plain-language short version of a long page, above its Prose (Terms, Privacy Policy).',
+    options: 'points[] · title (default "The short version") · note (line under the points) · as · class',
+    data: 'pages collection: summary',
+    avoid: 'Points the full text does not back up. It summarises, it never adds terms.',
+  },
+  {
     name: 'FaqAccordion', file: 'FaqAccordion.astro', kind: 'Astro', group: 'content', section: 'blocks',
     use: 'FAQ list, native <details>, zero JS.',
     options: 'items[{id?, question, answer}]: id makes an answer linkable, like /join#why-18',

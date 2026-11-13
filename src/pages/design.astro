@@ -23,7 +23,7 @@ import seigaihaArt from '@/assets/img/brand/seigaiha.png';
 import { palette } from '@/lib/palette';
 import { textures } from '@/lib/textures';
 import { catalog } from '@/lib/components';
-import { getCollection } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import DocSection from '@/components/design/DocSection.astro';
 import Specimen from '@/components/design/Specimen.astro';
@@ -64,6 +64,7 @@ import AgendaList from '@/components/AgendaList.astro';
 import ImagePlaceholder from '@/components/ImagePlaceholder.astro';
 import StatNumber from '@/components/StatNumber.astro';
 import Callout from '@/components/Callout.astro';
+import SummaryCard from '@/components/SummaryCard.astro';
 import MascotCallout from '@/components/MascotCallout.astro';
 import VideoPlayer from '@/components/VideoPlayer.astro';
 import VideoModal from '@/components/VideoModal.astro';
@@ -264,6 +265,8 @@ const num = (id: string) => {
   return String(i + 1).padStart(2, '0');
 };
 const nav = navGroups.map((g) => ({ ...g, sections: g.sections.map((sec) => ({ ...sec, number: num(sec.id) })) }));
+
+const privacyPage = await getEntry('pages', 'privacy');
 
 const threeColItems: { icon: 'jersey' | 'calendar' | 'trophy'; title: string; body: string }[] = [
   { icon: 'jersey', title: 'Bring your own gear', body: 'Your marker, mask and pods. No loaners.' },
@@ -784,6 +787,9 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
           <ImpactBand compact align="right" image={shooterImg} imageAlt="A sample photo." as="h3">
             <Callout feature align="inherit" class="relative" cite="Who said it" source="Where or when" href="#">Paintball builds better people.</Callout>
           </ImpactBand>
+        </Specimen>
+        <Specimen title="SummaryCard" class="lg:col-span-2" file="src/components/SummaryCard.astro" note="The short version of a long page, above the full text: the Terms and Privacy Policy. Points come from the page's Short version field in Pages CMS. Keep each to one sentence and true to the full text. Shown here with the Privacy Policy's own points.">
+          <SummaryCard as="h3" points={privacyPage?.data.summary ?? []} />
         </Specimen>
         <Specimen title="MascotCallout: empty state" file="src/components/MascotCallout.astro" note="The honest empty state. Use it instead of an empty grid. Slot takes action Buttons.">
           <MascotCallout as="h4" title="No photos up yet" body="Somebody always forgets to bring a camera.">

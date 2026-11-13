@@ -10,9 +10,16 @@ seo:
   description: >-
     How The Leftovers community paintball group handles analytics cookies,
     Google Forms submissions, Player Portal accounts, and EU/US privacy rights.
+summary:
+  - We collect what we need to run squads and events, like your name, contact details, player ID and what you've paid.
+  - We never sell your data. Your name and player ID go to the league for rosters, and that's it.
+  - Your Private ID Tag is encrypted, and only an admin or your captain can see it, when it's needed for a roster.
+  - Analytics on this website only run if you say yes. The player app has no analytics or ads.
+  - Players under 18 are managed by a parent or guardian, and we keep the parent's contact details with the profile.
+  - You can download or delete your data from the app at any time, or email info@theleftoverspb.com.
 ---
 
-**Last updated:** November 9, 2026
+**Last updated:** November 12, 2026
 
 ## Who we are
 
@@ -76,36 +83,40 @@ This website itself has no backend database and no user accounts. When you submi
 ## Player Portal
 
 The Player Portal (`app.theleftoverspb.com`) is a separate app with accounts.
-Signing up is optional, and you agree to a short notice when you do.
+Signing up is optional, and you agree to this policy and the [Terms](/terms)
+when you do.
 
 - **What you provide:** your email address, which is how you log in, and a
   player profile: name, country, phone, ranking, positions, and your APPA player
   ID. That ID has a public player number and a private ID Tag. You can add a
   photo (your own, or a copy of your PBLeagues photo if you ask for one) and
   links to your social profiles. A birth year and month are asked for only for
-  a player under 18 or an event with an age limit.
+  a player under 18 or an event with an age limit. If you sign up a child,
+  you also give your own name and mobile number, as their parent or guardian.
 - **What the portal records:** the events and squads you request and play,
   payments you tell us you've made and the ones organizers confirm (amounts,
   method and a reference code, never card or bank numbers), the devices you turn
-  notifications on for, when you agreed to the sign-up notice, and a log of
+  notifications on for, when you agreed to these policies, and a log of
   changes made by organizers.
 - **Who sees it:** organizers see your profile and contact details for the
-  events they run. Squadmates see your name, photo, position and country. Your
+  events they run, and for a child's profile, the parent's name, email and
+  phone. Squadmates see your name, photo, position and country. Your
   player card stays private unless you make it public. Your private ID Tag is
   shown only to an admin, or to your squad's captain while they add you to the
   league roster, and each time it's shown is recorded.
 - **Who receives it:** the event league, for rosters. **Cloudflare** hosts the
   portal and stores its data in the United States, and sends its emails.
   **Google**, **Facebook** or **Discord** handle sign-in only if you choose
-  them, and you can disconnect them at any time from your Profile. If you turn
+  them, and you can disconnect them at any time from your Account. If you turn
   on notifications, they go through your device's push service (such as Apple,
   Google or Mozilla).
 - **Cookies:** only the ones that keep you signed in. If something
   breaks, the portal reports the error and which screen it was on to our own
   server, never what you typed.
 - **Under 18s:** players under 18 don't get their own login. A parent or
-  guardian's account manages their profile.
-- **Your data, yourself:** your Profile lets you correct your details, download
+  guardian's account manages their profile, and we keep the parent's name,
+  email and phone with it so organizers can reach them.
+- **Your data, yourself:** your Account and Profile let you correct your details, download
   everything we hold about you, and delete your account. Deleting removes your
   profiles, ID Tags and photos. Payment records stay, without your name, so
   each squad's money still adds up. If you have a spot in an upcoming event,
@@ -116,7 +127,7 @@ Signing up is optional, and you agree to a short notice when you do.
 **To delete your Player Portal account and everything in it:**
 
 1. Log in at [app.theleftoverspb.com](https://app.theleftoverspb.com).
-2. Open **Profile**.
+2. Open **Account**.
 3. Choose **Delete account**, type `DELETE`, and confirm.
 
 This removes your account, your player profiles, your ID Tags, your photos and
@@ -131,7 +142,7 @@ from the address on your account, and we'll delete it within 30 days.
 we received from Facebook. To also stop Facebook sharing anything new with us,
 remove The Leftovers under **Apps and websites** in your Facebook settings. To
 keep your account but disconnect Facebook, choose **Disconnect** next to
-Facebook on your Profile.
+Facebook on your Account.
 
 **Join requests and pre-orders** are deleted on request: see
 [Your rights](#your-rights-including-eea--uk-visitors) below.
@@ -161,6 +172,6 @@ honour rights under the EU/UK GDPR and applicable US state privacy laws:
   pre-order form and want to see, update, or delete your entry from our Google
   Sheet, email [info@theleftoverspb.com](mailto:info@theleftoverspb.com) and we
   will remove it promptly. If you have a Player Portal account, you can download,
-  correct or delete your data yourself from your Profile, or email us.
+  correct or delete your data yourself from your Account, or email us.
 - **Where it's stored:** Player Portal data is stored in the United States. If
   you're in the EEA or UK, your data is transferred there when you use it.

@@ -90,6 +90,10 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **Callout** (`Callout.astro`): Pull quote / emphasis inside a Section (slot = quote). Also the CMS quote block.
   - Options: cite · source (where or when; needs cite) · href (links source) · feature (large standalone quote in headline type) · align: center|inherit (inherit inside an ImpactBand)
   - Avoid: Quoting a real person without their OK.
+- **SummaryCard** (`SummaryCard.astro`): Plain-language short version of a long page, above its Prose (Terms, Privacy Policy).
+  - Options: points[] · title (default "The short version") · note (line under the points) · as · class
+  - Data: pages collection: summary
+  - Avoid: Points the full text does not back up. It summarises, it never adds terms.
 - **FaqAccordion** (`FaqAccordion.astro`): FAQ list, native <details>, zero JS.
   - Options: items[{id?, question, answer}]: id makes an answer linkable, like /join#why-18
   - Data: faqs collection (sort by order)

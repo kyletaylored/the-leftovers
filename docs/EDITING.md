@@ -179,7 +179,12 @@ please don't plan a page section around a group feed.
 ## Page copy
 
 **Page copy** holds the body text and SEO fields for Contact, Shop and
-Community.
+Community, and for the Terms and Privacy Policy.
+
+**Short version** is a list of plain-language points shown in a card above
+the page text. The Terms and Privacy Policy use it. Keep each point to one
+sentence, and when you change the policy, check the points still match it.
+The player app links to both pages when people sign up.
 
 The **SEO** section is worth filling in properly:
 
