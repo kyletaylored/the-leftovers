@@ -28,6 +28,7 @@ import BrandRule from '@/components/brand/BrandRule.astro';
 import Icon from '@/components/brand/Icon.astro';
 import { fullTitle, getEvents, seasonOf } from '@/lib/events';
 import { isoDate } from '@/lib/format';
+import { LEAGUES } from '@/lib/leagues';
 import { site } from '@/lib/settings';
 import { recapsByEvent } from '@/lib/posts';
 
@@ -46,6 +47,7 @@ const schema = upcoming.flatMap((event) => {
   const { league, location, startDate, endDate, eventUrl } = event.data;
   if (!location) return [];
   const name = [league, fullTitle(event)].filter(Boolean).join(' ');
+  const organizer = league ? LEAGUES[league] : undefined;
   return [
     {
       '@type': 'SportsEvent',
@@ -69,7 +71,7 @@ const schema = upcoming.flatMap((event) => {
           addressCountry: location.country,
         },
       },
-      ...(league ? { organizer: { '@type': 'Organization', name: league } } : {}),
+      ...(organizer ? { organizer: { '@type': 'Organization', ...organizer } } : {}),
       competitor: { '@id': new URL('/#team', Astro.site).href },
       ...(eventUrl ? { sameAs: eventUrl } : {}),
     },
