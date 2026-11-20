@@ -1,7 +1,7 @@
 # Handoff: The Leftovers website
 
 **Start here** if you're picking this project up, whether you're a person or an
-agent. It covers what the site is, what state it's in (as of **11 Nov 2026**),
+agent. It covers what the site is, what state it's in (as of **20 Nov 2026**),
 how to work on it without breaking its rules, and what's left to do. Everything
 else in `docs/` goes deeper on one topic.
 
@@ -108,7 +108,18 @@ linked from anywhere either, but its closed state still points at `/shop` and
   status flag.
 - SEO: sitemap, robots, canonical URLs, per-page OG and Twitter tags, and
   JSON-LD (`SportsTeam`, `Person`, `SportsEvent`, `Product`, `FAQPage`,
-  `VideoObject`).
+  `VideoObject`). Search Console wants full date-times with a timezone, so
+  JSON-LD dates go through `isoDateTime` in `src/lib/format.ts`. A
+  `SportsEvent`'s organizer comes from the event's `league` tag via
+  `src/lib/leagues.ts` (name and website); add a league there before its
+  first event, or that event gets no organizer.
+- Analytics: Google Tag Manager and Datadog RUM, both opt-in behind the
+  cookie banner ([ANALYTICS.md](ANALYTICS.md)). RUM shares one session with
+  the player app across subdomains, and each side asks for its own consent.
+- `/privacy` and `/terms` (13 Nov 2026) open with a plain-language summary,
+  cover the website and the Player Portal, and list each company we share
+  data with as "name: what for". Keep it that way: no implementation
+  details or reasons for choosing a provider.
 - Design system: the `/design` page, Storybook with play tests, and shared
   token and texture data. See §4.
 - Wide screens: past 1600px the whole site sits in a centred page frame over
@@ -307,10 +318,13 @@ inline-styled HTML into the repo.
 
 ### Needs the team (decisions or content, not code)
 
-- **Connect Google Search Console and submit the sitemap.** Verify the
-   `theleftoverspb.com` Domain property by DNS, then submit
-   `/sitemap-index.xml`; import into Bing Webmaster Tools from there. Steps
-   in [SEO.md](SEO.md#connecting-google-search-console-one-off-by-the-owner).
+- **Finish the Search Console setup.** It's connected (its structured-data
+   notices are arriving). Confirm `/sitemap-index.xml` is submitted, then
+   import into Bing Webmaster Tools. Steps in
+   [SEO.md](SEO.md#connecting-google-search-console-one-off-by-the-owner).
+   After a structured-data fix goes live, use **Validate fix** on the issue:
+   the video `uploadDate` fix is live, and the `SportsEvent` organizer fix has
+   nothing to check until next season's events are added.
    Also decide the AI-crawler policy (`search.aiCrawlers`, default `allow`).
 
 0. **Review the homepage slider headlines** in
@@ -386,6 +400,8 @@ inline-styled HTML into the repo.
    section of [`AGENTS.md`](../AGENTS.md). Since 10 Nov 2026 `/join` sends people
    there to sign up, and new accounts wait for the team to let them in while it's
    tested.
+   The app's own build status and open items are in
+   `platform/docs/DESIGN.md` ("Build status").
 
 ### Don't do
 
