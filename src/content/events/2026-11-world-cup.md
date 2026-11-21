@@ -28,29 +28,30 @@ fees:
   - { format: 3v3, division: Novice, early: 360, regular: 385, late: 410 }
   - { format: 3v3, division: Youth, early: 300, regular: 300, late: 300 }
 squads:
-  - { name: The Leftovers, division: Division 3 X-Ball }
-  - { name: The Leftovers II, division: Division 4 X-Ball }
-  - { name: The Leftovers II.5, division: Division 4 X-Ball }
-  - { name: The Leftovers III, division: Division 5 X-Ball }
-  - { name: The Leftovers III.5, division: Division 5 X-Ball }
-  - { name: The Leftovers IV, division: Division 5 X-Ball }
-  - { name: The Leftovers OG, division: Masters X-Ball }
-  - { name: The Leftovers OG II, division: Masters X-Ball }
-  - { name: The Leftovers OG III, division: Masters X-Ball }
-  - { name: The Leftovers IV.5, division: Division 4 5v5 }
-  - { name: The Leftovers V, division: Division 4 5v5 }
-  - { name: The Leftovers VI, division: Division 5 5v5 }
+  - { name: The Leftovers, division: Division 3 X-Ball, place: 43, fieldSize: 44 }
+  - { name: The Leftovers II, division: Division 4 X-Ball, place: 41, fieldSize: 73 }
+  - { name: The Leftovers II.5, division: Division 4 X-Ball, place: 56, fieldSize: 73 }
+  - { name: The Leftovers III, division: Division 5 X-Ball, place: 30, fieldSize: 31 }
+  - { name: The Leftovers III.5, division: Division 5 X-Ball, place: 29, fieldSize: 31 }
+  - { name: The Leftovers IV, division: Division 5 X-Ball, place: 31, fieldSize: 31 }
+  - { name: The Leftovers OG, division: Masters X-Ball, place: 13, fieldSize: 13 }
+  - { name: The Leftovers OG II, division: Masters X-Ball, place: 10, fieldSize: 13 }
+  - { name: The Leftovers OG III, division: Masters X-Ball, place: 11, fieldSize: 13 }
+  - { name: The Leftovers IV.5, division: Division 4 5v5, place: 54, fieldSize: 68 }
+  - { name: The Leftovers V, division: Division 4 5v5, place: 62, fieldSize: 68 }
+  - { name: The Leftovers VI, division: Division 5 5v5, place: 24, fieldSize: 29 }
   - { name: The Leftovers Ladies, division: WNXL Amateur 5v5 }
-  - { name: The Leftovers 10v10, division: Amateur 10v10 }
-  - { name: The Leftovers 10v10 II, division: Amateur 10v10 }
-  - { name: The Leftovers Mech, division: Classic Mounds - Open 10v10 }
-  - { name: The Leftovers Mech, division: Classic Mounds - Open 5v5 }
-  - { name: The Leftovers Kidz, division: Youth Advanced 5v5 }
-  - { name: The Leftovers INTERM, division: Intermediate 3v3 }
-  - { name: The Leftovers NOV, division: Novice 3v3 }
-  - { name: The Leftovers NOV II, division: Novice 3v3 }
-  - { name: The Leftovers NOV III, division: Novice 3v3 }
-  - { name: The Leftovers Kidz, division: Youth 3v3 }
-  - { name: The Leftovers Kidz II, division: Youth 3v3 }
+  - { name: The Leftovers 10v10, division: Amateur 10v10, place: 34, fieldSize: 50 }
+  - { name: The Leftovers 10v10 II, division: Amateur 10v10, place: 43, fieldSize: 50 }
+  - { name: The Leftovers Mech, division: Classic Mounds - Open 10v10, place: 12, fieldSize: 12 }
+  - { name: The Leftovers Mech, division: Classic Mounds - Open 5v5, place: 10, fieldSize: 18 }
+  - { name: The Leftovers Kidz, division: Youth Advanced 5v5, place: 5, fieldSize: 5 }
+  - { name: The Leftovers INTERM, division: Intermediate 3v3, place: 66, fieldSize: 66 }
+  - { name: The Leftovers NOV, division: Novice 3v3, place: 1, fieldSize: 68 }
+  - { name: The Leftovers NOV II, division: Novice 3v3, place: 51, fieldSize: 68 }
+  - { name: The Leftovers NOV III, division: Novice 3v3, place: 56, fieldSize: 68 }
+  - { name: The Leftovers Insane NOV, division: Novice 3v3, place: 44, fieldSize: 68 }
+  - { name: The Leftovers Kidz, division: Youth 3v3, place: 5, fieldSize: 7 }
+  - { name: The Leftovers Kidz II, division: Youth 3v3, place: 7, fieldSize: 7 }
 coverAlt: ''
 ---

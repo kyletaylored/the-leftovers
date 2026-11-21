@@ -64,7 +64,7 @@ Options: `a|b` lists values, default first. Paths are relative to `src/component
 - **Section** (`Section.astro`): Every content band below the header: container, heading block, background.
   - Options: title · eyebrow · kicker · as: h2|h3 · id · tone: base|alt|topo|sand|seigaiha · divider (+dividerSeed)
   - Avoid: Two neighbouring Sections in the same tone; alternate base/alt. Full-bleed blocks (ImpactBand, CtaStrip, showcase Slideshow) go between Sections, not inside.
-- **Prose** (`Prose.astro`): Wraps CMS Markdown bodies (<Content />) with typographic defaults.
+- **Prose** (`Prose.astro`): Wraps CMS Markdown bodies (<Content />) with typographic defaults, including tables that scroll on their own on phones.
   - Data: pages collection / any entry body
   - Pairs with: Section
 - **TwoColumn** (`TwoColumn.astro`): Boxed image + copy (slot), buttons in slot="actions". A calm break between full-bleed blocks.

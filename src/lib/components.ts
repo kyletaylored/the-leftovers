@@ -78,7 +78,7 @@ export const catalog: CatalogEntry[] = [
   },
   {
     name: 'Prose', file: 'Prose.astro', kind: 'Astro', group: 'layout', section: 'blocks',
-    use: 'Wraps CMS Markdown bodies (<Content />) with typographic defaults.',
+    use: 'Wraps CMS Markdown bodies (<Content />) with typographic defaults, including tables that scroll on their own on phones.',
     data: 'pages collection / any entry body',
     pairs: ['Section'],
   },
