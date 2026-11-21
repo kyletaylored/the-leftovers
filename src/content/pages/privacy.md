@@ -18,7 +18,7 @@ summary:
   - You can download or delete your data from the app at any time, or email info@theleftoverspb.com.
 ---
 
-**Last updated:** November 12, 2026
+**Last updated:** November 21, 2026
 
 ## Who we are
 
@@ -94,7 +94,7 @@ with:
 - **Cloudflare:** hosting, data storage and email
 - **Google:** analytics and form responses, and sign-in if you choose it
 - **Datadog:** performance and error monitoring, if you allow it
-- **Facebook and Discord:** sign-in, if you choose them
+- **Apple, Facebook and Discord:** sign-in, if you choose them
 - **Apple, Google and Mozilla:** push notifications, if you turn them on
 
 ## Deleting your data
