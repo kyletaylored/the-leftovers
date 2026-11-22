@@ -2,7 +2,8 @@
 /**
  * Prose — typographic defaults for CMS-authored Markdown bodies. Written by
  * hand rather than pulling in @tailwindcss/typography: the site needs about
- * fifteen rules, not a plugin's worth of them.
+ * fifteen rules, not a plugin's worth of them. Tables scroll sideways inside
+ * themselves when they're wider than a phone, so the page never does.
  */
 interface Props {
   class?: string;
@@ -117,6 +118,33 @@ const { class: className = '' } = Astro.props;
   .prose-brand :global(pre code) {
     padding: 0;
     background: none;
+  }
+  /* Tables, for results in recaps. Wide ones scroll inside themselves on
+     phones rather than widening the page. */
+  .prose-brand :global(table) {
+    display: block;
+    max-width: 100%;
+    margin: 1.5rem 0 1.75rem;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .prose-brand :global(th),
+  .prose-brand :global(td) {
+    padding: 0.5rem 1rem 0.5rem 0;
+    border-bottom: 1px solid var(--color-ink-600);
+    text-align: left;
+    vertical-align: top;
+  }
+  .prose-brand :global(th:last-child),
+  .prose-brand :global(td:last-child) {
+    padding-right: 0;
+  }
+  .prose-brand :global(th) {
+    color: var(--color-bone);
+    font-weight: 700;
+    white-space: nowrap;
   }
   .prose-brand :global(hr) {
     margin: 2.5rem 0;

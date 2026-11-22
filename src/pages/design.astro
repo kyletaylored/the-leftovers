@@ -78,6 +78,7 @@ import Slideshow, { type Slide } from '@/components/Slideshow.tsx';
 import FeatureRow from '@/components/marketing/FeatureRow.astro';
 import ImpactBand from '@/components/marketing/ImpactBand.astro';
 import TwoColumn from '@/components/TwoColumn.astro';
+import Prose from '@/components/Prose.astro';
 import PricingCard from '@/components/marketing/PricingCard.astro';
 import ProductGrid from '@/components/marketing/ProductGrid.astro';
 import FormField from '@/components/form/FormField.astro';
@@ -835,6 +836,20 @@ const blockSpecimen = landingHome?.data.sections.slice(-2) ?? [];
           <CtaStrip as="h3" eyebrow="Open slots" title="Every name started as a slot" body="Confirm you're coming, cover your entry, and you're playing points." tone="crimson">
             <Button slot="actions" href="/join" variant="gold">Request a slot</Button>
           </CtaStrip>
+        </Specimen>
+        <Specimen title="Prose" class="lg:col-span-2" file="src/components/Prose.astro" note="Wrap any CMS Markdown body (<Content />) in it: pages, blog posts. It styles headings, lists, links, quotes, photos, code and tables. Specimen text, not real content.">
+          <Prose>
+            <h3>Results</h3>
+            <p>Body copy is muted bone at 68 characters wide, with <strong>strong</strong> text and <a href="#blocks">links</a> picked out.</p>
+            <ul><li>Lists get a gold square.</li><li>Tables get ruled rows.</li></ul>
+            <table>
+              <thead><tr><th>Squad</th><th>Division</th><th>Place</th></tr></thead>
+              <tbody>
+                <tr><td>Squad name</td><td>Division 5 X-Ball</td><td>3rd of 28</td></tr>
+                <tr><td>Another squad name</td><td>Novice 3v3</td><td>12th of 64</td></tr>
+              </tbody>
+            </table>
+          </Prose>
         </Specimen>
         <Specimen title="FaqAccordion" class="lg:col-span-2" file="src/components/FaqAccordion.astro" note="Native <details>, zero JS. Feed it the faqs collection.">
           <FaqAccordion items={sampleFaqs.map((f) => ({ question: f.data.question, answer: f.data.answer }))} />
