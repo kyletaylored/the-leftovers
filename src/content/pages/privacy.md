@@ -94,7 +94,7 @@ with:
 - **Cloudflare:** hosting, data storage and email
 - **Google:** analytics and form responses, and sign-in if you choose it
 - **Datadog:** performance and error monitoring, if you allow it
-- **Apple, Facebook and Discord:** sign-in, if you choose them
+- **Apple and Discord:** sign-in, if you choose them
 - **Apple, Google and Mozilla:** push notifications, if you turn them on
 
 ## Deleting your data
@@ -111,10 +111,6 @@ have a spot in an upcoming event, withdraw from it first.
 
 **Can't log in?** Email [info@theleftoverspb.com](mailto:info@theleftoverspb.com)
 from the address on your account, and we'll delete it within 30 days.
-
-**Signed in with Facebook?** Deleting your account removes everything we
-received from Facebook. To stop Facebook sharing anything new with us, remove
-The Leftovers under **Apps and websites** in your Facebook settings.
 
 **Join requests and pre-orders** are deleted on request: email
 [info@theleftoverspb.com](mailto:info@theleftoverspb.com).

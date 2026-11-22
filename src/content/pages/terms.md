@@ -50,8 +50,8 @@ The Player Portal at `app.theleftoverspb.com` is where confirmed players
 manage their profile, event requests and payments.
 
 - **One account per person.** You can log in with an email link, or with
-  Apple, Google, Facebook or Discord. Keep your email and connected accounts
-  secure, because anyone who can use them can use your account.
+  Apple, Google or Discord. Keep your email and connected accounts secure,
+  because anyone who can use them can use your account.
 - **Accurate details.** Use your real name and your own APPA player ID. A
   player ID can belong to only one profile. If yours is already taken, email us
   rather than creating another.
