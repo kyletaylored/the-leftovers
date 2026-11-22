@@ -68,7 +68,8 @@ the [Terms](/terms) when you do.
 - **Who sees it:** organizers see your profile and contact details for the
   events they run, including a parent's details on a child's profile.
   Squadmates see your name, photo, position and country. Your player card is
-  private unless you make it public. Your private ID Tag is encrypted and shown
+  private unless you make it public, and then anyone with the link can see it.
+  Your private ID Tag is encrypted and shown
   only to an admin or your squad's captain, when it's needed for a roster.
 - **Cookies:** one keeps you signed in. If you allow performance monitoring
   when the portal asks, it sets one more. You can turn monitoring off at any

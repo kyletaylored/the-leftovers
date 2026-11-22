@@ -16,6 +16,7 @@ summary:
   - Paintball has risks. Your safety, gear, travel and league memberships are up to you.
   - Pay your share by each event's deadline to make the roster. Payments happen off-site.
   - One account per person, with your real name and your own player ID. Parents manage players under 18.
+  - Photos and details you add stay yours. Anyone with the link can see a public player card.
   - Custom jerseys can't be changed or refunded once they're sent to be made.
 ---
 
@@ -43,6 +44,8 @@ organizer.
   as arranged directly with the squad organizer. Full payment for your share
   must be received by the stated event deadline for each event in order to be
   assigned to the active roster.
+- **Squad decisions:** Squad placement, captains and rosters are up to the
+  organizers.
 
 ## Player Portal accounts
 
@@ -55,8 +58,13 @@ manage their profile, event requests and payments.
 - **Accurate details.** Use your real name and your own APPA player ID. A
   player ID can belong to only one profile. If yours is already taken, email us
   rather than creating another.
-- **Under 18s.** Players under 18 don't get their own login. A parent or
-  guardian manages their profile, and agrees to these terms for them.
+- **Under 18s.** You need to be 18 or older to have your own login. A parent
+  or guardian manages a younger player's profile, and agrees to these terms
+  for them.
+- **Your photos and details.** What you add stays yours. You let us show it in
+  the portal to run the team, such as on rosters and your player card. If you
+  make your card public, anyone with the link can see it, and it could be
+  copied or show up in search results.
 - **Payments.** You pay your share off-site, using the methods shown for each
   event, with your reference code, and an organizer confirms it. Deadlines and
   refunds follow what's set out for each event.
@@ -64,6 +72,8 @@ manage their profile, event requests and payments.
   isn't yours. We may remove or block an account that does.
 - **Leaving.** You can delete your account from your Account page at any time. See
   the [Privacy Policy](/privacy#player-portal) for what's kept.
+- **Run by volunteers.** Features may change or stop, and the portal may
+  sometimes be offline.
 
 ## Jersey pre-orders and merchandise
 
@@ -93,6 +103,11 @@ fullest extent permitted by law, the volunteer organizers and members of The
 Leftovers are not liable for any damages, losses, or injuries arising from your
 use of this website, reliance on posted event information, or participation in
 any paintball event.
+
+## Changes to these terms
+
+If we change these terms, we'll post the new version here with a new date. For
+a big change, we'll also tell Player Portal users by email or in the portal.
 
 ## Contact
 
