@@ -18,7 +18,7 @@ summary:
   - You can download or delete your data from the app at any time, or email info@theleftoverspb.com.
 ---
 
-**Last updated:** November 12, 2026
+**Last updated:** November 21, 2026
 
 ## Who we are
 
@@ -68,7 +68,8 @@ the [Terms](/terms) when you do.
 - **Who sees it:** organizers see your profile and contact details for the
   events they run, including a parent's details on a child's profile.
   Squadmates see your name, photo, position and country. Your player card is
-  private unless you make it public. Your private ID Tag is encrypted and shown
+  private unless you make it public, and then anyone with the link can see it.
+  Your private ID Tag is encrypted and shown
   only to an admin or your squad's captain, when it's needed for a roster.
 - **Cookies:** one keeps you signed in. If you allow performance monitoring
   when the portal asks, it sets one more. You can turn monitoring off at any
@@ -94,7 +95,7 @@ with:
 - **Cloudflare:** hosting, data storage and email
 - **Google:** analytics and form responses, and sign-in if you choose it
 - **Datadog:** performance and error monitoring, if you allow it
-- **Facebook and Discord:** sign-in, if you choose them
+- **Apple and Discord:** sign-in, if you choose them
 - **Apple, Google and Mozilla:** push notifications, if you turn them on
 
 ## Deleting your data
@@ -111,10 +112,6 @@ have a spot in an upcoming event, withdraw from it first.
 
 **Can't log in?** Email [info@theleftoverspb.com](mailto:info@theleftoverspb.com)
 from the address on your account, and we'll delete it within 30 days.
-
-**Signed in with Facebook?** Deleting your account removes everything we
-received from Facebook. To stop Facebook sharing anything new with us, remove
-The Leftovers under **Apps and websites** in your Facebook settings.
 
 **Join requests and pre-orders** are deleted on request: email
 [info@theleftoverspb.com](mailto:info@theleftoverspb.com).
